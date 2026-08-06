@@ -58,51 +58,56 @@
             padding: 6px 0 10px;
         }
 
-        .card {
+        /* کارت اصلی فصل */
+        .chapter {
             background: rgba(20, 30, 50, 0.40);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(56, 189, 248, 0.12);
             border-radius: 20px;
-            padding: 18px 22px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 18px 18px 14px;
             position: relative;
             overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .card::before {
+        .chapter::before {
             content: '';
             position: absolute;
             inset: 0;
             background: radial-gradient(circle at 0% 30%, rgba(34,211,238,0.06), transparent 70%);
             opacity: 0;
             transition: opacity 0.4s;
+            pointer-events: none;
         }
 
-        .card.active {
+        .chapter.active {
             border-color: rgba(52, 211, 153, 0.5);
             box-shadow: 0 8px 30px rgba(52, 211, 153, 0.10), 0 0 0 1px rgba(52, 211, 153, 0.15);
         }
-        .card.active::before { opacity: 1; }
-        .card.active:hover {
-            transform: translateY(-3px) scale(1.01);
-            border-color: #34D399;
-            box-shadow: 0 16px 40px rgba(52, 211, 153, 0.18);
-        }
+        .chapter.active::before { opacity: 1; }
 
-        .card.locked {
+        .chapter.locked {
             opacity: 0.6;
             pointer-events: none;
             filter: grayscale(0.3);
         }
 
-        .card-top {
+        /* هدر قابل کلیک */
+        .chapter-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .chapter-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .num {
@@ -114,8 +119,9 @@
             color: #94A3B8;
             border: 1px solid rgba(255,255,255,0.08);
             transition: 0.3s;
+            flex-shrink: 0;
         }
-        .card.active .num {
+        .chapter.active .num {
             background: #34D399;
             color: #064E3B;
             border-color: transparent;
@@ -126,9 +132,12 @@
             font-size: 1.1rem;
             font-weight: 800;
             letter-spacing: -0.3px;
+        }
+
+        .header-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .badge {
@@ -151,12 +160,167 @@
             color: #64748B;
         }
 
+        /* فلش کشویی */
+        .chevron {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #67E8F9;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        .chevron svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        .chapter.open .chevron {
+            transform: rotate(180deg);
+        }
+
         .desc {
             font-size: 0.82rem;
             color: #94A3B8;
             line-height: 1.6;
-            margin-top: 6px;
-            padding-right: 4px;
+            margin-top: 4px;
+            padding-right: 42px;
+            margin-bottom: 0;
+            transition: margin 0.3s;
+        }
+
+        /* زیر‌بخش‌ها - کشویی */
+        .sub-list {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0;
+            padding-top: 0;
+            border-top: 1px solid transparent;
+        }
+
+        .chapter.open .sub-list {
+            grid-template-rows: 1fr;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top-color: rgba(56, 189, 248, 0.10);
+        }
+
+        .sub-list-inner {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(56, 189, 248, 0.08);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        .chapter.open .sub-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* تأخیر انیمیشن برای هر آیتم */
+        .chapter.open .sub-item:nth-child(1) { transition-delay: 0.05s; }
+        .chapter.open .sub-item:nth-child(2) { transition-delay: 0.10s; }
+        .chapter.open .sub-item:nth-child(3) { transition-delay: 0.15s; }
+        .chapter.open .sub-item:nth-child(4) { transition-delay: 0.20s; }
+
+        .sub-item:hover {
+            background: rgba(34, 211, 238, 0.08);
+            border-color: rgba(34, 211, 238, 0.25);
+            transform: translateX(-3px);
+        }
+
+        .sub-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            background: rgba(34, 211, 238, 0.10);
+            color: #67E8F9;
+        }
+
+        .sub-item.primary .sub-icon {
+            background: rgba(52, 211, 153, 0.15);
+            color: #34D399;
+        }
+
+        .sub-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sub-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #E2E8F0;
+            margin-bottom: 1px;
+        }
+
+        .sub-desc {
+            font-size: 0.72rem;
+            color: #64748B;
+            line-height: 1.4;
+        }
+
+        .sub-arrow {
+            color: #475569;
+            font-size: 0.85rem;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .sub-item:hover .sub-arrow {
+            color: #67E8F9;
+            transform: translateX(-2px);
+        }
+
+        /* کارت‌های قفل‌شده (ساده) */
+        .card {
+            background: rgba(20, 30, 50, 0.40);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.12);
+            border-radius: 20px;
+            padding: 18px 22px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card.locked {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
         }
 
         .footer {
@@ -203,9 +367,11 @@
         }
 
         @media (max-width: 400px) {
-            .card { padding: 14px 16px; }
+            .chapter { padding: 14px 14px 12px; }
             .title { font-size: 0.98rem; }
-            .desc { font-size: 0.75rem; }
+            .desc { font-size: 0.75rem; padding-right: 38px; }
+            .sub-item { padding: 10px 12px; }
+            .sub-title { font-size: 0.82rem; }
         }
     </style>
 </head>
@@ -216,17 +382,69 @@
 
     <div class="roadmap glass" style="padding: 18px 12px 12px; border-radius: 32px;">
         
-        <!-- 1 – Network+ (فعال) -->
-        <a href="network-plus.html" class="card active">
-            <div class="card-top">
-                <div style="display:flex;align-items:center;gap:12px">
+        <!-- 1 – Network+ (کشویی) -->
+        <div class="chapter active" id="network-plus">
+            <div class="chapter-header" onclick="toggleChapter('network-plus')">
+                <div class="chapter-left">
                     <div class="num">۱</div>
                     <span class="title">Network+</span>
                 </div>
-                <span class="badge badge-on">در دسترس</span>
+                <div class="header-right">
+                    <span class="badge badge-on">در دسترس</span>
+                    <div class="chevron">
+                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                    </div>
+                </div>
             </div>
             <div class="desc">دوره شبکه‌های کامپیوتری شامل ۲۲ فصل جامع</div>
-        </a>
+
+            <div class="sub-list">
+                <div class="sub-list-inner">
+                    <!-- درسنامه (اصلی) -->
+                    <a href="network-plus.html" class="sub-item primary">
+                        <div class="sub-icon">📖</div>
+                        <div class="sub-content">
+                            <div class="sub-title">درسنامه</div>
+                            <div class="sub-desc">۲۲ فصل کامل و جامع Network+</div>
+                        </div>
+                        <div class="sub-arrow">←</div>
+                    </a>
+
+                    <!-- تمرین‌ها -->
+                    <a href="network-plus-exercises.html" class="sub-item">
+                        <div class="sub-icon">✏️</div>
+                        <div class="sub-content">
+                            <div class="sub-title">تمرین‌ها</div>
+                            <div class="sub-desc">سوالات و تمرین‌های عملی هر فصل</div>
+                        </div>
+                        <div class="sub-arrow">←</div>
+                    </a>
+
+<!--  
+                   
+                    <a href="network-plus-scenarios.html" class="sub-item">
+                        <div class="sub-icon">🎯</div>
+                        <div class="sub-content">
+                            <div class="sub-title">سناریوها</div>
+                            <div class="sub-desc">سناریوهای واقعی و کاربردی شبکه</div>
+                        </div>
+                        <div class="sub-arrow">←</div>
+                    </a>
+
+            
+                    <a href="network-plus-protocols.html" class="sub-item">
+                        <div class="sub-icon">🔗</div>
+                        <div class="sub-content">
+                            <div class="sub-title">پروتکل‌ها</div>
+                            <div class="sub-desc">مرجع کامل پروتکل‌های شبکه</div>
+                        </div>
+                        <div class="sub-arrow">←</div>
+                    </a> 
+                    -->
+                    
+                </div>
+            </div>
+        </div>
 
         <!-- 2 – LPIC-1 -->
         <a href="lpic-1.html" class="card locked">
@@ -298,5 +516,15 @@
         <div class="sub-footer">تمامی حقوق برای navidyar.ir محفوظ است.</div>
     </div>
 </div>
+
+<script>
+    function toggleChapter(id) {
+        const chapter = document.getElementById(id);
+        chapter.classList.toggle('open');
+    }
+
+    // اختیاری: اگر بخوای موقع لود صفحه باز باشه، این خط رو فعال کن:
+    // document.getElementById('network-plus').classList.add('open');
+</script>
 </body>
 </html>

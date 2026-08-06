@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebBook · تمرین‌های شبکه</title>
+
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-soft: rgba(99, 102, 241, 0.12);
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            --accent: #22d3ee;
+
+            --bg-body: #f0f4f8;
+            --bg-card: rgba(255, 255, 255, 0.75);
+            --bg-navbar: rgba(255, 255, 255, 0.7);
+            --text-main: #1e293b;
+            --text-heading: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(148, 163, 184, 0.25);
+            --shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            --radius: 16px;
+
+            --note-bg: rgba(34, 197, 94, 0.1);
+            --note-border: #22c55e;
+            --important-bg: rgba(59, 130, 246, 0.1);
+            --important-border: #3b82f6;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --warning-border: #f59e0b;
+
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --terminal-green: #34d399;
+        }
+
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-hover: #a5b4fc;
+            --primary-soft: rgba(129, 140, 248, 0.15);
+            --primary-glow: rgba(129, 140, 248, 0.3);
+            --accent: #22d3ee;
+
+            --bg-body: #0b1120;
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-navbar: rgba(15, 23, 42, 0.8);
+            --text-main: #e2e8f0;
+            --text-heading: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+            --note-bg: rgba(34, 197, 94, 0.12);
+            --note-border: #4ade80;
+            --important-bg: rgba(59, 130, 246, 0.12);
+            --important-border: #60a5fa;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --warning-border: #fbbf24;
+
+            --code-bg: #020617;
+            --code-text: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.85;
+            font-size: 16.5px;
+            padding-bottom: 72px;
+            transition: background 0.35s, color 0.35s;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(34, 211, 238, 0.06) 0px, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 68px;
+            background: var(--bg-navbar);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .home-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .home-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .nav-links {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 6px 0;
+        }
+        .nav-links::-webkit-scrollbar { display: none; }
+
+        .nav-links a {
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: 0.25s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .nav-links a:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-color: var(--border);
+        }
+        .nav-links a.active {
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: #fff;
+            box-shadow: 0 4px 16px var(--primary-glow);
+            border-color: transparent;
+        }
+
+        .theme-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+        }
+        .theme-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .progress-track {
+            position: fixed;
+            bottom: 68px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            z-index: 999;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.15s;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .main {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 36px 22px 70px;
+        }
+
+        .chapter {
+            display: none;
+            animation: fadeUp 0.45s ease;
+        }
+        .chapter.active { display: block; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chapter-header {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 60%;
+            height: 200%;
+            background: linear-gradient(135deg, var(--primary-soft), transparent);
+            pointer-events: none;
+        }
+        .chapter-badge {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px var(--primary-glow);
+            position: relative;
+            z-index: 1;
+        }
+        .chapter-header h1 {
+            font-size: 1.55rem;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        .chapter-header span {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        .ex-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .ex-progress span {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .ex-progress span.correct {
+            background: var(--note-border);
+            color: #fff;
+            border-color: var(--note-border);
+        }
+        .ex-progress span.wrong {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        .ex-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 26px 28px;
+            margin: 26px 0;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+        .ex-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 6px; height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+        }
+        .ex-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 30px;
+            padding: 0 8px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 10px;
+        }
+        .ex-question {
+            font-weight: 700;
+            font-size: 1.03rem;
+            color: var(--text-heading);
+            margin-bottom: 18px;
+            line-height: 1.9;
+        }
+        .ex-options {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 18px;
+        }
+        .ex-options li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            background: rgba(255,255,255,0.35);
+            font-size: 0.94rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        [data-theme="dark"] .ex-options li {
+            background: rgba(15, 23, 42, 0.35);
+        }
+        .ex-options li .opt-letter {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ex-options li.selected-option {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .ex-options li.correct-option {
+            border-color: var(--note-border);
+            background: var(--note-bg);
+            font-weight: 600;
+        }
+        .ex-options li.correct-option .opt-letter {
+            background: var(--note-border);
+            color: #fff;
+        }
+        .ex-options li.wrong-option {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+        }
+        .ex-options li.wrong-option .opt-letter {
+            background: #ef4444;
+            color: #fff;
+        }
+        .ex-options li.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        .ex-options li .opt-check {
+            margin-right: auto;
+            font-size: 1.05rem;
+        }
+        .ex-options li.correct-option .opt-check {
+            color: var(--note-border);
+        }
+        .ex-options li.wrong-option .opt-check {
+            color: #ef4444;
+        }
+
+        .ex-answer {
+            display: none;
+            gap: 14px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            background: var(--important-bg);
+            border-right: 4px solid var(--important-border);
+            margin-top: 16px;
+        }
+        .ex-answer.show {
+            display: flex;
+        }
+        .ex-answer i {
+            font-size: 1.2rem;
+            color: var(--important-border);
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .ex-answer strong {
+            display: block;
+            color: var(--text-heading);
+            margin-bottom: 5px;
+            font-size: 0.98rem;
+        }
+        .ex-answer p {
+            margin: 0 0 6px 0;
+            font-size: 0.92rem;
+            color: var(--text-main);
+            text-align: right;
+        }
+        .ex-answer p:last-child { margin-bottom: 0; }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 52px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+            gap: 14px;
+        }
+        .nav-btn {
+            padding: 12px 26px;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.25s;
+            box-shadow: 0 6px 18px var(--primary-glow);
+            font-weight: 500;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+        .nav-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        @media (max-width: 640px) {
+            body { padding-bottom: 64px; }
+            .navbar { height: 60px; padding: 0 14px; }
+            .brand span { display: none; }
+            .nav-links a { padding: 7px 14px; font-size: 0.84rem; }
+            .progress-track { bottom: 60px; }
+            .main { padding: 26px 16px 55px; }
+            .chapter-header { padding: 20px; gap: 16px; }
+            .chapter-badge { width: 52px; height: 52px; font-size: 1.3rem; border-radius: 14px; }
+            .chapter-header h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <span>WebBook</span>
+        </div>
+        <div class="nav-links" id="navLinks"></div>
+        <a class="home-btn" href="index.html" title="بازگشت به خانه">
+            <i class="fas fa-house"></i>
+        </a>
+        <button class="theme-btn" onclick="toggleTheme()" title="تغییر تم">
+            <i class="fas fa-moon theme-icon"></i>
+        </button>
+    </nav>
+
+    <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <main class="main">
+
+        <!-- ==================== تمرین ۱ (۵۰ سوال مفهومی) ==================== -->
+<!-- ==================== تمرین ۱ (۵۰ سوال مفهومی) ==================== -->
+<div id="chap2" class="chapter active">
+    <div class="chapter-header">
+        <div class="chapter-badge"><i class="fas fa-pen-to-square"></i></div>
+        <div>
+            <h1>تمرین یک</h1>
+            <span>۵۰ سوال مفاهیم پایه شبکه</span>
+        </div>
+    </div>
+
+    <div class="ex-progress" id="progressChap2">
+        <span data-q="2-1">۱</span><span data-q="2-2">۲</span><span data-q="2-3">۳</span>
+        <span data-q="2-4">۴</span><span data-q="2-5">۵</span><span data-q="2-6">۶</span>
+        <span data-q="2-7">۷</span><span data-q="2-8">۸</span><span data-q="2-9">۹</span>
+        <span data-q="2-10">۱۰</span>
+        <span data-q="2-11">۱۱</span><span data-q="2-12">۱۲</span><span data-q="2-13">۱۳</span>
+        <span data-q="2-14">۱۴</span><span data-q="2-15">۱۵</span><span data-q="2-16">۱۶</span>
+        <span data-q="2-17">۱۷</span><span data-q="2-18">۱۸</span><span data-q="2-19">۱۹</span>
+        <span data-q="2-20">۲۰</span>
+        <span data-q="2-21">۲۱</span><span data-q="2-22">۲۲</span><span data-q="2-23">۲۳</span>
+        <span data-q="2-24">۲۴</span><span data-q="2-25">۲۵</span><span data-q="2-26">۲۶</span>
+        <span data-q="2-27">۲۷</span><span data-q="2-28">۲۸</span><span data-q="2-29">۲۹</span>
+        <span data-q="2-30">۳۰</span>
+        <span data-q="2-31">۳۱</span><span data-q="2-32">۳۲</span><span data-q="2-33">۳۳</span>
+        <span data-q="2-34">۳۴</span><span data-q="2-35">۳۵</span><span data-q="2-36">۳۶</span>
+        <span data-q="2-37">۳۷</span><span data-q="2-38">۳۸</span><span data-q="2-39">۳۹</span>
+        <span data-q="2-40">۴۰</span>
+        <span data-q="2-41">۴۱</span><span data-q="2-42">۴۲</span><span data-q="2-43">۴۳</span>
+        <span data-q="2-44">۴۴</span><span data-q="2-45">۴۵</span><span data-q="2-46">۴۶</span>
+        <span data-q="2-47">۴۷</span><span data-q="2-48">۴۸</span><span data-q="2-49">۴۹</span>
+        <span data-q="2-50">۵۰</span>
+    </div>
+
+    <!-- سوال ۱ -->
+    <div class="ex-card" data-q="2-1">
+        <p class="ex-question"><span class="ex-num">۱</span>کدام پروتکل برای ترجمه نام‌های دامنه به آدرس‌های IP استفاده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SNMP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SMB</li>
+            <li data-opt="2"><span class="opt-letter">C</span> DHCP</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> DNS</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) DNS</strong>
+                <p>سیستم نام‌گذاری دامنه (DNS) وظیفه دارد نام‌های قابل‌فهم برای انسان (مانند google.com) را به آدرس‌های عددی IP (مانند 142.250.185.46) ترجمه کند تا مرورگرها و سایر برنامه‌ها بتوانند منابع را بیابند. این سرویس از طریق پورت ۵۳ (UDP/TCP) در دسترس است.</p>
+                <p>گزینه‌های دیگر: SNMP (پورت ۱۶۱) برای مدیریت و مانیتورینگ دستگاه‌های شبکه، SMB (پورت ۴۴۵) برای اشتراک‌گذاری فایل و پرینتر در ویندوز، و DHCP (پورت‌های ۶۷/۶۸) برای تخصیص خودکار آدرس IP به کار می‌روند. هیچ‌کدام وظیفه ترجمه نام به IP را ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲ -->
+    <div class="ex-card" data-q="2-2">
+        <p class="ex-question"><span class="ex-num">۲</span>کدام پروتکل از دریافت ایمیل با همگام‌سازی پوشه‌ها، چندین دستگاه و ذخیره‌سازی سمت سرور پشتیبانی می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SMTP</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> IMAP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> POP3</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SMB</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) IMAP</strong>
+                <p>پروتکل IMAP (پورت ۱۴۳) ایمیل‌ها را روی سرور نگه می‌دارد و امکان هم‌گام‌سازی پوشه‌ها، وضعیت خوانده‌نخوانده و پرچم‌ها را بین چندین دستگاه فراهم می‌کند. کاربر می‌تواند از هر دستگاهی به ایمیل‌های خود دسترسی داشته باشد و تغییرات در همه‌جا بازتاب داده شود.</p>
+                <p>SMTP (پورت ۲۵) فقط برای ارسال ایمیل استفاده می‌شود. POP3 (پورت ۱۱۰) ایمیل را روی دستگاه دانلود کرده و معمولاً از سرور حذف می‌کند، بنابراین همگام‌سازی چنددستگاهی ندارد. SMB مربوط به اشتراک فایل در ویندوز است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳ -->
+    <div class="ex-card" data-q="2-3">
+        <p class="ex-question"><span class="ex-num">۳</span>کدام‌یک وظیفه اصلی Application Layer (لایه ۷ OSI) است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Encrypt</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Provide network services directly to user applications</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ensure reliable bitstream transfer</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Route packets between networks</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B</strong>
+                <p>لایه کاربرد (Application) بالاترین لایه مدل OSI است و واسط بین کاربر و شبکه محسوب می‌شود. پروتکل‌هایی مانند HTTP، FTP، SMTP، DNS و SSH در این لایه قرار دارند و سرویس‌های مستقیمی به برنامه‌های کاربر ارائه می‌دهند.</p>
+                <p>رمزنگاری (A) مربوط به لایه Presentation، انتقال قابل‌اطمینان بیت‌ها (C) در لایه‌های Physical/Data Link/Transport انجام می‌شود و مسیریابی (D) وظیفه لایه Network است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴ -->
+    <div class="ex-card" data-q="2-4">
+        <p class="ex-question"><span class="ex-num">۴</span>کدام پروتکل می‌تواند Diskless Workstations را با ارسال فایل بدون احراز هویت بوت کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> TFTP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SCP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> IMAP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> DHCP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) TFTP</strong>
+                <p>TFTP (پورت ۶۹) یک پروتکل انتقال فایل ساده و سبک است که از UDP استفاده می‌کند و هیچ احراز هویتی ندارد. به همین دلیل معمولاً در فرآیند بوت شبکه (PXE) برای دانلود فایل‌های بوت توسط کامپیوترهای بدون دیسک به کار می‌رود.</p>
+                <p>SCP مبتنی بر SSH است و احراز هویت قوی دارد. IMAP برای ایمیل است و DHCP فقط آدرس IP اختصاص می‌دهد، نه فایل بوت.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۵ -->
+    <div class="ex-card" data-q="2-5">
+        <p class="ex-question"><span class="ex-num">۵</span>یک مدیر ویندوز پوشه‌هایی را در LAN به اشتراک می‌گذارد. کدام پروتکل این دسترسی را مدیریت می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> SMB</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SNMP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> DHCP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SCP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) SMB</strong>
+                <p>پروتکل SMB (Server Message Block) که روی پورت ۴۴۵ کار می‌کند، پروتکل استاندارد اشتراک فایل، پرینتر و سایر منابع در شبکه‌های ویندوزی است. همچنین توسط لینوکس/یونیکس از طریق سرویس Samba پشتیبانی می‌شود.</p>
+                <p>SNMP برای مدیریت شبکه، DHCP برای تخصیص IP و SCP برای انتقال امن فایل در محیط‌های لینوکسی استفاده می‌شود و ارتباطی با اشتراک‌گذاری ویندوزی ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۶ -->
+    <div class="ex-card" data-q="2-6">
+        <p class="ex-question"><span class="ex-num">۶</span>فایروالی که بر اساس IP Address فیلتر می‌کند، عمدتاً در کدام لایه کار می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Presentation</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Network</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Physical</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Data Link</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) Network</strong>
+                <p>آدرس‌های IP در هدر بسته‌های لایه سوم (Network) قرار دارند. فایروال‌های مبتنی بر IP با بررسی این بخش از بسته تصمیم به قبول یا رد ترافیک می‌گیرند. این نوع فیلترینگ در لایه Network انجام می‌شود.</p>
+                <p>لایه Presentation به فرمت داده، لایه Physical به سیگنال‌های فیزیکی و لایه Data Link به آدرس‌های MAC می‌پردازد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۷ -->
+    <div class="ex-card" data-q="2-7">
+        <p class="ex-question"><span class="ex-num">۷</span>کاربر نمی‌تواند به یک Web Application دسترسی پیدا کند. کدام‌یک مسئولیت لایه ۷ است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Negotiate data formatting and initiate user interface communication</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Establish the TCP handshake</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ensure packets are routed correctly</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Translate IP addresses to MAC addresses</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A</strong>
+                <p>لایه Application (لایه ۷) وظیفه مذاکره درباره قالب داده و آغاز ارتباط با رابط کاربری را بر عهده دارد. این لایه با پروتکل‌هایی مانند HTTP به برنامه‌های کاربر (مرورگر) امکان تبادل اطلاعات می‌دهد.</p>
+                <p>برقراری TCP handshake توسط لایه Transport، مسیریابی بسته‌ها توسط لایه Network و ترجمه IP به MAC توسط پروتکل ARP در لایه Data Link انجام می‌شود.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۸ -->
+    <div class="ex-card" data-q="2-8">
+        <p class="ex-question"><span class="ex-num">۸</span>سرور DNS نام را ترجمه می‌کند اما کلاینت‌ها نمی‌توانند صفحات وب دریافت کنند. کدام پروتکل احتمالاً اشتباه پیکربندی شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SNMP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SMTP</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> HTTP (port-related issue)</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SSH</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) HTTP</strong>
+                <p>اگر DNS به درستی کار می‌کند (نام به IP ترجمه می‌شود) اما صفحات وب باز نمی‌شود، معمولاً مشکل از پروتکل HTTP یا دسترسی به پورت‌های ۸۰ و ۴۴۳ است. ممکن است فایروال، پروکسی یا تنظیمات سرور وب مشکل داشته باشد.</p>
+                <p>SNMP برای مدیریت شبکه، SMTP برای ارسال ایمیل و SSH برای دسترسی امن خط فرمان هستند و ربطی به دریافت صفحات وب ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۹ -->
+    <div class="ex-card" data-q="2-9">
+        <p class="ex-question"><span class="ex-num">۹</span>کدام دستگاه در شبکه به‌عنوان Host در نظر گرفته می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Network cable</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Computer sending or receiving data</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Signal amplifier</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Router performing switching</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B</strong>
+                <p>در اصطلاح شبکه، Host به هر دستگاه انتهایی گفته می‌شود که داده تولید یا دریافت می‌کند؛ مانند کامپیوتر، لپ‌تاپ، سرور، تلفن همراه و ... این دستگاه‌ها دارای آدرس IP هستند و در شبکه به‌عنوان منبع یا مقصد داده عمل می‌کنند.</p>
+                <p>کابل، تقویت‌کننده سیگنال و روتر (در نقش سوئیچ) دستگاه‌های واسط هستند و Host محسوب نمی‌شوند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۰ -->
+    <div class="ex-card" data-q="2-10">
+        <p class="ex-question"><span class="ex-num">۱۰</span>دانشگاهی چند ساختمان را در سراسر Campus با فیبر پرسرعت متصل می‌کند. این چه نوع شبکه‌ای است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> CAN</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SAN</li>
+            <li data-opt="2"><span class="opt-letter">C</span> WAN</li>
+            <li data-opt="3"><span class="opt-letter">D</span> PAN</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) CAN</strong>
+                <p>شبکه محوطه دانشگاهی (Campus Area Network) برای اتصال چندین ساختمان در یک محدوده جغرافیایی مشخص مانند دانشگاه، شرکت بزرگ یا مجتمع صنعتی طراحی شده است. این شبکه معمولاً از فیبر نوری یا لینک‌های پرسرعت استفاده می‌کند.</p>
+                <p>SAN برای ذخیره‌سازی، WAN برای اتصال شهرها/کشورها، و PAN برای بُرد شخصی (چند متر) هستند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۱ -->
+    <div class="ex-card" data-q="2-11">
+        <p class="ex-question"><span class="ex-num">۱۱</span>از نظر رفتار در OSI، یک Proxy Server چه تفاوتی با یک Router دارد؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Both operate only at the Data Link layer</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> A proxy operates at the Application layer, while a router operates at the Network layer</li>
+            <li data-opt="2"><span class="opt-letter">C</span> A proxy operates at the Physical layer, while a router operates at the Session layer</li>
+            <li data-opt="3"><span class="opt-letter">D</span> A proxy and a router are the same thing</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B</strong>
+                <p>Proxy Server در لایه Application (لایه ۷) کار می‌کند و درخواست‌های کلاینت را دریافت، تحلیل و به‌نام کلاینت به سرور مقصد ارسال می‌کند. می‌تواند محتوا را ذخیره (Cache) کرده و فیلترهای محتوایی اعمال کند. Router اما در لایه Network (لایه ۳) عمل کرده و بسته‌ها را بر اساس آدرس IP بین شبکه‌های مختلف مسیریابی می‌کند.</p>
+                <p>گزینه‌های A و C کاملاً اشتباه هستند و D نیز نادرست است زیرا این دو دستگاه عملکرد و لایه متفاوتی دارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۲ -->
+    <div class="ex-card" data-q="2-12">
+        <p class="ex-question"><span class="ex-num">۱۲</span>چرا حالت Wireless از نوع Infrastructure در محیط تجاری ترجیح داده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> It supports unlimited users</li>
+            <li data-opt="1"><span class="opt-letter">B</span> It is cheaper to deploy</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> It provides centralized management and better security integration</li>
+            <li data-opt="3"><span class="opt-letter">D</span> It does not require radio frequency</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C</strong>
+                <p>در حالت Infrastructure، یک نقطه دسترسی مرکزی (Access Point) وجود دارد که تمام ارتباطات بی‌سیم از طریق آن انجام می‌شود. این امکان مدیریت متمرکز، احراز هویت یکپارچه (مثلاً با RADIUS)، سیاست‌های امنیتی قوی و نظارت بر ترافیک را فراهم می‌کند که برای سازمان‌ها حیاتی است.</p>
+                <p>گزینه A (کاربران نامحدود) اشتباه است، B (ارزان‌تر) معمولاً هزینه بیشتری دارد، D نیز غلط است چون بی‌سیم همواره از امواج رادیویی استفاده می‌کند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۳ -->
+    <div class="ex-card" data-q="2-13">
+        <p class="ex-question"><span class="ex-num">۱۳</span>کدام‌یک ویژگی شبکه Client-Server در مقایسه با Workgroup است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Peer-to-peer only</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Decentralized management</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Centralized security and management</li>
+            <li data-opt="3"><span class="opt-letter">D</span> No servers allowed</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C</strong>
+                <p>در مدل Client-Server، یک یا چند سرور مرکزی وظیفه احراز هویت، مدیریت کاربران، تخصیص منابع و اعمال سیاست‌های امنیتی را بر عهده دارند. این رویکرد برای سازمان‌های بزرگ با تعداد زیادی کاربر بسیار کارآمد و امن است. در مقابل، Workgroup مبتنی بر همتا‌به‌همتا است و مدیریت غیرمتمرکز دارد.</p>
+                <p>گزینه‌های A و B ویژگی‌های Workgroup هستند و D برعکس Client-Server است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۴ -->
+    <div class="ex-card" data-q="2-14">
+        <p class="ex-question"><span class="ex-num">۱۴</span>سازمانی دفاتر در کشورهای مختلف را با اینترنت و لینک خصوصی متصل می‌کند. این چه شبکه‌ای است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> WAN</li>
+            <li data-opt="1"><span class="opt-letter">B</span> PAN</li>
+            <li data-opt="2"><span class="opt-letter">C</span> LAN</li>
+            <li data-opt="3"><span class="opt-letter">D</span> CAN</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) WAN</strong>
+                <p>شبکه گسترده (WAN) برای اتصال مکان‌های جغرافیایی بسیار دور از هم مانند دفاتر در شهرها یا کشورهای مختلف طراحی شده است. معمولاً از لینک‌های اجاره‌ای، MPLS، VPN یا اینترنت برای ایجاد ارتباط استفاده می‌شود.</p>
+                <p>PAN برای بُرد چند متر، LAN محدود به یک ساختمان و CAN محدود به یک محوطه دانشگاهی یا شرکت است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۵ -->
+    <div class="ex-card" data-q="2-15">
+        <p class="ex-question"><span class="ex-num">۱۵</span>ریسک مدیریتی اصلی مدلی که ۵۰۰ Workstation را با یک سرور مرکزی احراز هویت می‌کند چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> High overhead on individual workstations</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Decentralized security management</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Inability to support diverse operating systems</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Single point of failure for authentication</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D</strong>
+                <p>وقتی یک سرور واحد مسئول احراز هویت همه کاربران است، اگر آن سرور دچار مشکل شود (قطع برق، خرابی سخت‌افزاری، حمله سایبری)، کل فرآیند احراز هویت از کار می‌افتد و همه کاربران قادر به ورود نخواهند بود. این پدیده به عنوان نقطه شکست واحد (SPOF) شناخته می‌شود و باید با راه‌کارهای افزونگی (مانند سرورهای پشتیبان) برطرف شود.</p>
+                <p>گزینه A (بار روی کارستیشن‌ها) برعکس است، B مربوط به Workgroup است و C نیز صحیح نیست، زیرا Client-Server از سیستم‌عامل‌های مختلف پشتیبانی می‌کند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۶ -->
+    <div class="ex-card" data-q="2-16">
+        <p class="ex-question"><span class="ex-num">۱۶</span>اگر احراز هویت کاربر در یک Application امن ناموفق باشد، تراکنش در چه سطحی متوقف شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> WAN level</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Physical level</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ad hoc discovery level</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Application layer service level</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D</strong>
+                <p>احراز هویت و مدیریت نشست (Session) بخشی از خدمات لایه Application (لایه ۷) محسوب می‌شود. اگر کاربر نتواند احراز هویت کند، درخواست او در همان لایه Application متوقف می‌شود و به لایه‌های پایین‌تر نمی‌رسد.</p>
+                <p>WAN، Physical و Ad hoc Discovery ربطی به فرآیند احراز هویت در اپلیکیشن ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۷ -->
+    <div class="ex-card" data-q="2-17">
+        <p class="ex-question"><span class="ex-num">۱۷</span>در Application Layer، کاربر برای مرور یک وب‌پیج در درجه اول با کدام پروتکل تعامل دارد؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> IP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> TCP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ethernet</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> HTTP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) HTTP</strong>
+                <p>پروتکل انتقال ابرمتن (HTTP) که روی پورت ۸۰ یا ۴۴۳ (HTTPS) کار می‌کند، اصلی‌ترین پروتکل لایه Application برای مرور وب است. مرورگر با استفاده از HTTP درخواست صفحات را ارسال و پاسخ سرور را دریافت می‌کند.</p>
+                <p>IP لایه Network، TCP لایه Transport و Ethernet لایه Data Link/Physical هستند و کاربر مستقیماً با آنها تعامل ندارد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۸ -->
+    <div class="ex-card" data-q="2-18">
+        <p class="ex-question"><span class="ex-num">۱۸</span>کدام پروتکل روی پورت‌های ۱۳۷-۱۳۹ یا ۴۴۵ برای سرویس‌های نام‌گذاری و Session استفاده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> DNS</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> NetBIOS</li>
+            <li data-opt="2"><span class="opt-letter">C</span> HTTP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> DHCP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) NetBIOS</strong>
+                <p>NetBIOS یک سرویس قدیمی در شبکه‌های ویندوزی است که سرویس‌های نام‌گذاری (Name Service)، Session و Datagram را فراهم می‌کند. این سرویس روی پورت‌های ۱۳۷ (UDP برای Name)، ۱۳۸ (UDP برای Datagram)، ۱۳۹ (TCP برای Session) و ۴۴۵ (TCP برای SMB که بر اساس NetBIOS کار می‌کند) اجرا می‌شود.</p>
+                <p>DNS پورت ۵۳، HTTP پورت ۸۰ و DHCP پورت‌های ۶۷/۶۸ دارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۱۹ -->
+    <div class="ex-card" data-q="2-19">
+        <p class="ex-question"><span class="ex-num">۱۹</span>کدام پروتکل اشتراک‌گذاری فایل بین سیستم‌های ویندوز را فراهم می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> DNS</li>
+            <li data-opt="1"><span class="opt-letter">B</span> FTP</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> SMB</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SNMP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) SMB</strong>
+                <p>SMB (Server Message Block) پروتکل اصلی اشتراک‌گذاری فایل و چاپگر در سیستم‌عامل‌های ویندوز است. همچنین از طریق سامبا در لینوکس و macOS نیز قابل پیاده‌سازی است.</p>
+                <p>DNS برای ترجمه نام، FTP برای انتقال فایل (نه اشتراک‌گذاری دایرکتوری‌ها به‌صورت پیوسته) و SNMP برای مدیریت شبکه استفاده می‌شوند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۰ -->
+    <div class="ex-card" data-q="2-20">
+        <p class="ex-question"><span class="ex-num">۲۰</span>شماره‌های Sequence در TCP چگونه به ارتباط کمک می‌کنند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> They assign MAC addresses</li>
+            <li data-opt="1"><span class="opt-letter">B</span> They convert bits into signals</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> They ensure ordered delivery and reliable reassembly</li>
+            <li data-opt="3"><span class="opt-letter">D</span> They assign SSID</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C</strong>
+                <p>شماره ترتیب (Sequence Number) در TCP به گیرنده امکان می‌دهد بسته‌های دریافتی را به ترتیب صحیح بازسازی کند، حتی اگر بسته‌ها در شبکه نامرتب یا با تأخیر برسند. همچنین برای تشخیص بسته‌های تکراری و درخواست ارسال مجدد بسته‌های گم‌شده به کار می‌رود.</p>
+                <p>MAC address در لایه Data Link اختصاص داده می‌شود، تبدیل بیت به سیگنال کار Physical است، و SSID مربوط به شبکه‌های بی‌سیم است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۱ -->
+    <div class="ex-card" data-q="2-21">
+        <p class="ex-question"><span class="ex-num">۲۱</span>کدام پروتکل توسط مدیران سیستم برای مدیریت دستگاه‌ها با داده‌های MIB استفاده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SMB</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> SNMP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> SCP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> IMAP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) SNMP</strong>
+                <p>پروتکل مدیریت شبکه (SNMP) از پایگاه داده‌ای به نام MIB (Management Information Base) برای ذخیره و بازیابی اطلاعات مدیریتی دستگاه‌ها مانند وضعیت رابط‌ها، میزان استفاده از CPU، دمای دستگاه و ... استفاده می‌کند. مدیران شبکه با استفاده از SNMP می‌توانند دستگاه‌ها را مانیتور و پیکربندی کنند.</p>
+                <p>SMB برای اشتراک فایل، SCP برای انتقال امن فایل و IMAP برای دریافت ایمیل به کار می‌روند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۲ -->
+    <div class="ex-card" data-q="2-22">
+        <p class="ex-question"><span class="ex-num">۲۲</span>کدام پروتکل معمولاً برای ارسال ایمیل استفاده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> SMTP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> TFTP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> FTP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> IMAP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) SMTP</strong>
+                <p>پروتکل SMTP (Simple Mail Transfer Protocol) که روی پورت ۲۵ کار می‌کند، پروتکل استاندارد برای ارسال ایمیل از کلاینت به سرور یا بین سرورهای ایمیل است. ایمیل‌های خروجی توسط SMTP به سرور مقصد تحویل داده می‌شوند.</p>
+                <p>TFTP و FTP برای انتقال فایل هستند و IMAP برای دریافت (نه ارسال) ایمیل استفاده می‌شود.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۳ -->
+    <div class="ex-card" data-q="2-23">
+        <p class="ex-question"><span class="ex-num">۲۳</span>کدام پروتکل اجازه دسترسی از راه دور به خط فرمان (Command-line) را همراه با رمزنگاری فراهم می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SMTP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> FTP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> IMAP</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> SSH</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) SSH</strong>
+                <p>پروتکل SSH (Secure Shell) که روی پورت ۲۲ کار می‌کند، یک نسخه امن و رمزنگاری‌شده از Telnet است و به مدیران سیستم اجازه می‌دهد از راه دور به خط فرمان سرورها دسترسی داشته باشند. تمام ترافیک (از جمله نام کاربری و رمز عبور) رمزنگاری می‌شود.</p>
+                <p>SMTP، FTP و IMAP سرویس‌های ایمیل و فایل هستند و دسترسی خط فرمان ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۴ -->
+    <div class="ex-card" data-q="2-24">
+        <p class="ex-question"><span class="ex-num">۲۴</span>یک Packet به دلیل صفر شدن TTL دور انداخته می‌شود. این تصمیم توسط کدام لایه گرفته شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Transport</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Network</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Application</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Data Link</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) Network</strong>
+                <p>فیلد TTL (Time To Live) در هدر بسته IP قرار دارد و توسط لایه Network (لایه ۳) مدیریت می‌شود. هر روتری که بسته را عبور می‌دهد، یک واحد از TTL کم می‌کند و وقتی به صفر برسد، بسته دور انداخته می‌شود و پیام ICMP Time Exceeded به فرستنده ارسال می‌شود.</p>
+                <p>Transport به پورت‌ها، Application به سرویس‌های کاربر و Data Link به آدرس‌های MAC مربوط است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۵ -->
+    <div class="ex-card" data-q="2-25">
+        <p class="ex-question"><span class="ex-num">۲۵</span>هدف اصلی MSRPC در محیط شبکه چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Web browsing</li>
+            <li data-opt="1"><span class="opt-letter">B</span> IP assignment</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Remote procedure calls/execution</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Sharing large files</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C</strong>
+                <p>Microsoft Remote Procedure Call (MSRPC) یک پروتکل است که به برنامه‌ها اجازه می‌دهد تابع‌ها یا رویه‌هایی را روی یک سیستم دیگر در شبکه اجرا کنند. این قابلیت در بسیاری از سرویس‌های ویندوز مانند Active Directory، مدیریت از راه دور و ارتباطات بین سرویس‌ها استفاده می‌شود.</p>
+                <p>مرور وب با HTTP، تخصیص IP با DHCP و اشتراک فایل حجیم با SMB یا FTP انجام می‌شود.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۶ -->
+    <div class="ex-card" data-q="2-26">
+        <p class="ex-question"><span class="ex-num">۲۶</span>شرکتی توپولوژی Bus قدیمی را با Star (با سوییچ مدرن) جایگزین می‌کند. مهم‌ترین بهبود چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Increased geographic range</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Elimination of collisions by using switching instead of broadcasting</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Elimination of any need for IP configuration</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Reduced number of required cables</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B</strong>
+                <p>در توپولوژی Star با سوئیچ، هر دستگاه به یک پورت اختصاصی متصل است و سوئیچ ترافیک را فقط به مقصد ارسال می‌کند (برخلاف هاب که داده را به همه پورت‌ها Broadcast می‌کند). این کار برخورد (Collision) را به‌طور کامل از بین می‌برد و کارایی شبکه را به شدت افزایش می‌دهد.</p>
+                <p>گزینه A (برد جغرافیایی) ربطی به توپولوژی ندارد، C (حذف IP) و D (کاهش کابل) نیز نادرست هستند، زیرا Star معمولاً کابل بیشتری نیاز دارد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۷ -->
+    <div class="ex-card" data-q="2-27">
+        <p class="ex-question"><span class="ex-num">۲۷</span>کامپیوتری IP معتبر دارد اما نمی‌تواند در اینترنت مرور کند. مشکل احتمالی چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Keyboard driver</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Default gateway or Network layer configuration</li>
+            <li data-opt="2"><span class="opt-letter">C</span> DNS cable</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Monitor driver</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B</strong>
+                <p>داشتن یک IP معتبر کافی نیست؛ برای دسترسی به شبکه‌های خارجی، کامپیوتر باید آدرس پیش‌فرض دروازه (Default Gateway) را بداند تا بسته‌ها را به خارج از زیرشبکه ارسال کند. اگر Gateway اشتباه پیکربندی شده باشد، ترافیک اینترنتی نمی‌تواند خارج شود.</p>
+                <p>درایور کیبورد و مانیتور ربطی به شبکه ندارند و «DNS cable» نیز مفهومی ندارد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۸ -->
+    <div class="ex-card" data-q="2-28">
+        <p class="ex-question"><span class="ex-num">۲۸</span>شرکتی از شبکه اختصاصی برای اتصال Serverها به دستگاه‌های Storage استفاده می‌کند. این چه شبکه‌ای است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> MAN</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> SAN</li>
+            <li data-opt="2"><span class="opt-letter">C</span> PAN</li>
+            <li data-opt="3"><span class="opt-letter">D</span> LAN</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) SAN</strong>
+                <p>شبکه منطقه ذخیره‌سازی (Storage Area Network) یک شبکه پرسرعت و اختصاصی است که سرورها را به دستگاه‌های ذخیره‌سازی مانند آرایه‌های دیسک متصل می‌کند. این شبکه معمولاً از پروتکل‌هایی مانند Fibre Channel یا iSCSI استفاده می‌کند.</p>
+                <p>MAN برای شهر، PAN برای بُرد شخصی و LAN شبکه محلی عمومی هستند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۲۹ -->
+    <div class="ex-card" data-q="2-29">
+        <p class="ex-question"><span class="ex-num">۲۹</span>در توپولوژی Ring، دستگاه‌ها چگونه داده منتقل می‌کنند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Through a main backbone cable</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Through a central server</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> In a circular path from one device to the next</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Directly to all devices simultaneously</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C</strong>
+                <p>در توپولوژی حلقوی (Ring)، هر دستگاه به دو دستگاه همسایه خود متصل است و داده‌ها در یک مسیر دایره‌ای از یک دستگاه به دستگاه بعدی حرکت می‌کنند. هر دستگاه داده را دریافت کرده و اگر برای خودش نباشد، آن را به دستگاه بعدی ارسال می‌کند.</p>
+                <p>A مربوط به Bus، B مربوط به Star (با سرور مرکزی) و D شبیه Broadcast در Bus است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۰ -->
+    <div class="ex-card" data-q="2-30">
+        <p class="ex-question"><span class="ex-num">۳۰</span>کاربر ایمیل را دانلود می‌کند و ایمیل پس از دریافت از سرور پاک می‌شود. کدام پروتکل استفاده شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> IMAP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SMTP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> SMB</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> POP3</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) POP3</strong>
+                <p>پروتکل POP3 (پورت ۱۱۰) به‌صورت پیش‌فرض ایمیل‌ها را از سرور دانلود کرده و سپس آن‌ها را از سرور حذف می‌کند. بنابراین ایمیل‌ها فقط روی دستگاه کاربر باقی می‌مانند و همگام‌سازی بین چند دستگاه وجود ندارد.</p>
+                <p>IMAP برخلاف POP3 ایمیل‌ها را روی سرور نگه می‌دارد، SMTP برای ارسال و SMB برای اشتراک فایل است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۱ -->
+    <div class="ex-card" data-q="2-31">
+        <p class="ex-question"><span class="ex-num">۳۱</span>در شبکه Hybrid با VPN بین دفاتر و Data Center، داده Application در کدام لایه OSI Tunnel می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Layer 7</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Layer 1</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Layer 3</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Layer 2</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) Layer 3</strong>
+                <p>اکثر پیاده‌سازی‌های VPN امروزی (مانند IPsec، OpenVPN) در لایه Network (لایه ۳) کپسوله‌سازی (Tunneling) را انجام می‌دهند. در این روش، بسته‌های اصلی (شامل داده‌های لایه Application) درون بسته‌های IP جدید قرار می‌گیرند تا از طریق اینترنت منتقل شوند.</p>
+                <p>برخی VPNها مانند L2TP در لایه ۲ کار می‌کنند، اما گزینه C رایج‌ترین است. لایه ۷ جایی است که داده تولید می‌شود نه تونل، و لایه ۱ فقط سیگنال فیزیکی است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۲ -->
+    <div class="ex-card" data-q="2-32">
+        <p class="ex-question"><span class="ex-num">۳۲</span>سازمانی می‌خواهد Plaintext protocols را غیرفعال کند. کدام پروتکل باید جایگزین Telnet شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> FTP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> SCP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> POP3</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> SSH</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) SSH</strong>
+                <p>Telnet یک پروتکل قدیمی و ناامن است که تمام داده‌ها (از جمله رمز عبور) را به صورت متن ساده (Plaintext) ارسال می‌کند. SSH (پورت ۲۲) جایگزین امن آن است و تمام ترافیک را رمزنگاری می‌کند.</p>
+                <p>FTP (انتقال فایل) و POP3 (ایمیل) نیز ناامن هستند و با SSH جایگزین نمی‌شوند. SCP برای انتقال فایل است نه دسترسی خط فرمان.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۳ -->
+    <div class="ex-card" data-q="2-33">
+        <p class="ex-question"><span class="ex-num">۳۳</span>یک دستگاه Rogue در حال اختصاص IP است. کدام پروتکل Spoof شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SMB</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> DHCP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> DNS</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SMTP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) DHCP</strong>
+                <p>هنگامی که یک دستگاه غیرمجاز در شبکه شروع به پاسخ‌گویی به درخواست‌های DHCP و اختصاص آدرس IP می‌کند، به آن Rogue DHCP Server می‌گویند. این یک حمله امنیتی است که می‌تواند باعث اختلال در شبکه، هدایت ترافیک به مسیرهای اشتباه یا حملات Man-in-the-Middle شود.</p>
+                <p>SMB، DNS و SMTP وظیفه اختصاص IP را ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۴ -->
+    <div class="ex-card" data-q="2-34">
+        <p class="ex-question"><span class="ex-num">۳۴</span>کاربر می‌تواند IP یک سایت را Ping کند ولی در Browser باز نمی‌شود. مشکل مربوط به کدام لایه است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Physical</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Data Link</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Application</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Network</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) Application</strong>
+                <p>Ping از پروتکل ICMP استفاده می‌کند که در لایه Network کار می‌کند. اگر Ping موفق است، یعنی اتصال فیزیکی، Data Link و Network به درستی کار می‌کنند. بنابراین مشکل در لایه بالاتر یعنی Application (HTTP، DNS یا مرورگر) است.</p>
+                <p>اگر مشکل در لایه Physical یا Data Link بود، حتی Ping هم کار نمی‌کرد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۵ -->
+    <div class="ex-card" data-q="2-35">
+        <p class="ex-question"><span class="ex-num">۳۵</span>کدام توپولوژی دو یا چند توپولوژی مختلف را ترکیب می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Bus</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Hybrid</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ring</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Mesh</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) Hybrid</strong>
+                <p>توپولوژی ترکیبی (Hybrid) از ترکیب دو یا چند توپولوژی پایه مانند Star، Bus، Ring یا Mesh ساخته می‌شود. برای مثال، اتصال چندین سوئیچ Star از طریق یک کابل Backbone Bus، یک توپولوژی Hybrid محسوب می‌شود.</p>
+                <p>گزینه‌های A، C و D هرکدام یک توپولوژی پایه و مجزا هستند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۶ -->
+    <div class="ex-card" data-q="2-36">
+        <p class="ex-question"><span class="ex-num">۳۶</span>امنیت SSL/TLS برای ترافیک Web بیشترین ارتباط را با کدام لایه OSI دارد؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Network</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Physical</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Presentation</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Session</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) Presentation</strong>
+                <p>رمزنگاری و یکپارچگی داده که توسط SSL/TLS انجام می‌شود، در مدل OSI به لایه Presentation (لایه ۶) نسبت داده می‌شود. این لایه مسئول تبدیل، فشرده‌سازی و رمزنگاری داده‌ها است تا برای لایه Application قابل استفاده باشند.</p>
+                <p>لایه Network به آدرس‌دهی IP، لایه Physical به سیگنال و لایه Session به مدیریت نشست‌ها می‌پردازد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۷ -->
+    <div class="ex-card" data-q="2-37">
+        <p class="ex-question"><span class="ex-num">۳۷</span>در اپلیکیشن‌های Cloud مدرن، عملکردهای Presentation Layer مانند Encryption اغلب کجا مدیریت می‌شوند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Only on the physical cable</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Only in the router</li>
+            <li data-opt="2"><span class="opt-letter">C</span> In the switch CAM table</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> In application libraries or middleware</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D</strong>
+                <p>در معماری‌های مدرن، لایه Presentation دیگر به‌صورت سخت‌افزاری مجزا نیست. رمزنگاری، فشرده‌سازی و فرمت‌بندی داده اغلب توسط کتابخانه‌های نرم‌افزاری (مانند OpenSSL)، فریم‌ورک‌ها یا میان‌افزارها در خود برنامه (لایه Application) انجام می‌شود.</p>
+                <p>کابل، روتر و جدول CAM سوییچ هیچ‌کدام وظیفه رمزنگاری داده‌های کاربر را ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۸ -->
+    <div class="ex-card" data-q="2-38">
+        <p class="ex-question"><span class="ex-num">۳۸</span>کدام پروتکل فایل‌ها را بدون Authentication منتقل می‌کند و بسیار Lightweight است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SCP</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> TFTP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> FTP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> SFTP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) TFTP</strong>
+                <p>TFTP (Trivial FTP) یک پروتکل بسیار ساده است که روی UDP کار می‌کند، هیچ احراز هویتی ندارد و سربار کمی دارد. از آن برای انتقال فایل‌های کوچک مانند فایل‌های پیکربندی روترها یا بوت‌لودر در شبکه‌های محلی استفاده می‌شود.</p>
+                <p>SCP و SFTP مبتنی بر SSH هستند و احراز هویت قوی دارند. FTP نیز معمولاً نیاز به یوزرنیم و رمز دارد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۳۹ -->
+    <div class="ex-card" data-q="2-39">
+        <p class="ex-question"><span class="ex-num">۳۹</span>در شبکه Client-Server، کدام دستگاه فایل‌ها را ذخیره و دسترسی را مدیریت می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Server</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Switch</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Workstation</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Client</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) Server</strong>
+                <p>در معماری Client-Server، سرور نقش مرکزی را ایفا می‌کند و منابع (فایل‌ها، دیتابیس، پرینترها) را ذخیره و مدیریت می‌کند. کلاینت‌ها به سرور متصل می‌شوند و از سرویس‌های آن استفاده می‌کنند.</p>
+                <p>سوئیچ فقط ترافیک شبکه را هدایت می‌کند، workstation و client درخواست‌دهنده هستند نه ارائه‌دهنده سرویس.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۰ -->
+    <div class="ex-card" data-q="2-40">
+        <p class="ex-question"><span class="ex-num">۴۰</span>کدام ابزار ویندوز به‌شدت به MSRPC وابسته است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> DHCP</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Active Directory</li>
+            <li data-opt="2"><span class="opt-letter">C</span> HTTP</li>
+            <li data-opt="3"><span class="opt-letter">D</span> DNS</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) Active Directory</strong>
+                <p>Active Directory (AD) سرویس دایرکتوری مایکروسافت برای مدیریت کاربران، کامپیوترها و منابع شبکه است. بسیاری از عملیات‌های داخلی AD مانند Replication بین Domain Controllers و ارتباط با سرویس‌های دیگر از MSRPC استفاده می‌کنند.</p>
+                <p>DHCP، HTTP و DNS سرویس‌های مستقلی هستند که وابستگی شدیدی به MSRPC ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۱ -->
+    <div class="ex-card" data-q="2-41">
+        <p class="ex-question"><span class="ex-num">۴۱</span>شرکتی در دو شهر با ۵۰۰ کیلومتر فاصله دفتر دارد و نیاز به اشتراک داده دارد. کدام شبکه مناسب‌تر است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> CAN</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> WAN</li>
+            <li data-opt="2"><span class="opt-letter">C</span> LAN</li>
+            <li data-opt="3"><span class="opt-letter">D</span> MAN</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) WAN</strong>
+                <p>فاصله ۵۰۰ کیلومتر بسیار فراتر از محدوده LAN (چند صد متر)، CAN (چند ساختمان) و MAN (یک شهر) است. بنابراین برای اتصال دو شهر با چنین فاصله‌ای، شبکه گسترده (WAN) تنها گزینه مناسب است. معمولاً از لینک‌های اختصاصی، MPLS یا VPN از طریق اینترنت استفاده می‌شود.</p>
+                <p>گزینه‌های دیگر پوشش کافی ندارند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۲ -->
+    <div class="ex-card" data-q="2-42">
+        <p class="ex-question"><span class="ex-num">۴۲</span>کاربر فایل‌های Configuration را به‌صورت امن بر بستر SSH روی روتر کپی می‌کند. کدام پروتکل استفاده شده؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> SCP</li>
+            <li data-opt="1"><span class="opt-letter">B</span> FTP</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Telnet</li>
+            <li data-opt="3"><span class="opt-letter">D</span> NTP</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) SCP</strong>
+                <p>SCP (Secure Copy Protocol) یک پروتکل انتقال فایل امن است که از SSH برای رمزنگاری و احراز هویت استفاده می‌کند. به مدیران سیستم اجازه می‌دهد فایل‌ها را بین ماشین‌ها (مانند روتر) به‌صورت امن کپی کنند.</p>
+                <p>FTP و Telnet ناامن هستند و NTP پروتکل زمان‌سازی است و هیچ‌کدام برای انتقال فایل روی SSH نیستند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۳ -->
+    <div class="ex-card" data-q="2-43">
+        <p class="ex-question"><span class="ex-num">۴۳</span>شبکه خانگی از یک Wireless Router به‌عنوان Hub مرکزی استفاده می‌کند. این چه نوع Wireless Topology است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Point-to-Point</li>
+            <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Infrastructure</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Ad hoc</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Mesh</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: B) Infrastructure</strong>
+                <p>وقتی یک نقطه مرکزی (Access Point یا Wireless Router) وجود دارد که تمام دستگاه‌ها از طریق آن با یکدیگر و با شبکه‌های دیگر ارتباط برقرار می‌کنند، این حالت Infrastructure نامیده می‌شود. این رایج‌ترین روش در شبکه‌های خانگی و سازمانی است.</p>
+                <p>Point-to-Point فقط دو دستگاه را مستقیماً به هم متصل می‌کند، Ad hoc بدون نقطه مرکزی است و Mesh هر گره به چندین گره دیگر متصل است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۴ -->
+    <div class="ex-card" data-q="2-44">
+        <p class="ex-question"><span class="ex-num">۴۴</span>کدام لایه جریان داده را کنترل می‌کند تا Sender سریع، Receiver کند را تحت فشار قرار ندهد؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Transport</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Network</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Physical</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Presentation</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A) Transport</strong>
+                <p>کنترل جریان (Flow Control) یکی از وظایف اصلی لایه Transport است. پروتکل TCP با استفاده از مکانیزم‌هایی مانند پنجره لغزنده (Sliding Window) و تأییدیه‌ها (ACK) سرعت ارسال داده را با توانایی گیرنده تطبیق می‌دهد تا از سرریز شدن بافر گیرنده جلوگیری کند.</p>
+                <p>لایه Network به مسیریابی، لایه Physical به انتقال سیگنال و لایه Presentation به فرمت‌دهی داده می‌پردازد.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۵ -->
+    <div class="ex-card" data-q="2-45">
+        <p class="ex-question"><span class="ex-num">۴۵</span>چرا UDP اغلب نسبت به TCP برای Streaming بلادرنگ VoIP ترجیح داده می‌شود؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> It has lower latency and less overhead</li>
+            <li data-opt="1"><span class="opt-letter">B</span> It guarantees delivery and packet order</li>
+            <li data-opt="2"><span class="opt-letter">C</span> It has no header</li>
+            <li data-opt="3"><span class="opt-letter">D</span> It automatically encrypts all traffic</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A</strong>
+                <p>UDP پروتکلی بدون اتصال (Connectionless) و بدون تأیید دریافت است، بنابراین تأخیر (Latency) بسیار کمی دارد و سربار (Overhead) هدر آن کمتر از TCP است. برای برنامه‌های بلادرنگ مانند VoIP و ویدئو کنفرانس که از دست دادن چند بسته قابل‌تحمل است اما تأخیر بالا غیرقابل‌قبول است، UDP انتخاب بهتری است.</p>
+                <p>تضمین تحویل و ترتیب (B) ویژگی TCP است و برای VoIP مضر است. UDP هدر دارد (هرچند کوچک) و رمزنگاری خودکار ندارد (D).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۶ -->
+    <div class="ex-card" data-q="2-46">
+        <p class="ex-question"><span class="ex-num">۴۶</span>در Wireless Topology از نوع Ad hoc، ضعف اصلی از نظر مقیاس‌پذیری چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Performance degrades exponentially as more nodes are added</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Requires a central server for all traffic</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Relies on a physical bus cable</li>
+            <li data-opt="3"><span class="opt-letter">D</span> Cannot connect to the Internet</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: A</strong>
+                <p>در حالت Ad hoc، دستگاه‌ها مستقیماً با یکدیگر ارتباط برقرار می‌کنند و هر گره جدید باید ترافیک بیشتری را مدیریت کند. با افزایش تعداد گره‌ها، تداخل و پیچیدگی مسیریابی به شدت افزایش یافته و کارایی به‌صورت نمایی کاهش می‌یابد. به همین دلیل Ad hoc برای شبکه‌های کوچک و موقتی مناسب است.</p>
+                <p>Ad hoc هیچ سرور مرکزی ندارد (B)، بی‌سیم است و نیازی به کابل فیزیکی ندارد (C)، و می‌تواند از طریق یکی از گره‌ها به اینترنت متصل شود (D).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۷ -->
+    <div class="ex-card" data-q="2-47">
+        <p class="ex-question"><span class="ex-num">۴۷</span>مزیت اصلی توپولوژی Mesh چیست؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Low cost</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Simple configuration</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Minimal cabling</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> High redundancy and reliability</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D</strong>
+                <p>در توپولوژی مش (Mesh)، هر گره به چندین گره دیگر متصل است (در Full Mesh به همه). این باعث می‌شود اگر یک لینک یا گره دچار خرابی شود، ترافیک از مسیرهای جایگزین عبور کند. در نتیجه افزونگی (Redundancy) و قابلیت اطمینان بسیار بالایی دارد.</p>
+                <p>هزینه پایین، پیکربندی ساده و کابل‌کشی کم در واقع نقاط ضعف Mesh هستند (Mesh گران، پیچیده و پرکابل است).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۸ -->
+    <div class="ex-card" data-q="2-48">
+        <p class="ex-question"><span class="ex-num">۴۸</span>فرآیند اضافه کردن Headerها در هر لایه چه نام دارد؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Fragmentation</li>
+            <li data-opt="1"><span class="opt-letter">B</span> Multiplexing</li>
+            <li data-opt="2"><span class="opt-letter">C</span> Routing</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Encapsulation</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D) Encapsulation</strong>
+                <p>کپسوله‌سازی (Encapsulation) فرآیندی است که در آن هر لایه مدل OSI، داده‌های دریافتی از لایه بالاتر را با هدر (و گاهی تریلر) مخصوص خود بسته‌بندی می‌کند. برای مثال، داده‌های لایه Application به بخش (Segment) در Transport، سپس به بسته (Packet) در Network، سپس به فریم (Frame) در Data Link تبدیل می‌شود.</p>
+                <p>Fragmentation شکستن داده به قطعات کوچک‌تر، Multiplexing ترکیب چند جریان و Routing مسیریابی است.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۴۹ -->
+    <div class="ex-card" data-q="2-49">
+        <p class="ex-question"><span class="ex-num">۴۹</span>چرا سازمانی با بیش از ۱۰۰ دستگاه از Workgroup به Client-Server مهاجرت می‌کند؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> Because workgroups cannot connect to the Internet</li>
+            <li data-opt="1"><span class="opt-letter">B</span> So users can share printers more easily</li>
+            <li data-opt="2"><span class="opt-letter">C</span> To eliminate the need for network switches</li>
+            <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> To centralize user profiles, security policies, and resource management</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: D</strong>
+                <p>با افزایش تعداد کاربران، مدیریت غیرمتمرکز Workgroup بسیار دشوار می‌شود. مهاجرت به Client-Server امکان مدیریت متمرکز کاربران، سیاست‌های امنیتی، پشتیبان‌گیری و اشتراک منابع را فراهم می‌کند و بهره‌وری و امنیت را افزایش می‌دهد.</p>
+                <p>Workgroup نیز می‌تواند به اینترنت متصل شود (A)، اشتراک پرینتر یک مزیت جزئی است (B)، و سوییچ در هر دو مدل لازم است (C).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوال ۵۰ -->
+    <div class="ex-card" data-q="2-50">
+        <p class="ex-question"><span class="ex-num">۵۰</span>یک Smartphone با بلوتوث به یک Headset بی‌سیم متصل می‌شود. این چه نوع شبکه‌ای است؟</p>
+        <ul class="ex-options">
+            <li data-opt="0"><span class="opt-letter">A</span> SAN</li>
+            <li data-opt="1"><span class="opt-letter">B</span> LAN</li>
+            <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> PAN</li>
+            <li data-opt="3"><span class="opt-letter">D</span> WAN</li>
+        </ul>
+        <div class="ex-answer">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>پاسخ صحیح: C) PAN</strong>
+                <p>شبکه شخصی (Personal Area Network) برای اتصال دستگاه‌های شخصی در یک محدوده بسیار کوچک (معمولاً چند متر) مانند اتصال بلوتوث بین گوشی و هدست، یا اتصال لپ‌تاپ به ماوس بی‌سیم استفاده می‌شود. PAN معمولاً بی‌سیم و کم‌سرعت است.</p>
+                <p>SAN برای ذخیره‌سازی، LAN برای شبکه‌های محلی بزرگ‌تر، WAN برای فاصله‌های بسیار دور است.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" disabled>قبلی</button>
+        <button class="nav-btn" onclick="showChapter(3)">تمرین بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
+        <!-- ==================== تمرین ۲ (۵۰ سوال تخصصی) ==================== -->
+<!-- ==================== تمرین ۲ (۵۰ سوال تخصصی) ==================== -->
+        <div id="chap3" class="chapter">
+            <div class="chapter-header">
+                <div class="chapter-badge"><i class="fas fa-list-check"></i></div>
+                <div>
+                    <h1>تمرین دو</h1>
+                    <span>۵۰ سوال تخصصی شبکه</span>
+                </div>
+            </div>
+
+            <div class="ex-progress" id="progressChap3">
+                <span data-q="3-1">۱</span><span data-q="3-2">۲</span><span data-q="3-3">۳</span>
+                <span data-q="3-4">۴</span><span data-q="3-5">۵</span><span data-q="3-6">۶</span>
+                <span data-q="3-7">۷</span><span data-q="3-8">۸</span><span data-q="3-9">۹</span>
+                <span data-q="3-10">۱۰</span>
+                <span data-q="3-11">۱۱</span><span data-q="3-12">۱۲</span><span data-q="3-13">۱۳</span>
+                <span data-q="3-14">۱۴</span><span data-q="3-15">۱۵</span><span data-q="3-16">۱۶</span>
+                <span data-q="3-17">۱۷</span><span data-q="3-18">۱۸</span><span data-q="3-19">۱۹</span>
+                <span data-q="3-20">۲۰</span>
+                <span data-q="3-21">۲۱</span><span data-q="3-22">۲۲</span><span data-q="3-23">۲۳</span>
+                <span data-q="3-24">۲۴</span><span data-q="3-25">۲۵</span><span data-q="3-26">۲۶</span>
+                <span data-q="3-27">۲۷</span><span data-q="3-28">۲۸</span><span data-q="3-29">۲۹</span>
+                <span data-q="3-30">۳۰</span>
+                <span data-q="3-31">۳۱</span><span data-q="3-32">۳۲</span><span data-q="3-33">۳۳</span>
+                <span data-q="3-34">۳۴</span><span data-q="3-35">۳۵</span><span data-q="3-36">۳۶</span>
+                <span data-q="3-37">۳۷</span><span data-q="3-38">۳۸</span><span data-q="3-39">۳۹</span>
+                <span data-q="3-40">۴۰</span>
+                <span data-q="3-41">۴۱</span><span data-q="3-42">۴۲</span><span data-q="3-43">۴۳</span>
+                <span data-q="3-44">۴۴</span><span data-q="3-45">۴۵</span><span data-q="3-46">۴۶</span>
+                <span data-q="3-47">۴۷</span><span data-q="3-48">۴۸</span><span data-q="3-49">۴۹</span>
+                <span data-q="3-50">۵۰</span>
+            </div>
+
+            <!-- ===== سوالات ۱ تا ۱۰ ===== -->
+            <div class="ex-card" data-q="3-1">
+                <p class="ex-question"><span class="ex-num">۱</span>یک startup کوچک به laptop کارمندان اجازه می‌دهد وقتی access point در دسترس نیست، از طریق Wi-Fi مستقیماً به یکدیگر متصل شوند. کدام topology بی‌سیم در حال استفاده است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Ad hoc</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Star</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Infrastructure</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Hybrid</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Ad hoc</strong>
+                        <p>در شبکه‌های بی‌سیم دو حالت اصلی وجود دارد: Infrastructure mode که دستگاه‌ها از طریق Access Point به هم متصل می‌شوند، و Ad hoc mode که دستگاه‌ها بدون نیاز به AP و به‌صورت peer-to-peer مستقیماً به هم متصل می‌شوند. چون در سؤال گفته شده «وقتی AP در دسترس نیست، مستقیماً به یکدیگر متصل شوند»، دقیقاً همان Ad hoc است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-2">
+                <p class="ex-question"><span class="ex-num">۲</span>یک کاربر یک laptop را به network شرکت متصل می‌کند و به‌صورت خودکار یک IP address، gateway و DNS server دریافت می‌کند. کدام protocol این فرایند را انجام داده است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> DHCP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> ARP</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> DNS</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> SNMP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) DHCP</strong>
+                        <p>DHCP (Dynamic Host Configuration Protocol) وظیفه دارد به‌صورت خودکار به دستگاه‌های متصل به شبکه، اطلاعات پیکربندی IP از جمله آدرس IP، Subnet mask، Default gateway و DNS server را اختصاص دهد. ARP آدرس MAC متناظر با یک IP را می‌یابد، DNS نام دامنه را به IP تبدیل می‌کند و SNMP برای مدیریت و مانیتورینگ شبکه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-3">
+                <p class="ex-question"><span class="ex-num">۳</span>یک corporation بزرگ، officeهای شعبه‌ای در چندین کشور را با استفاده از لینک‌های خصوصی MPLS و tunnelهای internet به هم متصل می‌کند. کدام نوع network بهترین توصیف را برای این زیرساخت ارائه می‌دهد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> CAN</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> WAN</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> LAN</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> PAN</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) WAN</strong>
+                        <p>انواع شبکه بر اساس گستردگی جغرافیایی: PAN (چند متر، مثل بلوتوث)، LAN (یک ساختمان یا دفتر)، CAN (یک دانشگاه یا مجتمع)، MAN (یک شهر) و WAN (چندین شهر یا کشور). از آنجا که شرکت دارای دفاتر در چندین کشور است، زیرساخت آن یک WAN محسوب می‌شود.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-4">
+                <p class="ex-question"><span class="ex-num">۴</span>یک administrator شبکه‌ای طراحی می‌کند که در آن هر router برای بیشینه کردن redundancy به تمام routerهای دیگر متصل می‌شود. این کدام topology است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Ring</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Star</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Full Mesh</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Partial Mesh</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) Full Mesh</strong>
+                        <p>در Ring هر دستگاه به دو دستگاه مجاور متصل است، در Star همه به یک دستگاه مرکزی متصل هستند، در Partial Mesh فقط برخی دستگاه‌ها به همه متصل‌اند، اما در Full Mesh هر گره به تمام گره‌های دیگر متصل است. این بالاترین سطح redundancy را فراهم می‌کند، چون اگر یک لینک قطع شود مسیرهای جایگزین وجود دارد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-5">
+                <p class="ex-question"><span class="ex-num">۵</span>یک company یک network اختصاصی و پرسرعت برای اتصال serverها به storage arrayهای متمرکز نصب می‌کند. این چه نوع networkی است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> PAN</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> SAN</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> MAN</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> WAN</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) SAN</strong>
+                        <p>SAN (Storage Area Network) شبکه‌ای پرسرعت و اختصاصی است که برای اتصال سرورها به دستگاه‌های ذخیره‌سازی طراحی شده و معمولاً از پروتکل‌هایی مثل Fibre Channel یا iSCSI استفاده می‌کند. PAN برای وسایل شخصی، MAN برای محدوده شهر و WAN برای محدوده وسیع جغرافیایی است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-6">
+                <p class="ex-question"><span class="ex-num">۶</span>یک device شبکه که packetها را بر اساس MAC addressها forward می‌کند، در کدام OSI layer کار می‌کند؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Network</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Physical</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Transport</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Data Link</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Data Link</strong>
+                        <p>لایه Physical انتقال بیت‌ها (هاب، کابل)، لایه Data Link انتقال فریم‌ها بر اساس آدرس MAC (سوئیچ)، لایه Network مسیریابی بر اساس IP (روتر) و لایه Transport کنترل جریان و خطا (TCP/UDP) را انجام می‌دهد. دستگاهی که بر اساس MAC address تصمیم می‌گیرد سوئیچ است که در لایه Data Link کار می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-7">
+                <p class="ex-question"><span class="ex-num">۷</span>یک کاربر در browser، www.example.com را وارد می‌کند. سیستم برای به‌دست آوردن IP address متناظر، از یک server پرس‌وجو می‌کند. کدام protocol این وظیفه را انجام می‌دهد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SNMP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> DHCP</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> DNS</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> HTTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) DNS</strong>
+                        <p>DNS (Domain Name System) وظیفه دارد نام‌های دامنه را به آدرس IP تبدیل کند؛ این فرایند DNS Resolution نام دارد. HTTP برای انتقال صفحات وب، DHCP برای تخصیص IP خودکار و SNMP برای مدیریت شبکه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-8">
+                <p class="ex-question"><span class="ex-num">۸</span>یک system administrator از راه دور از طریق یک terminal session رمزنگاری‌شده به یک Linux server متصل می‌شود. از کدام protocol استفاده می‌شود؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> RDP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> FTP</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> SSH</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Telnet</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) SSH</strong>
+                        <p>Telnet قدیمی و بدون رمزنگاری است، در حالی که SSH (Secure Shell) مدرن، رمزنگاری‌شده و امن است. چون در سؤال گفته «terminal session رمزنگاری‌شده»، پروتکل مورد نظر SSH است. RDP برای دسکتاپ راه دور ویندوز و FTP برای انتقال فایل است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-9">
+                <p class="ex-question"><span class="ex-num">۹</span>یک monitoring system، میزان استفاده از CPU و آمار interfaceها را از routerها و switchها جمع‌آوری می‌کند. کدام protocol این امکان را فراهم می‌کند؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMB</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> DNS</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> SNMP</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> RDP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) SNMP</strong>
+                        <p>SNMP (Simple Network Management Protocol) پروتکل استاندارد برای مدیریت و مانیتورینگ دستگاه‌های شبکه است و می‌تواند میزان استفاده CPU، آمار پورت‌ها و وضعیت linkها را از روترها، سوئیچ‌ها و فایروال‌ها جمع‌آوری کند. SMB برای اشتراک فایل در ویندوز، DNS برای تبدیل نام به IP و RDP برای دسکتاپ راه دور است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-10">
+                <p class="ex-question"><span class="ex-num">۱۰</span>یک کاربر فایل‌های configuration را بین دو Linux server از طریق SSH به‌صورت امن منتقل می‌کند. از کدام protocol استفاده می‌شود؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> FTP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> POP3</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> SCP</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> TFTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) SCP</strong>
+                        <p>FTP قدیمی و بدون رمزنگاری است، TFTP ساده‌تر و بدون احراز هویت و رمزنگاری است، اما SCP (Secure Copy) از SSH استفاده می‌کند و انتقال فایل را امن می‌کند. چون در سؤال گفته «از طریق SSH به‌صورت امن»، پروتکل مورد استفاده SCP است (SFTP هم گزینه مشابهی است). POP3 برای دریافت ایمیل است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== سوالات ۱۱ تا ۲۰ ===== -->
+            <div class="ex-card" data-q="3-11">
+                <p class="ex-question"><span class="ex-num">۱۱</span>یک company از protocolی استفاده می‌کند که امکان انتقال امن و تعاملی فایل‌ها را همراه با قابلیت مرور directory فراهم می‌کند. کدام protocol با این نیاز سازگار است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMTP</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> SFTP</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> SNMP</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> TFTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) SFTP</strong>
+                        <p>FTP قدیمی و بدون رمزنگاری است. TFTP بسیار ساده و بدون احراز هویت است. SCP امن است اما تعاملی نیست و قابلیت مرور دایرکتوری ندارد. SFTP (SSH File Transfer Protocol) از SSH استفاده می‌کند، امن است، تعاملی است و امکان مرور دایرکتوری‌ها، تغییر دایرکتوری، حذف، rename و ... را فراهم می‌کند. SMTP برای ارسال ایمیل و SNMP برای مدیریت شبکه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-12">
+                <p class="ex-question"><span class="ex-num">۱۲</span>یک workstation بدون disk از طریق network boot می‌شود و بدون authentication، image مربوط به boot خود را از یک server دانلود می‌کند. کدام protocol درگیر است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMB</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> TFTP</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> SCP</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> FTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) TFTP</strong>
+                        <p>PXE (Preboot eXecution Environment) برای بوت شدن سیستم‌ها از طریق شبکه استفاده می‌شود. در این فرایند، کلاینت بدون دیسک، یک image بوت را از سرور دانلود می‌کند. FTP نیاز به احراز هویت دارد، SCP به SSH و احراز هویت نیاز دارد، SMB هم نیاز به احراز هویت دارد، اما TFTP بدون احراز هویت، سبک و روی UDP کار می‌کند و دقیقاً برای بوت شبکه طراحی شده است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-13">
+                <p class="ex-question"><span class="ex-num">۱۳</span>در logهای system در سراسر زیرساخت، چندین server timestampهای ناسازگار نشان می‌دهند. کدام protocol باید بررسی شود؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> DHCP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> DNS</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> FTP</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> NTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) NTP</strong>
+                        <p>NTP (Network Time Protocol) پروتکلی است برای همگام‌سازی ساعت سیستم‌ها در شبکه. اگر چند سرور timestampهای ناسازگار (زمان‌های مختلف) نشان دهند، یعنی یا NTP به درستی پیکربندی نشده یا سرور NTP در دسترس نیست. DHCP برای تخصیص IP، DNS برای تبدیل نام به IP، و FTP برای انتقال فایل است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-14">
+                <p class="ex-question"><span class="ex-num">۱۴</span>یک network scan نشان می‌دهد که port 161/UDP روی بسیاری از switchها باز است. کدام service در حال اجراست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMB</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> SSH</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> HTTP</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> SNMP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) SNMP</strong>
+                        <p>پورت‌های معروف: SSH=22/TCP، HTTP=80/TCP، HTTPS=443/TCP، DNS=53/UDP-TCP، DHCP=67/68/UDP، SNMP=161/UDP (و 162/UDP برای trap)، SMB=445/TCP. از آنجا که اسکن نشان داده port 161/UDP باز است، سرویس در حال اجرا SNMP است که برای مدیریت و مانیتورینگ دستگاه‌های شبکه استفاده می‌شود.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-15">
+                <p class="ex-question"><span class="ex-num">۱۵</span>یک device مخرب شروع به اختصاص دادن IP address به clientهای network می‌کند. کدام protocol در حال سوءاستفاده شدن است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> DHCP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> SNMP</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> DNS</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> SMB</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) DHCP</strong>
+                        <p>تنها پروتکلی که وظیفه اختصاص IP address به کلاینت‌ها را دارد، DHCP است. وقتی یک دستگاه مخرب در شبکه شروع به پاسخ دادن به درخواست‌های DHCP کلاینت‌ها کند و IPهای نادرست یا مخرب اختصاص دهد، به این حمله Rogue DHCP Server یا DHCP Spoofing می‌گویند. DNS برای تبدیل نام، SNMP برای مدیریت و SMB برای اشتراک فایل است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-16">
+                <p class="ex-question"><span class="ex-num">۱۶</span>یک switch جدولی از MAC addressهای مرتبط با interfaceهای خود می‌سازد. این جدول چه نام دارد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Routing table</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> DNS cache</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> ARP cache</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> MAC table</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) MAC table</strong>
+                        <p>سوئیچ برای تصمیم‌گیری درباره اینکه یک فریم را به کدام پورت ارسال کند، یک جدول از آدرس‌های MAC به همراه پورت متناظر نگهداری می‌کند. این جدول با نام‌های MAC table، CAM table یا Forwarding table شناخته می‌شود. Routing table مربوط به روتر است، ARP cache نگاشت IP به MAC را روی host نگهداری می‌کند، و DNS cache نگاشت نام به IP را نگهداری می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-17">
+                <p class="ex-question"><span class="ex-num">۱۷</span>یک connection از نوع TCP تحویل مرتب داده‌ها را تضمین می‌کند و packetهای از دست رفته را دوباره ارسال می‌کند. کدام OSI layer این قابلیت را فراهم می‌کند؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Data Link</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Transport</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Application</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Session</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Transport</strong>
+                        <p>لایه Transport (لایه ۴) وظایفی مانند تقسیم داده به بخش‌های کوچک‌تر (Segmentation)، کنترل جریان، کنترل خطا، ارسال مجدد بسته‌های از دست رفته و تحویل مرتب را بر عهده دارد. پروتکل TCP دقیقاً این قابلیت‌ها را فراهم می‌کند. Data Link خطاها را در سطح فریم کنترل می‌کند، Application مربوط به خود برنامه است و Session مدیریت جلسه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-18">
+                <p class="ex-question"><span class="ex-num">۱۸</span>یک application پیش از ارسال داده روی network، آن را با استفاده از TLS رمزنگاری می‌کند. این عملکرد بیشترین ارتباط را با کدام OSI layer دارد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Physical</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Transport</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Session</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Presentation</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Presentation</strong>
+                        <p>لایه Presentation (لایه ۶) وظایف رمزنگاری، فشرده‌سازی و تبدیل فرمت داده را بر عهده دارد. اگرچه TLS عملاً بین لایه Transport و Application قرار می‌گیرد، اما از نظر مفهومی وظیفه رمزنگاری به لایه Presentation نسبت داده می‌شود. Physical برای انتقال بیت، Transport برای کنترل جریان و خطا، و Session برای مدیریت جلسه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-19">
+                <p class="ex-question"><span class="ex-num">۱۹</span>یک computer با موفقیت host دیگری را ping می‌کند، اما نمی‌تواند website آن را در browser باز کند. به احتمال زیاد کدام layer دچار مشکل است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Network</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Application</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Data Link</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Physical</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Application</strong>
+                        <p>ping از پروتکل ICMP استفاده می‌کند که در لایه Network قرار دارد. اگر ping موفق باشد، یعنی لایه‌های Physical، Data Link و Network سالم هستند. اما اگر وب‌سایت در مرورگر باز نمی‌شود، مشکل در لایه‌های بالاتر است: DNS مشکل دارد (نام دامنه به IP تبدیل نمی‌شود) یا HTTP/HTTPS مسدود است. این‌ها همگی مربوط به لایه Application هستند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-20">
+                <p class="ex-question"><span class="ex-num">۲۰</span>یک proxy server درخواست‌های HTTP را intercept می‌کند و از طرف clientها آن‌ها را forward می‌کند. کدام OSI layer در درجه اول درگیر است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Application</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Data Link</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Network</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Physical</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Application</strong>
+                        <p>HTTP یک پروتکل لایه Application (لایه ۷) است. یک Proxy Server درخواست‌های HTTP را دریافت، بررسی و سپس ارسال می‌کند. از آنجا که با محتوای درخواست HTTP (که مربوط به لایه Application است) سروکار دارد، در لایه Application فعالیت می‌کند. پروکسی‌های لایه ۷ (HTTP proxy) دقیقاً در این لایه کار می‌کنند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== سوالات ۲۱ تا ۳۰ ===== -->
+            <div class="ex-card" data-q="3-21">
+                <p class="ex-question"><span class="ex-num">۲۱</span>یک workstation یک IP address معتبر دریافت می‌کند، اما نمی‌تواند به networkهای خارجی دسترسی پیدا کند. به احتمال زیاد کدام configuration وجود ندارد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Subnet mask</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Default gateway</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> DNS server</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> MAC address</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Default gateway</strong>
+                        <p>برای اینکه یک دستگاه بتواند به شبکه‌های خارج از subnet خود (مثل اینترنت) دسترسی داشته باشد، باید آدرس Default Gateway (دروازه پیش‌فرض) را بداند. اگر Subnet mask اشتباه باشد، دستگاه ممکن است تشخیص دهد که یک IP خارج از subnet است در حالی که داخل است و برعکس، اما این معمولاً باعث مشکلات اتصال به همه‌ی دستگاه‌ها می‌شود، نه فقط خارجی‌ها. DNS server برای تبدیل نام است و MAC address همیشه وجود دارد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-22">
+                <p class="ex-question"><span class="ex-num">۲۲</span>یک system مانیتورینگ شبکه با وجود موفق بودن pingها، نمی‌تواند از routerها آمار جمع‌آوری کند. کدام protocol ممکن است block شده باشد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMTP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> SSH</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> SNMP</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> DNS</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) SNMP</strong>
+                        <p>جمع‌آوری آمار از دستگاه‌های شبکه (مانند CPU usage، ترافیک پورت‌ها، وضعیت interfaceها) با استفاده از پروتکل SNMP انجام می‌شود. اگر ping (که از ICMP استفاده می‌کند) موفق است، یعنی اتصال شبکه و مسیریابی سالم است. اما اگر آمار دریافت نمی‌شود، احتمالاً پورت 161/UDP که SNMP روی آن کار می‌کند، توسط فایروال مسدود شده است یا SNMP روی روتر فعال نیست.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-23">
+                <p class="ex-question"><span class="ex-num">۲۳</span>یک Linux server نمی‌تواند یک shared directory راه‌ دور را از Linux server دیگری با استفاده از protocol بومی file sharing، mount کند. کدام protocol باید بررسی شود؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> SMTP</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> NFS</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> SMB</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> FTP</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) NFS</strong>
+                        <p>در سیستم‌های لینوکس، پروتکل بومی و استاندارد برای اشتراک‌گذاری فایل‌ها و mount کردن دایرکتوری‌های راه دور، NFS (Network File System) است. اگر یک سرور لینوکس نتواند دایرکتوری اشتراکی را از سرور لینوکس دیگری mount کند، باید NFS را بررسی کرد (پیکربندی، سرویس‌ها، مجوزها و فایروال). SMB پروتکل اشتراک‌گذاری فایل در ویندوز است (اگرچه در لینوکس هم با Samba قابل استفاده است، اما "بومی" لینوکس نیست).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-24">
+                <p class="ex-question"><span class="ex-num">۲۴</span>یک packet analyzer تعداد زیادی پیام ICMP “Destination Unreachable” نشان می‌دهد. به احتمال زیاد کدام device آن‌ها را تولید می‌کند؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Router</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Access Point</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Switch</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Hub</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Router</strong>
+                        <p>پیام ICMP "Destination Unreachable" توسط یک روتر تولید می‌شود وقتی که نتواند مسیری به مقصد پیدا کند، یا مقصد در شبکه‌ی متصل وجود نداشته باشد، یا بسته به دلایلی مانند MTU نتواند ارسال شود. روترها در لایه Network (لایه ۳) کار می‌کنند و ICMP یکی از پروتکل‌های همین لایه است. سوئیچ و هاب در لایه‌های پایین‌تر کار می‌کنند و چنین پیام‌هایی تولید نمی‌کنند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-25">
+                <p class="ex-question"><span class="ex-num">۲۵</span>کاربران شکایت دارند که تماس‌های VoIP به‌دلیل latency بالا و packet retransmission قطع می‌شوند. کدام رفتارِ protocol ممکن است باعث این مشکل شده باشد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> DNS recursion</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> ARP poisoning</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> TCP congestion control</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> UDP handshake</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) TCP congestion control</strong>
+                        <p>VoIP معمولاً از UDP استفاده می‌کند چون به تحویل بی‌درنگ نیاز دارد و تأخیر برای آن حیاتی است. اگر ترافیک VoIP به‌اشتباه از TCP استفاده کند (یا در کنار TCP باشد)، مکانیزم کنترل ازدحام TCP با کاهش نرخ ارسال و ارسال مجدد بسته‌ها، باعث افزایش latency و قطعی تماس می‌شود. DNS recursion مربوط به حل نام است، ARP poisoning یک حمله است و UDP handshake وجود ندارد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-26">
+                <p class="ex-question"><span class="ex-num">۲۶</span>یک team امنیتی پاسخ‌های غیرعادی DHCP را از یک device ناشناس شناسایی می‌کند. چه نوع attackای در حال وقوع است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> DNS tunneling</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> DHCP spoofing</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> ARP poisoning</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> SNMP flooding</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) DHCP spoofing</strong>
+                        <p>وقتی یک دستگاه ناشناس در شبکه شروع به پاسخ دادن به درخواست‌های DHCP کلاینت‌ها می‌کند و آدرس‌های IP (اغلب نادرست یا مخرب) به آنها تخصیص می‌دهد، به این حمله DHCP Spoofing یا Rogue DHCP Server می‌گویند. این حمله می‌تواند منجر به Man-in-the-Middle یا قطع ارتباط شود. DNS tunneling برای قاچاق داده از طریق DNS، ARP poisoning برای فریب دادن دستگاه‌ها در مورد آدرس MAC gateway، و SNMP flooding برای overload کردن دستگاه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-27">
+                <p class="ex-question"><span class="ex-num">۲۷</span>یک packet capture نشان می‌دهد که DNS queryها کار می‌کنند، اما پاسخ‌های HTTP هرگز نمی‌رسند. به احتمال زیاد مشکل مربوط به کدام layer است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Filtering at the Transport or Application layer</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Collision at the Data Link layer</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Failure at the Physical layer</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> ARP timeout</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Filtering at the Transport or Application layer</strong>
+                        <p>اگر DNS query موفق است، یعنی لایه‌های Physical، Data Link، Network و Application (DNS) کار می‌کنند. اما اگر پاسخ‌های HTTP نمی‌رسند، مشکل در جایی است که ترافیک HTTP را مسدود می‌کند. محتمل‌ترین دلیل، فیلتر کردن در لایه Transport یا Application است، مثل مسدود شدن پورت ۸۰ یا ۴۴۳ توسط فایروال یا مسدود شدن پروتکل HTTP توسط proxy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-28">
+                <p class="ex-question"><span class="ex-num">۲۸</span>یک device شبکه را نمی‌توان monitor کرد، چون SNMP community string آن نادرست است. کدام concept دچار مشکل است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Authentication</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Encryption</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Fragmentation</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Routing</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Authentication</strong>
+                        <p>SNMP community string در واقع یک رمز عبور ساده (یا کلید اشتراکی) است که برای احراز هویت بین مدیر شبکه و دستگاه استفاده می‌شود. اگر community string نادرست باشد، دستگاه درخواست را رد می‌کند و اجازه دسترسی به اطلاعات را نمی‌دهد. Encryption مربوط به رمزنگاری است، Fragmentation مربوط به تقسیم بسته‌هاست و Routing مربوط به مسیریابی است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-29">
+                <p class="ex-question"><span class="ex-num">۲۹</span>یک packet capture، TCP retransmissionهای تکراری بین دو server را نشان می‌دهد. این معمولاً نشان‌دهنده کدام symptom شبکه است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> ARP cache poisoning</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> DNS misconfiguration</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> MAC table overflow</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Packet loss or congestion</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Packet loss or congestion</strong>
+                        <p>در TCP، وقتی یک بسته ارسال می‌شود، فرستنده منتظر دریافت ACK از گیرنده می‌ماند. اگر ACK نرسد (به دلیل از دست رفتن بسته یا ازدحام شبکه)، فرستنده پس از مدت زمان مشخص، بسته را دوباره ارسال می‌کند. تعداد زیاد retransmissionهای تکراری نشان‌دهنده packet loss یا congestion در شبکه است. ARP cache poisoning یک حمله است، DNS misconfiguration روی ترافیک TCP تأثیر مستقیم ندارد، و MAC table overflow روی سوئیچ تأثیر می‌گذارد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-30">
+                <p class="ex-question"><span class="ex-num">۳۰</span>یک engineer مشکوک است که بیشینه اندازه packet مجاز بین دو host بیش از حد بزرگ است و باعث fragmentation می‌شود. از کدام روش discovery باید استفاده شود؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> DHCP discovery</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> ARP discovery</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> SNMP polling</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Path MTU discovery</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Path MTU discovery</strong>
+                        <p>MTU (Maximum Transmission Unit) بیشینه اندازه بسته‌ای است که می‌تواند در یک لینک ارسال شود. اگر اندازه بسته از MTU یک لینک در مسیر بیشتر باشد، بسته fragment (تکه‌تکه) می‌شود که می‌تواند باعث کاهش کارایی شود. برای پیدا کردن بیشینه MTU قابل قبول در کل مسیر بین دو host، از روش Path MTU Discovery استفاده می‌شود که معمولاً با ارسال بسته‌های با بیت DF و دریافت پیام ICMP "Fragmentation Needed" کار می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== سوالات ۳۱ تا ۴۰ ===== -->
+            <div class="ex-card" data-q="3-31">
+                <p class="ex-question"><span class="ex-num">۳۱</span>شما در حال عیب‌یابی اتصال به یک web server هستید. tcpdump نشان می‌دهد که یک بسته SYN ارسال شده است، اما server در پاسخ یک RST, ACK برمی‌گرداند. محتمل‌ترین علت چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The server is down.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> The client IP is blocked by the gateway</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> There is an MTU mismatch</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> The server is reachable, but the port is closed or rejected by the application/firewall.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) The server is reachable, but the port is closed or rejected.</strong>
+                        <p>در TCP، کلاینت SYN می‌فرستد و سرور می‌تواند سه نوع پاسخ دهد: SYN-ACK (پورت باز)، RST (پورت بسته یا رد اتصال)، یا هیچ پاسخی (drop). در اینجا سرور RST, ACK پاسخ داده، یعنی سرور در دسترس است اما پورت بسته است یا فایروال/برنامه درخواست را رد کرده است. Server down یا IP blocked باعث drop می‌شود نه RST. MTU mismatch باعث پیام ICMP می‌شود.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-32">
+                <p class="ex-question"><span class="ex-num">۳۲</span>هنگام تلاش برای انتقال فایل‌های بزرگ، در tcpdump تعداد زیادی پیام ICMP Destination Unreachable (Fragmentation Needed and DF set) می‌بینید. این نشان‌دهنده چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The server is rate-limiting your connection.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> A routing loop.</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> An MTU mismatch somewhere along the path.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> A DNS resolution error.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) An MTU mismatch</strong>
+                        <p>وقتی بسته‌ای با بیت DF (Don't Fragment) تنظیم شده باشد، روترها نمی‌توانند آن را fragment کنند. اگر اندازه بسته از MTU یک لینک در مسیر بزرگ‌تر باشد، روتر آن را دور می‌اندازد و یک پیام ICMP "Destination Unreachable (Fragmentation Needed and DF set)" به فرستنده برمی‌گرداند. این یعنی MTU در طول مسیر با هم تطابق ندارند. Rate-limiting معمولاً با کدهای خطای HTTP همراه است، routing loop باعث TTL exceeded می‌شود، و DNS resolution error ربطی به fragmentation ندارد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-33">
+                <p class="ex-question"><span class="ex-num">۳۳</span>هنگام عیب‌یابی با netstat -an، تعداد زیادی connection در وضعیت TIME_WAIT می‌بینید. نتیجه مستقیم این وضعیت چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The server is under a DoS attack.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> The connection is currently established and active.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The remote client has crashed.</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> The application is rapidly opening and closing connections with clients.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) The application is rapidly opening and closing connections</strong>
+                        <p>در TCP، وضعیت TIME_WAIT به این معناست که اتصال به‌طور عادی بسته شده است و سیستمعامل منتظر می‌ماند تا مطمئن شود بسته‌های تاخیری به مقصد نرسند (معمولاً ۲ برابر MSL). تعداد زیاد TIME_WAIT نشان می‌دهد که برنامه به‌طور مکرر اتصالات جدید باز و بسته می‌کند (مثلاً درخواست‌های HTTP بدون keep-alive). این لزوماً حمله نیست و معمولاً به دلیل طراحی برنامه است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-34">
+                <p class="ex-question"><span class="ex-num">۳۴</span>شما از traceroute استفاده می‌کنید و مشاهده می‌کنید که بعد از hop سوم، تمام packetها از بین می‌روند، اما hop سوم به‌طور عادی پاسخ می‌دهد. این موضوع چه چیزی را نشان می‌دهد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The destination is using a different routing protocol.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> The third hop is the destination.</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> There is a filtering issue (Firewall/ACL) at the fourth hop or on the link between hops 3 and 4.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Your local gateway is malfunctioning.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) There is a filtering issue at the fourth hop</strong>
+                        <p>در traceroute، بسته‌ها با TTL افزایشی ارسال می‌شوند. هر روتر در مسیر وقتی TTL به صفر می‌رسد، یک پیام ICMP Time Exceeded برمی‌گرداند. اگر تا hop سوم پاسخ می‌آید و از hop چهارم به بعد هیچ پاسخی نمی‌آید، یعنی مسیر تا hop سوم سالم است و در hop چهارم یا لینک بین hop سوم و چهارم، یک فایروال یا ACL بسته‌های ICMP را drop یا filter می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-35">
+                <p class="ex-question"><span class="ex-num">۳۵</span>یک کاربر گزارش می‌دهد که برای requestهای بزرگ، پیام Internal Server Error دریافت می‌کند، در حالی که requestهای کوچک به‌درستی کار می‌کنند. tcpdump نشان می‌دهد که packetهای بزرگ می‌رسند، اما هرگز ACK برنمی‌گردد. علت احتمالی چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The user’s MAC address is restricted by port security.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Incorrect subnet mask.</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> Path MTU Discovery (PMTUD) failure or a black hole router dropping large packets</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> DHCP lease expiration</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) PMTUD failure or black hole router</strong>
+                        <p>وقتی بسته‌های بزرگ به سرور می‌رسند اما ACK برنمی‌گردد، یعنی بسته‌های بزرگ در مسیر برگشت drop می‌شوند. این اتفاق معمولاً به دلیل شکست Path MTU Discovery رخ می‌دهد؛ یعنی روتری در مسیر، بسته‌های بزرگ را بدون ارسال پیام ICMP "Fragmentation Needed" دور می‌اندازد (که به آن Black Hole Router می‌گویند). درخواست‌های کوچک (که از MTU عبور نمی‌کنند) به‌درستی کار می‌کنند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-36">
+                <p class="ex-question"><span class="ex-num">۳۶</span>شما در حال بررسی connectivity بین دو subnet هستید. Ping کار می‌کند، اما telnet به یک application port مشخص شکست می‌خورد. منطقی‌ترین گام بعدی چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> Change the default gateway.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Reconfigure the subnet mask.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Restart the router.</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Check iptables or local firewall rules on the destination server for that specific port.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Check iptables or local firewall rules</strong>
+                        <p>Ping (که از ICMP استفاده می‌کند) موفق است، یعنی اتصال فیزیکی و لایه‌های ۲ و ۳ سالم هستند و مسیریابی بین subnetها کار می‌کند. اما telnet به یک پورت خاص شکست می‌خورد. این یعنی مشکل در خود پورت است. محتمل‌ترین دلیل: فایروال محلی (iptables/nftables) روی سرور مقصد آن پورت را مسدود کرده است. تغییر gateway یا subnet mask وقتی ping کار می‌کند منطقی نیست.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-37">
+                <p class="ex-question"><span class="ex-num">۳۷</span>هنگام استفاده از دستور tcpdump -i eth0 'tcp port 80 and tcp[tcpflags] & tcp-syn != 0، چه چیزی را capture می‌کنید؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> All packets with incorrect checksums.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> All traffic except SYN packets.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> All HTTP traffic.</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> Only initial SYN packets in TCP connections on port 80.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Only initial SYN packets on port 80</strong>
+                        <p>این دستور دو شرط دارد: ۱) tcp port 80 (فقط ترافیک پورت ۸۰)، ۲) tcp[tcpflags] & tcp-syn != 0 (بسته‌هایی که پرچم SYN در آنها تنظیم شده باشد). نتیجه: فقط بسته‌های SYN که برای شروع یک اتصال TCP روی پورت ۸۰ ارسال می‌شوند، capture می‌شوند. این شامل SYN-ACK یا ACK یا دیتا نمی‌شود.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-38">
+                <p class="ex-question"><span class="ex-num">۳۸</span>از lsof -i :22 استفاده می‌کنید و هیچ چیزی نمایش داده نمی‌شود، اما می‌توانید با SSH وارد ماشین شوید. چه دلیلی می‌تواند داشته باشد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> You do not have root/sudo privileges to view the process ownership.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> SSH is not running.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The machine has no network interface.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Port 22 is disabled</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) No root/sudo privileges</strong>
+                        <p>دستور lsof -i :22 فقط فرآیندهایی را نشان می‌دهد که کاربر جاری مالک آنهاست. سرویس SSH (sshd) معمولاً توسط کاربر root اجرا می‌شود. اگر شما بدون sudo یا root اجرا کنید، خروجی خالی خواهد بود، اما خود سرویس در حال اجراست و می‌توانید با SSH وارد شوید. با اجرای sudo lsof -i :22، نتیجه را مشاهده خواهید کرد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-39">
+                <p class="ex-question"><span class="ex-num">۳۹</span>شما دستور tcpdump -nn -i eth0 'tcp[13] & 16 != 0' را اجرا می‌کنید. دقیقاً چه ترافیکی را capture می‌کنید؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> All TCP RST packets.</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> All TCP ACK packets.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> All TCP FIN packets.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> All TCP SYN packets.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) All TCP ACK packets</strong>
+                        <p>در هدر TCP، بایت شماره ۱۳ شامل پرچم‌های TCP است. مقدار هر پرچم: FIN=1، SYN=2، RST=4، PSH=8، ACK=16، URG=32. عبارت tcp[13] & 16 != 0 یعنی بسته‌هایی که بیت ACK در آنها تنظیم شده باشد (چون 16 = ACK). پس این فیلتر تمام بسته‌های TCP که پرچم ACK دارند را capture می‌کند، صرف‌نظر از اینکه SYN یا RST یا FIN هم داشته باشند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-40">
+                <p class="ex-question"><span class="ex-num">۴۰</span>شما از دستور iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080 استفاده کرده‌اید. یک کاربر به port 80 متصل می‌شود، اما connection hang می‌کند. اگر application محلی روی 8080 در حال listen باشد، رایج‌ترین علت چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> The traffic is being redirected, but the application on 8080 is bound only to 127.0.0.1, not 0.0.0.0.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Port 8080 is blocked by a hardware firewall.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> REDIRECT requires a custom routing table</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The PREROUTING chain is only for outbound traffic.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Application on 8080 bound to 127.0.0.1</strong>
+                        <p>دستور REDIRECT در iptables ترافیک ورودی به پورت ۸۰ را به پورت ۸۰۸۰ همان دستگاه هدایت می‌کند. اگر برنامه روی پورت ۸۰۸۰ به 127.0.0.1 (localhost) متصل شده باشد، فقط درخواست‌هایی که از خود دستگاه می‌آیند را می‌پذیرد. اما ترافیک هدایت‌شده از خارج به نظر می‌رسد که از آدرس IP دستگاه (نه 127.0.0.1) آمده است، بنابراین برنامه آن را رد می‌کند و اتصال hang می‌کند. راه حل: برنامه باید روی 0.0.0.0 listen کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== سوالات ۴۱ تا ۵۰ ===== -->
+            <div class="ex-card" data-q="3-41">
+                <p class="ex-question"><span class="ex-num">۴۱</span>روی یک server، lsof -i :80 هیچ processی را نشان نمی‌دهد، اما nmap localhost گزارش می‌دهد که port 80 در وضعیت filtered است. این چه مفهومی دارد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The network interface is down.</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> A firewall rule (iptables/nftables) is dropping packets destined for port 80 before they reach the stack.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The service has crashed</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The application is hidden.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Firewall dropping packets</strong>
+                        <p>وقتی lsof -i :80 هیچ فرآیندی را نشان نمی‌دهد، یعنی هیچ سرویسی روی پورت ۸۰ گوش نمی‌دهد. اما وقتی nmap وضعیت filtered را گزارش می‌دهد، یعنی بسته‌های ارسال شده به پورت ۸۰ drop می‌شوند، اما drop توسط فایروال انجام می‌شود، نه اینکه سرویسی وجود داشته باشد و پاسخ ندهد. در حالت filtered، nmap هیچ پاسخی دریافت نمی‌کند (نه SYN-ACK و نه RST)، بنابراین نتیجه می‌گیرد که یک فایروال در حال حذف بسته‌هاست.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-42">
+                <p class="ex-question"><span class="ex-num">۴۲</span>در تحلیل Wireshark/tcpdump به‌طور مداوم پیام TCP Previous segment not captured را مشاهده می‌کنید. این نشان‌دهنده چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The MTU is configured too high.</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> Packets are being dropped in the network before reaching your capture interface.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The server has high CPU load.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> Your capture filter is too broad.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Packets are being dropped in the network</strong>
+                        <p>پیام "TCP Previous segment not captured" در Wireshark به این معناست که یک یا چند بسته TCP که باید قبل از بسته فعلی می‌رسیدند، به interface capture نرسیده‌اند. این یعنی بسته‌ها در شبکه drop شده‌اند (مثلاً به دلیل ازدحام، خطا، یا فایروال) و تحلیلگر نمی‌تواند دنباله کامل بسته‌ها را بازسازی کند. این نشانه از دست رفتن بسته در شبکه است، نه مشکل در خود دستگاه تحلیلگر.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-43">
+                <p class="ex-question"><span class="ex-num">۴۳</span>شما در حال عیب‌یابی یک مشکل iptables هستید. می‌بینید packetها با rule شما match می‌شوند، اما tcpdump نشان می‌دهد که drop می‌شوند. برای پردازش پنهان packetها باید کدام table را بررسی کنید؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> filter</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> raw or mangle, where packets may be marked or tracked</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> security</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> nat</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) raw or mangle</strong>
+                        <p>در iptables، جدول‌ها به ترتیب: raw (برای connection tracking)، mangle (برای تغییر packet مانند TOS، TTL، marking)، nat (برای ترجمه آدرس)، filter (برای مجوزدهی و drop/accept) پردازش می‌شوند. اگر بسته‌ها با قانون شما در جدول filter match می‌شوند اما همچنان drop می‌شوند، یعنی قبل از رسیدن به filter، در جدول‌های raw یا mangle علامت‌گذاری یا ردیابی شده‌اند که روی تصمیم‌گیری نهایی تأثیر می‌گذارند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-44">
+                <p class="ex-question"><span class="ex-num">۴۴</span>با tcpdump ترافیک را capture کرده‌اید و متوجه می‌شوید که packetهای SYN از سمت کلاینت تکرار می‌شوند، اما هیچ SYN-ACKای برنمی‌گردد. server با ping در دسترس است. محتمل‌ترین علت چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The DNS server is not configured correctly.</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> A firewall or ACL is blocking traffic to the TCP port.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The client has an incorrect subnet mask.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The server is using APIPA.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) Firewall or ACL blocking the TCP port</strong>
+                        <p>وقتی کلاینت بسته‌های SYN را تکرار می‌کند اما هیچ SYN-ACKی از سرور برنمی‌گردد، یعنی بسته‌های SYN به سرور می‌رسند، اما سرور پاسخ نمی‌دهد. از آنجا که ping (ICMP) کار می‌کند، سرور در دسترس است و لایه‌های پایین سالم هستند. محتمل‌ترین دلیل: یک فایروال یا ACL در مسیر یا روی خود سرور، بسته‌های TCP ارسال شده به آن پورت خاص را drop می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-45">
+                <p class="ex-question"><span class="ex-num">۴۵</span>یک host می‌تواند به deviceهای داخل همان subnet دسترسی داشته باشد، اما به هیچ device خارج از subnet خود دسترسی ندارد. ip route نشان می‌دهد که default route وجود دارد. محتمل‌ترین مورد بعدی که باید بررسی شود چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> MAC resolution for the default gateway through ARP</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> Loopback interface</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Switch MTU</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> DNS server address</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) MAC resolution for the default gateway through ARP</strong>
+                        <p>اگر host بتواند با دستگاه‌های همان subnet ارتباط برقرار کند، یعنی لایه‌های ۱ و ۲ و ۳ داخلی سالم هستند و آدرس IP و subnet mask صحیح است. اما اگر به خارج از subnet دسترسی ندارد، با وجود اینکه default route در routing table وجود دارد، مشکل در جایی است که host نمی‌تواند بسته‌ها را به دروازه پیش‌فرض ارسال کند. برای ارسال بسته به دروازه، host باید آدرس MAC دروازه را بداند که از طریق ARP به دست می‌آید. اگر ARP موفق نباشد، بسته‌ها هرگز به دروازه نمی‌رسند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-46">
+                <p class="ex-question"><span class="ex-num">۴۶</span>شما دستور tcpdump -i eth0 port 53 را اجرا می‌کنید، اما فقط DNS queryهای خروجی را می‌بینید و هیچ پاسخی دریافت نمی‌شود. این موضوع با احتمال بیشتر چه چیزی را نشان می‌دهد؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> Return traffic is likely blocked due to a firewall or routing issue.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> The client is not generating DNS requests.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> UDP checksums are always invalid.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The DNS server only responds over TCP.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Return traffic blocked</strong>
+                        <p>اگر queryهای DNS خروجی (که از کلاینت به سرور DNS می‌روند) را در tcpdump می‌بینید، یعنی کلاینت درخواست را ارسال کرده است. اما هیچ پاسخی دیده نمی‌شود. این یعنی ترافیک برگشتی (پاسخ DNS) به کلاینت نمی‌رسد. محتمل‌ترین دلایل: فایروال پاسخ‌های UDP روی پورت ۵۳ را مسدود کرده است، یا مسیریابی برگشت مشکل دارد، یا NAT به درستی پیکربندی نشده است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-47">
+                <p class="ex-question"><span class="ex-num">۴۷</span>یک server روی port 22 در حال listen است، اما تلاش‌های SSH از راه دور hang می‌شوند و در نهایت timeout می‌شوند. lsof -i :22 تأیید می‌کند که sshd روی 0.0.0.0:22 bind شده است. محتمل‌ترین مشکل چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The server is in the wrong VLAN only if ping fails.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> SSH is not installed.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> There is a duplicate MAC address.</li>
+                    <li data-opt="3" data-correct="true"><span class="opt-letter">D</span> A network filter is dropping incoming packets before they reach the service.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: D) Network filter dropping incoming packets</strong>
+                        <p>lsof -i :22 نشان می‌دهد که sshd روی 0.0.0.0:22 در حال listen است، یعنی سرویس به‌درستی اجرا می‌شود. اما وقتی از راه دور تلاش می‌کنید، اتصال hang و timeout می‌شود. این یعنی بسته‌های SSH به سرور می‌رسند، اما به سرویس sshd نمی‌رسند. محتمل‌ترین دلیل: یک فیلتر شبکه (فایروال یا ACL) در مسیر یا روی خود سرور، بسته‌های ورودی به پورت ۲۲ را drop می‌کند.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-48">
+                <p class="ex-question"><span class="ex-num">۴۸</span>یک packet capture نشان می‌دهد که three-way handshake کامل می‌شود، اما انتقال داده بلافاصله بعد از اولین packet مربوط به application متوقف می‌شود. علت محتمل چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0" data-correct="true"><span class="opt-letter">A</span> The application or firewall accepts the connection but drops or rejects the payload traffic.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> The TCP port is closed.</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> The client has no gateway.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The switch is powered off.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: A) Application/firewall drops payload</strong>
+                        <p>Three-way handshake (SYN, SYN-ACK, ACK) کامل شدن یعنی اتصال TCP برقرار شده است، پورت باز است و مسیریابی سالم است. اما اگر بلافاصله بعد از ارسال اولین packet داده (payload)، انتقال متوقف شود، یعنی سرویس یا برنامه، اتصال را پذیرفته اما داده را رد می‌کند (مثلاً به دلیل اعتبارسنجی، مجوز، یا محتوای نادرست)، یا فایروال payload را drop می‌کند در حالی که اجازه handshake را داده است.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-49">
+                <p class="ex-question"><span class="ex-num">۴۹</span>هنگام تلاش برای اتصال به یک application port، از سمت server تعداد زیادی packet با RST flag مشاهده می‌کنید. این حالت معمولاً نشان‌دهنده چیست؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> The client has sent too many ARP requests.</li>
+                    <li data-opt="1"><span class="opt-letter">B</span> There is no default route in the routing table.</li>
+                    <li data-opt="2" data-correct="true"><span class="opt-letter">C</span> The server is actively rejecting the connection or no process is listening on that port.</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> The port is open and healthy.</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: C) Server rejecting or no process listening</strong>
+                        <p>در TCP، وقتی کلاینت یک SYN به پورت مشخصی ارسال می‌کند، سرور دو نوع پاسخ می‌دهد: SYN-ACK (پورت باز) یا RST (پورت بسته یا رد اتصال). دیدن بسته‌های RST از سمت سرور یعنی سرور در دسترس است اما پورت مورد نظر باز نیست یا برنامه آن را رد می‌کند. ARP requests زیاد یا عدم وجود default route روی خود کلاینت تأثیر می‌گذارند، نه سرور.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ex-card" data-q="3-50">
+                <p class="ex-question"><span class="ex-num">۵۰</span>کدام دستور برای این‌که سریع بررسی کنید آیا یک TCP port قابل دسترس است یا نه، بدون این‌که یک session کامل application برقرار شود، مناسب‌تر است؟</p>
+                <ul class="ex-options">
+                    <li data-opt="0"><span class="opt-letter">A</span> arp -a</li>
+                    <li data-opt="1" data-correct="true"><span class="opt-letter">B</span> nc -vz host port or telnet host port</li>
+                    <li data-opt="2"><span class="opt-letter">C</span> Ping</li>
+                    <li data-opt="3"><span class="opt-letter">D</span> traceroute</li>
+                </ul>
+                <div class="ex-answer">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>پاسخ صحیح: B) nc -vz or telnet</strong>
+                        <p>برای بررسی سریع اینکه آیا یک پورت TCP روی یک host قابل دسترس است یا نه، بهترین ابزارها: nc -vz (Netcat با گزینه‌های verbose و zero) که یک اتصال TCP خالی (بدون ارسال داده) به پورت مورد نظر برقرار می‌کند و نتیجه را نشان می‌دهد، و telnet host port که سعی می‌کند یک اتصال TCP به پورت برقرار کند و اگر موفق شد، نشان می‌دهد که پورت باز است. این روش‌ها فقط three-way handshake را انجام می‌دهند و هیچ داده‌ای تبادل نمی‌کنند، بنابراین سریع و سبک هستند.</p>
+                    </div>
+                </div>
+            </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(2)"><i class="fas fa-arrow-right"></i> تمرین قبلی</button>
+        <button class="nav-btn" disabled>پایان</button>
+    </div>
+</div>
+
+
+
+    </main>
+
+    <script>
+        // ===== Navbar =====
+        const totalChapters = 3;
+        const navLinks = document.getElementById('navLinks');
+        const chapterLabels = { 2: 'تمرین ۱', 3: 'تمرین ۲' };
+
+        for (let i = 2; i <= 3; i++) {
+            const a = document.createElement('a');
+            a.textContent = chapterLabels[i] || `فصل ${i}`;
+            a.setAttribute('onclick', `showChapter(${i})`);
+            a.id = `nav-link-${i}`;
+            if (i === 2) a.classList.add('active');
+            navLinks.appendChild(a);
+        }
+
+        function showChapter(num) {
+            document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+            document.getElementById('chap' + num).classList.add('active');
+
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-link-' + num).classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== Theme =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('.theme-icon');
+            if (theme === 'dark') {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        // ===== Progress Bar =====
+        window.onscroll = function () {
+            const scroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('progressBar').style.width = (scroll / height * 100) + '%';
+        };
+
+        // ===== Quiz Logic =====
+        document.querySelectorAll('.ex-card').forEach(card => {
+            const options = card.querySelectorAll('.ex-options li');
+            const answerDiv = card.querySelector('.ex-answer');
+            const qId = card.dataset.q;
+
+            options.forEach(li => {
+                li.addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) return;
+
+                    options.forEach(opt => {
+                        opt.classList.add('disabled');
+                        opt.style.cursor = 'default';
+                    });
+
+                    this.classList.add('selected-option');
+
+                    const isCorrect = this.dataset.correct === 'true';
+                    options.forEach(opt => {
+                        if (opt.dataset.correct === 'true') {
+                            opt.classList.add('correct-option');
+                            let check = opt.querySelector('.opt-check');
+                            if (!check) {
+                                check = document.createElement('i');
+                                check.className = 'fas fa-circle-check opt-check';
+                                opt.appendChild(check);
+                            }
+                        } else if (opt === this && !isCorrect) {
+                            opt.classList.add('wrong-option');
+                            let check = opt.querySelector('.opt-check');
+                            if (!check) {
+                                check = document.createElement('i');
+                                check.className = 'fas fa-circle-xmark opt-check';
+                                opt.appendChild(check);
+                            }
+                        }
+                    });
+
+                    answerDiv.classList.add('show');
+
+                    const progressSpan = document.querySelector(`.ex-progress span[data-q="${qId}"]`);
+                    if (progressSpan) {
+                        if (isCorrect) {
+                            progressSpan.classList.add('correct');
+                            progressSpan.classList.remove('wrong');
+                        } else {
+                            progressSpan.classList.add('wrong');
+                            progressSpan.classList.remove('correct');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
