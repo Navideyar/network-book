@@ -794,313 +794,337 @@
     <main class="main">
 
         <!-- فصل ۱ -->
-        <div id="chap1" class="chapter active">
-            <div class="chapter-header">
-                <div class="chapter-badge">۱</div>
-                <div>
-                    <h1>مفاهیم پایه و معماری پروتکل‌های شبکه</h1>
-                    <span>فصل اول · پایه‌ای محکم برای تمام پروتکل‌ها</span>
-                </div>
-            </div>
-
-            <div class="box important">
-                <i class="fas fa-bullseye"></i>
-                <div>
-                    <strong>هدف فصل</strong>
-                    در این فصل قرار نیست یک پروتکل خاص را حفظ کنید؛ بلکه می‌خواهیم بدانیم <strong>پروتکل اصلاً چیست</strong>، <strong>چرا به آن نیاز داریم</strong>، در کدام <strong>لایه</strong> از مدل شبکه قرار می‌گیرد، و چطور یک <strong>سرویس</strong> با یک <strong>پروتکل</strong> فرق دارد. این پایه‌ای است که اگر درست جا بیفتد، بقیه پروتکل‌ها را مانند اعضای یک خانواده طبقه‌بندی و به خاطر می‌سپارید.
-                </div>
-            </div>
-
-            <h2>۱. پروتکل (Protocol) یعنی چه؟</h2>
-            <p>ساده‌ترین تعریف: <strong>پروتکل یک قرارداد و قانون از پیش تعیین‌شده برای ارتباط بین دو دستگاه است.</strong></p>
-
-            <blockquote>
-                فرض کنید وارد یک فروشگاه در یک کشور خارجی شده‌اید. اگر فروشنده فقط انگلیسی بلد باشد و شما فقط فارسی، هیچ خریدی انجام نمی‌شود. اما اگر هر دو به یک زبان مشترک (مثلاً انگلیسی) صحبت کنید، داد و ستد ممکن می‌شود.
-            </blockquote>
-
-            <p>در شبکه، دستگاه‌ها (کامپیوتر، روتر، گوشی، پرینتر) دقیقاً همین وضعیت را دارند. آنها برای اینکه بتوانند بسته‌های داده را رد و بدل کنند، به یک <strong>زبان مشترک</strong> نیاز دارند. به این زبان مشترک، <strong>پروتکل</strong> می‌گویند.</p>
-
-            <p>پروتکل مشخص می‌کند:</p>
-            <ul>
-                <li>داده چگونه قالب‌بندی شود (فرمت بسته)</li>
-                <li>چه زمانی داده ارسال یا دریافت شود (Timing)</li>
-                <li>اگر داده گم شد یا خراب آمد، چه واکنشی نشان دهیم (Error Handling)</li>
-                <li>چگونه مقصد پیدا شود (Addressing)</li>
-            </ul>
-
-            <h2>۲. تفاوت طلایی: پروتکل در برابر سرویس</h2>
-            <p>این یکی از سوالاتی است که در مصاحبه‌های شبکه و امنیت خیلی پرسیده می‌شود و خیلی‌ها آن را قاطی می‌کنند. تفاوت را با یک مثال ساده یاد بگیرید:</p>
-
-            <div class="box note">
-                <i class="fas fa-lightbulb"></i>
-                <div>
-                    <strong>پروتکل (Protocol)</strong>
-                    قانون و سازوکار فنی است. مثلاً <strong>HTTP</strong> یک پروتکل است که مشخص می‌کند مرورگر چگونه درخواست یک صفحه وب را بنویسد و سرور چگونه پاسخ دهد.
-                </div>
-            </div>
-
-            <div class="box important">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong>سرویس (Service)</strong>
-                    نتیجه و کاربردی است که کاربر نهایی دریافت می‌کند. مثلاً <strong>مرور صفحات وب</strong>، یک سرویس است که از پروتکل HTTP (یا HTTPS) استفاده می‌کند.
-                </div>
-            </div>
-
-            <p>مثال‌های دیگر:</p>
-            <ul>
-                <li><strong>SMTP</strong> پروتکل است، <strong>ارسال ایمیل</strong> سرویس است.</li>
-                <li><strong>DNS</strong> پروتکل است، <strong>تبدیل نام دامنه به آی‌پی</strong> سرویس است.</li>
-            </ul>
-
-            <div class="key-point">
-                <i class="fas fa-key"></i>
-                <div>
-                    <strong>نکته حفظی:</strong> پروتکل، <strong>چگونگی</strong> ارتباط را می‌گوید؛ سرویس، <strong>نتیجه</strong> آن ارتباط را به کاربر نشان می‌دهد.
-                </div>
-            </div>
-
-            <h2>۳. پروتکل‌ها در کدام لایه قرار دارند؟</h2>
-            <p>برای اینکه سردرگم نشوید، نیازی به حفظ ۷ لایه OSI در این مرحله نیست. فقط لایه‌های کلیدی را در نظر بگیرید که ۹۰٪ پروتکل‌های این دوره در آنها قرار می‌گیرند:</p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>لایه</th>
-                        <th>شماره در OSI</th>
-                        <th>وظیفه اصلی</th>
-                        <th>نمونه‌های مهم</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>کاربرد (Application)</strong></td>
-                        <td>لایه ۷</td>
-                        <td>سرویس‌هایی که کاربر با آنها سر و کار دارد</td>
-                        <td>HTTP, FTP, SSH, DNS, SMTP, SNMP, LDAP, Kerberos</td>
-                    </tr>
-                    <tr>
-                        <td><strong>انتقال (Transport)</strong></td>
-                        <td>لایه ۴</td>
-                        <td>حمل مطمئن یا سریع داده به مقصد</td>
-                        <td>TCP, UDP</td>
-                    </tr>
-                    <tr>
-                        <td><strong>شبکه (Network)</strong></td>
-                        <td>لایه ۳</td>
-                        <td>آدرس‌دهی منطقی و یافتن مسیر</td>
-                        <td>IP (IPv4/IPv6), ICMP</td>
-                    </tr>
-                    <tr>
-                        <td><strong>پیوند داده (Data Link)</strong></td>
-                        <td>لایه ۲</td>
-                        <td>آدرس‌دهی فیزیکی و کنترل دسترسی به رسانه</td>
-                        <td>ARP, STP, LACP</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="box note">
-                <i class="fas fa-lightbulb"></i>
-                <div>
-                    <strong>قانون کلی</strong>
-                    اگر نام پروتکل برای کار خاص کاربری است یا با حرف اول Application شروع می‌شود، بدانید لایه ۷ است. اگر قرار است یک لینک فیزیکی بین دو روتر مدیریت شود، لایه ۲ است.
-                </div>
-            </div>
-
-            <h2>۴. پورت (Port) چیست و چرا به آن نیاز داریم؟</h2>
-            <p>تصور کنید یک ساختمان بزرگ (سرور) یک آدرس IP دارد (مثلاً ۱۹۲.۱۶۸.۱.۱). اما هزاران نفر (برنامه) می‌خواهند همزمان با این ساختمان ارتباط بگیرند؛ یکی می‌خواهد وب‌سایت را ببیند، یکی ایمیل بفرستد، یکی فایل جابه‌جا کند. چطور سرور تشخیص می‌دهد کدام درخواست برای کدام برنامه است؟</p>
-
-            <p>اینجا <strong>پورت</strong> وارد می‌شود. پورت، شماره یک «در» مجازی روی همان IP است که به یک سرویس خاص اختصاص دارد.</p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>پورت</th>
-                        <th>پروتکل / سرویس</th>
-                        <th>توضیح</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>۸۰</strong></td><td>HTTP</td><td>وب معمولی</td></tr>
-                    <tr><td><strong>۴۴۳</strong></td><td>HTTPS</td><td>وب امن</td></tr>
-                    <tr><td><strong>۲۲</strong></td><td>SSH</td><td>مدیریت امن از راه دور</td></tr>
-                    <tr><td><strong>۵۳</strong></td><td>DNS</td><td>تبدیل نام به IP</td></tr>
-                    <tr><td><strong>۲۵</strong></td><td>SMTP</td><td>ارسال ایمیل</td></tr>
-                    <tr><td><strong>۲۳</strong></td><td>Telnet</td><td>مدیریت ناامن (منسوخ)</td></tr>
-                </tbody>
-            </table>
-
-            <p>پورت‌ها به سه دسته تقسیم می‌شوند:</p>
-            <ul>
-                <li><strong>Well-Known (۰ تا ۱۰۲۳):</strong> مخصوص سرویس‌های اصلی و استاندارد</li>
-                <li><strong>Registered (۱۰۲۴ تا ۴۹۱۵۱):</strong> مخصوص برنامه‌های کاربردی خاص</li>
-                <li><strong>Dynamic/Private (۴۹۱۵۲ تا ۶۵۵۳۵):</strong> موقتی و برای ارتباطات کلاینت</li>
-            </ul>
-
-            <h2>۵. TCP در برابر UDP</h2>
-            <p>در لایه انتقال، دو پروتکل داریم که وظیفه حمل داده را بر عهده دارند. تفاوت آنها در یک جمله است:</p>
-
-            <div class="box important">
-                <i class="fas fa-shield-alt"></i>
-                <div>
-                    <strong>TCP (Transmission Control Protocol)</strong>
-                    مثل یک بسته‌پست پیشتاز با رسید و پیگیری است. حتماً می‌رسد، به ترتیب می‌رسد، اما هزینه (پهنای باند و زمان) بیشتری دارد.<br>
-                    <strong>کاربرد:</strong> وب (HTTP)، ایمیل (SMTP)، انتقال فایل (FTP)
-                </div>
-            </div>
-
-            <div class="box note">
-                <i class="fas fa-bolt"></i>
-                <div>
-                    <strong>UDP (User Datagram Protocol)</strong>
-                    مثل یک بادبادک یا پیام صوتی در بیسیم است. سریع ارسال می‌شود، اما اگر نرسد، فرستنده دیگر آن را نمی‌فرستد.<br>
-                    <strong>کاربرد:</strong> پخش زنده (Streaming)، بازی آنلاین، DNS (درخواست‌های معمولی)
-                </div>
-            </div>
-
-            <div class="key-point">
-                <i class="fas fa-key"></i>
-                <div>
-                    <strong>قانون طلایی:</strong> اگر پروتکل به <strong>درستی مطلق</strong> نیاز داشت → TCP. اگر به <strong>سرعت بالا</strong> نیاز داشت و افتادن چند بسته مشکلی ایجاد نمی‌کند → UDP.
-                </div>
-            </div>
-
-            <h2>🧪 سناریوهای عیب‌یابی مفهومی</h2>
-            <p>این سناریوها دقیقاً همان چیزهایی هستند که در دنیای واقعی با آنها روبه‌رو می‌شوید.</p>
-
-            <div class="scenario">
-                <div class="scenario-title">
-                    <i class="fas fa-exclamation-circle"></i>
-                    سناریو ۱: نت دارم، اما وب‌سایت‌ها باز نمی‌شوند!
-                </div>
-                <p>کاربر می‌گوید اینترنت دارد اما هیچ سایتی باز نمی‌شود. شما با دستور <code>ping 8.8.8.8</code> تست می‌کنید و پاسخ دریافت می‌کنید. مشکل از کجاست؟</p>
-                <div class="scenario-analysis">
-                    <strong>تحلیل:</strong> اگر پینگ (که از ICMP استفاده می‌کند) جواب دهد، یعنی اتصال لایه ۳ (IP) و لایه‌های ۱/۲ سالم است. اما وب‌سایت‌ها باز نمی‌شوند یعنی پروتکل HTTP/HTTPS (لایه کاربرد) یا پورت‌های ۸۰ و ۴۴۳ روی فایروال یا سرور پراکسی بسته شده‌اند. بنابراین مشکل از <strong>پورت‌های لایه کاربرد</strong> است، نه خود اینترنت.
-                </div>
-            </div>
-
-            <div class="scenario">
-                <div class="scenario-title">
-                    <i class="fas fa-exclamation-circle"></i>
-                    سناریو ۲: اتصال مداوم به پورت ۲۳
-                </div>
-                <p>شما در حال تحلیل ترافیک هستید و می‌بینید یک کامپیوتر داخلی مدام به پورت ۲۳ یک سرور خارجی متصل می‌شود. چه خطری وجود دارد و چه جایگزینی باید پیشنهاد دهید؟</p>
-                <div class="scenario-analysis">
-                    <strong>تحلیل:</strong> پورت ۲۳ متعلق به پروتکل Telnet است. Telnet یک پروتکل مدیریت از راه دور است که <strong>هیچ رمزنگاری</strong> ندارد و نام کاربری و رمز عبور را به صورت متن ساده (Plain Text) در شبکه می‌فرستد. هر کسی در مسیر می‌تواند آن را بخواند. جایگزین امن آن، <strong>SSH</strong> با پورت ۲۲ است که کل ارتباط را رمزنگاری می‌کند.
-                </div>
-            </div>
-
-            <div class="scenario">
-                <div class="scenario-title">
-                    <i class="fas fa-exclamation-circle"></i>
-                    سناریو ۳: کمترین تأخیر ممکن
-                </div>
-                <p>یک برنامه‌نویس می‌گوید اپلیکیشن من باید داده را با کمترین تأخیر ممکن به سرور برساند، حتی اگر چند بسته گم شود. کدام پروتکل لایه انتقال را پیشنهاد می‌دهید؟</p>
-                <div class="scenario-analysis">
-                    <strong>تحلیل:</strong> پیشنهاد <strong>UDP</strong>. چون UDP هدر کوچکتری دارد و فرآیند Three-Way Handshake را انجام نمی‌دهد. در نتیجه تأخیر (Latency) بسیار کمتری دارد. این برای بازی‌های آنلاین یا تماس‌های VoIP ایده‌آل است.
-                </div>
-            </div>
-
-            <h2>📝 خودآزمایی (۶ تست چهارگزینه‌ای)</h2>
-
-            <div class="quiz-card">
-                <p>❓ تست ۱: کدام گزینه به‌درستی تفاوت «پروتکل» و «سرویس» را بیان می‌کند؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) پروتکل سخت‌افزاری است، سرویس نرم‌افزاری است.</button>
-                    <button onclick="selectOption(this)">ب) پروتکل قانون ارتباط است، سرویس نتیجه‌ی کاربردی آن قانون است.</button>
-                    <button onclick="selectOption(this)">ج) پروتکل از TCP استفاده می‌کند، سرویس از UDP استفاده می‌کند.</button>
-                    <button onclick="selectOption(this)">د) تفاوتی ندارند و مترادف هستند.</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
-                    پروتکل (مثل HTTP) چارچوب فنی را می‌سازد و سرویس (مثل مشاهده صفحات وب) همان کاربردی است که کاربر نهایی دریافت می‌کند.
-                </div>
-            </div>
-
-            <div class="quiz-card">
-                <p>❓ تست ۲: یک مدیر شبکه می‌خواهد از راه دور یک روتر را مدیریت کند و امنیت برای او اولویت دارد. کدام پورت و پروتکل را باید استفاده کند؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) پورت ۲۳ (Telnet)</button>
-                    <button onclick="selectOption(this)">ب) پورت ۲۲ (SSH)</button>
-                    <button onclick="selectOption(this)">ج) پورت ۸۰ (HTTP)</button>
-                    <button onclick="selectOption(this)">د) پورت ۱۶۱ (SNMP)</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
-                    SSH (پورت ۲۲) ارتباط را رمزنگاری می‌کند، در حالی که Telnet (پورت ۲۳) و HTTP (پورت ۸۰) اطلاعات را به صورت متن ساده ارسال می‌کنند. SNMP برای مانیتورینگ است، نه مدیریت تعاملی خط‌فرمان.
-                </div>
-            </div>
-
-            <div class="quiz-card">
-                <p>❓ تست ۳: کدام پروتکل در لایه «انتقال (Transport)» قرار دارد و وظیفه آن ایجاد یک ارتباط مطمئن و پیاپی (Ordered) بین دو نقطه است؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) IP</button>
-                    <button onclick="selectOption(this)">ب) TCP</button>
-                    <button onclick="selectOption(this)">ج) UDP</button>
-                    <button onclick="selectOption(this)">د) ARP</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
-                    TCP با مکانیزم تأیید دریافت (ACK) و شماره‌گذاری سگمنت‌ها، تحویل مطمئن و به‌ترتیب را تضمین می‌کند. IP در لایه شبکه و ARP در لایه پیوند داده قرار دارند.
-                </div>
-            </div>
-
-            <div class="quiz-card">
-                <p>❓ تست ۴: کاربری می‌گوید «اینترنت وصل است اما ایمیلم را نمی‌توانم بفرستم» (Send). کدام پورت را به‌عنوان مقصر اصلی باید روی فایروال چک کنید؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) پورت ۱۱۰ (POP3)</button>
-                    <button onclick="selectOption(this)">ب) پورت ۱۴۳ (IMAP)</button>
-                    <button onclick="selectOption(this)">ج) پورت ۲۵ (SMTP)</button>
-                    <button onclick="selectOption(this)">د) پورت ۵۳ (DNS)</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
-                    SMTP با پورت ۲۵ وظیفه <strong>ارسال</strong> ایمیل را بر عهده دارد. POP3 (۱۱۰) و IMAP (۱۴۳) وظیفه <strong>دریافت</strong> ایمیل را دارند. DNS هم برای پیدا کردن آدرس سرور ایمیل است، نه خودِ عمل ارسال.
-                </div>
-            </div>
-
-            <div class="quiz-card">
-                <p>❓ تست ۵: کدام دستور (Utility) در شبکه از پروتکل ICMP برای بررسی زنده بودن (Reachability) مقصد استفاده می‌کند؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) netstat</button>
-                    <button onclick="selectOption(this)">ب) ping</button>
-                    <button onclick="selectOption(this)">ج) arp</button>
-                    <button onclick="selectOption(this)">د) nslookup</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
-                    دستور <code>ping</code> بسته‌های Echo Request را با پروتکل ICMP ارسال و منتظر Echo Reply می‌ماند. <code>netstat</code> وضعیت پورت‌ها را نشان می‌دهد، <code>arp</code> جدول تبدیل IP به MAC را نشان می‌دهد و <code>nslookup</code> برای پرس‌وجوی DNS است.
-                </div>
-            </div>
-
-            <div class="quiz-card">
-                <p>❓ تست ۶: یک برنامه نیاز به پخش زنده ویدیو (Live Streaming) دارد. کدام ویژگی UDP آن را به گزینه بهتری نسبت به TCP تبدیل می‌کند؟</p>
-                <div class="quiz-options">
-                    <button onclick="selectOption(this)">الف) تحویل مطمئن داده‌ها</button>
-                    <button onclick="selectOption(this)">ب) سرعت بالا و تأخیر کمتر (با وجود احتمال افت بسته)</button>
-                    <button onclick="selectOption(this)">ج) قابلیت رمزنگاری داخلی</button>
-                    <button onclick="selectOption(this)">د) قابلیت مسیریابی در اینترنت</button>
-                </div>
-                <div class="quiz-answer">
-                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
-                    UDP هدر کوچک‌تر و بدون نیاز به برقراری جلسه (Connectionless) است، بنابراین سریع‌تر است. پخش زنده به تأخیر کم اهمیت‌تر از از دست رفتن چند فریم است، پس UDP انتخاب می‌شود.
-                </div>
-            </div>
-
-            <div class="box note">
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <strong>اگر این مفاهیم پایه برایتان جا افتاد...</strong>
-                    در فصل دوم به راحتی وارد پروتکل‌های مدیریتی مثل NTP، Syslog و SNMP خواهیم شد. آماده‌اید برویم سراغ فصل دوم؟
-                </div>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="nav-btn" disabled>قبلی</button>
-                <button class="nav-btn" onclick="showChapter(2)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
-            </div>
+<!-- فصل اول: مفاهیم پایه و معماری پروتکل‌های شبکه -->
+<div id="chap1" class="chapter active">
+    <div class="chapter-header">
+        <div class="chapter-badge">۱</div>
+        <div>
+            <h1>مفاهیم پایه و معماری پروتکل‌های شبکه</h1>
+            <span>فصل اول - پایه‌ای برای همه پروتکل‌های بعدی</span>
         </div>
+    </div>
+
+<div class="goal-banner">
+    <i class="fas fa-bullseye"></i>
+    <div>
+        <strong>هدف این فصل</strong>
+        در این فصل قرار نیست پروتکلی را حفظ کنید؛ می‌خواهیم <strong>مفهوم پروتکل</strong> را درک کنید. می‌آموزید که دستگاه‌ها چطور با هم ارتباط برقرار می‌کنند، پروتکل‌ها در کدام <strong>لایه</strong> از شبکه قرار می‌گیرند و تفاوت <strong>پروتکل</strong> با <strong>سرویس</strong> در چیست. این پایه‌ی محکم، باعث می‌شود بقیه پروتکل‌ها را مثل اعضای یک خانواده دسته‌بندی کنید و هیچ‌وقت آنها را قاطی نکنید.
+    </div>
+</div>
+
+    <!-- ۱. پروتکل یعنی چه -->
+    <h2>۱. پروتکل (Protocol) یعنی چه؟</h2>
+    <p>ساده‌ترین تعریف: <strong>پروتکل یک قرارداد و قانون از پیش تعیین‌شده برای ارتباط بین دو دستگاه است.</strong></p>
+
+    <div class="box important">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>تعریف ساده</strong>
+            پروتکل یک قرارداد و قانون از پیش تعیین‌شده برای ارتباط بین دو دستگاه است.
+        </div>
+    </div>
+
+    <p>فرض کنید وارد یک فروشگاه در یک کشور خارجی شده‌اید. اگر فروشنده فقط انگلیسی بلد باشد و شما فقط فارسی، هیچ خریدی انجام نمی‌شود. اما اگر هر دو به یک زبان مشترک صحبت کنید، داد و ستد ممکن می‌شود. دستگاه‌های شبکه (کامپیوتر، روتر، گوشی، پرینتر) دقیقاً همین وضعیت را دارند؛ برای رد و بدل کردن بسته‌های داده به یک زبان مشترک نیاز دارند. به این زبان مشترک <strong>پروتکل</strong> می‌گویند.</p>
+
+    <p>پروتکل مشخص می‌کند:</p>
+    <div class="mini-grid">
+        <div class="mini-card">
+            <i class="fas fa-file-shield"></i>
+            <strong>فرمت بسته</strong>
+            <p>داده چگونه قالب‌بندی شود.</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-clock"></i>
+            <strong>زمان‌بندی (Timing)</strong>
+            <p>چه زمانی داده ارسال یا دریافت شود.</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-triangle-exclamation"></i>
+            <strong>مدیریت خطا</strong>
+            <p>اگر داده گم یا خراب شد، چه واکنشی نشان دهیم.</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-location-dot"></i>
+            <strong>آدرس‌دهی</strong>
+            <p>چگونه مقصد پیدا شود.</p>
+        </div>
+    </div>
+
+    <!-- ۲. تفاوت پروتکل و سرویس -->
+    <h2>۲. تفاوت طلایی: پروتکل در برابر سرویس</h2>
+    <p>این یکی از سوالاتی است که در مصاحبه‌های شبکه و امنیت خیلی پرسیده می‌شود و خیلی‌ها آن را قاطی می‌کنند. تفاوت را با یک مثال ساده یاد بگیرید:</p>
+
+    <ul>
+        <li><strong>پروتکل (Protocol):</strong> قانون و سازوکار فنی است. مثلاً <strong>HTTP</strong> یک پروتکل است که مشخص می‌کند مرورگر چگونه درخواست یک صفحه وب را بنویسد و سرور چگونه پاسخ دهد.</li>
+        <li><strong>سرویس (Service):</strong> نتیجه و کاربردی است که کاربر نهایی دریافت می‌کند. مثلاً <strong>مرور صفحات وب</strong>، یک سرویس است که از پروتکل HTTP (یا HTTPS) استفاده می‌کند.</li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr>
+                <th>پروتکل</th>
+                <th>سرویس متناظر</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>HTTP / HTTPS</strong></td><td>مرور صفحات وب</td></tr>
+            <tr><td><strong>SMTP</strong></td><td>ارسال ایمیل</td></tr>
+            <tr><td><strong>DNS</strong></td><td>تبدیل نام دامنه به آی‌پی</td></tr>
+        </tbody>
+    </table>
+
+    <div class="box note">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+            <strong>نکته حفظی</strong>
+            پروتکل، «چگونگی» ارتباط را می‌گوید؛ سرویس، «نتیجه» آن ارتباط را به کاربر نشان می‌دهد.
+        </div>
+    </div>
+
+    <!-- ۳. لایه‌های شبکه -->
+    <h2>۳. پروتکل‌ها در کدام لایه قرار دارند؟</h2>
+    <p>برای اینکه سردرگم نشوید، نیازی به حفظ ۷ لایه OSI در این مرحله نیست. فقط چهار لایه کلیدی را در نظر بگیرید که بیشتر پروتکل‌های این دوره در آن‌ها قرار می‌گیرند:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>لایه</th>
+                <th>وظیفه</th>
+                <th>نمونه پروتکل‌ها</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>کاربرد</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Application · لایه ۷</span></td>
+                <td>پروتکل‌هایی که کاربر مستقیماً با آن‌ها سروکار دارد</td>
+                <td>HTTP، FTP، SSH، DNS، SMTP، SNMP، LDAP، Kerberos</td>
+            </tr>
+            <tr>
+                <td><strong>انتقال</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Transport · لایه ۴</span></td>
+                <td>رساندن مطمئن یا سریع داده به مقصد</td>
+                <td>TCP، UDP</td>
+            </tr>
+            <tr>
+                <td><strong>شبکه</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Network · لایه ۳</span></td>
+                <td>آدرس‌دهی منطقی (IP) و یافتن مسیر</td>
+                <td>IP (v4/v6)، ICMP</td>
+            </tr>
+            <tr>
+                <td><strong>پیوند داده</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Data Link · لایه ۲</span></td>
+                <td>آدرس‌دهی فیزیکی (MAC) و کنترل دسترسی به رسانه</td>
+                <td>ARP، STP، LACP</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="box warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <strong>یک قانون کلی</strong>
+            اگر پروتکل برای یک کار خاص کاربری است، معمولاً لایه ۷ (کاربرد) است. اگر قرار است یک لینک فیزیکی بین دو روتر مدیریت شود، معمولاً لایه ۲ است.
+        </div>
+    </div>
+
+    <!-- ۴. پورت چیست -->
+    <h2>۴. پورت (Port) چیست و چرا به آن نیاز داریم؟</h2>
+    <p>تصور کنید یک ساختمان بزرگ (سرور) یک آدرس IP دارد (مثلاً ۱۹۲.۱۶۸.۱.۱). اما هزاران نفر (برنامه) می‌خواهند همزمان با این ساختمان ارتباط بگیرند؛ یکی می‌خواهد وب‌سایت را ببیند، یکی ایمیل بفرستد، یکی فایل جابه‌جا کند. چطور سرور تشخیص می‌دهد کدام درخواست برای کدام برنامه است؟</p>
+
+    <div class="box important">
+        <i class="fas fa-door-open"></i>
+        <div>
+            <strong>تعریف پورت</strong>
+            پورت، شماره یک «در» مجازی روی همان IP است که به یک سرویس خاص اختصاص دارد.
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>پورت</th>
+                <th>سرویس</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>۸۰</strong></td><td>وب (HTTP)</td></tr>
+            <tr><td><strong>۴۴۳</strong></td><td>وب امن (HTTPS)</td></tr>
+            <tr><td><strong>۲۲</strong></td><td>مدیریت امن (SSH)</td></tr>
+            <tr><td><strong>۵۳</strong></td><td>تبدیل نام به IP (DNS)</td></tr>
+        </tbody>
+    </table>
+
+    <p>پورت‌ها به سه دسته تقسیم می‌شوند:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>دسته</th>
+                <th>محدوده</th>
+                <th>کاربرد</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Well-Known</strong></td><td>۰ تا ۱۰۲۳</td><td>سرویس‌های اصلی و استاندارد</td></tr>
+            <tr><td><strong>Registered</strong></td><td>۱۰۲۴ تا ۴۹۱۵۱</td><td>برنامه‌های کاربردی خاص</td></tr>
+            <tr><td><strong>Dynamic/Private</strong></td><td>۴۹۱۵۲ تا ۶۵۵۳۵</td><td>موقتی، برای ارتباطات کلاینت</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ۵. TCP در برابر UDP -->
+    <h2>۵. TCP در برابر UDP</h2>
+    <p>در لایه انتقال، دو پروتکل حمل داده را بر عهده دارند و تفاوتشان در یک جمله خلاصه می‌شود:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ویژگی</th>
+                <th>TCP</th>
+                <th>UDP</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>تشبیه</td><td>پست پیشتاز با رسید و پیگیری</td><td>بادبادک یا پیام صوتی بی‌سیم</td></tr>
+            <tr><td>تحویل</td><td>تضمین‌شده و به‌ترتیب</td><td>بدون تضمین</td></tr>
+            <tr><td>سرعت</td><td>کندتر (هزینه بیشتر)</td><td>سریع‌تر</td></tr>
+            <tr><td>کاربرد نمونه</td><td>وب، ایمیل، انتقال فایل</td><td>پخش زنده، بازی آنلاین، DNS</td></tr>
+        </tbody>
+    </table>
+
+    <div class="box note">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+            <strong>قانون طلایی</strong>
+            اگر پروتکل به «درستی مطلق» نیاز داشت → TCP. اگر به «سرعت بالا» نیاز داشت و افتادن چند بسته مشکلی ایجاد نمی‌کند → UDP.
+        </div>
+    </div>
+
+    <!-- سناریوها -->
+    <h2>سناریوهای عیب‌یابی مفهومی</h2>
+    <p>برای اینکه این مفاهیم را به دنیای واقعی وصل کنیم، روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-wifi"></i></span> سناریو ۱ — «نت دارم، اما وب‌سایت‌ها باز نمی‌شوند!»</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">اگر <code>ping 8.8.8.8</code> جواب بدهد، یعنی اتصال لایه ۳ (IP) و لایه‌های پایین‌تر سالم است. اما وب‌سایت‌ها باز نمی‌شوند یعنی مشکل از <strong>پورت‌های لایه کاربرد</strong> است — احتمالاً پورت ۸۰/۴۴۳ روی فایروال یا پراکسی بسته شده، نه خودِ اینترنت.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-terminal"></i></span> سناریو ۲ — اتصال مکرر به پورت ۲۳ یک سرور خارجی</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">پورت ۲۳ متعلق به <strong>Telnet</strong> است که هیچ رمزنگاری‌ای ندارد و نام‌کاربری/رمز را به‌صورت متن ساده می‌فرستد؛ هر کسی در مسیر می‌تواند آن را بخواند. جایگزین امن، <strong>SSH</strong> با پورت ۲۲ است که کل ارتباط را رمزنگاری می‌کند.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-bolt"></i></span> سناریو ۳ — کمترین تأخیر ممکن، حتی با از دست رفتن چند بسته</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">پیشنهاد <strong>UDP</strong> است. چون هدر کوچک‌تری دارد و Three-Way Handshake انجام نمی‌دهد، در نتیجه تأخیر بسیار کمتری دارد — ایده‌آل برای بازی‌های آنلاین یا تماس‌های VoIP.</p>
+        </div>
+    </details>
+
+    <!-- تست‌ها -->
+    <h2>تست چهارگزینه‌ای استاندارد</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کدام گزینه به‌درستی تفاوت «پروتکل» و «سرویس» را بیان می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) پروتکل سخت‌افزاری است، سرویس نرم‌افزاری است</button>
+            <button onclick="selectOption(this)">ب) پروتکل قانون ارتباط است، سرویس نتیجه‌ی کاربردی آن قانون است</button>
+            <button onclick="selectOption(this)">ج) پروتکل از TCP استفاده می‌کند، سرویس از UDP</button>
+            <button onclick="selectOption(this)">د) تفاوتی ندارند و مترادف هستند</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            پروتکل (مثل HTTP) چارچوب فنی می‌سازد و سرویس (مثل مشاهده صفحات وب) همان کاربردی است که کاربر نهایی دریافت می‌کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. یک مدیر شبکه می‌خواهد از راه دور یک روتر را مدیریت کند و امنیت برایش اولویت دارد. کدام گزینه؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) پورت ۲۳ (Telnet)</button>
+            <button onclick="selectOption(this)">ب) پورت ۲۲ (SSH)</button>
+            <button onclick="selectOption(this)">ج) پورت ۸۰ (HTTP)</button>
+            <button onclick="selectOption(this)">د) پورت ۱۶۱ (SNMP)</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            SSH (پورت ۲۲) ارتباط را رمزنگاری می‌کند، در حالی که Telnet و HTTP اطلاعات را به‌صورت متن ساده می‌فرستند. SNMP برای مانیتورینگ است، نه مدیریت تعاملی خط‌فرمان.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. کدام پروتکل در لایه «انتقال» قرار دارد و ارتباط مطمئن و پیاپی بین دو نقطه می‌سازد؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) IP</button>
+            <button onclick="selectOption(this)">ب) TCP</button>
+            <button onclick="selectOption(this)">ج) UDP</button>
+            <button onclick="selectOption(this)">د) ARP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            TCP با مکانیزم تأیید دریافت (ACK) و شماره‌گذاری سگمنت‌ها، تحویل مطمئن و به‌ترتیب را تضمین می‌کند. IP در لایه شبکه و ARP در لایه پیوند داده قرار دارند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. کاربری می‌گوید «اینترنت وصل است اما ایمیلم را نمی‌توانم بفرستم». کدام پورت را روی فایروال چک می‌کنید؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) پورت ۱۱۰ (POP3)</button>
+            <button onclick="selectOption(this)">ب) پورت ۱۴۳ (IMAP)</button>
+            <button onclick="selectOption(this)">ج) پورت ۲۵ (SMTP)</button>
+            <button onclick="selectOption(this)">د) پورت ۵۳ (DNS)</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            SMTP با پورت ۲۵ وظیفه ارسال ایمیل را دارد. POP3 و IMAP وظیفه دریافت دارند. DNS فقط آدرس سرور را پیدا می‌کند، نه خودِ عمل ارسال.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام دستور از پروتکل ICMP برای بررسی زنده بودن مقصد استفاده می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) netstat</button>
+            <button onclick="selectOption(this)">ب) ping</button>
+            <button onclick="selectOption(this)">ج) arp</button>
+            <button onclick="selectOption(this)">د) nslookup</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            دستور ping بسته‌های Echo Request را با ICMP ارسال و منتظر Echo Reply می‌ماند. netstat وضعیت پورت‌ها، arp جدول IP-به-MAC و nslookup پرس‌وجوی DNS را نشان می‌دهند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. برای پخش زنده ویدیو، کدام ویژگی UDP آن را بهتر از TCP می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) تحویل مطمئن داده‌ها</button>
+            <button onclick="selectOption(this)">ب) سرعت بالا و تأخیر کمتر (با وجود احتمال افت بسته)</button>
+            <button onclick="selectOption(this)">ج) قابلیت رمزنگاری داخلی</button>
+            <button onclick="selectOption(this)">د) قابلیت مسیریابی در اینترنت</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            UDP هدر کوچک‌تر و بدون نیاز به برقراری جلسه (Connectionless) است، پس سریع‌تر است. در پخش زنده، تأخیر کم از افت چند فریم مهم‌تر است.
+        </div>
+    </div>
+
+    <div class="box important" style="margin-top:40px;">
+        <i class="fas fa-arrow-turn-down"></i>
+        <div>
+            <strong>گام بعدی</strong>
+            اگر این مفاهیم پایه برایتان جا افتاد، در فصل دوم به راحتی وارد پروتکل‌های مدیریتی مثل NTP، Syslog و SNMP خواهیم شد.
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" disabled><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" onclick="showChapter(2)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
         <!-- فصل ۲ تا ۶ — placeholder -->
 <!-- فصل ۲ -->
 <div id="chap2" class="chapter">
@@ -1112,13 +1136,13 @@
         </div>
     </div>
 
-    <div class="goal-banner">
-        <i class="fas fa-bullseye"></i>
-        <div>
-            <strong>هدف این فصل</strong>
-            یاد می‌گیرید که یک شبکه بدون این سه پروتکل عملاً کور و کر است. <strong>NTP</strong> باعث می‌شود همه دستگاه‌ها یک زمان واحد داشته باشند. <strong>Syslog</strong> تمام رویدادهای مهم را در یک جا جمع می‌کند. <strong>SNMP</strong> وضعیت لحظه‌ای تجهیزات را نشان می‌دهد. این سه، مثل سه پایه یک مثلث، زیرساخت هر اتاق عملیات امنیت (SOC) هستند.
-        </div>
+<div class="goal-banner">
+    <i class="fas fa-bullseye"></i>
+    <div>
+        <strong> هدف این فصل</strong>
+        آیا تا به حال فکر کرده‌اید که یک شبکه بدون این سه پروتکل چگونه خواهد بود؟ <strong>NTP</strong> همانند یک ساعت‌ساز دقیق، زمان همه دستگاه‌ها را هماهنگ می‌کند. <strong>Syslog</strong> مثل یک دفترچه ثبت وقایع، تمام رویدادهای مهم را در یک جا جمع‌آوری می‌کند. <strong>SNMP</strong> نیز مانند یک دوربین مداربسته، وضعیت لحظه‌ای تجهیزات را به شما نشان می‌دهد. این سه پروتکل، مثلثی محکم را تشکیل می‌دهند که زیرساخت هر مرکز عملیات امنیت (SOC) بر آن استوار است.
     </div>
+</div>
 
     <h2>۱. NTP — هماهنگ‌کننده‌ی زمان</h2>
     <p>NTP (Network Time Protocol) یک پروتکل ساده اما حیاتی است که وظیفه دارد ساعت تمام دستگاه‌های شبکه را با یک منبع معتبر زمان، هماهنگ (Synchronize) کند.</p>
