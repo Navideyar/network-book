@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>پروتکل‌های شبکه · Modern Glass</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ----- reset & base ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --primary-soft: rgba(124, 58, 237, 0.14);
+            --primary-glow: rgba(124, 58, 237, 0.28);
+            --accent: #06b6d4;
+
+            --bg-body: #f1f5f9;
+            --bg-card: rgba(255, 255, 255, 0.55);
+            --bg-navbar: rgba(255, 255, 255, 0.70);
+            --text-main: #1e293b;
+            --text-heading: #0f172a;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.5);
+            --border-dark: rgba(148, 163, 184, 0.25);
+            --shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            --radius: 18px;
+
+            --note-bg: rgba(16, 185, 129, 0.12);
+            --note-border: #10b981;
+            --important-bg: rgba(59, 130, 246, 0.12);
+            --important-border: #3b82f6;
+            --warning-bg: rgba(245, 158, 11, 0.13);
+            --warning-border: #f59e0b;
+
+            --code-bg: rgba(15, 23, 42, 0.92);
+            --code-text: #e2e8f0;
+            --terminal-green: #34d399;
+        }
+
+        [data-theme="dark"] {
+            --primary: #a78bfa;
+            --primary-hover: #c4b5fd;
+            --primary-soft: rgba(167, 139, 250, 0.16);
+            --primary-glow: rgba(167, 139, 250, 0.3);
+            --accent: #22d3ee;
+
+            --bg-body: #0b1120;
+            --bg-card: rgba(30, 41, 59, 0.55);
+            --bg-navbar: rgba(15, 23, 42, 0.80);
+            --text-main: #e2e8f0;
+            --text-heading: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-dark: rgba(148, 163, 184, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+            --note-bg: rgba(16, 185, 129, 0.14);
+            --note-border: #34d399;
+            --important-bg: rgba(59, 130, 246, 0.14);
+            --important-border: #60a5fa;
+            --warning-bg: rgba(245, 158, 11, 0.14);
+            --warning-border: #fbbf24;
+
+            --code-bg: rgba(2, 6, 23, 0.9);
+            --code-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.85;
+            font-size: 16.5px;
+            padding-top: 74px;
+            transition: background 0.35s, color 0.35s;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(at 10% 20%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(167, 139, 250, 0.06) 0px, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        /* ----- Navbar (FIXED AT BOTTOM ON MOBILE) ----- */
+        .navbar {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            height: 62px;
+            background: var(--bg-navbar);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            transition: background 0.35s, border 0.35s;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+        .brand span {
+            display: none;
+        }
+
+        .nav-links {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 4px 2px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-links a {
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: 0.25s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .nav-links a:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+        .nav-links a.active {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: #fff;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .home-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg-card);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            flex-shrink: 0;
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+        }
+        .home-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-dark);
+            background: var(--bg-card);
+            color: var(--primary);
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: 0.25s;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .theme-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        @media (max-width: 500px) {
+            .navbar {
+                bottom: 12px;
+                left: 10px;
+                right: 10px;
+                height: 58px;
+                padding: 0 10px;
+                gap: 6px;
+                border-radius: 18px;
+            }
+            .brand-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 0.9rem;
+            }
+            .nav-links a {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+            .home-btn,
+            .theme-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 0.95rem;
+            }
+            body {
+                padding-top: 0;
+                padding-bottom: 80px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .brand span {
+                display: none;
+            }
+        }
+
+        .progress-track {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            z-index: 1001;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.15s;
+        }
+
+        /* ========== Content ========== */
+        .main {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 20px 20px 90px;
+        }
+
+        .chapter {
+            display: none;
+            animation: fadeUp 0.45s ease;
+        }
+        .chapter.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chapter-header {
+            background: var(--bg-card);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            margin-bottom: 36px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chapter-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary-soft), transparent 60%);
+            pointer-events: none;
+        }
+        .chapter-badge {
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.55rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px var(--primary-glow);
+            position: relative;
+            z-index: 1;
+        }
+        .chapter-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        .chapter-header span {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
+        }
+
+        .goal-banner {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: linear-gradient(135deg, var(--primary-soft), rgba(6,182,212,0.08));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+        }
+        .goal-banner i {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-top: 3px;
+        }
+        .goal-banner strong {
+            display: block;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+            font-size: 1.02rem;
+        }
+
+        h2 {
+            color: var(--text-heading);
+            font-size: 1.28rem;
+            margin: 38px 0 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h2::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            transform: rotate(45deg);
+        }
+        h3 {
+            color: var(--text-heading);
+            font-size: 1.1rem;
+            margin: 24px 0 10px;
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        strong {
+            color: var(--text-heading);
+        }
+
+        ul,
+        ol {
+            margin: 12px 0 20px;
+            padding-right: 24px;
+        }
+        li {
+            margin-bottom: 7px;
+        }
+
+        blockquote {
+            background: var(--primary-soft);
+            border-right: 4px solid var(--primary);
+            padding: 16px 20px;
+            margin: 22px 0;
+            border-radius: 0 14px 14px 0;
+            color: var(--text-heading);
+            font-style: italic;
+            backdrop-filter: blur(8px);
+        }
+
+        /* Boxes - Glass */
+        .box {
+            display: flex;
+            gap: 16px;
+            padding: 18px 20px;
+            border-radius: 16px;
+            margin: 24px 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .box i {
+            font-size: 1.3rem;
+            margin-top: 3px;
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .box strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1.03rem;
+        }
+
+        .box.note {
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+        .box.note i {
+            color: var(--note-border);
+            background: var(--note-bg);
+        }
+        .box.note strong {
+            color: var(--note-border);
+        }
+
+        .box.important {
+            border-color: rgba(59, 130, 246, 0.25);
+        }
+        .box.important i {
+            color: var(--important-border);
+            background: var(--important-bg);
+        }
+        .box.important strong {
+            color: var(--important-border);
+        }
+
+        .box.warning {
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+        .box.warning i {
+            color: var(--warning-border);
+            background: var(--warning-bg);
+        }
+        .box.warning strong {
+            color: var(--warning-border);
+        }
+
+        /* mini feature grid (what a protocol defines) */
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0 28px;
+        }
+        .mini-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+        .mini-card i {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        .mini-card strong {
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+            color: var(--text-heading);
+        }
+        .mini-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+        @media (max-width: 500px) {
+            .mini-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 0.93rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow);
+        }
+        th,
+        td {
+            border: 1px solid var(--border-dark);
+            padding: 13px 16px;
+            text-align: right;
+        }
+        th {
+            background: var(--primary-soft);
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+        tr:hover td {
+            background: var(--primary-soft);
+        }
+
+        /* Details (scenarios) */
+        details {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px 18px;
+            margin: 16px 0;
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow);
+        }
+        summary {
+            font-weight: 600;
+            color: var(--text-heading);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        summary .sc-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: auto;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: 0.25s;
+        }
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+        details[open] summary {
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--border-dark);
+        }
+        .sc-analysis {
+            display: flex;
+            gap: 10px;
+            color: var(--text-main);
+        }
+        .sc-analysis i {
+            color: var(--note-border);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Quiz */
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 26px;
+            margin: 32px 0 18px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+        .quiz-card>p {
+            font-weight: 700;
+            font-size: 1.06rem;
+            color: var(--text-heading);
+            margin-bottom: 18px;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quiz-options button {
+            background: rgba(255, 255, 255, 0.35);
+            border: 1.5px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 13px 18px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: 0.25s;
+            backdrop-filter: blur(6px);
+        }
+        [data-theme="dark"] .quiz-options button {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        .quiz-options button:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .quiz-options button.selected {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+        .quiz-answer {
+            display: none;
+            margin-top: 16px;
+            padding: 15px 18px;
+            background: var(--note-bg);
+            border-radius: 12px;
+            border-right: 4px solid var(--note-border);
+            color: var(--text-heading);
+            font-size: 0.95rem;
+        }
+        .quiz-answer.show {
+            display: block;
+            animation: fadeUp 0.3s;
+        }
+
+        /* placeholder chapters */
+        .coming-soon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 14px;
+            padding: 60px 24px;
+            background: var(--bg-card);
+            border: 1px dashed var(--border-dark);
+            border-radius: var(--radius);
+            backdrop-filter: blur(12px);
+        }
+        .coming-soon i {
+            font-size: 2.4rem;
+            color: var(--primary);
+        }
+        .coming-soon h3 {
+            margin: 0;
+        }
+        .coming-soon p {
+            color: var(--text-muted);
+            margin-bottom: 0;
+            max-width: 420px;
+        }
+
+        /* Nav buttons (inside content) */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 52px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border-dark);
+            gap: 14px;
+        }
+        .nav-btn {
+            padding: 13px 26px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.25s;
+            box-shadow: 0 6px 20px var(--primary-glow);
+            font-weight: 500;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px var(--primary-glow);
+        }
+        .nav-btn:disabled {
+            background: var(--border-dark);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        @media (max-width: 640px) {
+            .main {
+                padding: 16px 14px 100px;
+            }
+            .chapter-header {
+                padding: 22px;
+                gap: 16px;
+            }
+            .chapter-badge {
+                width: 52px;
+                height: 52px;
+                font-size: 1.3rem;
+                border-radius: 16px;
+            }
+            .chapter-header h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar (still at top) -->
+    <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- ====== NAVBAR (FIXED AT BOTTOM) ====== -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-diagram-project"></i></div>
+            <span>پروتکل‌ها</span>
+        </div>
+
+        <div class="nav-links" id="navLinks"></div>
+
+        <a class="home-btn" href="index.html" title="بازگشت به خانه">
+            <i class="fas fa-house"></i>
+        </a>
+
+        <button class="theme-btn" onclick="toggleTheme()" title="تغییر تم">
+            <i class="fas fa-moon theme-icon"></i>
+        </button>
+    </nav>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="main">
+
+        <!-- فصل ۱ -->
+        <div id="chap1" class="chapter active">
+            <div class="chapter-header">
+                <div class="chapter-badge">۱</div>
+                <div>
+                    <h1>مفاهیم پایه و معماری پروتکل‌های شبکه</h1>
+                    <span>فصل اول از ۶ · پایه‌ای برای همه پروتکل‌های بعدی</span>
+                </div>
+            </div>
+
+            <div class="goal-banner">
+                <i class="fas fa-bullseye"></i>
+                <div>
+                    <strong>هدف این فصل</strong>
+                    قرار نیست یک پروتکل خاص را حفظ کنید؛ می‌خواهیم بدانیم <strong>پروتکل اصلاً چیست</strong>، چرا به آن نیاز داریم، در کدام <strong>لایه</strong> از مدل شبکه قرار می‌گیرد و چطور یک <strong>سرویس</strong> با یک <strong>پروتکل</strong> فرق دارد. اگر این پایه درست جا بیفتد، بقیه پروتکل‌ها را مثل اعضای یک خانواده طبقه‌بندی و به‌خاطر می‌سپارید.
+                </div>
+            </div>
+
+            <h2>۱. پروتکل (Protocol) یعنی چه؟</h2>
+            <p>فرض کنید وارد یک فروشگاه در یک کشور خارجی شده‌اید. اگر فروشنده فقط انگلیسی بلد باشد و شما فقط فارسی، هیچ خریدی انجام نمی‌شود. اما اگر هر دو به یک زبان مشترک صحبت کنید، داد و ستد ممکن می‌شود. دستگاه‌های شبکه (کامپیوتر، روتر، گوشی، پرینتر) دقیقاً همین وضعیت را دارند؛ برای رد و بدل کردن بسته‌های داده به یک زبان مشترک نیاز دارند. به این زبان مشترک <strong>پروتکل</strong> می‌گویند.</p>
+
+            <div class="box important">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>تعریف ساده</strong>
+                    پروتکل یک قرارداد و قانون از پیش تعیین‌شده برای ارتباط بین دو دستگاه است.
+                </div>
+            </div>
+
+            <p>پروتکل مشخص می‌کند:</p>
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <i class="fas fa-file-shield"></i>
+                    <strong>فرمت بسته</strong>
+                    <p>داده چگونه قالب‌بندی شود.</p>
+                </div>
+                <div class="mini-card">
+                    <i class="fas fa-clock"></i>
+                    <strong>زمان‌بندی (Timing)</strong>
+                    <p>چه زمانی داده ارسال یا دریافت شود.</p>
+                </div>
+                <div class="mini-card">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <strong>مدیریت خطا</strong>
+                    <p>اگر داده گم یا خراب شد، چه واکنشی نشان دهیم.</p>
+                </div>
+                <div class="mini-card">
+                    <i class="fas fa-location-dot"></i>
+                    <strong>آدرس‌دهی</strong>
+                    <p>چگونه مقصد پیدا شود.</p>
+                </div>
+            </div>
+
+            <h2>۲. تفاوت طلایی: پروتکل در برابر سرویس</h2>
+            <p>این یکی از سوالاتی است که در مصاحبه‌های شبکه و امنیت خیلی پرسیده می‌شود و خیلی‌ها آن را قاطی می‌کنند:</p>
+            <ul>
+                <li><strong>پروتکل (Protocol):</strong> قانون و سازوکار فنی است. مثلاً <strong>HTTP</strong> مشخص می‌کند مرورگر چگونه درخواست صفحه وب را بنویسد و سرور چگونه پاسخ دهد.</li>
+                <li><strong>سرویس (Service):</strong> نتیجه و کاربردی است که کاربر نهایی دریافت می‌کند. مثلاً <strong>مرور صفحات وب</strong> یک سرویس است که از پروتکل HTTP/HTTPS استفاده می‌کند.</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>پروتکل</th>
+                        <th>سرویس متناظر</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>HTTP / HTTPS</strong></td><td>مرور صفحات وب</td></tr>
+                    <tr><td><strong>SMTP</strong></td><td>ارسال ایمیل</td></tr>
+                    <tr><td><strong>DNS</strong></td><td>تبدیل نام دامنه به آی‌پی</td></tr>
+                </tbody>
+            </table>
+
+            <div class="box note">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>نکته حفظی</strong>
+                    پروتکل، «چگونگی» ارتباط را می‌گوید؛ سرویس، «نتیجه» آن ارتباط را به کاربر نشان می‌دهد.
+                </div>
+            </div>
+
+            <h2>۳. پروتکل‌ها در کدام لایه قرار دارند؟</h2>
+            <p>نیازی به حفظ ۷ لایه OSI در این مرحله نیست. فقط چهار لایه کلیدی را در نظر بگیرید که بیشتر پروتکل‌های این دوره در آن‌ها قرار می‌گیرند:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>لایه</th>
+                        <th>وظیفه</th>
+                        <th>نمونه پروتکل‌ها</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>کاربرد</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Application · لایه ۷</span></td>
+                        <td>پروتکل‌هایی که کاربر مستقیماً با آن‌ها سروکار دارد</td>
+                        <td>HTTP، FTP، SSH، DNS، SMTP، SNMP، LDAP، Kerberos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>انتقال</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Transport · لایه ۴</span></td>
+                        <td>رساندن مطمئن یا سریع داده به مقصد</td>
+                        <td>TCP، UDP</td>
+                    </tr>
+                    <tr>
+                        <td><strong>شبکه</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Network · لایه ۳</span></td>
+                        <td>آدرس‌دهی منطقی (IP) و یافتن مسیر</td>
+                        <td>IP (v4/v6)، ICMP</td>
+                    </tr>
+                    <tr>
+                        <td><strong>پیوند داده</strong><br><span style="color:var(--text-muted); font-size:0.82rem;">Data Link · لایه ۲</span></td>
+                        <td>آدرس‌دهی فیزیکی (MAC) و کنترل دسترسی به رسانه</td>
+                        <td>ARP، STP، LACP</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>یک قانون کلی</strong>
+                    اگر پروتکل برای یک کار خاص کاربری است، معمولاً لایه ۷ (کاربرد) است. اگر قرار است یک لینک فیزیکی بین دو روتر مدیریت شود، معمولاً لایه ۲ است.
+                </div>
+            </div>
+
+            <h2>۴. پورت (Port) چیست و چرا به آن نیاز داریم؟</h2>
+            <p>تصور کنید یک سرور یک آدرس IP دارد، اما هزاران برنامه می‌خواهند همزمان با آن ارتباط بگیرند؛ یکی وب‌سایت می‌بیند، یکی ایمیل می‌فرستد، یکی فایل جابه‌جا می‌کند. چطور سرور تشخیص می‌دهد کدام درخواست برای کدام برنامه است؟</p>
+
+            <div class="box important">
+                <i class="fas fa-door-open"></i>
+                <div>
+                    <strong>تعریف پورت</strong>
+                    پورت، شماره یک «در» مجازی روی همان IP است که به یک سرویس خاص اختصاص دارد.
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>پورت</th>
+                        <th>سرویس</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>۸۰</strong></td><td>وب (HTTP)</td></tr>
+                    <tr><td><strong>۴۴۳</strong></td><td>وب امن (HTTPS)</td></tr>
+                    <tr><td><strong>۲۲</strong></td><td>مدیریت امن (SSH)</td></tr>
+                    <tr><td><strong>۵۳</strong></td><td>تبدیل نام به IP (DNS)</td></tr>
+                </tbody>
+            </table>
+
+            <p>پورت‌ها به سه دسته تقسیم می‌شوند:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>دسته</th>
+                        <th>محدوده</th>
+                        <th>کاربرد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Well-Known</strong></td><td>۰ تا ۱۰۲۳</td><td>سرویس‌های اصلی و استاندارد</td></tr>
+                    <tr><td><strong>Registered</strong></td><td>۱۰۲۴ تا ۴۹۱۵۱</td><td>برنامه‌های کاربردی خاص</td></tr>
+                    <tr><td><strong>Dynamic/Private</strong></td><td>۴۹۱۵۲ تا ۶۵۵۳۵</td><td>موقتی، برای ارتباطات کلاینت</td></tr>
+                </tbody>
+            </table>
+
+            <h2>۵. TCP در برابر UDP</h2>
+            <p>در لایه انتقال، دو پروتکل حمل داده را بر عهده دارند و تفاوتشان در یک جمله خلاصه می‌شود:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ویژگی</th>
+                        <th>TCP</th>
+                        <th>UDP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>تشبیه</td><td>پست پیشتاز با رسید و پیگیری</td><td>بادبادک یا پیام صوتی بی‌سیم</td></tr>
+                    <tr><td>تحویل</td><td>تضمین‌شده و به‌ترتیب</td><td>بدون تضمین</td></tr>
+                    <tr><td>سرعت</td><td>کندتر (هزینه بیشتر)</td><td>سریع‌تر</td></tr>
+                    <tr><td>کاربرد نمونه</td><td>وب، ایمیل، انتقال فایل</td><td>پخش زنده، بازی آنلاین، DNS</td></tr>
+                </tbody>
+            </table>
+
+            <div class="box note">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>قانون طلایی</strong>
+                    اگر پروتکل به «درستی مطلق» نیاز داشت → TCP. اگر به «سرعت بالا» نیاز داشت و افتادن چند بسته مشکلی ایجاد نمی‌کند → UDP.
+                </div>
+            </div>
+
+            <h2>سناریوهای عیب‌یابی مفهومی</h2>
+            <p>برای اینکه این مفاهیم را به دنیای واقعی وصل کنیم، روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+            <details>
+                <summary><span class="sc-icon"><i class="fas fa-wifi"></i></span> سناریو ۱ — «نت دارم، اما وب‌سایت‌ها باز نمی‌شوند!»</summary>
+                <div class="sc-analysis">
+                    <i class="fas fa-check"></i>
+                    <p style="margin:0;">اگر <code>ping 8.8.8.8</code> جواب بدهد، یعنی اتصال لایه ۳ (IP) و لایه‌های پایین‌تر سالم است. اما وب‌سایت‌ها باز نمی‌شوند یعنی مشکل از <strong>پورت‌های لایه کاربرد</strong> است — احتمالاً پورت ۸۰/۴۴۳ روی فایروال یا پراکسی بسته شده، نه خودِ اینترنت.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary><span class="sc-icon"><i class="fas fa-terminal"></i></span> سناریو ۲ — اتصال مکرر به پورت ۲۳ یک سرور خارجی</summary>
+                <div class="sc-analysis">
+                    <i class="fas fa-check"></i>
+                    <p style="margin:0;">پورت ۲۳ متعلق به <strong>Telnet</strong> است که هیچ رمزنگاری‌ای ندارد و نام‌کاربری/رمز را به‌صورت متن ساده می‌فرستد؛ هر کسی در مسیر می‌تواند آن را بخواند. جایگزین امن، <strong>SSH</strong> با پورت ۲۲ است که کل ارتباط را رمزنگاری می‌کند.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary><span class="sc-icon"><i class="fas fa-bolt"></i></span> سناریو ۳ — کمترین تأخیر ممکن، حتی با از دست رفتن چند بسته</summary>
+                <div class="sc-analysis">
+                    <i class="fas fa-check"></i>
+                    <p style="margin:0;">پیشنهاد <strong>UDP</strong> است. چون هدر کوچک‌تری دارد و Three-Way Handshake انجام نمی‌دهد، در نتیجه تأخیر بسیار کمتری دارد — ایده‌آل برای بازی‌های آنلاین یا تماس‌های VoIP.</p>
+                </div>
+            </details>
+
+            <h2>تست چهارگزینه‌ای استاندارد</h2>
+            <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+            <div class="quiz-card">
+                <p>❓ ۱. کدام گزینه به‌درستی تفاوت «پروتکل» و «سرویس» را بیان می‌کند؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) پروتکل سخت‌افزاری است، سرویس نرم‌افزاری است</button>
+                    <button onclick="selectOption(this)">ب) پروتکل قانون ارتباط است، سرویس نتیجه‌ی کاربردی آن قانون است</button>
+                    <button onclick="selectOption(this)">ج) پروتکل از TCP استفاده می‌کند، سرویس از UDP</button>
+                    <button onclick="selectOption(this)">د) تفاوتی ندارند و مترادف هستند</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+                    پروتکل (مثل HTTP) چارچوب فنی می‌سازد و سرویس (مثل مشاهده صفحات وب) همان کاربردی است که کاربر نهایی دریافت می‌کند.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <p>❓ ۲. یک مدیر شبکه می‌خواهد از راه دور یک روتر را مدیریت کند و امنیت برایش اولویت دارد. کدام گزینه؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) پورت ۲۳ (Telnet)</button>
+                    <button onclick="selectOption(this)">ب) پورت ۲۲ (SSH)</button>
+                    <button onclick="selectOption(this)">ج) پورت ۸۰ (HTTP)</button>
+                    <button onclick="selectOption(this)">د) پورت ۱۶۱ (SNMP)</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+                    SSH (پورت ۲۲) ارتباط را رمزنگاری می‌کند، در حالی که Telnet و HTTP اطلاعات را به‌صورت متن ساده می‌فرستند. SNMP برای مانیتورینگ است، نه مدیریت تعاملی خط‌فرمان.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <p>❓ ۳. کدام پروتکل در لایه «انتقال» قرار دارد و ارتباط مطمئن و پیاپی بین دو نقطه می‌سازد؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) IP</button>
+                    <button onclick="selectOption(this)">ب) TCP</button>
+                    <button onclick="selectOption(this)">ج) UDP</button>
+                    <button onclick="selectOption(this)">د) ARP</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+                    TCP با مکانیزم تأیید دریافت (ACK) و شماره‌گذاری سگمنت‌ها، تحویل مطمئن و به‌ترتیب را تضمین می‌کند. IP در لایه شبکه و ARP در لایه پیوند داده قرار دارند.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <p>❓ ۴. کاربری می‌گوید «اینترنت وصل است اما ایمیلم را نمی‌توانم بفرستم». کدام پورت را روی فایروال چک می‌کنید؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) پورت ۱۱۰ (POP3)</button>
+                    <button onclick="selectOption(this)">ب) پورت ۱۴۳ (IMAP)</button>
+                    <button onclick="selectOption(this)">ج) پورت ۲۵ (SMTP)</button>
+                    <button onclick="selectOption(this)">د) پورت ۵۳ (DNS)</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+                    SMTP با پورت ۲۵ وظیفه ارسال ایمیل را دارد. POP3 و IMAP وظیفه دریافت دارند. DNS فقط آدرس سرور را پیدا می‌کند، نه خودِ عمل ارسال.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <p>❓ ۵. کدام دستور از پروتکل ICMP برای بررسی زنده بودن مقصد استفاده می‌کند؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) netstat</button>
+                    <button onclick="selectOption(this)">ب) ping</button>
+                    <button onclick="selectOption(this)">ج) arp</button>
+                    <button onclick="selectOption(this)">د) nslookup</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+                    دستور ping بسته‌های Echo Request را با ICMP ارسال و منتظر Echo Reply می‌ماند. netstat وضعیت پورت‌ها، arp جدول IP-به-MAC و nslookup پرس‌وجوی DNS را نشان می‌دهند.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <p>❓ ۶. برای پخش زنده ویدیو، کدام ویژگی UDP آن را بهتر از TCP می‌کند؟</p>
+                <div class="quiz-options">
+                    <button onclick="selectOption(this)">الف) تحویل مطمئن داده‌ها</button>
+                    <button onclick="selectOption(this)">ب) سرعت بالا و تأخیر کمتر (با وجود احتمال افت بسته)</button>
+                    <button onclick="selectOption(this)">ج) قابلیت رمزنگاری داخلی</button>
+                    <button onclick="selectOption(this)">د) قابلیت مسیریابی در اینترنت</button>
+                </div>
+                <div class="quiz-answer">
+                    <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+                    UDP هدر کوچک‌تر و بدون نیاز به برقراری جلسه (Connectionless) است، پس سریع‌تر است. در پخش زنده، تأخیر کم از افت چند فریم مهم‌تر است.
+                </div>
+            </div>
+
+            <div class="box important" style="margin-top:40px;">
+                <i class="fas fa-arrow-turn-down"></i>
+                <div>
+                    <strong>گام بعدی</strong>
+                    اگر این مفاهیم پایه برایتان جا افتاد، در فصل دوم به راحتی وارد پروتکل‌های مدیریتی مثل NTP، Syslog و SNMP خواهیم شد.
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" disabled><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+                <button class="nav-btn" onclick="showChapter(2)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+            </div>
+        </div>
+
+        <!-- فصل ۲ تا ۶ — placeholder -->
+<!-- فصل ۲ -->
+<div id="chap2" class="chapter">
+    <div class="chapter-header">
+        <div class="chapter-badge">۲</div>
+        <div>
+            <h1>پروتکل‌های مدیریت، مانیتورینگ و زیرساخت شبکه</h1>
+            <span>فصل دوم از ۶ · NTP، Syslog، SNMP</span>
+        </div>
+    </div>
+
+    <div class="goal-banner">
+        <i class="fas fa-bullseye"></i>
+        <div>
+            <strong>هدف این فصل</strong>
+            یاد می‌گیرید که یک شبکه بدون این سه پروتکل عملاً کور و کر است. <strong>NTP</strong> باعث می‌شود همه دستگاه‌ها یک زمان واحد داشته باشند. <strong>Syslog</strong> تمام رویدادهای مهم را در یک جا جمع می‌کند. <strong>SNMP</strong> وضعیت لحظه‌ای تجهیزات را نشان می‌دهد. این سه، مثل سه پایه یک مثلث، زیرساخت هر اتاق عملیات امنیت (SOC) هستند.
+        </div>
+    </div>
+
+    <h2>۱. NTP — هماهنگ‌کننده‌ی زمان</h2>
+    <p>NTP (Network Time Protocol) یک پروتکل ساده اما حیاتی است که وظیفه دارد ساعت تمام دستگاه‌های شبکه را با یک منبع معتبر زمان، هماهنگ (Synchronize) کند.</p>
+
+    <p>فرض کنید یک حمله سایبری در ساعت ۱۰:۰۰ رخ داده است. لاگ فایروال می‌گوید حمله در ۰۹:۵۵ بوده، لاگ سرور می‌گوید ۱۰:۰۵ و لاگ کامپیوتر کاربر می‌گوید ۱۰:۳۰. با این اختلاف، نه‌تنها نمی‌توانید توالی رویدادها را بفهمید، بلکه ممکن است یک مهاجم را بی‌گناه و یک کاربر عادی را متهم کنید!</p>
+
+    <div class="box important">
+        <i class="fas fa-user-shield"></i>
+        <div>
+            <strong>وابستگی Kerberos به زمان</strong>
+            اگر ساعت دستگاه با سرور مرکزی بیش از ۵ دقیقه اختلاف داشته باشد، Kerberos درخواست ورود را حمله‌ی بازپخش (Replay Attack) تلقی کرده و رد می‌کند. پس NTP پیش‌نیاز ورود کاربران به دامنه است.
+        </div>
+    </div>
+
+    <p>یک سرور مرکزی (مثلاً Domain Controller یا یک سرور لینوکسی) به‌عنوان مرجع زمان انتخاب می‌شود و از GPS، ساعت اتمی یا سرورهای عمومی اینترنت (مثل pool.ntp.org) زمان دقیق را می‌گیرد. بقیه دستگاه‌ها هر چند دقیقه یک‌بار با این سرور چک می‌کنند و ساعت خود را تنظیم می‌کنند.</p>
+
+    <p>اگر NTP خراب شود:</p>
+    <div class="mini-grid">
+        <div class="mini-card">
+            <i class="fas fa-file-circle-question"></i>
+            <strong>لاگ‌ها بی‌معنا می‌شوند</strong>
+            <p>تحلیل‌گر امنیت نمی‌تواند بفهمد کدام رویداد زودتر رخ داده است.</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-user-lock"></i>
+            <strong>Kerberos از کار می‌افتد</strong>
+            <p>کاربران نمی‌توانند وارد دامنه شوند و خطای اختلاف زمان می‌بینند.</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-certificate"></i>
+            <strong>گواهی‌های دیجیتال نامعتبر می‌شوند</strong>
+            <p>گواهی‌های SSL/TLS تاریخ انقضا دارند؛ زمان اشتباه یعنی خطای امنیتی مرورگر.</p>
+        </div>
+    </div>
+
+    <h2>۲. Syslog — حافظه‌ی وقایع شبکه</h2>
+    <p>Syslog یک استاندارد و پروتکل برای ثبت و ارسال پیام‌های رویداد از تجهیزات مختلف (روتر، سوئیچ، فایروال، سرور لینوکس و ...) به یک سرور مرکزی به نام <strong>Syslog Server</strong> است.</p>
+
+    <p>تصور کنید یک سازمان ۱۰۰ دستگاه دارد. اگر هر دستگاه لاگ‌های خود را روی هارد خودش نگه دارد، برای تحلیل یک حادثه باید تک‌تک دستگاه‌ها را چک کنید — که غیرممکن است. Syslog همه را به یک نقطه می‌آورد تا مثل یک فیلم، کل ماجرا را از ابتدا تا انتها ببینید.</p>
+
+    <p>در Syslog معمولاً این‌ها ثبت می‌شود: لاگین/لاگ‌اوت کاربران، قطع و وصل شدن پورت‌ها، تغییرات تنظیمات، خطاهای سخت‌افزاری، و حملات رد شده توسط فایروال.</p>
+
+    <div class="box note">
+        <i class="fas fa-link"></i>
+        <div>
+            <strong>ازدواج اجباری NTP و Syslog</strong>
+            Syslog بدون NTP ارزشی ندارد. اگر زمان دستگاه‌ها هماهنگ نباشد، ترتیب رویدادها در سرور Syslog به‌هم می‌ریزد و ممکن است طوری نشان دهد که انگار کاربر بعد از حمله وارد سیستم شده! به همین دلیل همیشه ابتدا NTP تنظیم می‌شود، بعد Syslog.
+        </div>
+    </div>
+
+    <div class="box important">
+        <i class="fas fa-eye"></i>
+        <div>
+            <strong>فرق Syslog با SIEM</strong>
+            Syslog فقط جمع‌آوری‌کننده‌ی خام لاگ‌هاست، مثل یک انبار بزرگ. اما SIEM (مثل Splunk یا Sentinel) بالای سر Syslog می‌نشیند، لاگ‌ها را تحلیل و به‌هم ربط می‌دهد. پس SIEM مغز است و Syslog چشم.
+        </div>
+    </div>
+
+    <h2>۳. SNMP — مانیتورینگ لحظه‌ای</h2>
+    <p>SNMP (Simple Network Management Protocol) به مدیر شبکه اجازه می‌دهد وضعیت <strong>لحظه‌ای</strong> تجهیزات را ببیند، بدون اینکه وارد تک‌تک آن‌ها شود. اگر Syslog «گذشته» را ثبت می‌کند، SNMP «اکنون» را نشان می‌دهد.</p>
+
+    <p>تقریباً هر چیزی که یک سنسور اندازه بگیرد قابل مشاهده است: مصرف CPU و RAM، دمای دستگاه، دور فن، وضعیت پورت‌ها، پهنای باند مصرفی و تعداد خطاهای بسته.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>جزء</th>
+                <th>نقش</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>SNMP Manager</strong></td><td>نرم‌افزاری روی کامپیوتر مدیر شبکه (مثل PRTG، Zabbix، LibreNMS) که از دستگاه‌ها سوال می‌پرسد</td></tr>
+            <tr><td><strong>SNMP Agent</strong></td><td>نرم‌افزار کوچک روی خود دستگاه که اطلاعات را جمع‌آوری و ارسال می‌کند</td></tr>
+            <tr><td><strong>Managed Device</strong></td><td>خود تجهیز شبکه (روتر، سوئیچ، پرینتر و ...)</td></tr>
+        </tbody>
+    </table>
+
+    <div class="box warning">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div>
+            <strong>Trap (تله) — هشدار خودکار</strong>
+            در حالت عادی Manager هر چند دقیقه یک‌بار سوال می‌پرسد (Polling). اما اگر مثلاً دمای سوئیچ به ۹۰ درجه برسد، دستگاه خودش بدون منتظر ماندن، یک پیام هشدار به نام Trap می‌فرستد: «وضعیت اضطراری است، سریع بیا!»
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ابزار</th>
+                <th>کاری که انجام می‌دهد</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Ping</strong></td><td>فقط می‌گوید دستگاه روشن است یا نه</td></tr>
+            <tr><td><strong>SSH</strong></td><td>شما را وارد دستگاه می‌کند تا دستور بزنید (زمان‌بر)</td></tr>
+            <tr><td><strong>SNMP</strong></td><td>به‌صورت خودکار و منظم، داشبورد سلامت همه دستگاه‌ها را نشان می‌دهد</td></tr>
+        </tbody>
+    </table>
+
+    <h2>سناریوهای عیب‌یابی مفهومی</h2>
+    <p>روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-right-to-bracket"></i></span> سناریو ۱ — کاربران نمی‌توانند به دامنه لاگین کنند</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;">مدیر سیستم پیام «تفاوت زمان کلاینت و سرور» می‌بیند. چون Kerberos به زمان دقیق وابسته است، باید ابتدا سرور NTP را بررسی کرد و سپس با دستور <code>w32tm /resync</code> (ویندوز) یا <code>ntpdate</code> (لینوکس) ساعت‌ها را دوباره همگام‌سازی کرد.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-magnifying-glass"></i></span> سناریو ۲ — آیا اختلاف ۵ دقیقه‌ای لاگ‌ها یعنی کاربر عادی مهاجم است؟</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;"><strong>خیر.</strong> تا زمانی که NTP تنظیم نشده، نمی‌توان به ترتیب زمانی لاگ‌ها اعتماد کرد؛ این اختلاف می‌تواند به‌خاطر تنظیم دستی ساعت یا منطقه زمانی متفاوت باشد. اولویت اول، هماهنگ‌سازی زمان همه دستگاه‌ها با یک NTP Server است، سپس تحلیل لاگ‌ها.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-temperature-high"></i></span> سناریو ۳ — هشدار SNMP قطع شد و علتش معلوم نیست</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;">SNMP فقط وضعیت لحظه‌ای را نشان داده (الان بالا رفت، الان پایین آمد). برای فهمیدن <strong>علت</strong> (حمله DDoS بود یا آپدیت خودکار؟) باید به <strong>Syslog</strong> مراجعه کرد. ترکیب SNMP (مشاهده اکنون) و Syslog (بررسی گذشته) معجزه می‌کند.</p>
+        </div>
+    </details>
+
+    <h2>تست چهارگزینه‌ای استاندارد</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کدام پروتکل وظیفه دارد ساعت تمام دستگاه‌های شبکه را با یک منبع معتبر هماهنگ کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) SNMP</button>
+            <button onclick="selectOption(this)">ب) Syslog</button>
+            <button onclick="selectOption(this)">ج) NTP</button>
+            <button onclick="selectOption(this)">د) DNS</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            NTP دقیقاً همین وظیفه را دارد: هماهنگ‌سازی ساعت همه دستگاه‌ها با یک منبع زمان معتبر.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. یک مدیر شبکه می‌خواهد تمام لاگ‌های فایروال، روتر و سرورهای لینوکس را در یک محل متمرکز جمع‌آوری کند. کدام پروتکل؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) SNMP</button>
+            <button onclick="selectOption(this)">ب) Syslog</button>
+            <button onclick="selectOption(this)">ج) NTP</button>
+            <button onclick="selectOption(this)">د) LDAP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            Syslog دقیقاً برای همین ساخته شده: جمع‌آوری متمرکز لاگ رویدادها از تجهیزات مختلف.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. کدام پروتکل برای مانیتورینگ لحظه‌ای و دریافت هشدار خودکار (Trap) از تجهیزات طراحی شده است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Syslog</button>
+            <button onclick="selectOption(this)">ب) SNMP</button>
+            <button onclick="selectOption(this)">ج) NTP</button>
+            <button onclick="selectOption(this)">د) Kerberos</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            SNMP هم Polling منظم دارد و هم Trap برای هشدارهای فوری و خودکار.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. اگر ساعت یک کامپیوتر ۱۰ دقیقه با Domain Controller اختلاف داشته باشد، کدام پروتکل احراز هویت مختل می‌شود؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LDAP</button>
+            <button onclick="selectOption(this)">ب) NTP</button>
+            <button onclick="selectOption(this)">ج) Kerberos</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            NTP خودش مشکل است (اختلاف ساعت را ایجاد کرده)، اما سرویسی که به‌خاطر آن از کار می‌افتد Kerberos است — سوال اثر خرابی را می‌پرسد، نه علت آن.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام گزینه به‌درستی تفاوت Syslog و SIEM را بیان می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Syslog روی لایه شبکه کار می‌کند، SIEM روی لایه کاربرد</button>
+            <button onclick="selectOption(this)">ب) Syslog لاگ‌ها را جمع‌آوری می‌کند، SIEM لاگ‌ها را تحلیل کرده و هشدار می‌دهد</button>
+            <button onclick="selectOption(this)">ج) SIEM جایگزین Syslog است</button>
+            <button onclick="selectOption(this)">د) هر دو فقط روی سیستم‌های ویندوز کار می‌کنند</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            Syslog چشم است (جمع‌آوری خام)، SIEM مغز است (تحلیل و ربط‌دادن رویدادها).
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. مدیر شبکه می‌خواهد قبل از خرابی، درباره بالا رفتن دمای یک سوئیچ هشدار فوری دریافت کند. کدام قابلیت SNMP مناسب است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Polling منظم</button>
+            <button onclick="selectOption(this)">ب) Trap (تله)</button>
+            <button onclick="selectOption(this)">ج) SNMP Walk</button>
+            <button onclick="selectOption(this)">د) MIB</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            Trap به دستگاه اجازه می‌دهد در شرایط بحرانی (مثل دما)، خودش بدون درخواست Manager پیام بفرستد.
+        </div>
+    </div>
+
+    <div class="box important" style="margin-top:40px;">
+        <i class="fas fa-arrow-turn-down"></i>
+        <div>
+            <strong>گام بعدی</strong>
+            آماده‌اید برای فصل سوم که به دنیای Active Directory و پروتکل‌های هویتی می‌رویم؟ (LDAP، LDAPS و Kerberos)
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(1)"><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" onclick="showChapter(3)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
+
+<!-- فصل سوم -->
+<div id="chap3" class="chapter">
+    <div class="chapter-header">
+        <div class="chapter-badge">۳</div>
+        <div>
+            <h1>پروتکل‌های هویت، دایرکتوری و احراز هویت (Active Directory)</h1>
+            <span>فصل سوم از ۶ · LDAP، LDAPS، Kerberos</span>
+        </div>
+    </div>
+
+    <div class="goal-banner">
+        <i class="fas fa-bullseye"></i>
+        <div>
+            <strong>هدف این فصل</strong>
+            تا اینجا با پروتکل‌های زیرساختی (زمان، لاگ، مانیتورینگ) آشنا شدید[cite: 4]. حالا وارد قلب شبکه‌های سازمانی می‌شویم: <strong>مدیریت کاربران و احراز هویت</strong>[cite: 4]. در این فصل یاد می‌گیرید که چطور یک کاربر با یک نام کاربری و رمز عبور، هویت خود را اثبات می‌کند (<strong>Kerberos</strong>)، و چطور برنامه‌ها اطلاعات او را از یک بانک اطلاعاتی مرکزی به نام دایرکتوری (Directory) پیدا می‌کنند (<strong>LDAP</strong>)[cite: 4]. همچنین می‌فهمید چرا نسخه‌ی امن LDAP (یعنی <strong>LDAPS</strong>) برای حفظ حریم خصوصی ضروری است[cite: 4].
+        </div>
+    </div>
+
+    <h2>۱. دایرکتوری (Directory) چیست؟ نقطه‌ی شروع ماجرا</h2>
+    <p>قبل از هر چیز، باید بدانیم اطلاعات کاربران کجا ذخیره می‌شود[cite: 4]. فرض کنید شرکتی ۱۰۰۰ کارمند دارد[cite: 4]. برای هر کارمند باید مشخصاتی مثل نام، نام کاربری، شماره تلفن، ایمیل، بخش، گروه‌های امنیتی و ... ذخیره شود[cite: 4]. این اطلاعات در یک پایگاه داده‌ی خاص به نام <strong>دایرکتوری (Directory)</strong> نگهداری می‌شود[cite: 4].</p>
+
+    <p>معروف‌ترین دایرکتوری در دنیای ویندوز، <strong>Active Directory (AD)</strong> است[cite: 4]. در دنیای لینوکس نیز نمونه‌هایی مثل OpenLDAP وجود دارند[cite: 4]. دایرکتوری با یک پایگاه داده‌ی معمولی (مثل SQL) فرق دارد؛ چون برای عملیات <strong>بسیار زیاد خواندن (Read-heavy)</strong> و <strong>جستجوی سریع</strong> بهینه شده است، نه برای تراکنش‌های مالی یا ثبت سفارش[cite: 4].</p>
+
+    <h2>۲. LDAP (Lightweight Directory Access Protocol) – دربانِ اطلاعات</h2>
+    
+    <h3>۲-۱. LDAP دقیقاً چیست؟</h3>
+    <p>LDAP خودش اطلاعات را ذخیره نمی‌کند[cite: 4]. LDAP یک <strong>پروتکل</strong> است که برنامه‌ها از آن برای <strong>پرس و جو (Query)</strong> و خواندن اطلاعات از دایرکتوری استفاده می‌کنند[cite: 4].</p>
+    <p>مثلاً وقتی در Outlook نام یک همکار را تایپ می‌کنید، Outlook از طریق LDAP به Active Directory متصل می‌شود و شماره تلفن و ایمیل او را دریافت می‌کند[cite: 4]. یا وقتی یک اپلیکیشن وب می‌خواهد بداند کاربر جاری عضو کدام گروه‌هاست، این کار را با LDAP انجام می‌دهد[cite: 4].</p>
+
+    <div class="box warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <strong>نکته‌ی طلایی و مهم (بیشتر اشتباهات اینجاست!)</strong>
+            LDAP احراز هویت (Authentication) انجام نمی‌دهد؛ فقط اطلاعات را پیدا کرده و برمی‌گرداند[cite: 4]. خیلی‌ها فکر می‌کنند وقتی لاگین می‌کنیم، LDAP رمز عبور را چک می‌کند؛ اما این اشتباه است[cite: 4]. وظیفه‌ی بررسی رمز عبور بر عهده‌ی Kerberos است[cite: 4]. LDAP فقط نقش یک کتابخانه‌دار را دارد[cite: 4].
+        </div>
+    </div>
+
+    <h3>۲-۲. LDAP چه اطلاعاتی را برمی‌گرداند؟</h3>
+    <p>تقریباً هر شیء (Object) که در دایرکتوری تعریف شده باشد: کاربران، گروه‌ها، کامپیوترها، پرینترها، پوشه‌های اشتراکی، واحدهای سازمانی (OU) و حتی تنظیمات سیاست‌های گروهی[cite: 4].</p>
+
+    <h3>۲-۳. کاربرد LDAP در امنیت (برای Blue Team و PenTest)</h3>
+    <ul>
+        <li><strong>در Blue Team:</strong> برای ممیزی (Audit) استفاده می‌شود[cite: 4]. مثلاً بررسی می‌کنید که آیا کاربری به گروه Domain Admins اضافه شده یا نه؟[cite: 4]</li>
+        <li><strong>در PenTest:</strong> اگر مهاجمی به شبکه نفوذ کند و دسترسی به LDAP پیدا کند، می‌تواند Enumeration کند؛ یعنی ساختار سازمان، نام مدیران، گروه‌های حساس و حتی نام کامپیوترهای مهم را کشف کند[cite: 4]. به همین دلیل دسترسی به LDAP باید محدود و لاگ‌گذاری شود[cite: 4].</li>
+    </ul>
+
+    <h2>۳. LDAPS (LDAP Secure) – نسخه‌ی قفل‌دار</h2>
+    <p>ارتباط LDAP به‌صورت پیش‌فرض رمزنگاری (Encryption) ندارد[cite: 4]. یعنی اگر یک مهاجم در همان شبکه قرار داشته باشد، می‌تواند ترافیک LDAP را شنود کند[cite: 4]. راه‌حل این مشکل، استفاده از <strong>LDAPS (LDAP + TLS/SSL)</strong> است که کل ارتباط را رمزنگاری می‌کند[cite: 4].</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ویژگی</th>
+                <th>LDAP</th>
+                <th>LDAPS</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>وظیفه اصلی</strong></td>
+                <td>جستجو و خواندن اطلاعات دایرکتوری[cite: 4]</td>
+                <td>جستجو و خواندن اطلاعات دایرکتوری[cite: 4]</td>
+            </tr>
+            <tr>
+                <td><strong>رمزنگاری ارتباط</strong></td>
+                <td>❌ خیر (متن ساده)[cite: 4]</td>
+                <td>✅ بله (با TLS/SSL)[cite: 4]</td>
+            </tr>
+            <tr>
+                <td><strong>امنیت در برابر شنود</strong></td>
+                <td>ضعیف[cite: 4]</td>
+                <td>قوی[cite: 4]</td>
+            </tr>
+            <tr>
+                <td><strong>پورت پیش‌فرض</strong></td>
+                <td>۳۸۹ (TCP/UDP)[cite: 4]</td>
+                <td>۶۳۶ (TCP)[cite: 4]</td>
+            </tr>
+            <tr>
+                <td><strong>کاربرد در سازمان</strong></td>
+                <td>قدیمی یا داخلی غیرحساس[cite: 4]</td>
+                <td>استاندارد امروزی برای محیط‌های امن[cite: 4]</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>۴. Kerberos – قاضی هویت (Authentication)</h2>
+    <p>Kerberos یک پروتکل احراز هویت (Authentication) است که در قلب Active Directory قرار دارد[cite: 4]. وظیفه‌ی آن پاسخ به این سؤال است: <strong>«آیا این کاربر واقعاً همان کسی است که ادعا می‌کند؟»</strong>[cite: 4]</p>
+
+    <div class="box note">
+        <i class="fas fa-lightbulb"></i>
+        <div>
+            <strong>تفاوت حیاتی: Authentication در برابر Authorization</strong>
+            <ul>
+                <li><strong>Authentication (احراز هویت):</strong> «تو کیستی؟» (بررسی نام کاربری و رمز عبور) ← انجام می‌شود توسط <strong>Kerberos</strong>[cite: 4].</li>
+                <li><strong>Authorization (مجوز دسترسی):</strong> «اجازه‌ی انجام چه کاری را داری؟» (بررسی گروه‌های امنیتی) ← انجام می‌شود توسط بررسی گروه‌ها که اطلاعات آن را <strong>LDAP</strong> برمی‌گرداند[cite: 4].</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>مکانیزم Ticket (بلیت) – ایده‌ی ناب Kerberos</h3>
+    <p>در Kerberos، کاربر به جای ارسال مکرر رمز عبور در شبکه، فقط یک‌بار لاگین کرده و یک <strong>بلیت (Ticket)</strong> دریافت می‌کند[cite: 4]. از آن به بعد برای دسترسی به هر سرویس (مثل فایل سرور)، بلیت خود را نشان می‌دهد[cite: 4]. این کار امنیت را به شدت بالا می‌برد[cite: 4].</p>
+
+    <div class="box important">
+        <i class="fas fa-clock"></i>
+        <div>
+            <strong>وابستگی حیاتی Kerberos به NTP</strong>
+            بلیت‌های Kerberos دارای زمان انقضا (Timestamp) هستند[cite: 4]. اگر ساعت کامپیوتر کاربر با Domain Controller بیش از ۵ دقیقه اختلاف داشته باشد، بلیت نامعتبر تلقی شده و درخواست رد می‌شود[cite: 4].
+        </div>
+    </div>
+
+    <h2>۵. جمع‌بندی سه‌گانه‌ی Active Directory (نقشه‌ی ذهنی)</h2>
+    <div class="mini-grid">
+        <div class="mini-card">
+            <i class="fas fa-user-check"></i>
+            <strong>۱. ورود کاربر</strong>
+            <p>کاربر نام‌کاربری و رمزعبور را وارد می‌کند[cite: 4].</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-ticket"></i>
+            <strong>۲. احراز هویت (Kerberos)</strong>
+            <p>هویت کاربر تأیید شده و بلیت صادر می‌شود[cite: 4].</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-database"></i>
+            <strong>۳. دریافت اطلاعات (LDAP)</strong>
+            <p>برنامه اطلاعات تکمیلی کاربر (گروه‌ها، ایمیل) را می‌خواند[cite: 4].</p>
+        </div>
+        <div class="mini-card">
+            <i class="fas fa-lock"></i>
+            <strong>۴. امنیت ارتباط (LDAPS)</strong>
+            <p>در صورت استفاده از LDAPS، این پرس‌وجوها رمزنگاری می‌شوند[cite: 4].</p>
+        </div>
+    </div>
+
+    <h2>سناریوهای عیب‌یابی مفهومی</h2>
+    <p>روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-user-slash"></i></span> سناریو ۱ — لاگین موفق است، اما برنامه خطای «دسترسی به دایرکتوری ناموفق» می‌دهد</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;">چون لاگین موفق است، Kerberos سالم است[cite: 4]. اما عدم خواندن اطلاعات یعنی <strong>LDAP (یا LDAPS)</strong> دچار مشکل شده است (احتمال بسته‌بودن پورت ۳۸۹/۶۳۶ روی فایروال یا تنظیمات اشتباه برنامه)[cite: 4].</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-business-time"></i></span> سناریو ۲ — کاربران مکرراً خطای Ticket Expired می‌گیرند</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;">بلیت‌های Kerberos دارای زمان انقضا هستند[cite: 4]. علت اصلی نوسان و قطع بلیت‌ها معمولاً <strong>اختلاف ساعت (NTP)</strong> بین کلاینت‌ها و Domain Controller است که باید اولویت اول بررسی باشد[cite: 4].</p>
+        </div>
+    </details>
+
+    <details>
+        <summary><span class="sc-icon"><i class="fas fa-shield-halved"></i></span> سناریو ۳ — مدیر می‌گوید «چون رمز عبور با LDAP فرستاده نمی‌شود، نیازی به LDAPS نیست»</summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check"></i>
+            <p style="margin:0;"><strong>مدیر شبکه اشتباه می‌کند.</strong> گرچه رمز عبور توسط Kerberos مدیریت می‌شود[cite: 4]، اما اطلاعات حساس دیگری مثل اسامی کاربران، ایمیل‌ها و گروه‌های امنیتی به‌صورت متن ساده در LDAP لو می‌روند و LDAPS برای حفظ محرمانگی کامل ضروری است[cite: 4].</p>
+        </div>
+    </details>
+
+    <h2>تست چهارگزینه‌ای استاندارد</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کدام پروتکل وظیفه‌ی احراز هویت (Authentication) کاربران را در Active Directory بر عهده دارد و از مکانیزم Ticket استفاده می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LDAP</button>
+            <button onclick="selectOption(this)">ب) LDAPS</button>
+            <button onclick="selectOption(this)">ج) Kerberos</button>
+            <button onclick="selectOption(this)">د) NTP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            Kerberos پروتکل احراز هویت مبتنی بر بلیت (Ticket) در اکتیو دایرکتوری است[cite: 4].
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. یک برنامه‌ی تحت وب باید شماره تلفن و ایمیل کاربران را از Active Directory دریافت کند. کدام پروتکل برای این کار مناسب است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Kerberos</button>
+            <button onclick="selectOption(this)">ب) SNMP</button>
+            <button onclick="selectOption(this)">ج) LDAP</button>
+            <button onclick="selectOption(this)">د) Syslog</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            LDAP پروتکل جستجو و خواندن اطلاعات از دایرکتوری است[cite: 4].
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. کدام پروتکل نسخه‌ی امن LDAP است که ارتباط را با TLS رمزنگاری می‌کند و روی پورت ۶۳۶ کار می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LDAP</button>
+            <button onclick="selectOption(this)">ب) LDAPS</button>
+            <button onclick="selectOption(this)">ج) Kerberos</button>
+            <button onclick="selectOption(this)">د) HTTPS</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            LDAPS ترکیب LDAP با TLS/SSL روی پورت TCP 636 است[cite: 4].
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. در یک شبکه، کاربران به‌درستی لاگین می‌کنند اما برنامه‌های داخلی نمی‌توانند گروه‌های کاربران را نمایش دهند. کدام پروتکل به احتمال زیاد دچار مشکل شده است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Kerberos</button>
+            <button onclick="selectOption(this)">ب) NTP</button>
+            <button onclick="selectOption(this)">ج) LDAP</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            چون لاگین (Authentication) موفق است، Kerberos سالم است[cite: 4]. مشکل در دریافت اطلاعات (Directory Query) است که وظیفه‌ی LDAP است[cite: 4].
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام گزینه به‌درستی تفاوت Authentication و Authorization را بیان می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Authentication بررسی مجوزهاست، Authorization بررسی هویت است</button>
+            <button onclick="selectOption(this)">ب) Authentication بررسی هویت است، Authorization بررسی مجوزهاست</button>
+            <button onclick="selectOption(this)">ج) هر دو یک معنی دارند</button>
+            <button onclick="selectOption(this)">د) Authentication توسط LDAP و Authorization توسط Kerberos انجام می‌شود</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            Authentication یعنی «تو کیستی؟» (Kerberos) و Authorization یعنی «اجازه چه کاری داری؟» (بررسی گروه‌ها)[cite: 4].
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. اگر ساعت یک کامپیوتر ۷ دقیقه با Domain Controller اختلاف داشته باشد، کدام پروتکل احراز هویت مختل شده و کاربر خطای Ticket می‌گیرد؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LDAP</button>
+            <button onclick="selectOption(this)">ب) LDAPS</button>
+            <button onclick="selectOption(this)">ج) Kerberos</button>
+            <button onclick="selectOption(this)">د) NTP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            Kerberos به زمان حساس است و اختلاف بیش از ۵ دقیقه باعث عدم اعتبار بلیت می‌شود[cite: 4].
+        </div>
+    </div>
+
+    <div class="box important" style="margin-top:40px;">
+        <i class="fas fa-arrow-turn-down"></i>
+        <div>
+            <strong>گام بعدی</strong>
+            با پایان مفاهیم هویت و اکتیو دایرکتوری، در فصل چهارم وارد دنیای مسیریابی، سوئیچینگ و زیرساخت ارتباطی شبکه خواهیم شد.
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(2)"><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" onclick="showChapter(4)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
+
+<!-- فصل چهارم -->
+<div id="chap4" class="chapter">
+    <div class="chapter-header">
+        <div class="chapter-badge">۴</div>
+        <div>
+            <h1>پروتکل‌های لایه شبکه، مسیریابی و سوئیچینگ</h1>
+            <span>فصل چهارم از ۶ · RIP، OSPF، EIGRP، BGP، STP، LACP</span>
+        </div>
+    </div>
+
+    <div class="goal-banner">
+        <i class="fas fa-bullseye"></i>
+        <div>
+            <strong>هدف این فصل</strong>
+            در سه فصل قبل با پروتکل‌های مدیریتی و هویتی آشنا شدیم. حالا وارد <strong>قلب حرکت داده</strong> در شبکه می‌شویم. در این فصل یاد می‌گیرید که داده‌ها چطور از یک شبکه به شبکه‌ی دیگر می‌روند (مسیریابی)، چطور روترها بهترین مسیر را انتخاب می‌کنند (پروتکل‌های مسیریابی)، و چطور در یک شبکه‌ی محلی (سوئیچینگ) از ایجاد حلقه (Loop) جلوگیری یا پهنای باند را افزایش می‌دهیم. این فصل، پل بین شبکه‌های خانگی و اینترنت است.
+        </div>
+    </div>
+
+    <h2>۱. مرور سریع پروتکل‌های لایه شبکه (Network Layer)</h2>
+    <p>قبل از رفتن به مسیریابی، بیایید سه پروتکل حیاتی لایه ۳ را مرور کنیم که قبلاً مختصراً به آنها اشاره شد:</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 20px 0 30px;">
+        <div class="mini-card" style="border-top: 4px solid var(--primary);">
+            <i class="fas fa-globe" style="background: var(--primary-soft); color: var(--primary);"></i>
+            <strong>IP</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">آدرس‌دهی منطقی (IPv4 / IPv6)</p>
+        </div>
+        <div class="mini-card" style="border-top: 4px solid var(--warning-border);">
+            <i class="fas fa-heart-pulse" style="background: var(--warning-bg); color: var(--warning-border);"></i>
+            <strong>ICMP</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">پیام‌های خطا و Ping</p>
+        </div>
+        <div class="mini-card" style="border-top: 4px solid var(--note-border);">
+            <i class="fas fa-ethernet" style="background: var(--note-bg); color: var(--note-border);"></i>
+            <strong>ARP</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">تبدیل IP به MAC</p>
+        </div>
+    </div>
+
+    <h2>۲. پروتکل‌های مسیریابی (Routing Protocols) – پیدا کردن بهترین مسیر</h2>
+    <p>فرض کنید می‌خواهید از تهران به اصفهان بروید. چندین مسیر وجود دارد: اتوبان، جاده‌ی قدیمی، یا جاده‌ی کوهستانی. روترها هم دقیقاً همین وضعیت را دارند. یک بسته‌ی داده از مبدأ تا مقصد ممکن است از چندین روتر عبور کند. پروتکل‌های مسیریابی به روترها کمک می‌کنند <strong>بهترین مسیر</strong> را انتخاب کنند. چهار پروتکل اصلی را در سطح Network+ باید بشناسید:</p>
+
+    <!-- RIP -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--warning-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-arrow-trend-up" style="color: var(--warning-border);"></i>
+            ۲-۱. RIP (Routing Information Protocol) – قدیمی و ساده
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>مکانیزم انتخاب مسیر:</strong> صرفاً بر اساس <strong>تعداد پرش (Hop Count)</strong>. یعنی هر چه تعداد روترهای بین مبدأ و مقصد کمتر باشد، مسیر بهتر است.</li>
+            <li><strong>محدودیت:</strong> حداکثر ۱۵ Hop را پشتیبانی می‌کند. یعنی اگر مسیر بیش از ۱۵ روتر فاصله داشت، RIP آن را غیرقابل‌دسترس اعلام می‌کند.</li>
+            <li><strong>کاربرد:</strong> شبکه‌های بسیار کوچک و قدیمی. امروزه به‌ندرت استفاده می‌شود.</li>
+            <li><strong>مزیت:</strong> بسیار ساده و سبک.</li>
+            <li><strong>نقطه‌ضعف:</strong> سرعت همگرایی (Convergence) پایین؛ یعنی وقتی یک مسیر قطع می‌شود، زمان زیادی طول می‌کشد تا روترها مسیر جدید را پیدا کنند.</li>
+        </ul>
+    </div>
+
+    <!-- OSPF -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--important-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-bolt" style="color: var(--important-border);"></i>
+            ۲-۲. OSPF (Open Shortest Path First) – استاندارد طلایی شبکه‌های سازمانی
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>مکانیزم انتخاب مسیر:</strong> بر اساس <strong>Cost (هزینه)</strong> که معمولاً از روی <strong>سرعت لینک</strong> محاسبه می‌شود. هر چه لینک سریع‌تر (مثلاً ۱ گیگابیت بر ثانیه)، هزینه کمتر و مسیر ارجح‌تر است. لینک‌های کند (مثلاً ۱۰ مگابیت) هزینه‌ی بالاتری دارند.</li>
+            <li><strong>مزایا:</strong> بسیار سریع، مقیاس‌پذیر (مناسب برای هزاران روتر)، و همگرایی سریع.</li>
+            <li><strong>کاربرد:</strong> قلب شبکه‌های سازمانی و دیتاسنترها.</li>
+            <li><strong>نکته:</strong> OSPF از منطقه‌بندی (Area) پشتیبانی می‌کند که به کاهش بار پردازشی کمک می‌کند.</li>
+        </ul>
+    </div>
+
+    <!-- EIGRP -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--primary); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-cube" style="color: var(--primary);"></i>
+            ۲-۳. EIGRP (Enhanced Interior Gateway Routing Protocol) – خاص سیسکو
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>مکانیزم انتخاب مسیر:</strong> ترکیبی از چندین عامل شامل <strong>پهنای باند (Bandwidth)</strong> و <strong>تأخیر (Delay)</strong> است. گاهی از قابلیت اطمینان و بار هم استفاده می‌کند.</li>
+            <li><strong>ویژگی:</strong> همگرایی بسیار سریع و مصرف کم منابع.</li>
+            <li><strong>محدودیت:</strong> این پروتکل انحصاری شرکت سیسکو است (اگرچه تا حدی به‌صورت باز هم منتشر شده، اما همچنان بیشتر در شبکه‌های سیسکو دیده می‌شود).</li>
+            <li><strong>کاربرد:</strong> در شبکه‌هایی که تجهیزات سیسکو غالب هستند.</li>
+        </ul>
+    </div>
+
+    <!-- BGP -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-globe" style="color: var(--note-border);"></i>
+            ۲-۴. BGP (Border Gateway Protocol) – پروتکل اینترنت
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>مکانیزم انتخاب مسیر:</strong> بر اساس <strong>سیاست‌های مسیریابی (Path Attributes)</strong>. مثل این است که انتخاب مسیر نه فقط بر اساس سرعت، بلکه بر اساس قراردادهای مالی، مسائل سیاسی، یا امنیتی انجام شود.</li>
+            <li><strong>کاربرد:</strong> بین شبکه‌های مختلف (مثلاً بین شرکت‌ها و ISPها، یا بین ISPهای مختلف) در اینترنت استفاده می‌شود. به عبارت ساده، <strong>اینترنت با BGP کار می‌کند</strong>.</li>
+            <li><strong>ویژگی:</strong> بسیار پیچیده و قدرتمند. مناسب برای شبکه‌های بسیار بزرگ (مقیاس جهانی).</li>
+        </ul>
+    </div>
+
+    <h3>جدول مقایسه‌ی سریع پروتکل‌های مسیریابی</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>پروتکل</th>
+                <th>معیار انتخاب مسیر</th>
+                <th>حوزه‌ی کاربرد</th>
+                <th>محدودیت اصلی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>RIP</strong></td>
+                <td>تعداد Hop (حداکثر ۱۵)</td>
+                <td>شبکه‌های کوچک</td>
+                <td>کند، مقیاس‌پذیر نیست</td>
+            </tr>
+            <tr>
+                <td><strong>OSPF</strong></td>
+                <td>هزینه (Cost) بر اساس سرعت لینک</td>
+                <td>شبکه‌های متوسط تا بزرگ</td>
+                <td>نیاز به طراحی منطقه‌بندی</td>
+            </tr>
+            <tr>
+                <td><strong>EIGRP</strong></td>
+                <td>ترکیب پهنای باند و تأخیر</td>
+                <td>شبکه‌های سیسکو</td>
+                <td>انحصاری (بیشتر در سیسکو)</td>
+            </tr>
+            <tr>
+                <td><strong>BGP</strong></td>
+                <td>سیاست‌های مسیریابی</td>
+                <td>اینترنت و بین سازمان‌ها</td>
+                <td>بسیار پیچیده</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>۳. پروتکل‌های لایه پیوند داده در سوئیچینگ (STP و LACP)</h2>
+    <p>تا اینجا درمورد مسیریابی بین شبکه‌ها صحبت کردیم. حالا می‌رویم به داخل یک شبکه‌ی محلی (LAN) که توسط سوئیچ‌ها مدیریت می‌شود.</p>
+
+    <!-- STP -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--warning-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-circle-exclamation" style="color: var(--warning-border);"></i>
+            ۳-۱. STP (Spanning Tree Protocol) – نجات‌دهنده از حلقه
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>مشکل:</strong> فرض کنید یک سوئیچ را با دو کابل به سوئیچ دیگر وصل کرده‌اید تا اگر یک کابل قطع شد، ارتباط قطع نشود (افزونگی). اما این کار باعث ایجاد <strong>حلقه (Loop)</strong> می‌شود. یک بسته‌ی پخشی (Broadcast) در این حلقه بی‌نهایت می‌چرخد، باعث <strong>طوفان پخشی (Broadcast Storm)</strong> می‌شود و کل شبکه را فلج می‌کند.</li>
+            <li><strong>راه‌حل:</strong> STP به‌طور خودکار یکی از لینک‌های اضافی را <strong>مسدود (Block)</strong> می‌کند تا حلقه شکسته شود. اگر لینک اصلی قطع شد، STP لینک مسدود را فعال می‌کند تا ارتباط حفظ شود. پس <strong>STP با قربانی کردن افزونگی اضافی، از Loop جلوگیری می‌کند</strong>.</li>
+        </ul>
+    </div>
+
+    <!-- LACP -->
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem;">
+            <i class="fas fa-layer-group" style="color: var(--note-border);"></i>
+            ۳-۲. LACP (Link Aggregation Control Protocol) – افزایش پهنای باند
+        </h3>
+        <ul style="margin: 0; padding-right: 20px;">
+            <li><strong>هدف:</strong> برعکس STP که یک لینک را غیرفعال می‌کند، LACP چندین لینک فیزیکی را <strong>به یک لینک منطقی</strong> تبدیل می‌کند.</li>
+            <li><strong>کاربرد:</strong> فرض کنید بین دو سوئیچ، ۴ کابل ۱ گیگابیتی دارید. LACP آنها را به یک لینک ۴ گیگابیتی تبدیل می‌کند. این کار باعث می‌شود:
+                <ol style="margin: 6px 0 0 20px; padding-right: 0;">
+                    <li><strong>پهنای باند افزایش یابد</strong> (البته به‌صورت توزیع ترافیک بین لینک‌ها).</li>
+                    <li><strong>افزونگی ایجاد شود</strong> (اگر یک کابل قطع شد، بقیه کابل‌ها کار را ادامه می‌دهند و شبکه قطع نمی‌شود).</li>
+                </ol>
+            </li>
+            <li style="margin-top:6px;"><strong>تفاوت با STP:</strong> STP یک لینک را قربانی می‌کند، LACP همه‌ی لینک‌ها را به کار می‌گیرد.</li>
+        </ul>
+    </div>
+
+    <h2>سناریوهای عیب‌یابی مفهومی</h2>
+    <p>روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+    <!-- Scenario 1 -->
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-bolt"></i></span>
+            سناریو ۱ — کندی شدید شبکه و چشمک‌زدن چراغ‌های سوئیچ
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">این علائم کلاسیک <strong>طوفان پخشی (Broadcast Storm)</strong> ناشی از <strong>حلقه (Loop)</strong> است. به احتمال زیاد یکی از پورت‌های سوئیچ که باید توسط STP مسدود می‌شد، به‌دلیل تنظیم اشتباه یا خطا فعال شده است. باید تنظیمات <strong>STP</strong> را بررسی کرد و مطمئن شد که لینک‌های اضافی به‌درستی Block هستند.</p>
+        </div>
+    </details>
+
+    <!-- Scenario 2 -->
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-network-wired"></i></span>
+            سناریو ۲ — استفاده از ۴ کابل فیبر نوری بین دو طبقه برای افزایش سرعت و افزونگی
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">پیشنهاد <strong>LACP</strong>. با تجمیع این ۴ لینک، هم پهنای باند تجمعی افزایش می‌یابد (بار ترافیک بین آنها تقسیم می‌شود) و هم اگر یک یا دو کابل قطع شوند، ارتباط از طریق لینک‌های باقی‌مانده برقرار می‌ماند (افزونگی).</p>
+        </div>
+    </details>
+
+    <!-- Scenario 3 -->
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-route"></i></span>
+            سناریو ۳ — عدم توافق روترها روی بهترین مسیر پس از افزودن مسیر جدید
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">مشکل از <strong>همگرایی (Convergence)</strong> است. پروتکل‌های مسیریابی زمان می‌برند تا همه‌ی روترها به یک تصویر واحد از توپولوژی برسند. اگر از RIP استفاده می‌شود، این زمان طولانی‌تر است. راه‌حل، استفاده از پروتکل‌های سریع‌تر مثل OSPF یا EIGRP است که همگرایی به‌مراتب سریع‌تری دارند. همچنین می‌توان با تنظیم Timerها، سرعت همگرایی را افزایش داد.</p>
+        </div>
+    </details>
+
+    <h2>تست چهارگزینه‌ای استاندارد</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کدام پروتکل مسیریابی فقط بر اساس تعداد Hop (پرش) مسیر را انتخاب می‌کند و حداکثر ۱۵ Hop را پشتیبانی می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) OSPF</button>
+            <button onclick="selectOption(this)">ب) EIGRP</button>
+            <button onclick="selectOption(this)">ج) RIP</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            RIP از Hop Count به عنوان معیار اصلی استفاده می‌کند و حداکثر ۱۵ Hop مجاز است.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. کدام پروتکل مسیریابی معمولاً در اینترنت برای ارتباط بین شرکت‌ها و ISPها استفاده می‌شود و بر اساس سیاست‌های مسیریابی تصمیم‌گیری می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) OSPF</button>
+            <button onclick="selectOption(this)">ب) RIP</button>
+            <button onclick="selectOption(this)">ج) EIGRP</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «د»</strong><br>
+            BGP پروتکل اصلی اینترنت است و بر اساس سیاست‌های مختلف مسیریابی می‌کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. در یک شبکه‌ی سوئیچی، چندین مسیر بین دو سوئیچ وجود دارد و باعث ایجاد حلقه (Loop) شده است. کدام پروتکل این مشکل را حل می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LACP</button>
+            <button onclick="selectOption(this)">ب) STP</button>
+            <button onclick="selectOption(this)">ج) OSPF</button>
+            <button onclick="selectOption(this)">د) ARP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            STP با مسدود کردن لینک‌های اضافی از ایجاد حلقه جلوگیری می‌کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. یک مدیر شبکه ۴ کابل بین دو سوئیچ دیتاسنتر خود متصل کرده است. او می‌خواهد از هر ۴ کابل به‌طور همزمان استفاده کند تا پهنای باند افزایش یابد و در صورت قطع یک کابل، شبکه قطع نشود. کدام پروتکل مناسب است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) STP</button>
+            <button onclick="selectOption(this)">ب) RIP</button>
+            <button onclick="selectOption(this)">ج) LACP</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            LACP چندین لینک فیزیکی را به یک لینک منطقی تجمیع می‌کند تا هم پهنای باند افزایش یابد و هم افزونگی ایجاد شود.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام پروتکل مسیریابی در شبکه‌های سازمانی بزرگ بسیار محبوب است و مسیر را بر اساس هزینه (Cost) که از سرعت لینک محاسبه می‌شود، انتخاب می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) RIP</button>
+            <button onclick="selectOption(this)">ب) OSPF</button>
+            <button onclick="selectOption(this)">ج) EIGRP</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            OSPF از هزینه (Cost) بر اساس سرعت لینک استفاده می‌کند و در شبکه‌های سازمانی بسیار رایج است.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. دو روتر از طریق یک لینک WAN به هم متصل هستند. مدیر شبکه می‌خواهد از یک پروتکل مسیریابی استفاده کند که همگرایی سریعی داشته باشد و به‌طور خاص برای تجهیزات سیسکو بهینه شده است. کدام گزینه مناسب‌تر است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) RIP</button>
+            <button onclick="selectOption(this)">ب) OSPF</button>
+            <button onclick="selectOption(this)">ج) EIGRP</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            EIGRP پروتکل اختصاصی سیسکو است و همگرایی بسیار سریعی دارد. RIP کند است، OSPF خوب است اما انحصاری سیسکو نیست، BGP برای اینترنت است.
+        </div>
+    </div>
+
+    <div class="box important" style="margin-top:40px;">
+        <i class="fas fa-arrow-turn-down"></i>
+        <div>
+            <strong>گام بعدی</strong>
+            در فصل پنجم به پروتکل‌های لایه کاربرد (HTTP، FTP، SSH، DNS، DHCP، ایمیل‌ها و PPP/PPPoE) خواهیم پرداخت.
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(3)"><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" onclick="showChapter(5)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
+
+<!-- فصل پنجم -->
+<div id="chap5" class="chapter">
+    <div class="chapter-header">
+        <div class="chapter-badge">۵</div>
+        <div>
+            <h1>پروتکل‌های لایه کاربرد، انتقال داده، ایمیل و WAN</h1>
+            <span>فصل پنجم از ۶ · HTTP/HTTPS، FTP/SFTP/TFTP، SSH/Telnet/RDP، SMB، DNS، DHCP، SMTP/POP3/IMAP، PPP/PPPoE</span>
+        </div>
+    </div>
+
+    <div class="goal-banner">
+        <i class="fas fa-bullseye"></i>
+        <div>
+            <strong>هدف این فصل</strong>
+            به آخرین ایستگاه دوره رسیدیم. در این فصل با پروتکل‌هایی آشنا می‌شوید که مستقیماً با آنها سروکار دارید: مرور وب، انتقال فایل، مدیریت از راه دور، ارسال و دریافت ایمیل، و نحوه‌ی اتصال به اینترنت (PPP/PPPoE). بسیاری از این پروتکل‌ها را روزانه استفاده می‌کنید، اما حالا می‌فهمید که پشت صحنه چه اتفاقی می‌افتد.
+        </div>
+    </div>
+
+    <!-- ۱. پروتکل‌های وب -->
+    <h2>۱. پروتکل‌های وب و انتقال ابرمتن</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--warning-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-globe" style="color: var(--warning-border);"></i>
+            ۱-۱. HTTP (HyperText Transfer Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> انتقال صفحات وب بین مرورگر و سرور.</li>
+            <li><strong>پورت:</strong> ۸۰ (TCP)</li>
+            <li><strong>مشکل امنیتی:</strong> تمام داده‌ها (شامل فرم‌ها، کوکی‌ها و حتی رمز عبور) به‌صورت <strong>متن ساده</strong> ارسال می‌شوند. هر کسی در مسیر شبکه بتواند ترافیک را بگیرد، اطلاعات را می‌خواند.</li>
+            <li><strong>کاربرد امروزی:</strong> تقریباً منسوخ شده و بیشتر برای ریدایرکت به HTTPS استفاده می‌شود.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-lock" style="color: var(--note-border);"></i>
+            ۱-۲. HTTPS (HTTP Secure)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> همان HTTP اما با یک لایه‌ی رمزنگاری به نام <strong>TLS</strong> (که قبلاً SSL نامیده می‌شد).</li>
+            <li><strong>پورت:</strong> ۴۴۳ (TCP)</li>
+            <li><strong>مزیت:</strong> تمام اطلاعات بین مرورگر و سرور رمز می‌شود. حتی اگر کسی ترافیک را بگیرد، فقط یک رشته‌ی بی‌معنا می‌بیند.</li>
+            <li><strong>نکته:</strong> امروزه تمام وب‌سایت‌های معتبر از HTTPS استفاده می‌کنند و مرورگرها وب‌سایت‌های بدون HTTPS را «ناامن» اعلام می‌کنند.</li>
+        </ul>
+    </div>
+
+    <!-- ۲. پروتکل‌های انتقال فایل -->
+    <h2>۲. پروتکل‌های انتقال فایل</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--warning-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-file-export" style="color: var(--warning-border);"></i>
+            ۲-۱. FTP (File Transfer Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> جابه‌جایی فایل بین کلاینت و سرور.</li>
+            <li><strong>پورت‌ها:</strong> ۲۱ (کنترل) و ۲۰ (داده) – هر دو TCP</li>
+            <li><strong>مشکل امنیتی:</strong> اطلاعات (نام کاربری، رمز عبور و خود فایل) به‌صورت متن ساده ارسال می‌شود. برای محیط‌های داخلی غیرحساس یا دانلود فایل‌های عمومی استفاده می‌شود.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--important-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-file-shield" style="color: var(--important-border);"></i>
+            ۲-۲. FTPS (FTP Secure)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> FTP با لایه‌ی رمزنگاری TLS/SSL.</li>
+            <li><strong>پورت:</strong> معمولاً ۲۱ یا ۹۹۰ (بستگی به حالت فعال یا غیرفعال دارد).</li>
+            <li><strong>کاربرد:</strong> زمانی که نیاز به انتقال فایل امن دارید اما زیرساخت شما بر پایه‌ی FTP است.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-file-code" style="color: var(--note-border);"></i>
+            ۲-۳. SFTP (SSH File Transfer Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> انتقال فایل از طریق کانال امن SSH.</li>
+            <li><strong>پورت:</strong> ۲۲ (TCP) – همان پورت SSH.</li>
+            <li><strong>مزیت:</strong> فقط یک پورت باز می‌خواهد (بر خلاف FTP که دو پورت باز می‌کند) و بسیار امن است.</li>
+            <li><strong>کاربرد:</strong> استاندارد امروزی برای انتقال فایل در سرورهای لینوکسی و شبکه‌های امن.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--primary); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-file-waveform" style="color: var(--primary);"></i>
+            ۲-۴. TFTP (Trivial File Transfer Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> انتقال فایل بسیار ساده و سبک.</li>
+            <li><strong>پورت:</strong> ۶۹ (UDP)</li>
+            <li><strong>ویژگی:</strong> هیچ احراز هویتی ندارد و به‌صورت غیرمطمئن (UDP) ارسال می‌شود.</li>
+            <li><strong>کاربرد:</strong> برای بوت‌کردن تجهیزات شبکه (مثل دانلود فایل کانفیگ توسط روتر هنگام روشن شدن) یا به‌روزرسانی Firmware در دستگاه‌های ساده استفاده می‌شود.</li>
+        </ul>
+    </div>
+
+    <!-- ۳. پروتکل‌های مدیریت از راه دور -->
+    <h2>۳. پروتکل‌های مدیریت از راه دور</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-terminal" style="color: var(--note-border);"></i>
+            ۳-۱. SSH (Secure Shell)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> مدیریت خط فرمان (Command Line) سرورها و تجهیزات شبکه از راه دور.</li>
+            <li><strong>پورت:</strong> ۲۲ (TCP)</li>
+            <li><strong>ویژگی:</strong> ارتباط کاملاً رمزنگاری‌شده است. جایگزین امن برای Telnet.</li>
+            <li><strong>کاربرد:</strong> استاندارد مدیریت لینوکس، روترها و سوئیچ‌های حرفه‌ای.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--warning-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-triangle-exclamation" style="color: var(--warning-border);"></i>
+            ۳-۲. Telnet
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> مدیریت از راه دور (قدیمی).</li>
+            <li><strong>پورت:</strong> ۲۳ (TCP)</li>
+            <li><strong>مشکل امنیتی:</strong> هیچ رمزنگاری ندارد. هر کسی می‌تواند نام کاربری، رمز عبور و دستورات شما را بخواند.</li>
+            <li><strong>وضعیت امروزی:</strong> به‌شدت منسوخ شده و استفاده از آن در شبکه‌های امنیتی ممنوع است.</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--primary); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-desktop" style="color: var(--primary);"></i>
+            ۳-۳. RDP (Remote Desktop Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> اتصال به دسکتاپ گرافیکی ویندوز از راه دور.</li>
+            <li><strong>پورت:</strong> ۳۳۸۹ (TCP/UDP)</li>
+            <li><strong>ویژگی:</strong> امکان مشاهده و کنترل کامل محیط گرافیکی کاربر.</li>
+            <li><strong>کاربرد:</strong> پشتیبانی، مدیریت سرورهای ویندوز و اتصال از راه دور کاربران.</li>
+        </ul>
+    </div>
+
+    <!-- ۴. اشتراک فایل -->
+    <h2>۴. پروتکل‌های اشتراک فایل و منابع</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--important-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-folder-open" style="color: var(--important-border);"></i>
+            SMB (Server Message Block)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> اشتراک‌گذاری فایل‌ها، پوشه‌ها، پرینترها و سایر منابع در شبکه‌های ویندوزی.</li>
+            <li><strong>پورت امروزی:</strong> ۴۴۵ (TCP)</li>
+            <li><strong>نکته تاریخی:</strong> در گذشته روی NetBIOS (پورت‌های ۱۳۷ تا ۱۳۹) اجرا می‌شد، اما امروزه مستقیماً روی TCP/445 کار می‌کند.</li>
+            <li><strong>کاربرد:</strong> اتصال به پوشه‌های اشتراکی در شبکه (مثل `\\192.168.1.10\SharedFolder`).</li>
+        </ul>
+    </div>
+
+    <!-- ۵. DNS و DHCP -->
+    <h2>۵. پروتکل‌های نام‌گذاری و آدرس‌دهی خودکار</h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 30px;">
+        <div class="mini-card" style="border-top: 4px solid var(--primary);">
+            <i class="fas fa-server" style="background: var(--primary-soft); color: var(--primary);"></i>
+            <strong>DNS (Domain Name System)</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">تبدیل نام دامنه به IP · پورت ۵۳ (UDP/TCP)</p>
+            <p style="font-size:0.82rem; margin:6px 0 0; color:var(--text-muted);">هدف حملات اسپوفینگ؛ استفاده از DNS امن (DOH/DOT) توصیه می‌شود.</p>
+        </div>
+        <div class="mini-card" style="border-top: 4px solid var(--note-border);">
+            <i class="fas fa-network-wired" style="background: var(--note-bg); color: var(--note-border);"></i>
+            <strong>DHCP (Dynamic Host Configuration Protocol)</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">اختصاص خودکار IP، Subnet، Gateway و DNS · پورت‌های ۶۷ (سرور) و ۶۸ (کلاینت) UDP</p>
+            <p style="font-size:0.82rem; margin:6px 0 0; color:var(--text-muted);">در شبکه‌های بزرگ ضروری است؛ بدون آن باید IP ثابت تنظیم کنید.</p>
+        </div>
+    </div>
+
+    <!-- ۶. پروتکل‌های ایمیل -->
+    <h2>۶. پروتکل‌های ایمیل</h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 20px 0 30px;">
+        <div class="mini-card" style="border-top: 4px solid var(--warning-border);">
+            <i class="fas fa-envelope" style="background: var(--warning-bg); color: var(--warning-border);"></i>
+            <strong>SMTP</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">ارسال ایمیل · پورت ۲۵</p>
+        </div>
+        <div class="mini-card" style="border-top: 4px solid var(--primary);">
+            <i class="fas fa-inbox" style="background: var(--primary-soft); color: var(--primary);"></i>
+            <strong>POP3</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">دریافت و دانلود ایمیل (حذف از سرور) · پورت ۱۱۰</p>
+        </div>
+        <div class="mini-card" style="border-top: 4px solid var(--note-border);">
+            <i class="fas fa-envelope-open" style="background: var(--note-bg); color: var(--note-border);"></i>
+            <strong>IMAP</strong>
+            <p style="font-size:0.85rem; margin:4px 0 0; color:var(--text-muted);">مدیریت و همگام‌سازی ایمیل روی سرور · پورت ۱۴۳</p>
+        </div>
+    </div>
+
+    <!-- ۷. WAN -->
+    <h2>۷. پروتکل‌های WAN و اتصال به اینترنت</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--primary); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-link" style="color: var(--primary);"></i>
+            ۷-۱. PPP (Point-to-Point Protocol)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> برقراری ارتباط مستقیم (Point-to-Point) بین دو دستگاه، مثل دو روتر که با یک کابل سریال به هم وصل شده‌اند.</li>
+            <li><strong>قابلیت‌ها:</strong>
+                <ul style="margin: 4px 0 0 20px; padding-right: 0;">
+                    <li>احراز هویت (با روش‌های PAP ساده و CHAP امن‌تر)</li>
+                    <li>تشخیص خطا</li>
+                    <li>حمل پروتکل‌های لایه ۳ (IPv4 و IPv6)</li>
+                </ul>
+            </li>
+            <li><strong>کاربرد:</strong> لینک‌های اختصاصی WAN، خطوط تلفن قدیمی (Dial-up).</li>
+        </ul>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0; border-right: 6px solid var(--note-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <h3 style="display: flex; align-items: center; gap: 12px; margin: 0 0 10px 0; font-size: 1.1rem; color: var(--text-heading);">
+            <i class="fas fa-wifi" style="color: var(--note-border);"></i>
+            ۷-۲. PPPoE (PPP over Ethernet)
+        </h3>
+        <ul style="margin: 0; padding-right: 20px; color: var(--text-main);">
+            <li><strong>وظیفه:</strong> اجرای PPP روی شبکه‌های Ethernet. بیشتر کاربران خانگی با این پروتکل سروکار دارند.</li>
+            <li><strong>چرا ساخته شد؟</strong> ISPها می‌خواستند مزایای PPP (احراز هویت، حسابداری، مدیریت کاربران) را روی شبکه‌های Ethernet (که امروزه همه‌جا هست) داشته باشند.</li>
+            <li><strong>نحوه‌ی کار:</strong> مودم شما با استفاده از یک نام کاربری و رمز عبور (که ISP به شما داده) به سرور ISP متصل می‌شود. اگر اطلاعات درست باشد، به شما یک IP عمومی اختصاص داده می‌شود و اینترنت وصل می‌شود.</li>
+            <li><strong>کاربرد:</strong> اکثر اینترنت‌های ADSL، VDSL و فیبر نوری خانگی.</li>
+        </ul>
+    </div>
+
+    <!-- سناریوها -->
+    <h2>سناریوهای عیب‌یابی مفهومی</h2>
+    <p>روی هر سناریو بزنید تا تحلیل آن باز شود:</p>
+
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-globe"></i></span>
+            سناریو ۱ — وب‌سایت‌ها باز نمی‌شوند اما پینگ 8.8.8.8 جواب می‌دهد
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">پینگ جواب می‌دهد یعنی اتصال لایه ۳ (IP) و زیرساخت شبکه سالم است. وب‌سایت‌ها باز نمی‌شوند یعنی درخواست‌های HTTP/HTTPS (پورت ۸۰ و ۴۴۳) به مقصد نمی‌رسند. احتمالاً فایروال یا پراکسی این پورت‌ها را مسدود کرده، یا تنظیمات DNS خراب است که نام دامنه را به IP تبدیل نمی‌کند. اول DNS را با <code>nslookup google.com</code> چک کنید، بعد فایروال.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-terminal"></i></span>
+            سناریو ۲ — مدیریت از راه دور سرور لینوکس بدون شنود اطلاعات
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">پیشنهاد <strong>SSH</strong> (پورت ۲۲) که تمام ارتباطات را رمزنگاری می‌کند. هرگز Telnet (پورت ۲۳) را پیشنهاد ندهید چون متن ساده است. SSH همچنین امکان انتقال فایل امن (SFTP) را هم دارد.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-envelope"></i></span>
+            سناریو ۳ — ایمیل در تلفن همراه دیده می‌شود اما در Outlook اداره نیست
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">در تلفن همراه از <strong>POP3</strong> استفاده شده است که ایمیل را از سرور دانلود و حذف می‌کند. بنابراین ایمیل فقط روی تلفن باقی می‌ماند. باید تنظیمات را به <strong>IMAP</strong> تغییر دهد تا ایمیل‌ها روی سرور باقی بمانند و همه‌ی دستگاه‌ها یک وضعیت یکسان داشته باشند.</p>
+        </div>
+    </details>
+
+    <details>
+        <summary>
+            <span class="sc-icon"><i class="fas fa-router"></i></span>
+            سناریو ۴ — مودم روشن است اما اینترنت وصل نمی‌شود و خطای Authentication Failed
+        </summary>
+        <div class="sc-analysis">
+            <i class="fas fa-check-circle" style="color: var(--note-border); font-size: 1.1rem;"></i>
+            <p style="margin:0;">اینترنت خانگی معمولاً از <strong>PPPoE</strong> استفاده می‌کند که برای اتصال به ISP به نام کاربری و رمز عبور نیاز دارد. پیام Authentication Failed یعنی نام کاربری یا رمز عبور اشتباه است (یا ISP آنها را تغییر داده است). باید با ISP تماس گرفته و اطلاعات صحیح را دریافت کنید.</p>
+        </div>
+    </details>
+
+    <!-- کوئیزها -->
+    <h2>تست چهارگزینه‌ای استاندارد</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کدام پروتکل برای مشاهده‌ی صفحات وب امن (با رمزنگاری) استفاده می‌شود و روی پورت ۴۴۳ کار می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) HTTP</button>
+            <button onclick="selectOption(this)">ب) HTTPS</button>
+            <button onclick="selectOption(this)">ج) FTP</button>
+            <button onclick="selectOption(this)">د) SSH</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            HTTPS نسخه‌ی امن HTTP است که روی پورت ۴۴۳ با رمزنگاری TLS کار می‌کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. یک مدیر شبکه می‌خواهد از راه دور یک روتر را مدیریت کند و امنیت برای او اولویت دارد. کدام پروتکل را انتخاب می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Telnet (پورت ۲۳)</button>
+            <button onclick="selectOption(this)">ب) SSH (پورت ۲۲)</button>
+            <button onclick="selectOption(this)">ج) HTTP (پورت ۸۰)</button>
+            <button onclick="selectOption(this)">د) FTP (پورت ۲۱)</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            SSH ارتباط را رمزنگاری می‌کند، در حالی که Telnet و HTTP متن ساده هستند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. کدام پروتکل برای دریافت ایمیل طراحی شده است و ایمیل‌ها را روی سرور نگه می‌دارد تا از هر دستگاهی قابل مشاهده باشند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) SMTP</button>
+            <button onclick="selectOption(this)">ب) POP3</button>
+            <button onclick="selectOption(this)">ج) IMAP</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            IMAP ایمیل‌ها را روی سرور نگه می‌دارد و امکان همگام‌سازی بین دستگاه‌ها را فراهم می‌کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. مودم اینترنت خانگی برای اتصال به ISP از یک پروتکل استفاده می‌کند که روی Ethernet اجرا می‌شود و احراز هویت با نام کاربری و رمز عبور انجام می‌دهد. کدام پروتکل است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) PPP</button>
+            <button onclick="selectOption(this)">ب) PPPoE</button>
+            <button onclick="selectOption(this)">ج) DHCP</button>
+            <button onclick="selectOption(this)">د) DNS</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            PPPoE دقیقاً برای همین کار ساخته شده است: اجرای PPP روی Ethernet با احراز هویت.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام پروتکل انتقال فایل روی پورت ۶۹ (UDP) کار می‌کند، هیچ احراز هویتی ندارد و برای بوت‌کردن تجهیزات شبکه استفاده می‌شود؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) FTP</button>
+            <button onclick="selectOption(this)">ب) SFTP</button>
+            <button onclick="selectOption(this)">ج) TFTP</button>
+            <button onclick="selectOption(this)">د) FTPS</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            TFTP سبک، بدون احراز هویت و روی UDP/69 است که برای بوت شبکه و به‌روزرسانی Firmware استفاده می‌شود.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. کاربری از طریق مرورگر به یک وب‌سایت دسترسی دارد، اما نمی‌تواند به پوشه‌های اشتراکی شبکه (`\\Server\Share`) متصل شود. کدام پروتکل به احتمال زیاد دچار مشکل شده است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) HTTP</button>
+            <button onclick="selectOption(this)">ب) SMB</button>
+            <button onclick="selectOption(this)">ج) SMTP</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            اتصال به پوشه‌های اشتراکی ویندوز از پروتکل <strong>SMB</strong> (پورت ۴۴۵) استفاده می‌کند. HTTP برای وب است، SMTP برای ایمیل و SNMP برای مانیتورینگ.
+        </div>
+    </div>
+
+    <div class="box important" style="margin-top:40px;">
+        <i class="fas fa-arrow-turn-down"></i>
+        <div>
+            <strong>گام بعدی</strong>
+            در فصل ششم (پایانی) مرور کلی همه پروتکل‌ها و آزمون جامع خواهیم داشت.
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(4)"><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" onclick="showChapter(6)">فصل بعدی <i class="fas fa-arrow-left"></i></button>
+    </div>
+</div>
+
+       <!-- فصل ششم -->
+<div id="chap6" class="chapter">
+    <div class="chapter-header">
+        <div class="chapter-badge">۶</div>
+        <div>
+            <h1>جمع‌بندی و خلاصه‌ی جامع ۵ فصل</h1>
+            <span>فصل ششم از ۶ · مرور نهایی، نقشه ذهنی و آزمون جامع</span>
+        </div>
+    </div>
+
+    <div class="goal-banner">
+        <i class="fas fa-bullseye"></i>
+        <div>
+            <strong>هدف این فصل</strong>
+            به پایان این دوره رسیدیم. تا حالا حدود ۳۰ پروتکل مهم شبکه را با هم بررسی کردیم. ممکن است تعدادشان زیاد به نظر برسد، اما نگران نباشید. در این فصل، همه‌ی این پروتکل‌ها را در یک <strong>نقشه‌ی ذهنی</strong> کنار هم می‌چینیم، اشتباهات رایج را مرور می‌کنیم و با یک سناریوی جامع، همه‌ی یادگیری‌ها را به هم متصل می‌کنیم. هدف این است که دیگر هیچ پروتکلی برایتان مبهم نباشد.
+        </div>
+    </div>
+
+    <!-- ۱. نقشه ذهنی -->
+    <h2>۱. نقشه‌ی ذهنی: یک بسته‌ی داده از مرورگر تا اینترنت</h2>
+    <p>برای اینکه جایگاه هر پروتکل را بهتر بفهمید، بیایید یک سناریوی ساده را دنبال کنیم: <strong>شما در مرورگر خود آدرس google.com را تایپ می‌کنید.</strong></p>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin: 24px 0;">
+        <div class="mini-card" style="border-right: 6px solid var(--primary);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="background: var(--primary-soft); color: var(--primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">۱</span>
+                <strong style="color: var(--text-heading);">مرحله‌ی نام‌گذاری (فصل ۵)</strong>
+            </div>
+            <p style="margin: 6px 0 0 42px; color: var(--text-muted); font-size: 0.92rem;">مرورگر نمی‌داند google.com چه آی‌پی‌ای است. پس یک درخواست به <strong>DNS</strong> (پورت ۵۳) می‌فرستد تا آی‌پی را دریافت کند.</p>
+        </div>
+        <div class="mini-card" style="border-right: 6px solid var(--note-border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="background: var(--note-bg); color: var(--note-border); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">۲</span>
+                <strong style="color: var(--text-heading);">مرحله‌ی احراز هویت (فصل ۳)</strong>
+            </div>
+            <p style="margin: 6px 0 0 42px; color: var(--text-muted); font-size: 0.92rem;">اگر شبکه سازمانی باشد، اولین بار که سیستم را روشن می‌کنید، <strong>Kerberos</strong> هویت شما را با بلیت (Ticket) تأیید می‌کند و <strong>LDAP</strong> اطلاعات کاربری شما را از Active Directory می‌خواند (ترجیحاً با <strong>LDAPS</strong> برای امنیت).</p>
+        </div>
+        <div class="mini-card" style="border-right: 6px solid var(--warning-border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="background: var(--warning-bg); color: var(--warning-border); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">۳</span>
+                <strong style="color: var(--text-heading);">مرحله‌ی مسیریابی (فصل ۴)</strong>
+            </div>
+            <p style="margin: 6px 0 0 42px; color: var(--text-muted); font-size: 0.92rem;">بسته‌ی داده باید از شبکه‌ی داخلی خارج شود. روترها با کمک پروتکل‌های مسیریابی مثل <strong>OSPF</strong> (داخل سازمان) یا <strong>BGP</strong> (بین سازمان و اینترنت) بهترین مسیر را به سمت سرور گوگل پیدا می‌کنند.</p>
+        </div>
+        <div class="mini-card" style="border-right: 6px solid var(--important-border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="background: var(--important-bg); color: var(--important-border); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">۴</span>
+                <strong style="color: var(--text-heading);">مرحله‌ی ارسال داده (فصل ۱)</strong>
+            </div>
+            <p style="margin: 6px 0 0 42px; color: var(--text-muted); font-size: 0.92rem;">داده‌ها با پروتکل <strong>TCP</strong> (برای اطمینان از رسیدن) بسته‌بندی می‌شوند و با پروتکل <strong>IP</strong> هدایت می‌شوند. در شبکه‌های محلی، <strong>ARP</strong> آی‌پی را به مک‌آدرس تبدیل می‌کند.</p>
+        </div>
+        <div class="mini-card" style="border-right: 6px solid var(--note-border);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="background: var(--note-bg); color: var(--note-border); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">۵</span>
+                <strong style="color: var(--text-heading);">مرحله‌ی امنیت و نمایش (فصل ۵)</strong>
+            </div>
+            <p style="margin: 6px 0 0 42px; color: var(--text-muted); font-size: 0.92rem;">در نهایت، مرورگر شما با پروتکل <strong>HTTPS</strong> (پورت ۴۴۳) به سرور گوگل متصل می‌شود و صفحه‌ی وب را به‌صورت رمزنگاری‌شده دریافت می‌کند.</p>
+        </div>
+    </div>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 16px 20px; border-right: 6px solid var(--primary); box-shadow: var(--shadow); backdrop-filter: blur(8px); margin-bottom: 30px;">
+        <p style="margin: 0; color: var(--text-main);"><strong>در همین حین، پشت صحنه (فصل ۲):</strong></p>
+        <ul style="margin: 6px 0 0 20px; padding-right: 0; color: var(--text-muted);">
+            <li><strong>NTP</strong> مطمئن می‌شود که ساعت کامپیوتر شما با سرور هماهنگ است تا گواهی SSL معتبر باشد.</li>
+            <li><strong>Syslog</strong> تمام این رویدادها را روی سرور مرکزی ثبت می‌کند.</li>
+            <li><strong>SNMP</strong> مدام وضعیت CPU و پهنای باند روتر را چک می‌کند تا مبادا شبکه کند شود.</li>
+        </ul>
+    </div>
+
+    <!-- ۲. جدول جمع‌بندی -->
+    <h2>۲. جدول جمع‌بندی دسته‌بندی پروتکل‌ها (برای مرور سریع)</h2>
+    <p>به‌جای حفظ کردن لیست بلندبالا، پروتکل‌ها را بر اساس <strong>دسته‌ی کاری</strong>شان دسته‌بندی کنید:</p>
+
+    <div style="overflow-x: auto; margin: 20px 0 30px;">
+        <table style="min-width: 500px; font-size: 0.9rem;">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;">دسته‌بندی</th>
+                    <th>پروتکل‌ها</th>
+                    <th>یک جمله برای یادآوری</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>🕐 زیرساخت و زمان</strong></td>
+                    <td>NTP، Syslog، SNMP</td>
+                    <td>زمان را هماهنگ کن، لاگ‌ها را جمع کن، وضعیت لحظه‌ای را ببین.</td>
+                </tr>
+                <tr>
+                    <td><strong>👤 هویت و کاربران</strong></td>
+                    <td>LDAP، LDAPS، Kerberos</td>
+                    <td>کیستی؟ (Kerberos) و چه اطلاعاتی داری؟ (LDAP) – امن با LDAPS.</td>
+                </tr>
+                <tr>
+                    <td><strong>🗺️ مسیریابی (لایه ۳)</strong></td>
+                    <td>RIP، OSPF، EIGRP، BGP</td>
+                    <td>یافتن بهترین مسیر؛ از کوچک (RIP) تا اینترنت (BGP).</td>
+                </tr>
+                <tr>
+                    <td><strong>🔌 سوئیچینگ (لایه ۲)</strong></td>
+                    <td>STP، LACP</td>
+                    <td>جلوگیری از حلقه (STP) یا ترکیب پهنای باند (LACP).</td>
+                </tr>
+                <tr>
+                    <td><strong>🌐 کاربرد و وب</strong></td>
+                    <td>HTTP/HTTPS، FTP/SFTP/TFTP</td>
+                    <td>نمایش وب و جابه‌جایی فایل؛ امن با S.</td>
+                </tr>
+                <tr>
+                    <td><strong>🖥️ مدیریت از راه دور</strong></td>
+                    <td>SSH، Telnet، RDP</td>
+                    <td>مدیریت سرور؛ SSH امن، Telnet مرده.</td>
+                </tr>
+                <tr>
+                    <td><strong>📧 ایمیل</strong></td>
+                    <td>SMTP، POP3، IMAP</td>
+                    <td>بفرست (SMTP)، بگیر (POP3) یا همگام‌ساز (IMAP).</td>
+                </tr>
+                <tr>
+                    <td><strong>🏷️ نام‌گذاری و تنظیمات</strong></td>
+                    <td>DNS، DHCP</td>
+                    <td>نام را به آی‌پی تبدیل کن (DNS) و تنظیمات بده (DHCP).</td>
+                </tr>
+                <tr>
+                    <td><strong>🌍 اتصال به اینترنت</strong></td>
+                    <td>PPP، PPPoE</td>
+                    <td>ارتباط نقطه‌به‌نقطه؛ PPPoE برای مودم خانگی.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ۳. اشتباهات طلایی -->
+    <h2>۳. ۳ اشتباه طلایی که نباید مرتکب شوید (نکات کلیدی)</h2>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin: 20px 0 30px;">
+        <div class="box warning" style="margin: 0;">
+            <i class="fas fa-times-circle"></i>
+            <div>
+                <strong>اشتباه اول:</strong> فکر کنید LDAP رمز عبور را چک می‌کند.
+                <p style="margin: 6px 0 0; font-weight: 400; color: var(--text-main);">✅ <strong>واقعیت:</strong> <strong>Kerberos</strong> رمز را چک می‌کند (Authentication). <strong>LDAP</strong> فقط اطلاعات را جستجو می‌کند (Directory Query).</p>
+            </div>
+        </div>
+        <div class="box warning" style="margin: 0;">
+            <i class="fas fa-times-circle"></i>
+            <div>
+                <strong>اشتباه دوم:</strong> فکر کنید Syslog و SIEM یکی هستند.
+                <p style="margin: 6px 0 0; font-weight: 400; color: var(--text-main);">✅ <strong>واقعیت:</strong> <strong>Syslog</strong> جمع‌آوری‌کننده‌ی خام لاگ‌هاست. <strong>SIEM</strong> (مثل Splunk) تحلیل‌گر آن لاگ‌ها و تولیدکننده‌ی هشدار است.</p>
+            </div>
+        </div>
+        <div class="box warning" style="margin: 0;">
+            <i class="fas fa-times-circle"></i>
+            <div>
+                <strong>اشتباه سوم:</strong> فکر کنید STP و LACP رقیب هم هستند.
+                <p style="margin: 6px 0 0; font-weight: 400; color: var(--text-main);">✅ <strong>واقعیت:</strong> <strong>STP</strong> برای جلوگیری از Loop (یک لینک را قربانی می‌کند) و <strong>LACP</strong> برای افزایش پهنای باند (همه‌ی لینک‌ها را به کار می‌گیرد) است. این دو مکمل هم هستند و معمولاً با هم در یک شبکه‌ی حرفه‌ای فعال‌اند.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ۴. سناریوی جامع -->
+    <h2>۴. سناریوی جامع عیب‌یابی (ترکیبی از همه‌ی فصل‌ها)</h2>
+
+    <div style="background: var(--bg-card); border-radius: var(--radius); padding: 18px 22px; margin: 20px 0; border-right: 6px solid var(--important-border); box-shadow: var(--shadow); backdrop-filter: blur(8px);">
+        <p style="margin: 0 0 12px 0; font-weight: 700; color: var(--text-heading);"><i class="fas fa-building" style="color: var(--important-border); margin-left: 8px;"></i>سناریو:</p>
+        <p style="margin: 0 0 12px 0; color: var(--text-main);">یک شرکت بزرگ، امروز صبح با سه مشکل همزمان مواجه شده است:</p>
+        <ol style="margin: 0 0 16px 20px; padding-right: 0; color: var(--text-main);">
+            <li>کاربران نمی‌توانند به دامنه (Domain) لاگین کنند و خطای زمان می‌دهند.</li>
+            <li>مدیر شبکه می‌بیند که ترافیک شبکه به شدت بالا رفته و سوئیچ‌ها داغ کرده‌اند.</li>
+            <li>تیم امنیت گزارش می‌دهد که یک برنامه‌ی داخلی، اطلاعات کاربران را به‌صورت رمزنگاری‌نشده از دایرکتوری می‌خواند.</li>
+        </ol>
+
+        <p style="margin: 0 0 8px 0; font-weight: 700; color: var(--text-heading);"><i class="fas fa-screwdriver-wrench" style="color: var(--note-border); margin-left: 8px;"></i>تحلیل و راه‌حل گام‌به‌گام:</p>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+            <div style="background: var(--bg-body); border-radius: 12px; padding: 12px 16px; border-right: 4px solid var(--warning-border);">
+                <strong style="color: var(--text-heading);">مشکل ۱ (لاگین):</strong>
+                <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.92rem;">خطای زمان یعنی <strong>NTP</strong> (فصل ۲) خراب است یا همگام‌سازی نشده. در نتیجه <strong>Kerberos</strong> (فصل ۳) نمی‌تواند بلیت را تأیید کند. باید NTP Server را ریستارت کرد و کلاینت‌ها را مجدداً همگام‌سازی کرد.</p>
+            </div>
+            <div style="background: var(--bg-body); border-radius: 12px; padding: 12px 16px; border-right: 4px solid var(--warning-border);">
+                <strong style="color: var(--text-heading);">مشکل ۲ (ترافیک و دما):</strong>
+                <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.92rem;">افزایش ترافیک و داغ شدن سوئیچ‌ها نشانه‌ی <strong>حلقه (Loop)</strong> در شبکه است. باید تنظیمات <strong>STP</strong> (فصل ۴) را چک کرد تا ببینیم چرا یکی از لینک‌های اضافی Block نشده است. همچنین می‌توان با <strong>SNMP</strong> (فصل ۲) دمای لحظه‌ای را مانیتور کرد تا از آسیب دیدن سخت‌افزار جلوگیری کرد.</p>
+            </div>
+            <div style="background: var(--bg-body); border-radius: 12px; padding: 12px 16px; border-right: 4px solid var(--warning-border);">
+                <strong style="color: var(--text-heading);">مشکل ۳ (امنیت برنامه):</strong>
+                <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.92rem;">برنامه‌ای که اطلاعات را رمزنگاری‌نشده می‌خواند یعنی از <strong>LDAP</strong> معمولی (پورت ۳۸۹) استفاده می‌کند. راه‌حل، تغییر پیکربندی برنامه به <strong>LDAPS</strong> (پورت ۶۳۶) است تا ارتباط با Active Directory با TLS رمزنگاری شود (فصل ۳).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ۵. تست‌های جامع -->
+    <h2>۵. شش تست جامع نهایی (پوشش تمام فصول)</h2>
+    <p>روی گزینه‌ای که فکر می‌کنید درست است بزنید تا تحلیل پاسخ نمایش داده شود.</p>
+
+    <div class="quiz-card">
+        <p>❓ ۱. کاربری می‌گوید «اینترنت وصل است اما وب‌سایت‌ها باز نمی‌شوند». شما <code>ping 8.8.8.8</code> را جواب می‌گیرید، اما <code>ping google.com</code> جواب نمی‌دهد. مشکل از کدام پروتکل است؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) HTTP</button>
+            <button onclick="selectOption(this)">ب) DNS</button>
+            <button onclick="selectOption(this)">ج) DHCP</button>
+            <button onclick="selectOption(this)">د) ARP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            پینگ به آی‌پی (۸.۸.۸.۸) جواب می‌دهد یعنی اتصال لایه ۳ سالم است. اما پینگ به نام دامنه جواب نمی‌دهد یعنی <strong>DNS</strong> نمی‌تواند نام را به آی‌پی تبدیل کند.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۲. یک مدیر امنیت می‌خواهد بداند چه کسی در ۲۴ ساعت گذشته به فایل‌های حساس دسترسی داشته است. برای یافتن این رویدادها، به کدام پروتکل مراجعه می‌کند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) SNMP</button>
+            <button onclick="selectOption(this)">ب) NTP</button>
+            <button onclick="selectOption(this)">ج) Syslog</button>
+            <button onclick="selectOption(this)">د) LDAP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            <strong>Syslog</strong> همه‌ی رویدادهای گذشته را در یک سرور مرکزی ذخیره می‌کند. SNMP وضعیت لحظه‌ای است و LDAP برای جستجوی اطلاعات کاربران است.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۳. کدام ترکیب از پروتکل‌ها به‌ترتیب وظایف «احراز هویت کاربر» و «دریافت اطلاعات گروه‌های کاربر» را در Active Directory انجام می‌دهند؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) LDAP و Kerberos</button>
+            <button onclick="selectOption(this)">ب) Kerberos و LDAP</button>
+            <button onclick="selectOption(this)">ج) NTP و SNMP</button>
+            <button onclick="selectOption(this)">د) Kerberos و NTP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            اول <strong>Kerberos</strong> هویت را تأیید می‌کند (Authentication)، سپس <strong>LDAP</strong> اطلاعات کاربر را برمی‌گرداند (Directory Query).
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۴. مدیر شبکه ۴ کابل بین دو سوئیچ وصل کرده است، اما می‌بیند فقط یک کابل ترافیک دارد و سه کابل دیگر بیکارند. کدام پروتکل را فعال کند تا از همه‌ی کابل‌ها استفاده شود؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) STP</button>
+            <button onclick="selectOption(this)">ب) LACP</button>
+            <button onclick="selectOption(this)">ج) OSPF</button>
+            <button onclick="selectOption(this)">د) BGP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            <strong>LACP</strong> چند لینک فیزیکی را تجمیع می‌کند. STP باعث می‌شود لینک‌های اضافی Block شوند (بیکار بمانند) تا Loop ایجاد نشود، بنابراین اگر STP فعال است، باید آن را برای آن پورت‌ها غیرفعال و LACP را فعال کرد.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۵. کدام پروتکل در لایه کاربرد (Application) قرار دارد، روی پورت ۲۲ کار می‌کند، هم برای مدیریت از راه دور و هم برای انتقال فایل امن استفاده می‌شود؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) Telnet</button>
+            <button onclick="selectOption(this)">ب) FTP</button>
+            <button onclick="selectOption(this)">ج) SSH</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ج»</strong><br>
+            <strong>SSH</strong> (پورت ۲۲) هم مدیریت از راه دور امن است و هم SFTP (انتقال فایل امن) روی همین پورت سوار می‌شود. Telnet ناامن است و FTP پورت‌های ۲۰/۲۱ دارد.
+        </div>
+    </div>
+
+    <div class="quiz-card">
+        <p>❓ ۶. یک کاربر از راه دور (VPN) به شبکه وصل می‌شود، اما نمی‌تواند به پوشه‌های اشتراکی روی سرور ویندوز دسترسی پیدا کند. احراز هویت VPN موفق بوده است. کدام پروتکل را ابتدا بررسی می‌کنید؟</p>
+        <div class="quiz-options">
+            <button onclick="selectOption(this)">الف) HTTP</button>
+            <button onclick="selectOption(this)">ب) SMB</button>
+            <button onclick="selectOption(this)">ج) SMTP</button>
+            <button onclick="selectOption(this)">د) SNMP</button>
+        </div>
+        <div class="quiz-answer">
+            <strong>✅ پاسخ صحیح: گزینه «ب»</strong><br>
+            اتصال به پوشه‌های اشتراکی ویندوز از پروتکل <strong>SMB</strong> (پورت ۴۴۵) استفاده می‌کند. احراز هویت VPN (که ممکن است از Kerberos یا LDAP استفاده کند) موفق بوده، پس مشکل از خودِ سرویس اشتراک فایل (SMB) یا پورت آن روی فایروال است.
+        </div>
+    </div>
+
+    <!-- حرف آخر -->
+    <div style="background: linear-gradient(135deg, var(--primary-soft), rgba(6,182,212,0.08)); border-radius: var(--radius); padding: 24px 28px; margin: 40px 0 20px; border: 1px solid var(--border);">
+        <h2 style="margin: 0 0 8px 0; font-size: 1.3rem; display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-rocket" style="color: var(--primary);"></i>
+            حرف آخر
+        </h2>
+        <p style="margin: 0; color: var(--text-main); font-size: 1.02rem;">
+            تبریک می‌گویم! 🌟 شما از صفر تا صد پروتکل‌های شبکه را با هم مرور کردیم. از هماهنگ‌سازی زمان (NTP) گرفته تا مسیریابی در اینترنت (BGP) و اتصال مودم خانگی (PPPoE).
+        </p>
+        <p style="margin: 12px 0 0; color: var(--text-main); font-size: 1.02rem;">
+            به یاد داشته باشید که شبکه مثل یک شهر بزرگ است. پروتکل‌ها، قوانین راهنمایی و رانندگی آن شهر هستند. اگر قانون (پروتکل) را بلد باشید، هرگز در این شهر گم نمی‌شوید و هر وقت خرابی (عیب‌یابی) پیش بیاید، می‌دانید کدام چراغ راهنمایی را باید چک کنید.
+        </p>
+        <p style="margin: 12px 0 0; color: var(--text-main); font-size: 1.02rem;">
+            اگر این دوره برایتان مفید بود، همین حالا یک سناریوی واقعی از محیط کار یا خانه‌تان را پیدا کنید و سعی کنید پروتکل‌های درگیر را تشخیص دهید. تمرین عملی، بهترین راه برای تثبیت این مفاهیم است. موفق و پیروز باشید! 🚀
+        </p>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showChapter(5)"><i class="fas fa-arrow-right"></i> فصل قبلی</button>
+        <button class="nav-btn" disabled>پایان دوره</button>
+    </div>
+</div>
+
+    </main>
+
+    <script>
+        // ====== generate nav links ======
+        const totalChapters = 6;
+        const navLinksContainer = document.getElementById('navLinks');
+
+        for (let i = 1; i <= totalChapters; i++) {
+            const a = document.createElement('a');
+            a.textContent = `فصل ${i}`;
+            a.setAttribute('onclick', `showChapter(${i})`);
+            a.id = `nav-link-${i}`;
+            if (i === 1) a.classList.add('active');
+            navLinksContainer.appendChild(a);
+        }
+
+        // ====== show chapter ======
+        function showChapter(num) {
+            document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+            document.getElementById('chap' + num).classList.add('active');
+
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-link-' + num).classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ====== theme toggle (in-memory, persists for this session) ======
+        let currentTheme = 'light';
+        function toggleTheme() {
+            const html = document.documentElement;
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('.theme-icon');
+            if (theme === 'dark') {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon(currentTheme);
+
+        // ====== quiz ======
+        function selectOption(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            parent.nextElementSibling.classList.add('show');
+        }
+
+        // ====== progress bar ======
+        window.onscroll = function() {
+            const scroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('progressBar').style.width = (scroll / height * 100) + '%';
+        };
+    </script>
+
+</body>
+</html>
