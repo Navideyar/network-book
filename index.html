@@ -85,6 +85,11 @@
             border-color: rgba(52, 211, 153, 0.5);
             box-shadow: 0 8px 30px rgba(52, 211, 153, 0.10), 0 0 0 1px rgba(52, 211, 153, 0.15);
         }
+        .card.active {
+    border-color: rgba(52, 211, 153, 0.5);
+    box-shadow: 0 8px 30px rgba(52, 211, 153, 0.10),
+                0 0 0 1px rgba(52, 211, 153, 0.15);
+}
         .chapter.active::before { opacity: 1; }
 
         .chapter.locked {
@@ -127,6 +132,12 @@
             border-color: transparent;
             box-shadow: 0 0 18px rgba(52,211,153,0.5);
         }
+        .card:not(.locked) .num {
+    background: #34D399;
+    color: #064E3B;
+    border-color: transparent;
+    box-shadow: 0 0 18px rgba(52,211,153,0.5);
+}
 
         .title {
             font-size: 1.1rem;
@@ -447,13 +458,13 @@
         </div>
 
         <!-- 2 – LPIC-1 -->
-        <a href="lpic-1.html" class="card locked">
+        <a href="lpic-1.html" class="card active">
             <div class="card-top">
                 <div style="display:flex;align-items:center;gap:12px">
                     <div class="num">۲</div>
                     <span class="title">LPIC-1</span>
                 </div>
-                <span class="badge badge-off">به زودی</span>
+                <span class="badge badge-on">در حال تکمیل</span>
             </div>
             <div class="desc">مدیریت، خط فرمان و کاربری سیستم‌عامل لینوکس.</div>
         </a>
