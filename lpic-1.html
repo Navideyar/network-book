@@ -540,6 +540,16 @@
             margin: 22px 0;
             background: var(--bg-card);
             border: 1px solid var(--border);
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: hidden;
+            overflow-wrap: break-word;
+        }
+
+        .box > div {
+            min-width: 0;
+            flex: 1;
+            overflow-wrap: break-word;
         }
         .box i {
             font-size: 1.3rem;
@@ -584,6 +594,9 @@
         .code-container {
             position: relative;
             margin: 24px 0;
+            max-width: 100%;
+            min-width: 0;
+            width: 100%;
         }
 
         .code-label {
@@ -608,11 +621,25 @@
             font-size: 0.9rem;
             direction: ltr;
             text-align: left;
+            unicode-bidi: isolate;
             white-space: pre;
             overflow-x: auto;
             border: 1px solid var(--border);
             max-width: 100%;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             -webkit-overflow-scrolling: touch;
+        }
+
+        /* جمع‌بندی‌ها و خطوط دو زبانه روی موبایل داخل کادر بمانند */
+        .summary-box,
+        .summary-box .code-container,
+        .summary-box .code-block,
+        .box .code-container,
+        .box .code-block {
+            max-width: 100%;
+            min-width: 0;
         }
 
         code, .section code {
@@ -842,6 +869,10 @@
             padding: 20px 22px;
             margin: 24px 0;
             box-shadow: var(--shadow);
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: hidden;
+            overflow-wrap: break-word;
         }
         .summary-box h3 {
             margin-top: 0;
@@ -936,6 +967,11 @@
             .code-block {
                 font-size: 0.78rem;
                 padding: 24px 12px 14px;
+                /* خطوط بلند جمع‌بندی (مثل env → توضیح) داخل کادر می‌شکنند */
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                overflow-x: hidden;
             }
             .code-label {
                 font-size: 0.68rem;
@@ -1013,6 +1049,10 @@
             .code-block {
                 font-size: 0.72rem;
                 padding: 22px 10px 12px;
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                overflow-x: hidden;
             }
             table {
                 font-size: 0.78rem;
