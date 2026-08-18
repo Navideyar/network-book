@@ -90,6 +90,11 @@
             padding: 0;
         }
 
+        html {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         body {
             font-family: 'Vazirmatn', sans-serif;
             background: var(--bg-body);
@@ -98,6 +103,8 @@
             font-size: 16.5px;
             padding-top: 64px;          /* ارتفاع نوار بالا */
             transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+            max-width: 100%;
         }
 
         /* ============================================================
@@ -387,12 +394,19 @@
             margin-right: calc(var(--sidebar-width) + 24px);
             padding: 32px 24px 80px;
             transition: margin 0.3s;
+            min-width: 0;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         /* هر بخش (section) به صورت پیش‌فرض مخفی است */
         .section {
             display: none;
             animation: fadeIn 0.35s ease;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
         .section.active {
             display: block;
@@ -597,6 +611,13 @@
             white-space: pre;
             overflow-x: auto;
             border: 1px solid var(--border);
+            max-width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        code, .section code {
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         /* پرامپت $ برای خطوط فرمان */
@@ -611,6 +632,22 @@
         /* ============================================================
            بخش ۱۳ – جدول‌ها
            ============================================================ */
+        .table-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 22px 0;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .table-wrap table {
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -619,6 +656,7 @@
             border-radius: 10px;
             overflow: hidden;
             border: 1px solid var(--border);
+            min-width: 0;
         }
 
         th,
@@ -626,16 +664,22 @@
             border: 1px solid var(--border);
             padding: 11px 14px;
             text-align: right;
+            vertical-align: top;
         }
 
         th {
             background: var(--primary-soft);
             color: var(--text-heading);
             font-weight: 600;
+            white-space: nowrap;
         }
 
         tr:hover td {
             background: var(--bg-body);
+        }
+
+        td code {
+            white-space: nowrap;
         }
 
         /* ============================================================
@@ -817,6 +861,7 @@
                 max-width: 88vw;
                 border-left: none;
                 box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+                -webkit-overflow-scrolling: touch;
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -838,35 +883,114 @@
 
             .main {
                 margin-right: 0 !important;
-                padding: 24px 16px 90px;
+                padding: 20px 14px 100px;
+                max-width: 100%;
+                width: 100%;
+                overflow-x: hidden;
             }
 
             body {
                 padding-top: 56px;
+                font-size: 15.5px;
+                line-height: 1.8;
             }
             .navbar {
                 height: 56px;
-                padding: 0 14px;
+                padding: 0 12px;
+                gap: 10px;
             }
             .progress-track {
                 top: 56px;
             }
 
             .brand span {
-                display: none;   /* مخفی کردن نوشته "WebBook · Linux" در موبایل */
+                display: none;   /* مخفی کردن نوشته برند در موبایل */
             }
 
             .section-header {
-                padding: 16px;
+                padding: 14px 14px;
                 gap: 12px;
+                flex-wrap: wrap;
             }
             .section-badge {
-                width: 42px;
-                height: 42px;
-                font-size: 0.95rem;
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
             }
             .section-header h1 {
+                font-size: 1.1rem;
+                line-height: 1.45;
+                word-break: break-word;
+            }
+            .section-header .meta {
+                font-size: 0.8rem;
+            }
+
+            h2 {
+                font-size: 1.08rem;
+            }
+            h3 {
+                font-size: 0.98rem;
+            }
+
+            .code-block {
+                font-size: 0.78rem;
+                padding: 24px 12px 14px;
+            }
+            .code-label {
+                font-size: 0.68rem;
+                left: 10px;
+            }
+
+            .table-wrap {
+                margin: 16px -4px;
+                border-radius: 8px;
+            }
+            table {
+                font-size: 0.82rem;
+                min-width: 420px;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+
+            .box {
+                padding: 12px 12px;
+                gap: 10px;
+            }
+            .box i {
                 font-size: 1.15rem;
+            }
+
+            .quiz-card {
+                padding: 16px;
+            }
+            .quiz-options button {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .nav-buttons {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.88rem;
+                flex: 1 1 auto;
+                justify-content: center;
+            }
+
+            .summary-box {
+                padding: 14px 14px;
+            }
+
+            blockquote {
+                padding: 12px 14px;
+            }
+
+            .code-container {
+                max-width: 100%;
             }
         }
 
@@ -876,6 +1000,30 @@
                 left: 18px;
                 width: 48px;
                 height: 48px;
+            }
+            .main {
+                padding: 14px 10px 100px;
+            }
+            body {
+                font-size: 15px;
+            }
+            .section-header h1 {
+                font-size: 1.02rem;
+            }
+            .code-block {
+                font-size: 0.72rem;
+                padding: 22px 10px 12px;
+            }
+            table {
+                font-size: 0.78rem;
+                min-width: 360px;
+            }
+            th, td {
+                padding: 7px 8px;
+            }
+            .nav-btn {
+                font-size: 0.84rem;
+                padding: 9px 12px;
             }
         }
     </style>
@@ -991,7 +1139,7 @@
         { "id": "ch2-7", "title": "kill + تکمیلی مدیریت Process" },
         { "id": "ch2-8", "title": "مرور و جمع‌بندی مدیریت نرم‌افزار و Processها" }
     ]
-},, {
+}, {
             "id": "ch3",
             "title": "سخت‌افزار، دیسک و سیستم فایل",
             "en": "Hardware, Disk & Filesystem",
@@ -9697,10 +9845,24 @@ kill %number    → پایان دادن به یک Job پس‌زمینه</div></d
         });
 
         // ============================================================
-        // ۲۶-۱۲ – مقداردهی اولیه: ساخت TOC، بخش‌ها و نمایش بخش اول
+        // ۲۶-۱۲ – بسته‌بندی جدول‌ها برای اسکرول افقی روی موبایل (بدون حذف محتوا)
+        // ============================================================
+        function wrapTables() {
+            document.querySelectorAll('.section table').forEach(function(table) {
+                if (table.parentElement && table.parentElement.classList.contains('table-wrap')) return;
+                var wrap = document.createElement('div');
+                wrap.className = 'table-wrap';
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            });
+        }
+
+        // ============================================================
+        // ۲۶-۱۳ – مقداردهی اولیه: ساخت TOC، بخش‌ها و نمایش بخش اول
         // ============================================================
         buildTOC();
         buildSections();
+        wrapTables();
         showSection(0);
     </script>
 
