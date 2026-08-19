@@ -3307,309 +3307,354 @@ AlmaLinux → <code>/etc/yum.repos.d/</code>
 <div class="section-header">
     <div class="section-badge">۱</div>
     <div>
-        <h1>ویرایشگر vi</h1>
+        <h1>آموزش کامل ویرایشگر vi</h1>
         <div class="meta">کار با خط فرمان · بخش ۶ از ۱۴</div>
     </div>
 </div>
 
-<p>در جلسات قبل با مفهوم ویرایش فایل‌ها آشنا شدیم. در این جلسه یاد می‌گیریم چگونه با <strong>ویرایشگر <code>vi</code></strong> کار کنیم.</p>
-<p><code>vi</code> یکی از مهم‌ترین و پرکاربردترین ویرایشگرهای لینوکس است و دانستن آن برای آزمون <strong>LPIC-1</strong> و کار به عنوان مدیر سیستم ضروری است.</p>
+<p>در جلسه قبل با اهمیت ویرایش فایل‌ها و معرفی کلی ویرایشگرهای <code>vi</code>, <code>vim</code> و <code>nano</code> آشنا شدیم.</p>
+<p>در این جلسه به‌صورت کامل و عملی یاد می‌گیریم چگونه با <code>vi</code> کار کنیم؛ چون:</p>
+<blockquote><code>vi</code> مهم‌ترین ویرایشگر متن در آزمون LPIC-1 است.</blockquote>
 
-<h2>vi چیست؟</h2>
-<p><code>vi</code> یک ویرایشگر متنی است که تقریباً روی تمام توزیع‌های لینوکس و یونیکس به‌صورت پیش‌فرض وجود دارد.</p>
-<p>برای باز کردن یک فایل:</p>
-<div class="code-container"><span class="code-label">باز کردن</span><div class="code-block">vi file.txt</div></div>
-<p>اگر فایل وجود نداشته باشد، با ذخیره کردن ایجاد خواهد شد.</p>
-
-<h2>حالت‌های مختلف vi</h2>
-<p>برخلاف بسیاری از ویرایشگرها، <code>vi</code> دارای چند حالت مختلف است. سه حالت اصلی عبارت‌اند از:</p>
-<div class="code-container"><span class="code-label">حالت‌ها</span><div class="code-block no-prompt">             +----------------+\n             | Command Mode   |\n             +----------------+\n               |          |\n         i,a,o...       :\n               |          |\n               v          v\n        +------------+  +-----------+\n        | Insert     |  | Ex Mode   |\n        +------------+  +-----------+</div></div>
-
-<h3>Command Mode</h3>
-<p>بعد از باز کردن فایل، <code>vi</code> به‌طور پیش‌فرض در این حالت قرار دارد.</p>
-<p>در این حالت می‌توانید:</p>
+<h2>بخش اول: چرا <code>vi</code>؟</h2>
+<p>سؤال رایج این است:</p>
+<blockquote>چرا با وجود ویرایشگرهای ساده‌تری مثل <code>nano</code>، باید <code>vi</code> را یاد بگیریم؟</blockquote>
+<p>دلایل اصلی:</p>
 <ul>
-    <li>حرکت در متن</li>
-    <li>حذف متن</li>
-    <li>کپی و چسباندن</li>
-    <li>جستجو</li>
-    <li>ورود به حالت‌های دیگر</li>
+    <li>روی <strong>همه توزیع‌های لینوکس</strong> (حتی نسخه‌های خیلی سبک) از قبل نصب است.</li>
+    <li>در سرورهایی که رابط گرافیکی ندارند، همیشه در دسترس است.</li>
+    <li>در آزمون <strong>LPIC-1</strong> به‌طور مستقیم از آن سؤال طرح می‌شود.</li>
+    <li>سرعت کار بسیار بالاست (بعد از یادگیری).</li>
 </ul>
-<p>را انجام دهید.</p>
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>تا زمانی که وارد Insert Mode نشده‌اید، هر کلیدی یک فرمان محسوب می‌شود.</div></div>
 
-<h3>Insert Mode</h3>
-<p>در این حالت می‌توانید متن تایپ کنید.</p>
-<p>برای ورود به این حالت از کلیدهایی مانند:</p>
-<div class="code-container"><span class="code-label">کلیدها</span><div class="code-block no-prompt">i\na\no\nI\nA\nO</div></div>
-<p>استفاده می‌شود.</p>
-<p>برای خروج از Insert Mode:</p>
-<div class="code-container"><span class="code-label">خروج</span><div class="code-block no-prompt">Esc</div></div>
-
-<h3>Ex Mode</h3>
-<p>برای ورود به این حالت <code>:</code> را فشار دهید.</p>
-<p>در این حالت می‌توانید:</p>
-<ul>
-    <li>ذخیره فایل</li>
-    <li>خروج</li>
-    <li>اجرای دستورات خاص</li>
-    <li>اجرای دستورات Shell</li>
-</ul>
-<p>را انجام دهید.</p>
-
-<h2>ورود به حالت Insert</h2>
-
-<h3>درج قبل از مکان‌نما</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">i</div></div>
+<h2>بخش دوم: باز کردن فایل با <code>vi</code></h2>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">vi filename</div></div>
 <p>مثال:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">i\nLinux</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">vi test.txt</div></div>
+<p>اگر فایل وجود نداشته باشد، <code>vi</code> یک فایل جدید (خالی) با همان نام باز می‌کند و در صورت ذخیره، فایل ساخته می‌شود.</p>
 
-<h3>درج بعد از مکان‌نما</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">a</div></div>
-<p>اگر مکان‌نما روی حرفی باشد، متن بعد از آن نوشته می‌شود.</p>
+<h2>بخش سوم: حالت‌های (Modes) <code>vi</code></h2>
+<p>مهم‌ترین و گیج‌کننده‌ترین بخش برای مبتدی‌ها، <strong>حالت‌های مختلف</strong> <code>vi</code> است.</p>
+<p>سه حالت اصلی:</p>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>حالت</th><th>کاربرد</th></tr></thead>
+        <tbody>
+            <tr><td>Command Mode (حالت فرمان)</td><td>حرکت، حذف، کپی، جستجو</td></tr>
+            <tr><td>Insert Mode (حالت درج)</td><td>تایپ و ویرایش متن</td></tr>
+            <tr><td>Last Line Mode (حالت خط آخر)</td><td>ذخیره، خروج، جستجو و جایگزینی</td></tr>
+        </tbody>
+    </table>
+</div>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong>هنگام باز شدن <code>vi</code>، همیشه در <strong>Command Mode</strong> هستید، نه حالت تایپ متن.</div></div>
 
-<h3>درج در ابتدای خط</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">I</div></div>
-<p>مکان‌نما به ابتدای خط رفته و وارد حالت Insert می‌شود.</p>
-
-<h3>درج در انتهای خط</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">A</div></div>
-<p>مکان‌نما به انتهای خط می‌رود.</p>
-
-<h3>ایجاد خط جدید پایین</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">o</div></div>
-<p>نمونه:</p>
-<p>قبل:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">Line 1\nLine 2</div></div>
-<p>پس از فشردن <code>o</code>:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">Line 1\n<خط جدید>\nLine 2</div></div>
-
-<h3>ایجاد خط جدید بالا</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">O</div></div>
-<p>نمونه:</p>
-<p>قبل:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">Line 1\nLine 2</div></div>
-<p>بعد:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt"><خط جدید>\nLine 1\nLine 2</div></div>
-
-<h2>حذف متن</h2>
-
-<h3>حذف خط جاری</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">dd</div></div>
-<p>اگر مکان‌نما روی خط دوم باشد:</p>
-<p>قبل:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">Line1\nLine2\nLine3</div></div>
-<p>بعد:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">Line1\nLine3</div></div>
-
-<h3>حذف یک کلمه</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">dw</div></div>
-<p>مثال:</p>
-<p>قبل:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">Linux LPIC</div></div>
-<p>بعد از قرار گرفتن روی Linux و اجرای <code>dw</code>:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">LPIC</div></div>
-
-<h2>کپی و چسباندن</h2>
-<p>در <code>vi</code> عمل Copy با نام <strong>Yank</strong> شناخته می‌شود.</p>
-
-<h3>کپی یک خط</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">yy</div></div>
-
-<h3>کپی یک کلمه</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">yw</div></div>
-
-<h3>چسباندن بعد از مکان‌نما</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">p</div></div>
-
-<h3>چسباندن قبل از مکان‌نما</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block no-prompt">P</div></div>
-<p>مثال:</p>
-<p>قبل:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">Line1\nLine2</div></div>
-<p>اجرای:</p>
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">yy\np</div></div>
-<p>بعد:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">Line1\nLine1\nLine2</div></div>
-
-<h2>اجرای دستورات Shell در vi</h2>
-<p>یکی از قابلیت‌های جالب <code>vi</code> این است که بدون خروج از ویرایشگر می‌توانید دستورات لینوکس را اجرا کنید.</p>
-
-<h3>اجرای یک دستور Shell</h3>
-<p>در حالت Ex:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:!date</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Mon Aug 16 ...</div></div>
-<p>ویرایشگر بسته نمی‌شود.</p>
-
-<h3>درج خروجی یک دستور داخل فایل</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:r! date</div></div>
-<p>خروجی دستور در محل مکان‌نما وارد فایل می‌شود.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Mon Aug 16 09:30</div></div>
-
-<h3>وارد کردن محتوای یک فایل</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:r file.txt</div></div>
-<p>محتوای <code>file.txt</code> در محل مکان‌نما درج می‌شود.</p>
-
-<h2>ذخیره و خروج</h2>
-<p>تمام این دستورات در حالت Ex اجرا می‌شوند.</p>
-
-<h3>ذخیره فایل</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:w</div></div>
-<p>فایل ذخیره می‌شود ولی داخل ویرایشگر باقی می‌مانید.</p>
-
-<h3>ذخیره و خروج</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:wq</div></div>
-<p>یا</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:x</div></div>
-<p>هر دو فایل را ذخیره کرده و خارج می‌شوند.</p>
-
-<h3>ذخیره اجباری</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:w!</div></div>
-
-<h3>ذخیره و خروج اجباری</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:wq!</div></div>
-
-<h3>خروج بدون ذخیره</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:q</div></div>
-<p>اگر تغییری داده باشید، اجازه خروج نمی‌دهد.</p>
-
-<h3>خروج اجباری بدون ذخیره</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">:q!</div></div>
-<p>تمام تغییرات نادیده گرفته می‌شوند.</p>
-
-<h3>ذخیره و خروج با میانبر</h3>
-<p>در حالت Command:</p>
-<div class="code-container"><span class="code-label">میانبر</span><div class="code-block no-prompt">ZZ</div></div>
-<p>معادل <code>:wq</code> است.</p>
-
-<div class="summary-box">
-<h3>جدول خلاصه دستورات مهم</h3>
-<table>
-<thead><tr><th>دستور</th><th>عملکرد</th></tr></thead>
-<tbody>
-<tr><td><code>i</code></td><td>درج قبل از مکان‌نما</td></tr>
-<tr><td><code>a</code></td><td>درج بعد از مکان‌نما</td></tr>
-<tr><td><code>I</code></td><td>درج ابتدای خط</td></tr>
-<tr><td><code>A</code></td><td>درج انتهای خط</td></tr>
-<tr><td><code>o</code></td><td>ایجاد خط جدید پایین</td></tr>
-<tr><td><code>O</code></td><td>ایجاد خط جدید بالا</td></tr>
-<tr><td><code>dd</code></td><td>حذف خط</td></tr>
-<tr><td><code>dw</code></td><td>حذف کلمه</td></tr>
-<tr><td><code>yy</code></td><td>کپی خط</td></tr>
-<tr><td><code>yw</code></td><td>کپی کلمه</td></tr>
-<tr><td><code>p</code></td><td>چسباندن بعد از مکان‌نما</td></tr>
-<tr><td><code>P</code></td><td>چسباندن قبل از مکان‌نما</td></tr>
-<tr><td><code>Esc</code></td><td>خروج از Insert Mode</td></tr>
-<tr><td><code>:w</code></td><td>ذخیره</td></tr>
-<tr><td><code>:q</code></td><td>خروج</td></tr>
-<tr><td><code>:q!</code></td><td>خروج بدون ذخیره</td></tr>
-<tr><td><code>:wq</code></td><td>ذخیره و خروج</td></tr>
-<tr><td><code>:x</code></td><td>ذخیره و خروج</td></tr>
-<tr><td><code>ZZ</code></td><td>ذخیره و خروج</td></tr>
-<tr><td><code>:!command</code></td><td>اجرای دستور Shell</td></tr>
-<tr><td><code>:r! command</code></td><td>درج خروجی دستور در فایل</td></tr>
-<tr><td><code>:r file</code></td><td>درج محتوای فایل</td></tr>
-</tbody>
-</table>
+<h3>ورود به هر حالت</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>از حالت</th><th>به حالت</th><th>کلید</th></tr></thead>
+        <tbody>
+            <tr><td>Command</td><td>Insert</td><td><code>i</code> یا <code>a</code> یا <code>o</code></td></tr>
+            <tr><td>Insert</td><td>Command</td><td><code>Esc</code></td></tr>
+            <tr><td>Command</td><td>Last Line</td><td><code>:</code></td></tr>
+        </tbody>
+    </table>
 </div>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکات مهم LPIC-1</strong>
+<h2>بخش چهارم: ورود به حالت Insert</h2>
+<p>برای شروع تایپ متن، باید وارد Insert Mode شوید.</p>
+<p>رایج‌ترین کلیدها:</p>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>i</code></td><td>درج قبل از مکان‌نما</td></tr>
+            <tr><td><code>a</code></td><td>درج بعد از مکان‌نما</td></tr>
+            <tr><td><code>I</code></td><td>درج در ابتدای خط</td></tr>
+            <tr><td><code>A</code></td><td>درج در انتهای خط</td></tr>
+            <tr><td><code>o</code></td><td>باز کردن خط جدید زیر خط فعلی</td></tr>
+            <tr><td><code>O</code></td><td>باز کردن خط جدید بالای خط فعلی</td></tr>
+        </tbody>
+    </table>
+</div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">i    -> شروع نوشتن از همان‌جا
+A    -> رفتن به انتهای خط و شروع نوشتن
+o    -> ساخت خط جدید و نوشتن در آن</div></div>
+<p>برای خروج از Insert Mode و بازگشت به Command Mode:</p>
+<div class="code-container"><span class="code-label">خروج</span><div class="code-block no-prompt">Esc</div></div>
+
+<h2>بخش پنجم: حرکت در <code>vi</code> (Navigation)</h2>
+<p>در Command Mode می‌توانید بدون استفاده از موس، به‌سرعت جابه‌جا شوید.</p>
+
+<h3>حرکت با کاراکتر</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>h</code></td><td>چپ</td></tr>
+            <tr><td><code>l</code></td><td>راست</td></tr>
+            <tr><td><code>j</code></td><td>پایین</td></tr>
+            <tr><td><code>k</code></td><td>بالا</td></tr>
+        </tbody>
+    </table>
+</div>
+<div class="box note"><i class="fas fa-lightbulb"></i><div>این چهار کلید جایگزین کلیدهای جهت‌دار (Arrow Keys) هستند.</div></div>
+
+<h3>حرکت سریع‌تر</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>0</code></td><td>ابتدای خط</td></tr>
+            <tr><td><code>$</code></td><td>انتهای خط</td></tr>
+            <tr><td><code>w</code></td><td>یک کلمه به جلو</td></tr>
+            <tr><td><code>b</code></td><td>یک کلمه به عقب</td></tr>
+            <tr><td><code>gg</code></td><td>ابتدای فایل</td></tr>
+            <tr><td><code>G</code></td><td>انتهای فایل</td></tr>
+            <tr><td><code>:n</code></td><td>رفتن به خط شماره n (مثلاً <code>:10</code>)</td></tr>
+        </tbody>
+    </table>
+</div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">:25</div></div>
+<p>مکان‌نما را به خط ۲۵ فایل می‌برد.</p>
+
+<h2>بخش ششم: ذخیره و خروج (Last Line Mode)</h2>
+<p>برای ذخیره یا خروج، ابتدا باید در Command Mode باشید (با <code>Esc</code>)، سپس <code>:</code> را بزنید.</p>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>دستور</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>:w</code></td><td>ذخیره فایل</td></tr>
+            <tr><td><code>:q</code></td><td>خروج (اگر تغییری نباشد)</td></tr>
+            <tr><td><code>:wq</code></td><td>ذخیره و خروج</td></tr>
+            <tr><td><code>:x</code></td><td>ذخیره و خروج (مشابه <code>:wq</code>)</td></tr>
+            <tr><td><code>:q!</code></td><td>خروج بدون ذخیره (نادیده گرفتن تغییرات)</td></tr>
+            <tr><td><code>:w newname</code></td><td>ذخیره با نام جدید</td></tr>
+        </tbody>
+    </table>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی مهم:</strong> تفاوت <code>:q</code> و <code>:q!</code>
 <ul>
-    <li>⭐ بعد از باز شدن <code>vi</code>، ابتدا در <strong>Command Mode</strong> قرار دارید.</li>
-    <li>⭐ برای تایپ متن باید وارد <strong>Insert Mode</strong> شوید.</li>
-    <li>⭐ کلید <code>Esc</code> شما را از Insert Mode به Command Mode برمی‌گرداند.</li>
-    <li>⭐ <code>:wq</code>، <code>:x</code> و <code>ZZ</code> همگی برای <strong>ذخیره و خروج</strong> استفاده می‌شوند.</li>
-    <li>⭐ <code>:q!</code> تمام تغییرات ذخیره‌نشده را دور می‌اندازد.</li>
-    <li>⭐ <code>yy</code> و <code>dd</code> از پرکاربردترین دستورات <code>vi</code> هستند.</li>
+    <li><code>:q</code> اگر فایل تغییر کرده باشد، اجازه خروج نمی‌دهد.</li>
+    <li><code>:q!</code> بدون توجه به تغییرات، خارج می‌شود.</li>
+</ul>
+</div></div>
+
+<h2>بخش هفتم: حذف، کپی و جای‌گذاری متن</h2>
+
+<h3>حذف (Delete)</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>x</code></td><td>حذف یک کاراکتر زیر مکان‌نما</td></tr>
+            <tr><td><code>dd</code></td><td>حذف کل خط</td></tr>
+            <tr><td><code>ndd</code></td><td>حذف n خط (مثلاً <code>3dd</code>)</td></tr>
+            <tr><td><code>dw</code></td><td>حذف یک کلمه</td></tr>
+            <tr><td><code>D</code></td><td>حذف از مکان‌نما تا انتهای خط</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>کپی (Yank) و جای‌گذاری (Paste)</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>yy</code></td><td>کپی کل خط</td></tr>
+            <tr><td><code>nyy</code></td><td>کپی n خط</td></tr>
+            <tr><td><code>p</code></td><td>جای‌گذاری بعد از خط فعلی</td></tr>
+            <tr><td><code>P</code></td><td>جای‌گذاری قبل از خط فعلی</td></tr>
+        </tbody>
+    </table>
+</div>
+<div class="box note"><i class="fas fa-lightbulb"></i><div>نکته: در <code>vi</code>، دستور <code>dd</code> علاوه بر حذف، متن حذف‌شده را در حافظه موقت نگه می‌دارد؛ پس می‌توانید با <code>p</code> همان خط را جای دیگری جای‌گذاری کنید.</div></div>
+
+<h2>بخش هشتم: بازگشت تغییرات (Undo / Redo)</h2>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>u</code></td><td>بازگشت آخرین تغییر (Undo)</td></tr>
+            <tr><td><code>Ctrl + r</code></td><td>بازگرداندن تغییر لغوشده (Redo)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h2>بخش نهم: جستجو و جایگزینی</h2>
+<h3>جستجوی ساده</h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>/word</code></td><td>جستجوی «word» به سمت جلو</td></tr>
+            <tr><td><code>?word</code></td><td>جستجوی «word» به سمت عقب</td></tr>
+            <tr><td><code>n</code></td><td>رفتن به نتیجه بعدی</td></tr>
+            <tr><td><code>N</code></td><td>رفتن به نتیجه قبلی (جهت معکوس)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>جایگزینی (Find & Replace)</h3>
+<p>ساختار کلی:</p>
+<div class="code-container"><span class="code-label">جایگزینی</span><div class="code-block">:s/old/new/</div></div>
+<p>جایگزینی فقط اولین مورد در خط فعلی.</p>
+<div class="code-container"><span class="code-label">جایگزینی همه در خط</span><div class="code-block">:s/old/new/g</div></div>
+<p>جایگزینی همه موارد در خط فعلی (<code>g</code> = global در خط).</p>
+<div class="code-container"><span class="code-label">جایگزینی در کل فایل</span><div class="code-block">:%s/old/new/g</div></div>
+<p>جایگزینی همه موارد در <strong>کل فایل</strong>.</p>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">:%s/root/admin/g</div></div>
+<p>همه کلمات «root» را در کل فایل به «admin» تبدیل می‌کند.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی</strong>این دستور یکی از پرکاربردترین و پرسؤال‌ترین موارد <code>vi</code> در LPIC-1 است.</div></div>
+
+<h2>بخش دهم: کپی و جای‌گذاری چند خط با محدوده</h2>
+<p>می‌توانید عملیات را روی محدوده‌ای از خطوط انجام دهید:</p>
+<div class="code-container"><span class="code-label">حذف محدوده</span><div class="code-block">:5,10d</div></div>
+<p>حذف خطوط ۵ تا ۱۰</p>
+<div class="code-container"><span class="code-label">کپی محدوده</span><div class="code-block">:5,10y</div></div>
+<p>کپی خطوط ۵ تا ۱۰</p>
+<div class="code-container"><span class="code-label">جایگزینی محدوده</span><div class="code-block">:5,10s/old/new/g</div></div>
+<p>جایگزینی در خطوط ۵ تا ۱۰</p>
+
+<h2>بخش یازدهم: شماره خط و تنظیمات نمایشی</h2>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>دستور</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>:set nu</code></td><td>نمایش شماره خطوط</td></tr>
+            <tr><td><code>:set nonu</code></td><td>مخفی کردن شماره خطوط</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="summary-box">
+<h3>جدول خلاصه کلیدهای پرکاربرد <code>vi</code></h3>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>دسته</th><th>کلید</th><th>عملکرد</th></tr></thead>
+        <tbody>
+            <tr><td>ورود به Insert</td><td><code>i</code> <code>a</code> <code>o</code></td><td>شروع نوشتن</td></tr>
+            <tr><td>خروج از Insert</td><td><code>Esc</code></td><td>بازگشت به Command Mode</td></tr>
+            <tr><td>حرکت</td><td><code>h</code> <code>j</code> <code>k</code> <code>l</code></td><td>چپ، پایین، بالا، راست</td></tr>
+            <tr><td>حرکت سریع</td><td><code>gg</code> <code>G</code> <code>0</code> <code>$</code></td><td>ابتدا/انتهای فایل یا خط</td></tr>
+            <tr><td>ذخیره/خروج</td><td><code>:w</code> <code>:q</code> <code>:wq</code> <code>:q!</code></td><td>ذخیره، خروج، خروج اجباری</td></tr>
+            <tr><td>حذف</td><td><code>x</code> <code>dd</code></td><td>حذف کاراکتر / خط</td></tr>
+            <tr><td>کپی-جای‌گذاری</td><td><code>yy</code> <code>p</code></td><td>کپی خط / جای‌گذاری</td></tr>
+            <tr><td>بازگشت</td><td><code>u</code> <code>Ctrl+r</code></td><td>Undo / Redo</td></tr>
+            <tr><td>جستجو</td><td><code>/word</code> <code>n</code></td><td>جستجو / نتیجه بعدی</td></tr>
+            <tr><td>جایگزینی</td><td><code>:%s/old/new/g</code></td><td>جایگزینی در کل فایل</td></tr>
+        </tbody>
+    </table>
+</div>
+</div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکات مهم LPIC-1</strong>
+<ul>
+    <li>⭐ همیشه به یاد داشته باشید <code>vi</code> با <strong>Command Mode</strong> باز می‌شود، نه حالت تایپ.</li>
+    <li>⭐ برای شروع تایپ حتماً باید یکی از کلیدهای <code>i</code> <code>a</code> <code>o</code> را بزنید.</li>
+    <li>⭐ تفاوت <code>:q</code> و <code>:q!</code> را حتماً حفظ کنید.</li>
+    <li>⭐ دستور <code>:%s/old/new/g</code> مهم‌ترین دستور جایگزینی در <code>vi</code> است و در آزمون بسیار پرتکرار است.</li>
+    <li>⭐ <code>dd</code> هم حذف می‌کند و هم در حافظه برای <code>p</code> نگه می‌دارد.</li>
 </ul>
 </div></div>
 
 <h2>🧪 تمرین</h2>
+
 <h3>تمرین ۱</h3>
-<p>یک فایل جدید ایجاد کنید:</p>
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">vi test.txt</div></div>
+<p>فایلی به نام <code>practice.txt</code> بسازید و وارد آن شوید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">vi practice.txt</div></div>
+<p>با کلید <code>i</code> وارد Insert Mode شوید و چند خط متن دلخواه بنویسید.</p>
 
 <h3>تمرین ۲</h3>
-<p>با استفاده از <code>i</code> وارد حالت Insert شوید و چند خط متن بنویسید.</p>
+<p>با <code>Esc</code> به Command Mode برگردید و فایل را ذخیره کرده و خارج شوید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">:wq</div></div>
 
 <h3>تمرین ۳</h3>
-<p>با فشردن <code>Esc</code> به Command Mode برگردید و یک خط را با <code>dd</code> حذف کنید.</p>
+<p>فایل را دوباره باز کنید، یک خط را با <code>dd</code> حذف کنید، سپس با <code>u</code> آن را بازگردانید.</p>
 
 <h3>تمرین ۴</h3>
-<p>یک خط را با <code>yy</code> کپی کرده و با <code>p</code> در خط بعد قرار دهید.</p>
+<p>با استفاده از دستور زیر، همه کلمات «test» موجود در فایل را به «done» تغییر دهید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">:%s/test/done/g</div></div>
 
 <h3>تمرین ۵</h3>
-<p>فایل را با یکی از روش‌های زیر ذخیره و خارج شوید:</p>
-<div class="code-container"><span class="code-label">ذخیره</span><div class="code-block">:wq</div></div>
-<p>یا</p>
-<div class="code-container"><span class="code-label">ذخیره</span><div class="code-block">:x</div></div>
-<p>یا</p>
-<div class="code-container"><span class="code-label">ذخیره</span><div class="code-block">ZZ</div></div>
+<p>شماره خطوط را نمایش دهید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">:set nu</div></div>
+<p>سپس با <code>:n</code> (مثلاً <code>:3</code>) به خط سوم بروید.</p>
 
-<h2>خودآزمایی</h2>
-<div class="quiz-card"><p>❓ تست ۱: بعد از اجرای دستور <code>vi file.txt</code>، ویرایشگر در کدام حالت قرار دارد؟</p>
+<h2>📝 تست‌های جلسه ۶</h2>
+
+<div class="quiz-card"><p>❓ تست ۱: بلافاصله بعد از اجرای دستور <code>vi file.txt</code> در کدام حالت قرار داریم؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) Insert Mode</button>
     <button onclick="selectOption(this)">ب) Command Mode</button>
-    <button onclick="selectOption(this)">ج) Ex Mode</button>
+    <button onclick="selectOption(this)">ج) Last Line Mode</button>
     <button onclick="selectOption(this)">د) Replace Mode</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>vi</code> به‌صورت پیش‌فرض در حالت فرمان (Command Mode) باز می‌شود و برای تایپ متن باید وارد Insert Mode شوید.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>vi</code> همیشه در حالت Command باز می‌شود؛ برای تایپ باید وارد Insert Mode شویم.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۲: کدام کلید متن را <strong>بعد از مکان‌نما</strong> درج می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>i</code></button>
-    <button onclick="selectOption(this)">ب) <code>a</code></button>
-    <button onclick="selectOption(this)">ج) <code>I</code></button>
-    <button onclick="selectOption(this)">د) <code>O</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>a</code> متن را بعد از مکان‌نما وارد می‌کند، در حالی که <code>i</code> قبل از مکان‌نما و <code>I</code> ابتدای خط را برای درج انتخاب می‌کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۳: کدام دستور یک خط کامل را حذف می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>dw</code></button>
-    <button onclick="selectOption(this)">ب) <code>yy</code></button>
-    <button onclick="selectOption(this)">ج) <code>dd</code></button>
-    <button onclick="selectOption(this)">د) <code>p</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>dd</code> خط جاری را حذف می‌کند. <code>dw</code> فقط یک کلمه را حذف می‌کند، <code>yy</code> خط را کپی می‌کند و <code>p</code> برای چسباندن استفاده می‌شود.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۴: برای اجرای یک دستور Shell بدون خروج از <code>vi</code> از کدام دستور استفاده می‌شود؟</p>
+<div class="quiz-card"><p>❓ تست ۲: کدام دستور فایل را ذخیره کرده و از <code>vi</code> خارج می‌کند؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>:w</code></button>
-    <button onclick="selectOption(this)">ب) <code>:! command</code></button>
-    <button onclick="selectOption(this)">ج) <code>:r file</code></button>
-    <button onclick="selectOption(this)">د) <code>:q</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>:! command</code> دستور Shell را اجرا کرده و نتیجه را نمایش می‌دهد، بدون اینکه از ویرایشگر خارج شوید.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۵: کدام دستور فایل را ذخیره کرده و از <code>vi</code> خارج می‌شود؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>:q</code></button>
-    <button onclick="selectOption(this)">ب) <code>:q!</code></button>
+    <button onclick="selectOption(this)">ب) <code>:q</code></button>
     <button onclick="selectOption(this)">ج) <code>:wq</code></button>
-    <button onclick="selectOption(this)">د) <code>dd</code></button>
+    <button onclick="selectOption(this)">د) <code>:q!</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>:wq</code> فایل را ذخیره کرده و از ویرایشگر خارج می‌شود. <code>:q</code> فقط در صورت نداشتن تغییرات خارج می‌شود و <code>:q!</code> تغییرات را بدون ذخیره دور می‌اندازد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>:wq</code> هم ذخیره می‌کند و هم خارج می‌شود. <code>:q!</code> فقط خروج بدون ذخیره است، نه ذخیره و خروج.</div>
 </div>
 
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>جمع‌بندی جلسه ۶</strong><br>
-<code>vi</code> یک ویرایشگر قدرتمند است که یادگیری آن برای هر مدیر سیستم لینوکس ضروری است. مهم‌ترین نکات:
+<div class="quiz-card"><p>❓ تست ۳: دستور <code>dd</code> در <code>vi</code> چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) کپی خط فعلی</button>
+    <button onclick="selectOption(this)">ب) حذف کل خط فعلی</button>
+    <button onclick="selectOption(this)">ج) ذخیره فایل</button>
+    <button onclick="selectOption(this)">د) جستجوی یک عبارت</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>dd</code> خط فعلی را حذف می‌کند و آن را در حافظه موقت برای <code>p</code> نگه می‌دارد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۴: کدام دستور همه موارد کلمه «old» را در <strong>کل فایل</strong> به «new» تغییر می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>:s/old/new/</code></button>
+    <button onclick="selectOption(this)">ب) <code>:s/old/new/g</code></button>
+    <button onclick="selectOption(this)">ج) <code>:%s/old/new/g</code></button>
+    <button onclick="selectOption(this)">د) <code>/old/new/</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>علامت <code>%</code> یعنی «همه خطوط فایل» و <code>g</code> یعنی «همه موارد در هر خط». بدون <code>%</code>، جایگزینی فقط در خط فعلی انجام می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۵: برای بازگرداندن آخرین تغییر انجام‌شده در <code>vi</code> از کدام کلید استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>p</code></button>
+    <button onclick="selectOption(this)">ب) <code>u</code></button>
+    <button onclick="selectOption(this)">ج) <code>x</code></button>
+    <button onclick="selectOption(this)">د) <code>n</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>u</code> معادل Undo است. برای Redo از <code>Ctrl+r</code> استفاده می‌شود.</div>
+</div>
+
+<div class="summary-box">
+<h3>🎯 جمع‌بندی جلسه ۶</h3>
+<p>مهم‌ترین نکات این جلسه:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">i / a / o   -> ورود به Insert Mode
+Esc         -> بازگشت به Command Mode
+:w :q :wq :q!  -> ذخیره و خروج
+dd / yy / p    -> حذف، کپی، جای‌گذاری
+u / Ctrl+r     -> Undo / Redo
+/word , n      -> جستجو
+:%s/old/new/g  -> جایگزینی در کل فایل</div></div>
+<p>همچنین یاد گرفتیم که:</p>
 <ul>
-    <li>حالت‌های اصلی: Command Mode، Insert Mode، Ex Mode</li>
-    <li>کلیدهای ورود به Insert: <code>i</code>، <code>a</code>، <code>o</code>، <code>I</code>، <code>A</code>، <code>O</code></li>
-    <li>خروج از Insert: <code>Esc</code></li>
-    <li>ذخیره و خروج: <code>:wq</code>، <code>:x</code>، <code>ZZ</code></li>
-    <li>خروج بدون ذخیره: <code>:q!</code></li>
-    <li>حذف خط: <code>dd</code>، کپی خط: <code>yy</code></li>
+    <li><code>vi</code> سه حالت اصلی دارد: Command، Insert و Last Line.</li>
+    <li>همیشه کار در <code>vi</code> با Command Mode شروع می‌شود.</li>
+    <li>دستورات ذخیره و خروج، حذف/کپی/جای‌گذاری و جایگزینی متن، پرتکرارترین موضوعات آزمون LPIC-1 درباره <code>vi</code> هستند.</li>
+    <li>تمرین روزانه با <code>vi</code> سرعت و مهارت شما را به‌طور محسوسی افزایش می‌دهد.</li>
 </ul>
-</div></div>
+<p>در جلسه بعد به‌صورت کامل با ویرایشگر <code>nano</code> آشنا خواهیم شد.</p>
+</div>
 `,
 "ch1-7": `
 <div class="section-header">
