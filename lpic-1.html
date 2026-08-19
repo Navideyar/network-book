@@ -5465,7 +5465,8 @@ Pipe و <code>tr</code> دو ابزار قدرتمند برای پردازش د�
     <li><code>sed</code> همراه با Pipe و در اسکریپت‌نویسی کاربرد بسیار گسترده‌ای دارد.</li>
 </ul>
 </div></div>
-` ,"ch1-13": `
+` ,
+"ch1-13": `
 <div class="section-header">
     <div class="section-badge">۱</div>
     <div>
@@ -5474,253 +5475,706 @@ Pipe و <code>tr</code> دو ابزار قدرتمند برای پردازش د�
     </div>
 </div>
 
-<p><code>xargs</code> یکی از قدرتمندترین و در عین حال کمتر شناخته‌شده‌ترین ابزارهای خط فرمان لینوکس است که در اسکریپت‌نویسی و مدیریت سیستم کاربرد فراوانی دارد. در این جلسه به‌طور کامل با این ابزار آشنا می‌شویم.</p>
+<p>در جلسات قبل با ابزارهایی مثل <code>grep</code>، <code>find</code> و <code>sed</code> آشنا شدیم. حالا می‌خواهیم یکی از ابزارهای بسیار مهم خط فرمان لینوکس را یاد بگیریم:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">xargs</div></div>
+<p><code>xargs</code> در نگاه اول ساده است، اما یکی از ابزارهایی است که اگر منطق آن را درست متوجه شوید، ترکیب کردن چند دستور لینوکس برای انجام کارهای پیچیده بسیار راحت‌تر می‌شود.</p>
+<p>در <strong>LPIC-1</strong> نیز باید بتوانید:</p>
+<ul>
+    <li>مفهوم <code>xargs</code> را توضیح دهید.</li>
+    <li>تفاوت <code>xargs</code> و Pipe را بدانید.</li>
+    <li>از <code>-n</code> استفاده کنید.</li>
+    <li>از <code>-I</code> برای جایگزینی ورودی استفاده کنید.</li>
+    <li>مشکل نام فایل‌های دارای فاصله را تشخیص دهید.</li>
+    <li>ترکیب <code>find -print0 | xargs -0</code> را بشناسید.</li>
+    <li>گزینه‌های <code>-p</code>، <code>-t</code> و <code>-r</code> را تشخیص دهید.</li>
+    <li>خروجی <code>xargs</code> را در ذهن خود به دستور واقعی تبدیل کنید.</li>
+</ul>
 
-<h2>مشکل بنیادین در خط فرمان (و اینکه چرا <code>xargs</code> متولد شد)</h2>
+<h2>بخش اول — <code>xargs</code> چیست؟</h2>
 
-<p>در محیط لینوکس، هر دستور خروجی خود را به‌صورت <strong>متن (stdout)</strong> چاپ می‌کند. با استفاده از <strong>لوله (<code>|</code>)</strong> می‌توانیم این خروجی را به <strong>ورودی استاندارد (stdin)</strong> دستور بعدی بدهیم. اما <strong>همهٔ دستورات</strong> ورودی خود را از stdin نمی‌گیرند!</p>
+<h3>تعریف ساده</h3>
+<p><code>xargs</code> ورودی استاندارد (<code>stdin</code>) را می‌گیرد و آن را به <strong>آرگومان‌های یک دستور</strong> تبدیل می‌کند.</p>
+<blockquote><code>xargs</code> خروجی یک دستور را می‌گیرد و آن را به چیزی تبدیل می‌کند که بتوانیم به‌عنوان آرگومان به دستور دیگری بدهیم.</blockquote>
+<p>ساختار ذهنی:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Command 1\n   │\n   │ stdout\n   ▼\n xargs\n   │\n   │ arguments\n   ▼\nCommand 2</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "file1 file2 file3" | xargs rm</div></div>
+<p>تقریباً یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">rm file1 file2 file3</div></div>
+<p>پس <code>xargs</code> در اینجا خروجی <code>echo</code> را به آرگومان‌های <code>rm</code> تبدیل کرده است.</p>
 
-<p>به مثال ساده توجه کنید:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "myfile.txt" | rm</div></div>
+<h2>بخش دوم — تفاوت Pipe و <code>xargs</code></h2>
+<p>این یکی از مهم‌ترین مفاهیم این جلسه است.</p>
 
-<p>این دستور <strong>کار نمی‌کند</strong>، چون <code>rm</code> منتظر است آرگومان را جلوی خودش ببیند، نه اینکه از stdin بخواند. خطا می‌دهد: <code>rm: missing operand</code></p>
+<h3>Pipe چیست؟</h3>
+<p>وقتی می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Pipe</span><div class="code-block">command1 | command2</div></div>
+<p>خروجی <code>command1</code> به <strong>stdin</strong> دستور دوم فرستاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "hello world" | wc -w</div></div>
+<p><code>wc</code> می‌تواند از <code>stdin</code> بخواند، بنابراین Pipe برای آن مناسب است.</p>
 
-<p>اینجا بود که ابزار <code>xargs</code> ساخته شد تا این <strong>شکاف</strong> را پر کند. <code>xargs</code> <strong>خروجی stdin را می‌خواند، آن را به آرگومان‌های خط فرمان تبدیل می‌کند و دستور مورد نظر را با آن آرگومان‌ها اجرا می‌کند.</strong></p>
+<h3>اما <code>xargs</code> چه می‌کند؟</h3>
+<p><code>xargs</code> خروجی را به <strong>آرگومان خط فرمان</strong> تبدیل می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "file1 file2" | xargs rm</div></div>
+<p>تقریباً تبدیل می‌شود به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">rm file1 file2</div></div>
 
-<p>پس فرمول کلی:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">[دستور مولد خروجی] | xargs [دستور هدف] [گزینه‌های xargs]</div></div>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>Pipe</th><th><code>xargs</code></th></tr></thead>
+        <tbody>
+            <tr><td>خروجی را به <code>stdin</code> می‌دهد</td><td>خروجی را به آرگومان تبدیل می‌کند</td></tr>
+            <tr><td>مناسب دستورهایی که از stdin می‌خوانند</td><td>مناسب دستورهایی که آرگومان می‌گیرند</td></tr>
+            <tr><td><code>grep</code>، <code>wc</code> و ...</td><td><code>rm</code>، <code>cp</code>، <code>chmod</code> و ...</td></tr>
+        </tbody>
+    </table>
+</div>
 
-<h2>طرز کار <code>xargs</code> به زبان ساده (جریان داده)</h2>
+<div class="box important"><i class="fas fa-star"></i><div><strong>قانون طلایی</strong><br>
+این جمله را برای آزمون به خاطر بسپار:
+<div class="code-container"><span class="code-label">قانون</span><div class="code-block no-prompt">Pipe → stdin\nxargs → arguments</div></div>
+</div></div>
 
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">┌─────────────────┐\n│  فرمان اول      │  ← مثلاً ls یا find یا cat\n│  (خروجی می‌دهد) │\n└────────┬────────┘\n         │  از طریق لوله (|)\n         ▼\n┌─────────────────┐\n│     xargs        │  ← خروجی را می‌خواند و به آرگومان تبدیل می‌کند\n└────────┬────────┘\n         │  آرگومان‌ها را به دستور هدف می‌دهد\n         ▼\n┌─────────────────┐\n│  فرمان هدف      │  ← مثلاً rm, cp, mkdir, grep, chmod\n│  (اجرا می‌شود)  │\n└─────────────────┘</div></div>
+<h2>بخش سوم — ساختار کلی <code>xargs</code></h2>
+<p>ساختار معمول:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">command1 | xargs [options] command2</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.log" | xargs wc -l</div></div>
+<p>اجزای آن:</p>
+<div class="code-container"><span class="code-label">اجزا</span><div class="code-block no-prompt">find\n │\n │ output\n ▼\nxargs\n │\n │ arguments\n ▼\nwc -l</div></div>
+<p>اگر <code>find</code> این خروجی را بدهد:</p>
+<div class="code-container"><span class="code-label">خروجی find</span><div class="code-block no-prompt">./a.log\n./b.log\n./c.log</div></div>
+<p><code>xargs</code> می‌تواند چیزی شبیه این اجرا کند:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">wc -l ./a.log ./b.log ./c.log</div></div>
 
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته مهم</strong><code>xargs</code> به‌طور پیش‌فرض <strong>از فاصله و خط جدید (newline)</strong> به‌عنوان جداکننده استفاده می‌کند. یعنی هر کلمه یا هر خط را یک آرگومان در نظر می‌گیرد.</div></div>
+<h2>بخش چهارم — اگر دستور مشخص نکنیم چه می‌شود؟</h2>
+<p>اگر بعد از <code>xargs</code> دستوری مشخص نکنیم، دستور پیش‌فرض <code>echo</code> استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "one two three" | xargs</div></div>
+<p>تقریباً نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo one two three</div></div>
+<p>و خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">one two three</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">xargs</div></div>
+<p>به‌صورت پیش‌فرض با <code>echo</code> کار می‌کند.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته آزمونی</strong><br>
+اگر سؤال گفت: «What is the default command used by xargs?» پاسخ: <code>echo</code></div></div>
 
-<h2>گزینه‌های اصلی و حیاتی <code>xargs</code></h2>
+<h2>بخش پنجم — اولین مثال‌های عملی</h2>
 
-<h3>گزینه <code>-n</code> (تعداد آرگومان در هر بار اجرا)</h3>
-
-<p>به <code>xargs</code> می‌گوید: «هر بار بیش از N آرگومان به دستور هدف نده». این گزینه برای زمانی به کار می‌رود که دستور هدف <strong>تعداد مشخصی آرگومان</strong> قبول می‌کند یا می‌خواهیم اجراهای کوچک‌تر و متعدد داشته باشیم.</p>
-
-<p><strong>مثال:</strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo 1 2 3 4 5 | xargs -n 2</div></div>
+<h3>مثال ۱</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "one two three" | xargs echo</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo one two three</div></div>
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">1 2\n3 4\n5</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">one two three</div></div>
 
-<p><strong>مثال کاربردی‌تر:</strong> فرض کنید می‌خواهید فایل‌ها را به گروه‌های ۵تایی به <code>rm</code> بدهید:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.log | xargs -n 5 rm -f</div></div>
+<h3>مثال ۲ — ساخت چند دایرکتوری</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "dir1 dir2 dir3" | xargs mkdir</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">mkdir dir1 dir2 dir3</div></div>
+<p>در نتیجه سه دایرکتوری ساخته می‌شود:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">dir1\ndir2\ndir3</div></div>
 
-<h3>گزینه <code>-I {}</code> (تعریف متغیر جایگزین)</h3>
+<h3>مثال ۳ — حذف چند فایل</h3>
+<p>فرض کنید فایل‌های زیر وجود دارند:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">a.txt\nb.txt\nc.txt</div></div>
+<p>می‌توانیم بنویسیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "a.txt b.txt c.txt" | xargs rm</div></div>
+<p>که تقریباً معادل است با:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">rm a.txt b.txt c.txt</div></div>
 
-<p>قدرتمندترین گزینهٔ <code>xargs</code>. وقتی می‌خواهید آرگومان را <strong>در میانهٔ دستور</strong> قرار دهید، نه فقط در انتهای آن، از <code>-I</code> استفاده می‌کنیم.</p>
-
-<p><strong>فرمول:</strong> <code>... | xargs -I {} [دستور] {} [بقیهٔ دستور]</code></p>
-
+<h2>بخش ششم — <code>xargs</code> چگونه ورودی را تقسیم می‌کند؟</h2>
+<p>این قسمت بسیار مهم است.</p>
+<p>به‌صورت پیش‌فرض <code>xargs</code> ورودی را بر اساس <strong>whitespace</strong> تقسیم می‌کند.</p>
+<p>Whitespace شامل مواردی مانند:</p>
 <ul>
-    <li><code>{}</code> یک <strong>متغیر</strong> است که به‌جای هر آرگومان ورودی قرار می‌گیرد.</li>
-    <li>می‌توانید به‌جای <code>{}</code> هر چیز دیگری مثل <code>[file]</code> یا <code>$arg</code> هم بنویسید، ولی <code>{}</code> قرارداد رایج است.</li>
+    <li>Space</li>
+    <li>Tab</li>
+    <li>Newline</li>
 </ul>
+<p>است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs echo</div></div>
+<p>به آرگومان‌های زیر تبدیل می‌شود:</p>
+<div class="code-container"><span class="code-label">آرگومان‌ها</span><div class="code-block no-prompt">A\nB\nC\nD</div></div>
+<p>و دستور تقریباً می‌شود:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B C D</div></div>
+<p>اما نکته مهم این است که <code>xargs</code> لزوماً برای هر آرگومان یک بار دستور را اجرا نمی‌کند.</p>
+<p>در حالت عادی سعی می‌کند چند آرگومان را در یک اجرای دستور قرار دهد.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs echo</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B C D</div></div>
+<p>و نه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A\necho B\necho C\necho D</div></div>
+<p>برای کنترل تعداد آرگومان‌ها از <code>-n</code> استفاده می‌کنیم.</p>
 
-<p><strong>مثال ۱: کپی کردن هر فایل به نام جدید با پسوند <code>.bak</code></strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.txt | xargs -I {} cp {} {}.bak</div></div>
-<p>برای فایل <code>a.txt</code> تبدیل می‌شود به: <code>cp a.txt a.txt.bak</code></p>
+<h2>بخش هفتم — گزینه <code>-n</code></h2>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-n number</div></div>
+<p>تعداد آرگومان‌هایی را که در <strong>هر بار اجرای دستور</strong> استفاده می‌شوند مشخص می‌کند.</p>
 
-<p><strong>مثال ۲: انتقال هر فایل به پوشه‌ای دیگر با همان نام</strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.jpg | xargs -I {} mv {} ~/Pictures/</div></div>
+<h3><code>-n 1</code></h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs -n 1 echo</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">A\nB\nC\nD</div></div>
+<p>چرا؟ چون در هر اجرای <code>echo</code> فقط یک آرگومان قرار می‌گیرد.</p>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A\necho B\necho C\necho D</div></div>
 
-<p><strong>مثال ۳: ساخت پوشه به ازای هر فایل (با نام فایل)</strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.pdf | xargs -I {} mkdir {}_dir</div></div>
+<h3><code>-n 2</code></h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs -n 2 echo</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">A B\nC D</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B\necho C D</div></div>
 
-<h3>گزینه <code>-0</code> (جداکنندهٔ null) – ناجی فایل‌های با فاصله</h3>
+<h3><code>-n 3</code></h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D E" | xargs -n 3 echo</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">A B C\nD E</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B C\necho D E</div></div>
 
-<p>به‌طور پیش‌فرض، <code>xargs</code> از <strong>فاصله و خط جدید (space و newline)</strong> برای جدا کردن آرگومان‌ها استفاده می‌کند. این یعنی اگر نام فایل شما <code>"my file.pdf"</code> باشد، <code>xargs</code> آن را به <strong>دو آرگومان</strong> <code>my</code> و <code>file.pdf</code> تبدیل می‌کند که باعث خرابی دستور می‌شود.</p>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته بسیار مهم</strong><br>
+<code>-n</code> به معنی «دستور چند بار اجرا شود» نیست. بلکه «در هر اجرای دستور چند آرگومان قرار بگیرد» است. تعداد اجرا از تعداد کل آرگومان‌ها و مقدار <code>-n</code> به دست می‌آید. مثلاً ۱۰ آرگومان با <code>-n 2</code> یعنی تقریباً ۵ بار اجرا.</div></div>
 
-<p><strong>راه حل:</strong> از ترکیب <code>-print0</code> در دستور مولد و <code>-0</code> در <code>xargs</code> استفاده کنید.</p>
-<ul>
-    <li><code>-print0</code> در <code>find</code> باعث می‌شود نام فایل‌ها با کاراکتر <strong>null</strong> (<code>\0</code>) از هم جدا شوند (نه فاصله یا Enter).</li>
-    <li><code>-0</code> در <code>xargs</code> یعنی «ورودی را با null جدا کن».</li>
-</ul>
+<h2>بخش هشتم — گزینه <code>-I</code> و Placeholder</h2>
+<p>گاهی نمی‌خواهیم ورودی فقط در انتهای دستور قرار بگیرد.</p>
+<p>مثلاً می‌خواهیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">echo "a.txt b.txt" | ...</div></div>
+<p>را به شکل زیر استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">echo "Processing a.txt"\necho "Processing b.txt"</div></div>
+<p>اینجاست که <code>-I</code> بسیار مهم می‌شود.</p>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">xargs -I PLACEHOLDER command PLACEHOLDER</div></div>
+<p>رایج‌ترین Placeholder:</p>
+<div class="code-container"><span class="code-label">جای‌گذار</span><div class="code-block no-prompt">{}</div></div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "a.txt b.txt" | xargs -I {} echo "Processing {}"</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Processing a.txt\nProcessing b.txt</div></div>
 
-<p><strong>مثال امن برای حذف فایل‌های موقت:</strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /tmp -name "*.tmp" -type f -print0 | xargs -0 rm -f</div></div>
+<h2>بخش نهم — <code>-I</code> چگونه کار می‌کند؟</h2>
+<p>در این دستور:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">xargs -I {} echo "File: {}"</div></div>
+<p><code>{}</code> یک جای خالی است. هر ورودی جای <code>{}</code> قرار می‌گیرد.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">a.txt</div></div>
+<p>تبدیل می‌شود به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo "File: a.txt"</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">b.txt</div></div>
+<p>تبدیل می‌شود به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo "File: b.txt"</div></div>
 
-<p>حتی اگر فایلی به اسم <code>"my temp file.tmp"</code> باشد، به‌درستی یک آرگومان در نظر گرفته می‌شود.</p>
+<h2>بخش دهم — تفاوت اصلی <code>-n</code> و <code>-I</code></h2>
+<p>این تفاوت را خوب یاد بگیر.</p>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>برخی دستورات مثل <code>grep -Z</code> و <code>sort -z</code> هم از null پشتیبانی می‌کنند تا زنجیرهٔ امنی بسازید.</div></div>
+<h3><code>-n</code></h3>
+<p>تمرکز روی <strong>تعداد آرگومان‌ها در هر اجرا</strong> است.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs -n 2 echo</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B\necho C D</div></div>
 
-<h3>گزینه <code>-p</code> (حالت تعاملی – Interactive)</h3>
+<h3><code>-I</code></h3>
+<p>تمرکز روی <strong>محل قرار گرفتن ورودی</strong> است.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C" | xargs -I {} echo "Value={}"</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo "Value=A"\necho "Value=B"\necho "Value=C"</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته مهم LPIC-1</strong><br>
+برای سؤال‌های آزمون:
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">-n → number of arguments\n-I → replace input at a specific location</div></div>
+</div></div>
 
-<p>قبل از اجرای هر دستور، از شما <strong>سؤال می‌کند</strong> که آیا اجرا شود یا خیر. برای تست و اشکال‌زدایی عالی است.</p>
+<h2>بخش یازدهم — مثال بسیار مهم با <code>cp</code></h2>
+<p>فرض کنید:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1.txt\nfile2.txt\nfile3.txt</div></div>
+<p>داریم.</p>
+<p>اگر بنویسیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "file1.txt file2.txt file3.txt" | xargs cp -t /backup/</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">cp -t /backup/ file1.txt file2.txt file3.txt</div></div>
+<p>یعنی همه فایل‌ها در یک اجرای <code>cp</code> کپی می‌شوند.</p>
+<p>اما با <code>-I</code>:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "file1.txt file2.txt file3.txt" |\nxargs -I {} cp {} /backup/</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">cp file1.txt /backup/\ncp file2.txt /backup/\ncp file3.txt /backup/</div></div>
+<p>یعنی دستور برای هر ورودی جداگانه اجرا می‌شود.</p>
 
-<p><strong>مثال:</strong></p>
+<h2>بخش دوازدهم — ترکیب <code>find</code> و <code>xargs</code></h2>
+<p>یکی از مهم‌ترین کاربردهای <code>xargs</code>:</p>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">find + xargs</div></div>
+<p>است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.log" | xargs wc -l</div></div>
+<p>اگر <code>find</code> این موارد را پیدا کند:</p>
+<div class="code-container"><span class="code-label">خروجی find</span><div class="code-block no-prompt">./app.log\n./error.log\n./system.log</div></div>
+<p><code>xargs</code> آن‌ها را به آرگومان‌های <code>wc</code> تبدیل می‌کند:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">wc -l ./app.log ./error.log ./system.log</div></div>
+
+<h2>بخش سیزدهم — چرا <code>find -exec</code> را هم باید بشناسیم؟</h2>
+<p>یک نکته مهم: <code>xargs</code> تنها راه اجرای یک دستور روی خروجی <code>find</code> نیست.</p>
+<p><code>find</code> خودش گزینه‌ای به نام:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-exec</div></div>
+<p>دارد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.log" -exec wc -l {} \\;</div></div>
+<p>این دستور نیز روی فایل‌های پیدا شده <code>wc -l</code> را اجرا می‌کند.</p>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">find ... | xargs ...\n\nfind ... -exec ...</div></div>
+<p>دو روش متفاوت برای انجام کار روی خروجی <code>find</code> هستند. برای LPIC-1 باید مفهوم هر دو را بدانید.</p>
+
+<h2>بخش چهاردهم — مشکل بزرگ: نام فایل‌های دارای فاصله</h2>
+<p>اینجا یکی از مهم‌ترین دام‌های <code>xargs</code> قرار دارد.</p>
+<p>فرض کنید فایلی داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">my file.txt</div></div>
+<p>دستور زیر را اجرا می‌کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find . -name "*.txt" | xargs rm</div></div>
+<p><code>find</code> ممکن است خروجی بدهد:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">./my file.txt</div></div>
+<p>اما <code>xargs</code> به‌صورت پیش‌فرض whitespace را جداکننده می‌داند. در نتیجه ممکن است آن را به شکل زیر تفسیر کند:</p>
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">./my\nfile.txt</div></div>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">rm ./my file.txt</div></div>
+<p>عملاً به معنای دو آرگومان است:</p>
+<div class="code-container"><span class="code-label">آرگومان‌ها</span><div class="code-block no-prompt">./my\nfile.txt</div></div>
+<p>نه یک فایل به نام:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">my file.txt</div></div>
+<p>این می‌تواند باعث خطا یا حتی حذف اشتباه فایل‌ها شود.</p>
+
+<h2>بخش پانزدهم — راه‌حل امن: <code>-print0</code> و <code>-0</code></h2>
+<p>راه‌حل استاندارد:</p>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block">find . -name "*.txt" -print0 | xargs -0 rm</div></div>
+<p>این دو گزینه باید با هم یاد گرفته شوند.</p>
+
+<h3><code>find -print0</code></h3>
+<p>به‌جای جدا کردن فایل‌ها با newline، آن‌ها را با کاراکتر NULL جدا می‌کند.</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-print0</div></div>
+<p>یعنی:</p>
+<blockquote>Print each result followed by a null character.</blockquote>
+
+<h3><code>xargs -0</code></h3>
+<p>به <code>xargs</code> می‌گوید: ورودی را با NULL جدا کن، نه whitespace.</p>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.txt" -print0 | xargs -0 rm</div></div>
+<p>نام:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">my file.txt</div></div>
+<p>را به‌عنوان <strong>یک آرگومان کامل</strong> حفظ می‌کند.</p>
+
+<h2>بخش شانزدهم — چرا NULL مهم است؟</h2>
+<p>فرض کنید این فایل‌ها را داریم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1.txt\nmy file.txt\nbackup file.txt</div></div>
+<p>با روش عادی:</p>
+<div class="code-container"><span class="code-label">روش عادی</span><div class="code-block">find . -name "*.txt" | xargs ...</div></div>
+<p>ممکن است فاصله باعث شکسته شدن نام‌ها شود.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">روش امن</span><div class="code-block">find . -name "*.txt" -print0 | xargs -0 ...</div></div>
+<p>داده‌ها به شکل منطقی زیر جدا می‌شوند:</p>
+<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">file1.txt\\0\nmy file.txt\\0\nbackup file.txt\\0</div></div>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1.txt\nmy file.txt\nbackup file.txt</div></div>
+<p>هر کدام یک آرگومان مستقل هستند.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>قانون طلایی</strong><br>
+این دو را همیشه کنار هم به خاطر بسپار:
+<div class="code-container"><span class="code-label">قانون</span><div class="code-block no-prompt">-print0  ↔  -0</div></div>
+</div></div>
+
+<h2>بخش هفدهم — گزینه <code>-p</code></h2>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-p</div></div>
+<p>مخفف Prompt است. قبل از اجرای دستور، از کاربر تأیید می‌گیرد.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "file1.txt file2.txt" | xargs -p rm</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">rm file1.txt file2.txt ?...y</div></div>
-<p>شما با زدن <code>y</code> دستور اجرا می‌شود و با <code>n</code> رد می‌شود.</p>
+<p><code>xargs</code> دستور پیشنهادی را نمایش می‌دهد و از شما تأیید می‌خواهد.</p>
+<p>این گزینه مخصوصاً برای دستورات خطرناک مثل <code>rm</code> می‌تواند مفید باشد.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته آزمونی</strong><br>
+<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">-p → Prompt</div></div>
+یعنی: قبل از اجرای هر دستور از کاربر تأیید بگیر.</div></div>
 
-<h3>گزینه <code>-t</code> (حالت verbose – نمایش دستور قبل از اجرا)</h3>
-
-<p>دستوری که قرار است اجرا شود را <strong>چاپ</strong> می‌کند و بعد اجرا می‌کند. بسیار مفید برای آموزش و دیباگ.</p>
-
-<p><strong>مثال:</strong></p>
+<h2>بخش هجدهم — گزینه <code>-t</code></h2>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-t</div></div>
+<p>دستور ساخته‌شده را قبل از اجرای آن نمایش می‌دهد.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "a.txt b.txt" | xargs -t rm</div></div>
-<p>خروجی:</p>
+<p>ممکن است چیزی شبیه این نمایش دهد:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">rm a.txt b.txt</div></div>
+<p>سپس دستور اجرا می‌شود.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>به خاطر سپاری</strong><br>
+<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">-t → trace</div></div>
+یعنی: دستور را قبل از اجرا ببین.</div></div>
 
-<h3>گزینه <code>-r</code> (اجرا نکن اگر ورودی خالی باشد)</h3>
+<h2>بخش نوزدهم — گزینه <code>-r</code></h2>
+<p>یکی از رفتارهای مهم <code>xargs</code> این است که اگر ورودی وجود نداشته باشد، در بعضی پیاده‌سازی‌ها ممکن است دستور را بدون آرگومان اجرا کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.xyz" | xargs rm</div></div>
+<p>اگر هیچ فایل <code>.xyz</code> پیدا نشود، ممکن است <code>rm</code> بدون آرگومان اجرا شود.</p>
+<p>برای جلوگیری از این رفتار:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.xyz" | xargs -r rm</div></div>
+<p><code>-r</code> یعنی: اگر ورودی خالی بود، دستور را اجرا نکن.</p>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>
+رفتار <code>-r</code> در نسخه‌های مختلف <code>xargs</code> ممکن است متفاوت باشد؛ در GNU <code>xargs</code> این گزینه رایج است. برای LPIC-1 معمولاً دانستن مفهوم آن کافی است:
+<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">-r → no-run-if-empty</div></div>
+</div></div>
 
-<p>اگر <code>xargs</code> هیچ ورودی دریافت نکند، به‌طور پیش‌فرض <strong>یک بار</strong> دستور را با آرگومان خالی اجرا می‌کند (که ممکن است خطرناک باشد). گزینه <code>-r</code> می‌گوید: «اگر ورودی نداشتی، اصلاً اجرا نکن».</p>
+<h2>بخش بیستم — گزینه <code>-0</code></h2>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-0</div></div>
+<p>برای کار با ورودی‌هایی است که با NULL جدا شده‌اند.</p>
+<p>معمولاً همراه:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find ... -print0</div></div>
+<p>استفاده می‌شود.</p>
+<p>الگوی بسیار مهم:</p>
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">find ... -print0 | xargs -0 command</div></div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /tmp -name "*.tmp" -print0 | xargs -0 rm</div></div>
 
-<p><strong>مثال:</strong></p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.nonexist" | xargs -r rm</div></div>
+<h2>بخش بیست‌ویکم — <code>xargs</code> و تعداد اجرای دستور</h2>
+<p>یکی از نکات مهم این است که <code>xargs</code> لزوماً برای هر ورودی یک بار دستور را اجرا نمی‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs echo</div></div>
+<p>یک اجرای تقریبی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B C D</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "A B C D" | xargs -n 2 echo</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo A B\necho C D</div></div>
+<p>بنابراین <code>xargs</code> می‌تواند چندین ورودی را در یک اجرای دستور جمع کند. این کار از نظر کارایی مهم است.</p>
 
-<h2>ترکیب <code>xargs</code> با سایر دستورات – سناریوهای واقعی</h2>
+<h2>بخش بیست‌ودوم — چرا <code>xargs</code> می‌تواند مفید باشد؟</h2>
+<p>فرض کنید ۱۰۰۰ فایل داریم. به‌جای اینکه الزاماً ۱۰۰۰ بار یک دستور اجرا شود، <code>xargs</code> می‌تواند چند فایل را در یک اجرای دستور قرار دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.log" -print0 | xargs -0 -n 20 wc -l</div></div>
+<p>یعنی: در هر اجرای <code>wc</code> حداکثر ۲۰ فایل قرار بده. این می‌تواند تعداد اجرای processها را کاهش دهد.</p>
 
-<h3>سناریو ۱: پیدا کردن همه فایل‌های <code>*.conf</code> و تغییر مجوز آنها به <code>644</code></h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /etc -name "*.conf" -type f | xargs chmod 644</div></div>
+<h2>بخش بیست‌وسوم — مثال‌های کاربردی مهم</h2>
 
-<h3>سناریو ۲: گرفتن ۱۰ فایل بزرگ و نمایش جزئیات آنها با <code>ls -lh</code></h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -type f -size +10M | xargs ls -lh</div></div>
+<h3>مثال ۱ — حذف فایل‌های <code>.tmp</code></h3>
+<p>روش امن:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.tmp" -print0 | xargs -0 rm</div></div>
 
-<h3>سناریو ۳: حذف همه فایل‌های خالی در یک پوشه (با <code>find</code> و <code>xargs</code>)</h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -type f -empty -print0 | xargs -0 rm -v</div></div>
+<h3>مثال ۲ — شمارش خطوط فایل‌ها</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.c" -print0 | xargs -0 wc -l</div></div>
 
-<h3>سناریو ۴: فشرده‌سازی همه فایل‌های <code>*.log</code> با <code>gzip</code></h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.log | xargs -n 1 gzip</div></div>
+<h3>مثال ۳ — فشرده‌سازی</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.log" -print0 | xargs -0 gzip</div></div>
 
-<h3>سناریو ۵: جستجوی یک عبارت در میان همه فایل‌های متنی یک پروژه</h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /project -name "*.py" | xargs grep -n "TODO"</div></div>
+<h3>مثال ۴ — تغییر permission</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.sh" -print0 | xargs -0 chmod +x</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">chmod +x file1.sh file2.sh file3.sh</div></div>
 
-<h3>سناریو ۶: ساخت پوشه‌های جدید بر اساس نام فایل‌های موجود در یک لیست</h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat folders.txt | xargs -I {} mkdir -p "{}"</div></div>
+<h3>مثال ۵ — تغییر مالکیت</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -user olduser -print0 | xargs -0 chown newuser</div></div>
 
-<h2>اشتباهات رایج و روش‌های جلوگیری</h2>
+<h2>بخش بیست‌وچهارم — یک الگوی بسیار مهم برای LPIC</h2>
+<p>اگر سؤال چیزی شبیه این گفت: «تمام فایل‌های پیدا شده توسط <code>find</code> را به یک دستور دیگر بده، در حالی که نام فایل‌ها ممکن است شامل فاصله باشد.»</p>
+<p>الگوی ذهنی:</p>
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">find ... -print0 | xargs -0 ...</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /home -name "*.log" -print0 | xargs -0 wc -l</div></div>
 
-<table>
-<thead><tr><th>اشتباه</th><th>توضیح</th><th>راه حل</th></tr></thead>
-<tbody>
-<tr><td><strong>استفاده از Pipe مستقیم به دستوراتی مثل <code>rm</code></strong></td><td><code>rm</code> stdin را نمی‌خواند.</td><td>حتماً از <code>xargs</code> استفاده کنید.</td></tr>
-<tr><td><strong>فراموش کردن <code>-0</code> در مواجهه با فایل‌های دارای فاصله</strong></td><td>باعث می‌شود فایل‌ها اشتباه گرفته شوند.</td><td>ترکیب <code>-print0</code> و <code>-0</code> را فراموش نکنید.</td></tr>
-<tr><td><strong>اجرای دستورات مخرب با <code>rm</code></strong></td><td>ممکن است فایل‌های اشتباه حذف شوند.</td><td>اول با <code>-p</code> یا <code>-t</code> تست کنید، یا از <code>echo</code> به‌جای دستور اصلی استفاده کنید: <code>find ... | xargs echo rm</code></td></tr>
-<tr><td><strong>خطای «Argument list too long»</strong></td><td>وقتی تعداد آرگومان‌ها خیلی زیاد است.</td><td><code>xargs</code> خودش این مشکل را حل می‌کند، اما اگر با <code>find</code> و <code>-exec</code> کار می‌کنید، از <code>xargs</code> استفاده کنید.</td></tr>
-</tbody>
-</table>
+<h2>بخش بیست‌وپنجم — <code>xargs -I</code> در یک سناریوی واقعی</h2>
+<p>فرض کنید فایل <code>users.txt</code> شامل:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">ali\nreza\nsara</div></div>
+<p>است. می‌خواهیم برای هر کاربر پیام چاپ کنیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat users.txt | xargs -I {} echo "User: {}"</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">User: ali\nUser: reza\nUser: sara</div></div>
+<p>تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo "User: ali"\necho "User: reza"\necho "User: sara"</div></div>
 
-<h2>مقایسهٔ <code>xargs</code> با <code>-exec</code> در <code>find</code></h2>
+<h2>بخش بیست‌وششم — استفاده از Placeholder در وسط دستور</h2>
+<p>مزیت مهم <code>-I</code> این است که ورودی می‌تواند در هر جای دستور قرار بگیرد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "ali reza sara" | xargs -I {} echo "Hello {}"</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo "a.txt b.txt" | xargs -I {} mv {} {}.bak</div></div>
+<p>در مثال دوم، برای هر فایل:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">mv a.txt a.txt.bak\nmv b.txt b.txt.bak</div></div>
+<p>اجرا می‌شود.</p>
 
-<p>خیلی از کاربران بین این دو سردرگم می‌شوند. تفاوت اصلی:</p>
+<h2>بخش بیست‌وهفتم — دام مهم <code>xargs -I</code></h2>
+<p>وقتی از <code>-I {}</code> استفاده می‌کنیم، <code>xargs</code> معمولاً ورودی را به‌صورت یک logical line در نظر می‌گیرد و برای هر مورد جایگزینی انجام می‌دهد. بنابراین رفتار <code>-I</code> را با رفتار عادی <code>xargs</code> یکی ندانید.</p>
+<p>برای آزمون، این تفاوت مهم است:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">xargs\n    → جمع کردن آرگومان‌ها و اجرای دستور\n\nxargs -n\n    → کنترل تعداد آرگومان در هر اجرا\n\nxargs -I\n    → جایگزینی ورودی در محل مشخص</div></div>
 
-<table>
-<thead><tr><th><code>-exec</code> در <code>find</code></th><th><code>xargs</code></th></tr></thead>
-<tbody>
-<tr><td>به‌ازای <strong>هر</strong> فایل پیدا شده، یک بار دستور را اجرا می‌کند (مگر اینکه از <code>+</code> استفاده کنید).</td><td>لیست را جمع می‌کند و در <strong>چند بار اجرای بهینه</strong> به دستور می‌دهد.</td></tr>
-<tr><td>امن‌تر است (با فاصله در نام فایل مشکلی ندارد).</td><td>نیاز به <code>-0</code> دارد تا با فاصله مشکل نداشته باشد.</td></tr>
-<tr><td>کندتر است چون تعداد اجراها زیاد است.</td><td>سریع‌تر است چون تعداد اجراها کمتر است.</td></tr>
-</tbody>
-</table>
+<h2>بخش بیست‌وهشتم — گزینه‌های مهم <code>xargs</code></h2>
+<div class="table-wrap">
+    <table>
+        <thead><tr><th>گزینه</th><th>معنی</th><th>کاربرد</th></tr></thead>
+        <tbody>
+            <tr><td><code>-n N</code></td><td>حداکثر N آرگومان در هر اجرا</td><td>کنترل تعداد آرگومان</td></tr>
+            <tr><td><code>-I {}</code></td><td>جایگزینی ورودی</td><td>قرار دادن ورودی در محل مشخص</td></tr>
+            <tr><td><code>-0</code></td><td>NULL-delimited input</td><td>ورودی امن از <code>find -print0</code></td></tr>
+            <tr><td><code>-p</code></td><td>Prompt</td><td>تأیید قبل از اجرا</td></tr>
+            <tr><td><code>-t</code></td><td>Trace</td><td>نمایش دستور قبل از اجرا</td></tr>
+            <tr><td><code>-r</code></td><td>No-run-if-empty</td><td>در صورت ورودی خالی اجرا نکن</td></tr>
+        </tbody>
+    </table>
+</div>
 
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>توصیه</strong>برای کارهای حجیم و سنگین، از <code>xargs</code> استفاده کنید. برای کارهای ساده و امن، <code>-exec</code> کافی است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>مهم‌ترین‌ها برای LPIC-1</strong><br>
+اگر بخواهیم اولویت‌بندی کنیم:
+<div class="code-container"><span class="code-label">اولویت</span><div class="code-block no-prompt">★★★★★  -n\n★★★★★  -I\n★★★★★  -0\n★★★★★  -print0 در find\n★★★★☆  -p\n★★★★☆  -t\n★★★☆☆  -r</div></div>
+</div></div>
+
+<h2>بخش بیست‌ونهم — الگوهای مهم برای حفظ کردن</h2>
+
+<h3>الگو ۱</h3>
+<div class="code-container"><span class="code-label">الگو ۱</span><div class="code-block">command1 | xargs command2</div></div>
+<p>یعنی: خروجی command1 → آرگومان command2</p>
+
+<h3>الگو ۲</h3>
+<div class="code-container"><span class="code-label">الگو ۲</span><div class="code-block">... | xargs -n 1 command</div></div>
+<p>یعنی: هر بار یک آرگومان.</p>
+
+<h3>الگو ۳</h3>
+<div class="code-container"><span class="code-label">الگو ۳</span><div class="code-block">... | xargs -I {} command {}</div></div>
+<p>یعنی: ورودی را در محل <code>{}</code> قرار بده.</p>
+
+<h3>الگو ۴</h3>
+<div class="code-container"><span class="code-label">الگو ۴</span><div class="code-block">find ... -print0 | xargs -0 command</div></div>
+<p>یعنی: نام فایل‌ها را به‌صورت امن، حتی با فاصله، منتقل کن.</p>
+
+<h3>الگو ۵</h3>
+<div class="code-container"><span class="code-label">الگو ۵</span><div class="code-block">... | xargs -p command</div></div>
+<p>یعنی: قبل از اجرا تأیید بگیر.</p>
+
+<h3>الگو ۶</h3>
+<div class="code-container"><span class="code-label">الگو ۶</span><div class="code-block">... | xargs -t command</div></div>
+<p>یعنی: دستور در حال اجرا را نمایش بده.</p>
+
+<h2>بخش سی‌ام — دام‌های آزمون LPIC-1</h2>
+
+<h3>دام ۱</h3>
+<p><code>xargs</code> خروجی را به <code>stdin</code> نمی‌دهد. بلکه آن را به <code>arguments</code> تبدیل می‌کند.</p>
+
+<h3>دام ۲</h3>
+<p><code>-n 1</code> به معنی «فقط یک بار اجرا کن» نیست. بلکه: در هر اجرا یک آرگومان قرار بده.</p>
+
+<h3>دام ۳</h3>
+<p><code>-I</code> برای تعداد آرگومان نیست. برای <code>replacement</code> است.</p>
+
+<h3>دام ۴</h3>
+<p><code>-print0</code> مربوط به <code>find</code> است: <code>find ... -print0</code> اما <code>-0</code> مربوط به <code>xargs</code> است: <code>xargs -0</code></p>
+
+<h3>دام ۵</h3>
+<p>این دو را با هم اشتباه نکن: <code>-p → prompt</code> و <code>-t → trace</code></p>
+
+<h2>بخش سی‌ویکم — جمع‌بندی جلسه</h2>
+<p><code>xargs</code> پلی بین <strong>stdin</strong> و <strong>command-line arguments</strong> ایجاد می‌کند.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">stdin\n  ↓\nxargs\n  ↓\narguments\n  ↓\ncommand</div></div>
+<p>مهم‌ترین گزینه‌ها:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-n   → تعداد آرگومان در هر اجرا\n-I   → جایگزینی ورودی\n-0   → ورودی NULL-delimited\n-p   → تأیید قبل از اجرا\n-t   → نمایش دستور قبل از اجرا\n-r   → اجرا نکردن در صورت ورودی خالی</div></div>
+<p>و مهم‌ترین ترکیب جلسه:</p>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">find ... -print0 | xargs -0 ...</div></div>
+<p>این ترکیب برای جلوگیری از مشکل نام فایل‌های دارای فاصله و کاراکترهای خاص بسیار مهم است.</p>
 
 <div class="summary-box">
-<h3>جمع‌بندی نهایی</h3>
-<ul>
-    <li><strong><code>xargs</code></strong> خروجی stdin را به آرگومان خط فرمان تبدیل می‌کند.</li>
-    <li>اگر با فایل‌های دارای <strong>فاصله</strong> سر و کار دارید، همیشه از <code>-0</code> استفاده کنید.</li>
-    <li>اگر می‌خواهید آرگومان را در میانهٔ دستور قرار دهید، از <code>-I {}</code> استفاده کنید.</li>
-    <li>اگر می‌خواهید تعداد آرگومان‌ها را کنترل کنید، از <code>-n</code> استفاده کنید.</li>
-    <li>برای تست و امنیت، از <code>-p</code> یا <code>-t</code> غافل نشوید.</li>
-    <li><code>xargs</code> راه حل قطعی برای خطای «Argument list too long» است.</li>
-</ul>
+    <h3>🧠 خلاصه فوق‌سریع برای شب امتحان</h3>
+    <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Pipe:\noutput → stdin\n\nxargs:\nstdin → arguments\n\n-n:\nnumber of arguments\n\n-I:\ninput replacement\n\n-0:\nNULL-separated input\n\n-print0:\nNULL-separated output from find\n\n-p:\nprompt\n\n-t:\ntrace\n\n-r:\nno run if empty\n\nDefault command:\necho</div></div>
+    <p>و مهم‌ترین الگوی جلسه:</p>
+    <div class="code-container"><span class="code-label">الگوی نهایی</span><div class="code-block">find . -name "*.log" -print0 | xargs -0 wc -l</div></div>
 </div>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکات مهم LPIC-1</strong>
-<ul>
-    <li>⭐ <code>xargs</code> خروجی stdin را به آرگومان خط فرمان تبدیل می‌کند.</li>
-    <li>⭐ <code>-n</code> تعداد آرگومان‌ها در هر بار اجرا را کنترل می‌کند.</li>
-    <li>⭐ <code>-I {}</code> برای قرار دادن آرگومان در میانهٔ دستور استفاده می‌شود.</li>
-    <li>⭐ <code>-0</code> به همراه <code>-print0</code> در <code>find</code> برای مدیریت امن فایل‌های دارای فاصله استفاده می‌شود.</li>
-    <li>⭐ <code>-p</code> حالت تعاملی و <code>-t</code> حالت verbose برای تست و دیباگ.</li>
-    <li>⭐ <code>-r</code> از اجرا در صورت ورودی خالی جلوگیری می‌کند.</li>
-</ul>
+<h2>🧪 تمرین‌های کاربردی</h2>
+
+<h3>تمرین ۱ — شروع ساده</h3>
+<p>دستور زیر را اجرا کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "one two three four" | xargs -n 1 echo</div></div>
+<p><strong>سؤال:</strong> چرا چهار خط خروجی تولید می‌شود؟</p>
+<p><strong>پاسخ:</strong> چون <code>-n 1</code> باعث می‌شود در هر اجرای <code>echo</code> فقط یک آرگومان قرار بگیرد.</p>
+
+<h3>تمرین ۲ — گروه‌بندی</h3>
+<p>دستور زیر را اجرا کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "1 2 3 4 5 6" | xargs -n 2 echo</div></div>
+<p><strong>انتظار:</strong></p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">1 2\n3 4\n5 6</div></div>
+<p><strong>سؤال:</strong> تقریباً چه دستورهایی اجرا شده‌اند؟</p>
+<p><strong>پاسخ:</strong></p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">echo 1 2\necho 3 4\necho 5 6</div></div>
+
+<h3>تمرین ۳ — Placeholder</h3>
+<p>دستور زیر را اجرا کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "Ali Reza Sara" | xargs -I {} echo "User: {}"</div></div>
+<p><strong>سؤال:</strong> چرا هر نام در یک خط جداگانه نمایش داده می‌شود؟</p>
+<p><strong>پاسخ:</strong> چون <code>-I {}</code> باعث می‌شود ورودی در محل <code>{}</code> جایگزین شود و برای هر ورودی دستور اجرا شود.</p>
+
+<h3>تمرین ۴ — کار با <code>find</code></h3>
+<p>دستور زیر را تحلیل کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">find . -name "*.log" -print0 | xargs -0 wc -l</div></div>
+<p><strong>سؤال:</strong> نقش هر بخش چیست؟</p>
+<p><strong>پاسخ:</strong></p>
+<div class="code-container"><span class="code-label">تحلیل</span><div class="code-block no-prompt">find\n    → فایل‌ها را پیدا می‌کند.\n\n-name "*.log"\n    → فقط فایل‌های log\n\n-print0\n    → خروجی را با NULL جدا می‌کند.\n\nxargs -0\n    → ورودی NULL-separated را دریافت می‌کند.\n\nwc -l\n    → تعداد خطوط را محاسبه می‌کند.</div></div>
+
+<h3>تمرین ۵ — تشخیص مشکل</h3>
+<p>دستور زیر را ببینید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">find . -name "*.txt" | xargs rm</div></div>
+<p>فرض کنید یکی از فایل‌ها نام زیر را دارد:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">my notes.txt</div></div>
+<p><strong>سؤال:</strong> چه مشکلی ممکن است رخ دهد؟</p>
+<p><strong>پاسخ:</strong> <code>xargs</code> به‌صورت پیش‌فرض whitespace را جداکننده در نظر می‌گیرد. در نتیجه <code>my notes.txt</code> ممکن است به دو آرگومان <code>my</code> و <code>notes.txt</code> تبدیل شود. روش امن:</p>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block">find . -name "*.txt" -print0 | xargs -0 rm</div></div>
+
+<h3>تمرین ۶ — <code>-p</code></h3>
+<p>دستور زیر را اجرا کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "a.txt b.txt" | xargs -p rm</div></div>
+<p><strong>سؤال:</strong> وظیفه <code>-p</code> چیست؟</p>
+<p><strong>پاسخ:</strong> قبل از اجرای دستور از کاربر تأیید می‌گیرد.</p>
+
+<h3>تمرین ۷ — <code>-t</code></h3>
+<p>دستور:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "a.txt b.txt" | xargs -t rm</div></div>
+<p><strong>سؤال:</strong> <code>-t</code> چه چیزی را تغییر می‌دهد؟</p>
+<p><strong>پاسخ:</strong> دستور ساخته‌شده را قبل از اجرای آن نمایش می‌دهد.</p>
+
+<h3>تمرین ۸ — سؤال ترکیبی</h3>
+<p>دستور زیر را تحلیل کنید:</p>
+<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">find /var/log -name "*.log" -print0 | xargs -0 -n 5 wc -l</div></div>
+<p><strong>پاسخ:</strong> این دستور:</p>
+<ol>
+    <li>فایل‌های <code>.log</code> را پیدا می‌کند.</li>
+    <li>نتایج را با NULL جدا می‌کند.</li>
+    <li><code>xargs -0</code> آن‌ها را به‌صورت امن دریافت می‌کند.</li>
+    <li>در هر اجرای <code>wc</code> حداکثر ۵ فایل قرار می‌دهد.</li>
+    <li>تعداد خطوط فایل‌ها را محاسبه می‌کند.</li>
+</ol>
+
+<h2>📝 تست‌های LPIC-1 — جلسه ۱۳</h2>
+
+<div class="quiz-card"><p>❓ تست ۱: وظیفه اصلی <code>xargs</code> چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) تبدیل stdout به stdin</button>
+    <button onclick="selectOption(this)">ب) تبدیل stdin به آرگومان‌های خط فرمان</button>
+    <button onclick="selectOption(this)">ج) حذف فایل‌های موقت</button>
+    <button onclick="selectOption(this)">د) ویرایش فایل‌های متنی</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>xargs</code> ورودی استاندارد را گرفته و آن را به آرگومان‌های یک دستور تبدیل می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۲: کدام گزینه تفاوت اصلی Pipe و <code>xargs</code> را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Pipe آرگومان می‌سازد و <code>xargs</code> stdin می‌سازد.</button>
+    <button onclick="selectOption(this)">ب) هر دو دقیقاً یک کار انجام می‌دهند.</button>
+    <button onclick="selectOption(this)">ج) Pipe خروجی را به stdin می‌دهد، در حالی که <code>xargs</code> آن را به آرگومان تبدیل می‌کند.</button>
+    <button onclick="selectOption(this)">د) <code>xargs</code> فقط برای <code>find</code> است.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>این یکی از مهم‌ترین نکات این جلسه است: <code>Pipe → stdin</code> و <code>xargs → arguments</code>.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۳: خروجی دستور زیر چیست؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">echo "A B C D" | xargs -n 2 echo</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) A B C D</button>
+    <button onclick="selectOption(this)">ب) A B\nC D</button>
+    <button onclick="selectOption(this)">ج) A\nB\nC\nD</button>
+    <button onclick="selectOption(this)">د) هیچ خروجی‌ای ندارد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>-n 2</code> یعنی در هر اجرای <code>echo</code> حداکثر دو آرگومان قرار بگیرد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۴: کدام گزینه برای قرار دادن ورودی در محل مشخصی از دستور استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>-n</code></button>
+    <button onclick="selectOption(this)">ب) <code>-p</code></button>
+    <button onclick="selectOption(this)">ج) <code>-I</code></button>
+    <button onclick="selectOption(this)">د) <code>-t</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>-I</code> یک replacement string تعریف می‌کند: <code>xargs -I {} command {}</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۵: در دستور زیر <code>{}</code> چه نقشی دارد؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">echo "a.txt b.txt" | xargs -I {} echo "File: {}"</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) تعداد آرگومان‌ها را تعیین می‌کند.</button>
+    <button onclick="selectOption(this)">ب) یک Placeholder است.</button>
+    <button onclick="selectOption(this)">ج) دستور <code>echo</code> را فعال می‌کند.</button>
+    <button onclick="selectOption(this)">د) ورودی را NULL-separated می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>{}</code> محل قرارگیری ورودی است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۶: برای کار با فایل‌هایی که نامشان شامل فاصله است، کدام روش مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>find . -name "*.txt" | xargs rm</code></button>
+    <button onclick="selectOption(this)">ب) <code>find . -name "*.txt" -print0 | xargs -0 rm</code></button>
+    <button onclick="selectOption(this)">ج) <code>find . -name "*.txt" -print0 | xargs rm</code></button>
+    <button onclick="selectOption(this)">د) <code>find . -name "*.txt" | xargs -0 rm</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>هر دو طرف باید از یک روش جداسازی استفاده کنند: <code>find -print0</code> و <code>xargs -0</code>.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۷: گزینه <code>-p</code> چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) دستور را چاپ می‌کند ولی اجرا نمی‌کند.</button>
+    <button onclick="selectOption(this)">ب) قبل از اجرای دستور از کاربر تأیید می‌گیرد.</button>
+    <button onclick="selectOption(this)">ج) ورودی را به NULL تبدیل می‌کند.</button>
+    <button onclick="selectOption(this)">د) تعداد آرگومان‌ها را محدود می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>p</code> را به خاطر Prompt به یاد بسپار.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۸: گزینه <code>-t</code> چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) دستور ساخته‌شده را قبل از اجرا نمایش می‌دهد.</button>
+    <button onclick="selectOption(this)">ب) اجرای دستور را متوقف می‌کند.</button>
+    <button onclick="selectOption(this)">ج) ورودی را یک آرگومان در نظر می‌گیرد.</button>
+    <button onclick="selectOption(this)">د) ورودی خالی را حذف می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br><code>-t</code> از Trace می‌آید و برای مشاهده دستور اجراشده مفید است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۹: کدام گزینه به <code>xargs</code> می‌گوید در صورت خالی بودن ورودی دستور را اجرا نکند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>-n</code></button>
+    <button onclick="selectOption(this)">ب) <code>-I</code></button>
+    <button onclick="selectOption(this)">ج) <code>-r</code></button>
+    <button onclick="selectOption(this)">د) <code>-p</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>-r</code> در GNU <code>xargs</code> به معنی <code>no-run-if-empty</code> است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۱۰ — تست مفهومی سخت: دستور زیر را در نظر بگیرید:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">echo "A B C D E" | xargs -n 2 echo</div></div>
+<p>تقریباً چند بار <code>echo</code> اجرا می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) ۱</button>
+    <button onclick="selectOption(this)">ب) ۲</button>
+    <button onclick="selectOption(this)">ج) ۳</button>
+    <button onclick="selectOption(this)">د) ۵</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>پنج آرگومان داریم و در هر اجرا دو آرگومان قرار می‌گیرد: <code>A B</code>، <code>C D</code>، <code>E</code> → بنابراین ۳ بار اجرا.</div>
+</div>
+
+<div class="summary-box">
+    <h3>🎯 نکات طلایی جلسه ۱۳</h3>
+    <ol>
+        <li><strong>مهم‌ترین مفهوم:</strong> <code>xargs = stdin → arguments</code></li>
+        <li><strong>Pipe را اشتباه نکن:</strong> <code>| → stdin</code> و <code>xargs → arguments</code></li>
+        <li><strong><code>-n</code>:</strong> <code>-n N</code> یعنی در هر اجرای دستور، حداکثر N آرگومان.</li>
+        <li><strong><code>-I</code>:</strong> <code>-I {}</code> یعنی <code>{}</code> را با ورودی جایگزین کن.</li>
+        <li><strong>فایل‌های دارای فاصله:</strong> همیشه الگوی <code>find ... -print0 | xargs -0 ...</code> را به خاطر بسپار.</li>
+        <li><strong>گزینه‌های کوچک ولی مهم:</strong> <code>-p → Prompt</code>، <code>-t → Trace</code>، <code>-r → no run if empty</code></li>
+        <li><strong>دستور پیش‌فرض:</strong> اگر command مشخص نشود: <code>echo</code></li>
+        <li><strong>نکته بسیار مهم:</strong> <code>xargs</code> لزوماً برای هر ورودی یک process جداگانه ایجاد نمی‌کند؛ می‌تواند چندین آرگومان را در یک اجرای دستور قرار دهد. با <code>-n</code> می‌توانیم این تعداد را کنترل کنیم.</li>
+    </ol>
+</div>
+
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 نقشه ذهنی نهایی</strong><br>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                    xargs\n                      │\n          ┌───────────┴───────────┐\n          │                       │\n       ورودی                    خروجی\n        stdin                 arguments\n          │                       │\n          └───────────┬───────────┘\n                      ▼\n                   command\n                      │\n          ┌───────────┼───────────┐\n          │           │           │\n         -n          -I          -0\n     تعداد args    جایگزینی    NULL input\n                      │\n          ┌───────────┴───────────┐\n          │                       │\n         -p                      -t\n       Prompt                   Trace\n\n             find + xargs\n                  │\n                  ▼\n       -print0 | xargs -0\n                  │\n                  ▼\n          Safe filenames</div></div>
+<p>اگر فقط <strong>۵ چیز</strong> از این جلسه یادت بماند، این‌ها باشند:</p>
+<div class="code-container"><span class="code-label">۵ نکته</span><div class="code-block no-prompt">1. command | xargs command\n2. xargs → arguments\n3. xargs -n 2\n4. xargs -I {}\n5. find ... -print0 | xargs -0 ...</div></div>
+<p>این پنج مورد هسته اصلی <code>xargs</code> برای LPIC-1 هستند.</p>
 </div></div>
-
-<h2>🧪 تمرین</h2>
-
-<h3>تمرین ۱</h3>
-<p>با استفاده از <code>find</code> و <code>xargs</code> همه فایل‌های <code>.txt</code> را پیدا کرده و محتوای آنها را با <code>grep</code> برای کلمه <code>test</code> جستجو کنید.</p>
-
-<h3>تمرین ۲</h3>
-<p>یک لیست از نام فایل‌ها در فایل <code>files.txt</code> بسازید و با <code>xargs -I {}</code> هر فایل را به پوشه <code>backup</code> کپی کنید.</p>
-
-<h3>تمرین ۳</h3>
-<p>با <code>find</code> و <code>xargs</code> همه فایل‌های <code>.tmp</code> را به‌صورت امن (با <code>-0</code>) حذف کنید.</p>
-
-<h3>تمرین ۴</h3>
-<p>از گزینه <code>-n</code> برای حذف فایل‌ها در گروه‌های ۳تایی استفاده کنید.</p>
-
-<h2>خودآزمایی</h2>
-
-<div class="quiz-card"><p>❓ تست ۱: کدام یک از گزینه‌ها به‌درستی بیان می‌کند که چرا دستور زیر <strong>کار نمی‌کند</strong>؟ <code>ls *.txt | rm</code></p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) چون <code>ls</code> خروجی را به‌درستی تولید نمی‌کند.</button>
-    <button onclick="selectOption(this)">ب) چون <code>rm</code> نمی‌تواند بیش از یک فایل را حذف کند.</button>
-    <button onclick="selectOption(this)">ج) چون <code>rm</code> ورودی خود را از stdin نمی‌گیرد و منتظر آرگومان در خط فرمان است.</button>
-    <button onclick="selectOption(this)">د) چون لوله (<code>|</code>) در اینجا معکوس عمل می‌کند.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>rm</code> به‌گونه‌ای طراحی شده که نام فایل‌ها را باید به‌عنوان <strong>آرگومان</strong> در کنار خودش دریافت کند، نه از طریق stdin. <code>ls</code> خروجی درستی دارد و <code>rm</code> می‌تواند چندین فایل را حذف کند، اما نمی‌تواند از stdin بخواند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۲: کدام دستور، همه فایل‌های <code>*.mp4</code> را پیدا کرده و به‌طور <strong>امن</strong> (با در نظر گرفتن فاصله در نام فایل‌ها) به پوشهٔ <code>~/Videos/</code> منتقل می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>find . -name "*.mp4" | xargs mv ~/Videos/</code></button>
-    <button onclick="selectOption(this)">ب) <code>find . -name "*.mp4" -print0 | xargs -0 mv -t ~/Videos/</code></button>
-    <button onclick="selectOption(this)">ج) <code>find . -name "*.mp4" -print0 | xargs -0 -I {} mv {} ~/Videos/</code></button>
-    <button onclick="selectOption(this)">د) <code>mv $(find . -name "*.mp4") ~/Videos/</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>ترکیب <code>-print0</code> و <code>-0</code> امنیت در برابر فاصله را فراهم می‌کند. گزینه <code>-I {}</code> هم باعث می‌شود که هر فایل به‌عنوان <code>{}</code> در جای درست دستور <code>mv</code> قرار گیرد و به مقصد نهایی منتقل شود. گزینه ب مشکل دارد و الف و د با فاصله و تعداد زیاد فایل مشکل دارند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۳: گزینهٔ <code>-n 3</code> در دستور <code>xargs</code> چه تأثیری دارد؟ فرض کنید ورودی <code>xargs</code> شامل ۱۰ فایل باشد.</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) دستور را فقط ۳ بار اجرا می‌کند.</button>
-    <button onclick="selectOption(this)">ب) هر بار ۳ آرگومان به دستور می‌دهد و این کار را تا اتمام لیست تکرار می‌کند.</button>
-    <button onclick="selectOption(this)">ج) فقط ۳ تا از فایل‌ها را پردازش می‌کند و بقیه را نادیده می‌گیرد.</button>
-    <button onclick="selectOption(this)">د) دستور را با ۳ تا از بزرگترین فایل‌ها اجرا می‌کند.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>-n 3</code> یعنی «حداکثر ۳ آرگومان به ازای هر بار اجرا». اگر ۱۰ فایل داشته باشیم، <code>xargs</code> دستور را ۴ بار اجرا می‌کند (۳+۳+۳+۱). هیچ آرگومانی دور انداخته نمی‌شود و ترتیب ورودی رعایت می‌شود.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۴: با فرض اینکه فایل <code>list.txt</code> شامل نام چند فایل (هر خط یک نام) است، کدام دستور هر خط را به‌عنوان یک آرگومان در نظر گرفته و با دستور <code>touch</code> یک فایل خالی با همان نام می‌سازد؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>cat list.txt | touch</code></button>
-    <button onclick="selectOption(this)">ب) <code>touch < list.txt</code></button>
-    <button onclick="selectOption(this)">ج) <code>cat list.txt | xargs touch</code></button>
-    <button onclick="selectOption(this)">د) <code>cat list.txt | xargs -n 1 echo touch</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>cat</code> محتوای فایل را چاپ می‌کند و <code>xargs</code> هر خط را به‌عنوان یک آرگومان به <code>touch</code> می‌دهد و فایل‌های خالی ساخته می‌شوند. گزینه‌های الف و ب اشتباه هستند چون <code>touch</code> stdin را نمی‌خواند. گزینه د فقط دستورات را چاپ می‌کند و اجرا نمی‌کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۵: کدام گزینه در مورد گزینهٔ <code>-p</code> در <code>xargs</code> <strong>نادرست</strong> است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) قبل از اجرای هر دستور از کاربر تأیید می‌گیرد.</button>
-    <button onclick="selectOption(this)">ب) برای جلوگیری از اجرای اشتباهی دستورات خطرناک مفید است.</button>
-    <button onclick="selectOption(this)">ج) دستور را بدون تأیید و به‌صورت خودکار اجرا می‌کند.</button>
-    <button onclick="selectOption(this)">د) با وارد کردن <code>y</code> دستور اجرا می‌شود و با <code>n</code> اجرا نمی‌شود.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>گزینه <code>-p</code> دقیقاً برای <strong>گرفتن تأیید</strong> ساخته شده است، پس «بدون تأیید و خودکار» بودن، کاملاً برعکس رفتار آن است. گزینه‌های الف، ب و د همگی درست هستند.</div>
-</div>
-
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>جمع‌بندی جلسه ۱۳</strong><br>
-<code>xargs</code> یکی از ابزارهای کلیدی برای تبدیل خروجی به آرگومان است که در اسکریپت‌نویسی و مدیریت سیستم کاربرد گسترده‌ای دارد. مهم‌ترین نکات:
-<ul>
-    <li><code>xargs</code> خروجی stdin را به آرگومان خط فرمان تبدیل می‌کند.</li>
-    <li>گزینه‌های کلیدی: <code>-n</code>، <code>-I {}</code>، <code>-0</code>، <code>-p</code>، <code>-t</code>، <code>-r</code></li>
-    <li>برای فایل‌های دارای فاصله، حتماً از <code>-0</code> و <code>-print0</code> استفاده کنید.</li>
-    <li><code>xargs</code> راه حل خطای «Argument list too long» است.</li>
-    <li>ترکیب با <code>find</code> رایج‌ترین کاربرد آن است.</li>
-</ul>
-</div></div>
-` ,
+`
+,
 "ch1-14": `
 <div class="section-header">
     <div class="section-badge">۱</div>
