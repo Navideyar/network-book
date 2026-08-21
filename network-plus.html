@@ -97,7 +97,7 @@
             height: 60px;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             gap: 12px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .navbar-brand {
@@ -114,15 +114,17 @@
         .navbar-links {
             display: flex;
             flex: 1;
+            min-width: 0; /* critical for flex overflow */
             overflow-x: auto;
             gap: 6px;
-            padding: 4px 0;
+            padding: 4px 0 6px;
             scrollbar-width: thin;
             -webkit-overflow-scrolling: touch;
             align-items: center;
         }
         .navbar-links::-webkit-scrollbar { height: 4px; }
         .navbar-links::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .navbar-links::-webkit-scrollbar-track { background: transparent; }
 
         .navbar-links a {
             display: inline-block;
@@ -254,6 +256,20 @@
             margin: 15px 0;
         }
 
+        /* ----- اسکرول افقی امن برای جدول‌ها ----- */
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 8px;
+            /* جلوگیری از بیرون زدن از کارت فصل */
+            max-width: 100%;
+        }
+        .table-scroll table {
+            margin: 0; /* margin روی wrapper است */
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -292,13 +308,16 @@
         }
         .quiz-answer strong { color: var(--text-heading); }
 
-        /* ----- ناوبری داخلی فصل (فقط دسکتاپ) ----- */
+        /* ----- ناوبری داخلی فصل ----- */
+        .nav-buttons,
         .nav-buttons-desktop {
             display: flex;
             justify-content: space-between;
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid var(--border);
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .nav-btn {
             padding: 10px 20px;
@@ -387,35 +406,68 @@
 
         /* ----- واکنش‌گرایی برای موبایل ----- */
         @media (max-width: 768px) {
-            body { padding-top: 56px; padding-bottom: 70px; } /* فضای پایین برای نوار موبایل */
-            .navbar { height: 56px; padding: 0 10px; gap: 6px; }
-            .navbar-brand { font-size: 0.85rem; }
+            body { padding-top: 56px; padding-bottom: 80px; } /* فضای پایین برای نوار موبایل */
+            .navbar {
+                height: 56px;
+                padding: 0 8px;
+                gap: 6px;
+                overflow: visible;
+            }
+            .navbar-brand { font-size: 0.85rem; flex-shrink: 0; }
             .navbar-brand span { display: none; }
-            .navbar-links a { font-size: 0.7rem; padding: 4px 8px; }
+            .navbar-links {
+                flex: 1;
+                min-width: 0;
+                gap: 4px;
+                padding: 2px 0 4px;
+            }
+            .navbar-links a {
+                font-size: 0.72rem;
+                padding: 6px 10px; /* touch target بهتر */
+                min-height: 32px;
+                display: inline-flex;
+                align-items: center;
+            }
             
             .back-home-btn { font-size: 0.7rem; padding: 4px 10px; }
             .back-home-btn span { display: none; } /* فقط آیکون خانه در موبایل */
             
-            .navbar-actions .icon-btn { font-size: 1.1rem; padding: 2px 6px; }
-            .main-content { padding: 16px 12px 20px; }
-            .chapter { padding: 20px 16px; }
-            h1 { font-size: 1.4rem; }
-            table { font-size: 0.75rem; }
-            th, td { padding: 4px 6px; }
+            .navbar-actions { flex-shrink: 0; }
+            .navbar-actions .icon-btn { font-size: 1.15rem; padding: 4px 8px; }
+            .main-content { padding: 16px 12px 24px; overflow-x: hidden; }
+            .chapter { padding: 20px 14px; overflow-x: hidden; max-width: 100%; }
+            h1 { font-size: 1.35rem; }
+            
+            /* جدول‌ها: اسکرول افقی داخل wrapper، نه کل صفحه */
+            .table-scroll {
+                margin: 14px 0;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+            }
+            table { font-size: 0.72rem; }
+            th, td { padding: 6px 8px; }
 
             /* نمایش نوار پایین و مخفی کردن دکمه‌های داخل محتوا در موبایل */
             .bottom-nav { display: flex; }
+            .nav-buttons,
             .nav-buttons-desktop { display: none; }
         }
 
         @media (max-width: 480px) {
-            .navbar-brand i { font-size: 0.9rem; }
-            .navbar-links a { font-size: 0.6rem; padding: 3px 6px; }
+            .navbar-brand i { font-size: 0.95rem; }
+            .navbar-links a {
+                font-size: 0.68rem;
+                padding: 6px 8px;
+                min-height: 30px;
+            }
             .back-home-btn { padding: 4px 8px; }
             .bottom-nav-btn { font-size: 0.55rem; }
             .bottom-nav-btn i { font-size: 1.1rem; }
             .bottom-nav-btn.home-btn { width: 44px; height: 44px; }
             .bottom-nav-btn.home-btn i { font-size: 1.2rem; }
+            .chapter { padding: 16px 10px; }
+            table { font-size: 0.68rem; }
+            th, td { padding: 5px 6px; }
         }
     </style>
 </head>
@@ -12760,9 +12812,27 @@ nmap -oA scan_result 192.168.1.1            # ذخیره در هر سه فرمت
             navbarLinks.appendChild(link);
         }
 
+        // ----- پیچیدن همه جدول‌ها در wrapper اسکرول افقی (بدون تغییر محتوا) -----
+        function wrapTablesForMobile() {
+            document.querySelectorAll('.chapter table').forEach(function(table) {
+                // اگر از قبل داخل table-scroll یا div با overflow-x باشد، دوباره نپیچ
+                var parent = table.parentElement;
+                if (!parent) return;
+                if (parent.classList.contains('table-scroll')) return;
+                var style = (parent.getAttribute('style') || '').replace(/\s/g, '').toLowerCase();
+                if (style.indexOf('overflow-x:auto') !== -1 || style.indexOf('overflow-x:scroll') !== -1) return;
+
+                var wrap = document.createElement('div');
+                wrap.className = 'table-scroll';
+                parent.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            });
+        }
+
         // ----- نمایش فصل پیش‌فرض (فصل 1) هنگام لود صفحه -----
         // این خط باعث می‌شود صفحه اول خالی نباشد
         window.onload = function() {
+            wrapTablesForMobile();
             showChapter(1);
         };
 
@@ -12778,7 +12848,15 @@ nmap -oA scan_result 192.168.1.1            # ذخیره در هر سه فرمت
             // به‌روزرسانی لینک‌های فعال در نوار بالا
             document.querySelectorAll('.navbar-links a').forEach(link => link.classList.remove('active'));
             const activeLink = document.getElementById('nav-link-' + chapNum);
-            if (activeLink) activeLink.classList.add('active');
+            if (activeLink) {
+                activeLink.classList.add('active');
+                // اسکرول نرم لینک فعال به مرکز نوار (موبایل)
+                try {
+                    activeLink.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } catch (e) {
+                    activeLink.scrollIntoView(false);
+                }
+            }
 
             // اسکرول به بالای صفحه
             window.scrollTo(0, 0);
