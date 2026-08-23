@@ -11624,955 +11624,271 @@ Virtual FS:
     </div>
 </div>
 
-<p>در جلسه قبل دیدیم که بعد از اجرای GRUB، <strong>Linux Kernel</strong> وارد عمل می‌شود و مدیریت منابع و سخت‌افزار سیستم را بر عهده می‌گیرد.</p>
-
-<p>حالا یک سؤال مهم داریم:</p>
-
-<blockquote>اگر بعداً بخواهیم قابلیت جدیدی مثل پشتیبانی از یک سخت‌افزار یا Driver جدید را به Kernel اضافه کنیم، آیا باید کل Kernel را از اول بسازیم؟</blockquote>
-
-<p>اینجاست که مفهوم <strong>Kernel Module</strong> اهمیت پیدا می‌کند.</p>
-
-<h2>Kernel چیست؟</h2>
-
-<p>قبل از اینکه Module را یاد بگیریم، باید خود Kernel را خوب بشناسیم.</p>
-
-<p>Kernel هسته اصلی سیستم‌عامل Linux است و بین نرم‌افزارها و سخت‌افزار قرار می‌گیرد.</p>
-
-<p>به شکل ساده:</p>
-
-<div class="code-container"><span class="code-label">لایه‌ها</span><div class="code-block no-prompt">Applications
-      ↓
-   Kernel
-      ↓
-   Hardware</div></div>
-
-<p>Kernel مسئول مدیریت منابع مهم سیستم است؛ برای مثال:</p>
-
-<div class="code-container"><span class="code-label">منابع تحت مدیریت Kernel</span><div class="code-block no-prompt">CPU
-Memory
-Devices
-Storage
-Network
-Processes</div></div>
-
-<p>بنابراین وقتی می‌گوییم:</p>
-
-<blockquote>Linux Kernel</blockquote>
-
-<p>منظور بخش مرکزی سیستم است که وظیفه مدیریت منابع و ارتباط با Hardware را بر عهده دارد.</p>
-
-<h2>قابلیت‌های Kernel</h2>
-
-<p>در این درسنامه، طبق ساختار منبع آموزشی، Kernel را به عنوان هسته‌ای با <strong>چهار قابلیت اصلی</strong> در نظر می‌گیریم.</p>
-
-<p>اما مسئله اینجاست:</p>
-
-<p>ممکن است بعداً بخواهیم قابلیت دیگری به Kernel اضافه کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نمونه قابلیت‌ها</span><div class="code-block no-prompt">پشتیبانی از یک کارت شبکه جدید
-پشتیبانی از یک Storage Controller
-پشتیبانی از یک USB Device
-یا یک قابلیت جدید در Kernel</div></div>
-
-<p>برای اضافه کردن قابلیت جدید، دو روش کلی داریم:</p>
-
-<div class="code-container"><span class="code-label">دو روش</span><div class="code-block no-prompt">                    Add New Capability
-                           │
-                 ┌─────────┴─────────┐
-                 ↓                   ↓
-             Compile              Module
-                 │                   │
-             Kernel                Kernel
-             Rebuild              Extension</div></div>
-
-<p>یعنی:</p>
-
-<h3>روش اول</h3>
-<p><strong>Compile کردن Kernel</strong></p>
-
-<h3>روش دوم</h3>
-<p>استفاده از <strong>Kernel Module</strong></p>
-
-<h2>روش اول — Compile کردن Kernel</h2>
-
-<p>در روش قدیمی‌تر، اگر بخواهیم قابلیت جدیدی به Kernel اضافه کنیم، می‌توانیم Kernel را دوباره Compile کنیم.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">فرآیند Compile</span><div class="code-block no-prompt">Kernel Source Code
-       ↓
-Configure
-       ↓
-Compile
-       ↓
-New Kernel
-       ↓
-Boot</div></div>
-
-<p>اما این روش مشکلاتی دارد.</p>
-
-<h3>مشکل اول — سخت بودن</h3>
-
-<p>Compile کردن Kernel کار ساده‌ای نیست.</p>
-
-<p>برای این کار باید مراحل مختلفی را انجام دهیم:</p>
-
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">Source Code
-    ↓
-Configuration
-    ↓
-Dependencies
-    ↓
-Compilation
-    ↓
-Installation
-    ↓
-Boot Configuration</div></div>
-
-<p>هر مرحله می‌تواند باعث ایجاد مشکل شود.</p>
-
-<h3>مشکل دوم — زمان‌بر بودن</h3>
-
-<p>فرض کن فقط می‌خواهی یک Driver جدید به Kernel اضافه کنی.</p>
-
-<p>اگر بخواهی کل Kernel را دوباره Compile کنی:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">یک تغییر کوچک
-      ↓
-Compile کل Kernel</div></div>
-
-<p>این کار می‌تواند زمان زیادی ببرد.</p>
-
-<h3>مشکل سوم — نیاز به ابزارهای Compile</h3>
-
-<p>برای Compile کردن Kernel معمولاً باید ابزارها و محیط لازم برای Build روی سیستم وجود داشته باشد.</p>
-
-<p>بنابراین ممکن است مجبور شوی ابزارهای مختلفی نصب کنی.</p>
-
-<p>به صورت مفهومی:</p>
-
-<div class="code-container"><span class="code-label">نیازمندی‌ها</span><div class="code-block no-prompt">Kernel Source
-     +
-Build Tools
-     +
-Dependencies
-     ↓
-Compilation</div></div>
-
-<p>اگر یکی از موارد لازم وجود نداشته باشد، فرآیند Compile ممکن است با خطا مواجه شود.</p>
-
-<h3>مشکل چهارم — خطاهای متعدد</h3>
-
-<p>Compile کردن Kernel می‌تواند با خطاهای مختلفی مواجه شود.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خطاهای احتمالی</span><div class="code-block no-prompt">Configuration Error
-Dependency Error
-Compilation Error
-Driver Error
-Installation Error</div></div>
-
-<p>بنابراین برای اضافه کردن یک قابلیت نسبتاً کوچک، مجبور شدن به ساخت مجدد کل Kernel چندان ایده‌آل نیست.</p>
-
-<h2>قبل از Kernel Modules چه اتفاقی می‌افتاد؟</h2>
-
-<p>یکی از نکات تاریخی مهم این مبحث این است که در گذشته Kernelها مانند امروز از سیستم Module استفاده نمی‌کردند.</p>
-
-<p>اگر قابلیت جدیدی لازم بود:</p>
-
-<div class="code-container"><span class="code-label">روش قدیمی</span><div class="code-block no-prompt">New Feature
-    ↓
-Modify Kernel
-    ↓
-Compile Entire Kernel
-    ↓
-Install New Kernel
-    ↓
-Reboot</div></div>
-
-<p>یعنی برای اضافه کردن قابلیت جدید، مجبور بودیم Kernel را دوباره بسازیم.</p>
-
-<p>این روش انعطاف‌پذیری کمی داشت.</p>
-
-<h2>راه‌حل — Kernel Module</h2>
-
-<p>اینجاست که:</p>
-
-<div class="code-container"><span class="code-label">Kernel Module</span><div class="code-block no-prompt">Kernel Module</div></div>
-
-<p>وارد می‌شود.</p>
-
-<p>Module را می‌توانیم به زبان خیلی ساده این‌طور تصور کنیم:</p>
-
-<blockquote><strong>یک قطعه قابل اضافه‌شدن به Kernel که می‌تواند قابلیت خاصی را به آن اضافه کند.</strong></blockquote>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Linux Kernel
-     │
-     ├── Core
-     │
-     ├── Module A
-     │
-     ├── Module B
-     │
-     └── Module C</div></div>
-
-<p>Module می‌تواند برای اضافه کردن قابلیت‌هایی مثل Driverهای Hardware استفاده شود.</p>
-
-<h2>چرا Module بهتر است؟</h2>
-
-<p>فرض کن Kernel را یک ساختمان بزرگ در نظر بگیریم.</p>
-
-<p>اگر بخواهی یک قابلیت جدید اضافه کنی، دو راه داری.</p>
-
-<h3>روش اول</h3>
-<p>کل ساختمان را خراب کنی و دوباره بسازی:</p>
-<div class="code-container"><span class="code-label">روش اول</span><div class="code-block no-prompt">کل Kernel
-   ↓
-Rebuild</div></div>
-
-<h3>روش دوم</h3>
-<p>یک بخش جدید را به ساختمان اضافه کنی:</p>
-<div class="code-container"><span class="code-label">روش دوم</span><div class="code-block no-prompt">Kernel
-  +
-Module</div></div>
-
-<p>روش دوم سریع‌تر و انعطاف‌پذیرتر است.</p>
-
-<h2>مهم‌ترین مزیت Module</h2>
-
-<p>یکی از مهم‌ترین ویژگی‌های Kernel Module این است که لازم نیست برای هر تغییر کوچک، کل Kernel را دوباره Compile کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">New Driver
-    ↓
-Compile Module
-    ↓
-Load Module
-    ↓
-Kernel supports new Device</div></div>
-
-<p>در نتیجه:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">❌ Compile Entire Kernel
-
-✅ Compile Specific Module</div></div>
-
-<h2>Module چگونه وارد Kernel می‌شود؟</h2>
-
-<p>Module را می‌توان در زمان نیاز در Kernel Load کرد.</p>
-
-<p>تصویر ذهنی:</p>
-
-<div class="code-container"><span class="code-label">جریان Load</span><div class="code-block no-prompt">Kernel
-  │
-  │ Load
-  ↓
-Module
-  │
-  ↓
-New Capability</div></div>
-
-<p>مثلاً یک Driver برای سخت‌افزار خاص می‌تواند به صورت Module در سیستم وجود داشته باشد.</p>
-
-<p>وقتی Module Load شود:</p>
-
-<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Hardware
-   ↓
-Driver Module
-   ↓
-Kernel
-   ↓
-Linux</div></div>
-
-<p>سیستم می‌تواند از آن Hardware استفاده کند.</p>
-
-<h2>آیا Module همیشه داخل Kernel می‌ماند؟</h2>
-
-<p>خیر.</p>
-
-<p>یکی از مزایای مهم Module این است که می‌توان آن را از Kernel خارج کرد.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">چرخه</span><div class="code-block no-prompt">Load Module
-    ↓
-Kernel
-    ↓
-Use Module
-    ↓
-Unload Module</div></div>
-
-<p>این ویژگی انعطاف‌پذیری زیادی ایجاد می‌کند.</p>
-
-<h2>Load و Unload چیست؟</h2>
-
-<p>دو واژه مهم:</p>
-
-<h3>Load</h3>
-<p>یعنی Module را وارد Kernel کنیم.</p>
-<div class="code-container"><span class="code-label">Load</span><div class="code-block no-prompt">Module
-   ↓
-Kernel</div></div>
-
-<h3>Unload</h3>
-<p>یعنی Module را از Kernel خارج کنیم.</p>
-<div class="code-container"><span class="code-label">Unload</span><div class="code-block no-prompt">Kernel
-   ↓
-Module Removed</div></div>
-
-<p>بنابراین:</p>
-
-<div class="code-container"><span class="code-label">تعاریف</span><div class="code-block no-prompt">Load   = اضافه کردن Module
-Unload = خارج کردن Module</div></div>
-
-<h2>مزایای Kernel Module</h2>
-
-<p>حالا مزیت‌های اصلی را جمع کنیم.</p>
-
-<h3>۱. سریع‌تر</h3>
-<p>در مقایسه با Compile کردن کل Kernel، معمولاً سریع‌تر است.</p>
-
-<h3>۲. فقط بخش موردنیاز Build می‌شود</h3>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">New Driver
-   ↓
-Build Driver Module</div></div>
-<p>نه اینکه:</p>
-<div class="code-container"><span class="code-label">روش قدیمی</span><div class="code-block no-prompt">New Driver
-   ↓
-Build Entire Kernel</div></div>
-
-<h3>۳. قابل Load شدن</h3>
-<p>می‌توان Module را در زمان نیاز Load کرد.</p>
-
-<h3>۴. قابل Unload شدن</h3>
-<p>اگر دیگر به Module نیاز نداشته باشیم، می‌توان آن را خارج کرد.</p>
-
-<h2>یک مثال ساده</h2>
-
-<p>فرض کن یک Linux Server داری و یک سخت‌افزار جدید به آن اضافه می‌کنی.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">New Network Device</div></div>
-
-<p>Kernel فعلی Driver آن را ندارد.</p>
-
-<p>یکی از روش‌ها این است:</p>
-
-<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block no-prompt">New Driver
-    ↓
-Compile Module
-    ↓
-Load Module
-    ↓
-Kernel
-    ↓
-Network Device Works</div></div>
-
-<p>در این حالت لازم نیست برای یک Driver کوچک کل Kernel را دوباره بسازی.</p>
-
-<h2>Kernel Module و Driver</h2>
-
-<p>این دو مفهوم بسیار به هم مرتبط هستند.</p>
-
-<p><strong>Driver</strong> نرم‌افزاری است که به سیستم‌عامل کمک می‌کند با Hardware خاصی کار کند.</p>
-
-<p>یک Driver می‌تواند به صورت Kernel Module ارائه شود.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Hardware
-    ↓
-Driver
-    ↓
-Kernel Module
-    ↓
-Linux Kernel</div></div>
-
-<p>اما یک نکته مهم:</p>
-
-<blockquote>هر Kernel Module الزاماً Driver سخت‌افزار نیست.</blockquote>
-
-<p>Moduleها می‌توانند قابلیت‌های دیگری هم به Kernel اضافه کنند.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Kernel Module
-   ├── Hardware Driver
-   └── Other Kernel Functionality</div></div>
-
-<h2>مشکل امنیتی Kernel Module</h2>
-
-<p>Kernel Module قدرت زیادی دارد.</p>
-
-<p>چرا؟</p>
-
-<p>چون Module داخل فضای Kernel اجرا می‌شود.</p>
-
-<p>پس اگر یک مهاجم بتواند یک Module مخرب را وارد Kernel کند، وضعیت می‌تواند بسیار خطرناک شود.</p>
-
-<p>اینجا مفهوم:</p>
-
-<div class="code-container"><span class="code-label">Rootkit</span><div class="code-block no-prompt">Rootkit</div></div>
-
-<p>مطرح می‌شود.</p>
-
-<h2>Rootkit چیست؟</h2>
-
-<p>Rootkit نوعی ابزار/بدافزار است که هدف آن می‌تواند پنهان‌سازی حضور مهاجم و حفظ دسترسی سطح بالا به سیستم باشد.</p>
-
-<p>یکی از نگرانی‌های مهم در Kernel این است که مهاجم بتواند یک <strong>Kernel Module مخرب</strong> را Load کند.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">تهدید</span><div class="code-block no-prompt">Attacker
-   ↓
-Malicious Kernel Module
-   ↓
-Kernel
-   ↓
-High Privilege / Stealth</div></div>
-
-<p>به همین دلیل قابلیت Load کردن Moduleها یک موضوع امنیتی مهم است.</p>
-
-<h2>چرا Rootkit خطرناک است؟</h2>
-
-<p>چون Kernel بالاترین سطح کنترل را روی بسیاری از قسمت‌های سیستم دارد.</p>
-
-<p>اگر کد مخرب وارد Kernel شود، می‌تواند در سطح بسیار پایین سیستم فعالیت کند.</p>
-
-<p>به همین دلیل:</p>
-
-<div class="code-container"><span class="code-label">دو روی سکه</span><div class="code-block no-prompt">Kernel Module
-      ↓
-Powerful
-      ↓
-Useful
-      +
-Security Risk</div></div>
-
-<p>یعنی Module هم یک قابلیت بسیار مفید است و هم باید با دقت امنیتی مدیریت شود.</p>
-
-<h2>فرمان‌های مدیریت Kernel Module</h2>
-
-<p>حالا به بخش مهم و عملی درس می‌رسیم.</p>
-
-<p>فرمان‌های اصلی:</p>
-
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block no-prompt">lsmod
-modinfo
-insmod
-modprobe</div></div>
-
-<p>هستند.</p>
-
-<p>هر کدام وظیفه متفاوتی دارند.</p>
-
-<h3><code>lsmod</code></h3>
-
-<p>اولین فرمان:</p>
+<p>در جلسه قبل دیدیم که پس از اجرای GRUB، نوبت به <strong>Linux Kernel</strong> می‌رسد. کرنل مغز سیستم‌عامل است؛ وظیفه دارد:</p>
+
+<ul>
+    <li><strong>منابع سخت‌افزاری</strong> (CPU، حافظه، دیسک، شبکه) را مدیریت کند.</li>
+    <li><strong>درایورها</strong> را برای ارتباط با دستگاه‌ها اجرا کند.</li>
+    <li><strong>فضای کاربری (User Space)</strong> را از سخت‌افزار جدا کند تا برنامه‌ها به صورت امن و یکسان با سخت‌افزار ارتباط برقرار کنند.</li>
+</ul>
+
+<div class="code-container"><span class="code-label">لایه‌ها</span><div class="code-block no-prompt">+------------------+
+|   برنامه‌های کاربر  |
++------------------+
+         ↓
++------------------+
+|     Kernel       |  ← هسته سیستم
++------------------+
+         ↓
++------------------+
+|    سخت‌افزار      |
++------------------+</div></div>
+
+<h2>چالش: چگونه قابلیت جدید به Kernel اضافه کنیم؟</h2>
+
+<p>فرض کنید یک <strong>کارت شبکه جدید</strong> خریداری کرده‌اید که کرنل فعلی آن را نمی‌شناسد. برای پشتیبانی از این کارت، دو راه داریم:</p>
+
+<h3>روش اول: کامپایل مجدد کل Kernel (روش قدیمی)</h3>
+
+<ul>
+    <li>کد منبع کرنل را دریافت کنید.</li>
+    <li>تنظیمات (Config) را تغییر دهید تا درایور جدید فعال شود.</li>
+    <li>کل کرنل را کامپایل کنید (مدت زمان طولانی).</li>
+    <li>کرنل جدید را نصب کرده و سیستم را ریبوت کنید.</li>
+</ul>
+
+<p><strong>مشکلات این روش:</strong></p>
+<ul>
+    <li>زمان‌بر و پیچیده.</li>
+    <li>نیاز به ابزارهای کامپایل و وابستگی‌های متعدد.</li>
+    <li>امکان بروز خطا در هر مرحله (از تنظیمات تا نصب).</li>
+    <li>برای هر تغییر کوچک، باید کل فرایند را تکرار کنید.</li>
+</ul>
+
+<h3>روش دوم: استفاده از Kernel Module (روش مدرن)</h3>
+
+<ul>
+    <li>فقط <strong>همان درایور</strong> را به صورت یک ماژول جداگانه کامپایل کنید.</li>
+    <li>ماژول را در زمان اجرا به کرنل متصل (Load) کنید.</li>
+    <li>بدون ریبوت، قابلیت جدید در دسترس خواهد بود.</li>
+    <li>در صورت نیاز، ماژول را از کرنل جدا (Unload) کنید.</li>
+</ul>
+
+<p><strong>مزایا:</strong></p>
+<ul>
+    <li>سریع و کم‌هزینه.</li>
+    <li>فقط بخش مورد نظر ساخته می‌شود.</li>
+    <li>امکان بارگذاری و باربرداری پویا.</li>
+    <li>کاهش حجم کرنل اصلی.</li>
+</ul>
+
+<h2>Kernel Module دقیقاً چیست؟</h2>
+
+<p>یک <strong>Kernel Module</strong> یک فایل باینری (معمولاً با پسوند <code>.ko</code>) است که شامل کد قابل اجرا در فضای کرنل می‌باشد. این فایل می‌تواند:</p>
+
+<ul>
+    <li>یک <strong>درایور سخت‌افزاری</strong> (مثلاً برای کارت شبکه، چاپگر، یا USB) باشد.</li>
+    <li>یک <strong>قابلیت سیستمی</strong> جدید (مثل یک سیستم فایل جدید) اضافه کند.</li>
+    <li>یک <strong>قابلیت امنیتی</strong> یا <strong>ابزار ردیابی</strong> را فراهم آورد.</li>
+</ul>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">        Kernel (هسته اصلی)
+            │
+    ┌───────┼───────┐
+    │       │       │
+ ماژول A   ماژول B  ماژول C
+ (درایور)  (ویژگی)  (ابزار)</div></div>
+
+<h2>چرخه حیات یک Module</h2>
+
+<ol>
+    <li><strong>ایجاد (Compile)</strong> – کد منبع ماژول با استفاده از امکانات کرنل ساخته می‌شود.</li>
+    <li><strong>بارگذاری (Loading)</strong> – ماژول با دستوراتی مثل <code>insmod</code> یا <code>modprobe</code> به کرنل اضافه می‌شود.</li>
+    <li><strong>استفاده (Using)</strong> – قابلیت جدید در دسترس سیستم و برنامه‌ها قرار می‌گیرد.</li>
+    <li><strong>باربرداری (Unloading)</strong> – در صورت عدم نیاز، ماژول با دستور <code>rmmod</code> از کرنل خارج می‌شود.</li>
+</ol>
+
+<div class="code-container"><span class="code-label">چرخه</span><div class="code-block no-prompt">Compile → Load → Use → Unload</div></div>
+
+<h2>دستورات مدیریت ماژول (کاربردی و آزمونی)</h2>
+
+<h3><code>lsmod</code> – نمایش ماژول‌های بارگذاری‌شده</h3>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsmod</div></div>
 
-<p>است.</p>
+<p>ستون‌های خروجی:</p>
+<ul>
+    <li><strong>Module</strong>: نام ماژول</li>
+    <li><strong>Size</strong>: اندازه (بایت)</li>
+    <li><strong>Used by</strong>: تعداد دفعات استفاده و ماژول‌های وابسته</li>
+</ul>
 
-<p><code>lsmod</code> برای نمایش Moduleهایی است که در حال حاضر در Kernel Load شده‌اند.</p>
-
-<p>مثلاً:</p>
-
+<p>مثال:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Module                  Size  Used by
-...</div></div>
+nvidia                  12345  3
+usb_storage             9876  1</div></div>
 
-<p>یعنی می‌توانی ببینی چه Moduleهایی در Kernel فعال هستند.</p>
+<h3><code>modinfo</code> – دریافت اطلاعات یک ماژول خاص</h3>
 
-<p>پس:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">modinfo &lt;نام ماژول&gt;</div></div>
 
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">lsmod
-  ↓
-List Loaded Modules</div></div>
+<p>نمایش مواردی مانند:</p>
+<ul>
+    <li>مسیر فایل ماژول</li>
+    <li>توضیحات</li>
+    <li>وابستگی‌ها</li>
+    <li>مجوز (License)</li>
+</ul>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته آزمونی</strong><br>اگر سؤال پرسید: <strong>کدام دستور لیست Moduleهای Load شده را نشان می‌دهد؟</strong><br>
-پاسخ: <code>lsmod</code></div></div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">modinfo usb_storage</div></div>
 
-<h3><code>modinfo</code></h3>
+<h3><code>insmod</code> – بارگذاری ساده ماژول</h3>
 
-<p>فرض کن یک Module خاص داری و می‌خواهی اطلاعات آن را ببینی.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo insmod /path/to/module.ko</div></div>
 
-<p>از:</p>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>توجه</strong><br><code>insmod</code> وابستگی‌های ماژول را <strong>به صورت خودکار</strong> مدیریت نمی‌کند. اگر ماژول A به ماژول B وابسته باشد، ابتدا باید B را با <code>insmod</code> بارگذاری کنید، سپس A را.</div></div>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">modinfo</div></div>
+<h3><code>modprobe</code> – بارگذاری هوشمند ماژول</h3>
 
-<p>استفاده می‌کنیم.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo modprobe &lt;نام ماژول&gt;</div></div>
 
-<p>مثلاً:</p>
+<p><code>modprobe</code> با استفاده از اطلاعات موجود در <code>/lib/modules/$(uname -r)/modules.dep</code> وابستگی‌ها را تشخیص داده و به ترتیب بارگذاری می‌کند. این دستور <strong>انتخاب اول</strong> برای بارگذاری ماژول‌هاست.</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">modinfo module_name</div></div>
-
-<p>این دستور می‌تواند اطلاعاتی درباره Module نمایش دهد.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">modinfo
-   ↓
-Module Information</div></div>
-
-<p>تفاوت مهم:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">lsmod
- ↓
-چه Moduleهایی Load شده‌اند؟
-
-modinfo
- ↓
-اطلاعات یک Module خاص چیست؟</div></div>
-
-<h3><code>insmod</code></h3>
-
-<p>برای Load کردن یک Module می‌توان از:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">insmod</div></div>
-
-<p>استفاده کرد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo insmod module.ko</div></div>
-
-<p>اما یک نکته بسیار مهم وجود دارد:</p>
-
-<blockquote><code>insmod</code> وابستگی‌های Module را به صورت هوشمند مدیریت نمی‌کند.</blockquote>
-
-<p>یعنی اگر Module موردنظر به Module دیگری وابسته باشد، <code>insmod</code> خودش آن Dependency را برایت حل نمی‌کند.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">insmod
-   ↓
-Load Module
-   ↓
-No automatic dependency handling</div></div>
-
-<h3><code>modprobe</code></h3>
-
-<p>حالا به دستور مهم‌تر می‌رسیم:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">modprobe</div></div>
-
-<p><code>modprobe</code> نیز برای Load کردن Module استفاده می‌شود، اما نسبت به <code>insmod</code> هوشمندتر است.</p>
-
-<p>یکی از تفاوت‌های اصلی:</p>
-
-<blockquote><code>modprobe</code> می‌تواند Dependencyهای Module را نیز مدیریت کند.</blockquote>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Module A
-   ↓
-depends on
-   ↓
-Module B</div></div>
-
-<p>با <code>insmod</code> باید Dependencyها را خودت در نظر بگیری.</p>
-
-<p>اما <code>modprobe</code> می‌تواند آنها را مدیریت کند.</p>
-
-<p>به صورت مفهومی:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">insmod
-   ↓
-Load this module
-
-modprobe
-   ↓
-Load this module
-   +
-Handle dependencies</div></div>
-
-<h3><code>insmod</code> در مقابل <code>modprobe</code></h3>
-
-<p>این تفاوت را حتماً یاد بگیر.</p>
+<h4>مقایسه سریع:</h4>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>دستور</th><th>وظیفه</th></tr></thead>
+<thead><tr><th>دستور</th><th>مدیریت وابستگی</th><th>نیاز به مسیر کامل</th></tr></thead>
 <tbody>
-<tr><td><code>insmod</code></td><td>Load کردن Module مشخص</td></tr>
-<tr><td><code>modprobe</code></td><td>Load کردن Module و مدیریت Dependencyها</td></tr>
+<tr><td><code>insmod</code></td><td>خیر (دستی)</td><td>بله (فایل <code>.ko</code>)</td></tr>
+<tr><td><code>modprobe</code></td><td>بله (خودکار)</td><td>خیر (فقط نام ماژول)</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>بنابراین اگر در تست دیدی:</p>
+<h3><code>rmmod</code> – باربرداری ماژول</h3>
 
-<blockquote>کدام ابزار برای Load کردن Module همراه با Dependencyهای آن مناسب‌تر است؟</blockquote>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo rmmod &lt;نام ماژول&gt;</div></div>
 
-<p>پاسخ:</p>
+<p>ماژول را از کرنل خارج می‌کند، به شرطی که در حال استفاده نباشد.</p>
 
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block">modprobe</div></div>
+<h2>مثال عملی: بارگذاری یک ماژول فرضی</h2>
 
-<h3>چرا <code>modprobe</code> هوشمندتر است؟</h3>
+<p>فرض کنید ماژولی به نام <code>my_driver.ko</code> داریم که به ماژول <code>usb_core</code> وابسته است.</p>
 
-<p>فرض کن:</p>
+<p><strong>روش با <code>insmod</code> (دستی):</strong></p>
+<div class="code-container"><span class="code-label">insmod</span><div class="code-block">sudo insmod /lib/modules/.../usb_core.ko
+sudo insmod /path/to/my_driver.ko</div></div>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Module A
-   ↓
-Dependency B
-   ↓
-Dependency C</div></div>
+<p><strong>روش با <code>modprobe</code> (خودکار):</strong></p>
+<div class="code-container"><span class="code-label">modprobe</span><div class="code-block">sudo modprobe my_driver   # وابستگی‌ها را خودکار بار می‌کند</div></div>
 
-<p>اگر بخواهی A را Load کنی، باید مطمئن شوی B و C هم در دسترس باشند.</p>
+<h2>امنیت و Kernel Module: خطر Rootkit</h2>
 
-<p><code>modprobe</code> برای همین سناریو طراحی شده است.</p>
+<p>از آنجا که ماژول‌ها در <strong>فضای کرنل</strong> اجرا می‌شوند، به تمام حافظه و سخت‌افزار دسترسی کامل دارند. این قدرت، هم نعمت است و هم تهدید.</p>
 
-<div class="code-container"><span class="code-label">عملکرد</span><div class="code-block no-prompt">modprobe A
-    ↓
-A
-├── B
-└── C</div></div>
+<ul>
+    <li>یک ماژول مخرب (بدافزار) می‌تواند:
+        <ul>
+            <li>اطلاعات حساس را بدزدد.</li>
+            <li>فرایندها را پنهان کند.</li>
+            <li>دسترسی سطح بالا (root) را برای مهاجم حفظ کند.</li>
+            <li>خود را در کرنل پنهان کرده و تشخیص آن را دشوار سازد.</li>
+        </ul>
+    </li>
+</ul>
 
-<p>بنابراین مدیریت Dependencyها یکی از ویژگی‌های مهم آن است.</p>
+<p>به چنین بدافزارهایی <strong>Rootkit</strong> گفته می‌شود. به همین دلیل:</p>
+<ul>
+    <li>فقط ماژول‌های معتبر و امضا شده باید بارگذاری شوند.</li>
+    <li>در سیستم‌های امن، بارگذاری ماژول‌های جدید محدود می‌شود (مثلاً با <code>module.sig_enforce=1</code> در کرنل).</li>
+</ul>
 
-<h2>پس چهار دستور اصلی را چطور حفظ کنیم؟</h2>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>هشدار امنیتی</strong><br>ماژول‌های مخرب می‌توانند به Rootkit تبدیل شوند و کنترل کامل سیستم را در دست بگیرند. همیشه ماژول‌ها را از منابع معتبر دریافت کنید.</div></div>
 
-<p>یک جدول خیلی مهم:</p>
+<div class="summary-box">
+    <h3>🧠 جمع‌بندی نهایی (برای مرور سریع)</h3>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
-<tbody>
-<tr><td><code>lsmod</code></td><td>لیست Moduleهای Load شده</td></tr>
-<tr><td><code>modinfo</code></td><td>اطلاعات یک Module</td></tr>
-<tr><td><code>insmod</code></td><td>Load Module بدون مدیریت خودکار Dependency</td></tr>
-<tr><td><code>modprobe</code></td><td>Load Module با مدیریت Dependency</td></tr>
-</tbody>
-</table>
+    <p><strong>کرنل چیست؟</strong><br>واسط بین نرم‌افزار و سخت‌افزار، مدیر منابع.</p>
+
+    <p><strong>چگونه قابلیت جدید اضافه کنیم؟</strong></p>
+    <ul>
+        <li>روش سنتی: کامپایل کل کرنل (سخت و زمان‌بر)</li>
+        <li>روش مدرن: ماژول (سریع و انعطاف‌پذیر)</li>
+    </ul>
+
+    <p><strong>ماژول چیست؟</strong><br>یک فایل <code>.ko</code> که قابلیت جدیدی به کرنل می‌دهد؛ قابل بارگذاری و باربرداری پویا.</p>
+
+    <p><strong>دستورات اصلی:</strong></p>
+    <ul>
+        <li><code>lsmod</code> → لیست ماژول‌های فعال</li>
+        <li><code>modinfo</code> → اطلاعات یک ماژول</li>
+        <li><code>insmod</code> → بارگذاری (بدون وابستگی‌ها)</li>
+        <li><code>modprobe</code> → بارگذاری هوشمند (با وابستگی‌ها)</li>
+        <li><code>rmmod</code> → باربرداری</li>
+    </ul>
+
+    <p><strong>نکته امنیتی:</strong><br>ماژول‌ها با بالاترین سطح دسترسی اجرا می‌شوند؛ ممکن است مسیر را برای Rootkit باز کنند.</p>
 </div>
-
-<p>یک روش ساده برای حفظ:</p>
-
-<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">lsmod
- ↓
-List
-
-modinfo
- ↓
-Info
-
-insmod
- ↓
-Insert
-
-modprobe
- ↓
-Insert + Dependency</div></div>
-
-<h2>پس از کجا بفهمیم Module فعال است؟</h2>
-
-<p>فرض کن Moduleای را Load کرده‌ای.</p>
-
-<p>می‌توانی:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsmod</div></div>
-
-<p>را اجرا کنی و بررسی کنی آیا Module در لیست وجود دارد یا خیر.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">چرخه</span><div class="code-block no-prompt">Load Module
-    ↓
-lsmod
-    ↓
-Check</div></div>
-
-<h2>یک سناریوی کامل</h2>
-
-<p>فرض کن یک Driver به شکل Kernel Module در سیستم داری.</p>
-
-<p>مراحل ذهنی:</p>
-
-<h3>مرحله اول — اطلاعات Module</h3>
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block">modinfo module_name</div></div>
-
-<h3>مرحله دوم — Load کردن</h3>
-<div class="code-container"><span class="code-label">Load</span><div class="code-block">sudo modprobe module_name</div></div>
-
-<h3>مرحله سوم — بررسی</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsmod</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">Workflow</span><div class="code-block no-prompt">modinfo
-   ↓
-Information
-
-modprobe
-   ↓
-Load
-
-lsmod
-   ↓
-Verify</div></div>
-
-<p>این یک Workflow خوب برای کار با Moduleهاست.</p>
-
-<h2>نکته مهم درباره فایل Module</h2>
-
-<p>Kernel Moduleها معمولاً فایل‌هایی با پسوند:</p>
-
-<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.ko</div></div>
-
-<p>دارند.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">module_name.ko</div></div>
-
-<p>پس اگر در Linux فایلی مثل:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">something.ko</div></div>
-
-<p>دیدی، احتمالاً با یک Kernel Module سروکار داری.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته آزمونی</strong><br>پسوند استاندارد فایل‌های Kernel Module: <strong><code>.ko</code></strong></div></div>
-
-<h2>تصویر کامل Kernel Module</h2>
-
-<p>حالا همه چیز را کنار هم قرار بده:</p>
-
-<div class="code-container"><span class="code-label">ساختار کامل</span><div class="code-block no-prompt">                    Linux Kernel
-                         │
-            ┌────────────┴────────────┐
-            │                         │
-       Built-in Code             Kernel Modules
-                                      │
-                         ┌────────────┼────────────┐
-                         ↓            ↓            ↓
-                      Driver       Feature       Other
-                         │
-                         ↓
-                     Hardware</div></div>
-
-<p>و مدیریت Moduleها:</p>
-
-<div class="code-container"><span class="code-label">مدیریت</span><div class="code-block no-prompt">modinfo
-   ↓
-Information
-
-modprobe
-   ↓
-Load + Dependencies
-
-insmod
-   ↓
-Load Module
-
-lsmod
-   ↓
-List Loaded Modules</div></div>
-
-<h2>جمع‌بندی مفهومی</h2>
-
-<p>تا اینجا باید این تفاوت را کاملاً متوجه شده باشی:</p>
-
-<h3>روش قدیمی / Compile</h3>
-<div class="code-container"><span class="code-label">روش قدیمی</span><div class="code-block no-prompt">Change
-  ↓
-Compile Entire Kernel
-  ↓
-Install
-  ↓
-Boot</div></div>
-
-<h3>روش Module</h3>
-<div class="code-container"><span class="code-label">روش Module</span><div class="code-block no-prompt">Change
-  ↓
-Compile Specific Module
-  ↓
-Load Module
-  ↓
-Kernel Gets New Capability</div></div>
-
-<p>روش دوم انعطاف‌پذیرتر است.</p>
-
-<h2>نکته امنیتی مهم</h2>
-
-<p>همان قابلیتی که Module را قدرتمند می‌کند، می‌تواند مشکل امنیتی هم ایجاد کند.</p>
-
-<div class="code-container"><span class="code-label">تهدید امنیتی</span><div class="code-block no-prompt">Kernel Module
-      ↓
-Runs with Kernel Privilege
-      ↓
-Very Powerful
-      ↓
-Malicious Module
-      ↓
-Potential Rootkit</div></div>
-
-<p>بنابراین در محیط‌های حساس، مدیریت Moduleها موضوع امنیتی مهمی است.</p>
 
 <h2>خودآزمایی</h2>
 
-<div class="quiz-card"><p>❓ تست ۱: اگر بخواهیم یک قابلیت جدید را بدون Compile کردن کل Kernel اضافه کنیم، کدام روش مناسب‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Partition</button>
-    <button onclick="selectOption(this)">ب) Kernel Module</button>
-    <button onclick="selectOption(this)">ج) Mount</button>
-    <button onclick="selectOption(this)">د) GRUB</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>هدف Kernel Module این است که قابلیت‌های جدید را به شکل جداگانه به Kernel اضافه کنیم.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۲: یکی از مشکلات اصلی Compile کردن کل Kernel چیست؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) نیاز نداشتن به ابزارهای اضافی</button>
-    <button onclick="selectOption(this)">ب) بسیار سریع بودن</button>
-    <button onclick="selectOption(this)">ج) سخت و زمان‌بر بودن</button>
-    <button onclick="selectOption(this)">د) عدم امکان ایجاد Kernel جدید</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>Compile کردن Kernel می‌تواند پیچیده، زمان‌بر و مستعد خطا باشد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۳: کدام دستور لیست Moduleهای Load شده در Kernel را نمایش می‌دهد؟</p>
+<div class="quiz-card"><p>❓ سوال ۱: کدام دستور برای نمایش ماژول‌های بارگذاری‌شده در کرنل استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>modinfo</code></button>
     <button onclick="selectOption(this)">ب) <code>lsmod</code></button>
     <button onclick="selectOption(this)">ج) <code>insmod</code></button>
     <button onclick="selectOption(this)">د) <code>modprobe</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lsmod</code> برای مشاهده Moduleهای Load شده است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>lsmod</code></strong><br><code>lsmod</code> لیست ماژول‌های بارگذاری‌شده در کرنل را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۴: برای مشاهده اطلاعات یک Module خاص از چه دستوری استفاده می‌کنیم؟</p>
+<div class="quiz-card"><p>❓ سوال ۲: تفاوت اصلی <code>insmod</code> و <code>modprobe</code> چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lsmod</code></button>
-    <button onclick="selectOption(this)">ب) <code>modprobe</code></button>
-    <button onclick="selectOption(this)">ج) <code>modinfo</code></button>
-    <button onclick="selectOption(this)">د) <code>insmod</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>modinfo module_name</code> اطلاعات Module را نمایش می‌دهد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۵: تفاوت مهم <code>insmod</code> و <code>modprobe</code> چیست؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>insmod</code> برای Disk و <code>modprobe</code> برای RAM است.</button>
-    <button onclick="selectOption(this)">ب) <code>modprobe</code> Dependencyها را مدیریت می‌کند ولی <code>insmod</code> این کار را به صورت خودکار انجام نمی‌دهد.</button>
-    <button onclick="selectOption(this)">ج) <code>insmod</code> فقط برای نمایش Moduleها است.</button>
+    <button onclick="selectOption(this)">الف) <code>insmod</code> فقط برای ماژول‌های USB است.</button>
+    <button onclick="selectOption(this)">ب) <code>modprobe</code> وابستگی‌ها را خودکار مدیریت می‌کند.</button>
+    <button onclick="selectOption(this)">ج) <code>insmod</code> سریع‌تر است.</button>
     <button onclick="selectOption(this)">د) هیچ تفاوتی ندارند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>insmod</code> بدون مدیریت خودکار Dependency و <code>modprobe</code> با مدیریت Dependency.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>modprobe</code> وابستگی‌های ماژول را به‌طور خودکار مدیریت می‌کند، در حالی که <code>insmod</code> این کار را نمی‌کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۶: کدام گزینه درباره Kernel Module صحیح است؟</p>
+<div class="quiz-card"><p>❓ سوال ۳: یک Kernel Module مخرب چه تهدیدی می‌تواند ایجاد کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Module همیشه باید به صورت دائمی داخل Kernel باقی بماند.</button>
-    <button onclick="selectOption(this)">ب) Module می‌تواند Load و سپس Unload شود.</button>
-    <button onclick="selectOption(this)">ج) Module فقط برای Partitioning استفاده می‌شود.</button>
-    <button onclick="selectOption(this)">د) Module هیچ ارتباطی با Driver ندارد.</button>
+    <button onclick="selectOption(this)">الف) فقط پیام خطا چاپ کند.</button>
+    <button onclick="selectOption(this)">ب) یک Rootkit ایجاد کرده و کنترل سیستم را در دست بگیرد.</button>
+    <button onclick="selectOption(this)">ج) فقط سرعت سیستم را کم کند.</button>
+    <button onclick="selectOption(this)">د) هیچ خطری ندارد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>یکی از مزیت‌های Module قابلیت Load و Unload است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>یک ماژول مخرب می‌تواند به Rootkit تبدیل شود و کنترل کامل سیستم را در دست بگیرد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۷: چرا Kernel Module می‌تواند از نظر امنیتی خطرناک باشد؟</p>
+<div class="quiz-card"><p>❓ سوال ۴: کدام دستور اطلاعات یک ماژول خاص را نمایش می‌دهد؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) چون Moduleها فقط در User Space اجرا می‌شوند.</button>
-    <button onclick="selectOption(this)">ب) چون Module مخرب می‌تواند در سطح Kernel اجرا شود.</button>
-    <button onclick="selectOption(this)">ج) چون Moduleها فقط برای USB هستند.</button>
-    <button onclick="selectOption(this)">د) چون Moduleها هیچ دسترسی به سیستم ندارند.</button>
+    <button onclick="selectOption(this)">الف) <code>lsmod</code></button>
+    <button onclick="selectOption(this)">ب) <code>modinfo</code></button>
+    <button onclick="selectOption(this)">ج) <code>insmod</code></button>
+    <button onclick="selectOption(this)">د) <code>rmmod</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>قدرت Kernel Module باعث می‌شود Module مخرب بتواند تهدید جدی ایجاد کند و یکی از زمینه‌های مرتبط با Rootkitها باشد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>modinfo</code></strong><br><code>modinfo</code> اطلاعاتی مانند مسیر، وابستگی‌ها و مجوز یک ماژول را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: پسوند رایج فایل Kernel Module چیست؟</p>
+<div class="quiz-card"><p>❓ سوال ۵: پسوند استاندارد فایل‌های Kernel Module چیست؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>.txt</code></button>
     <button onclick="selectOption(this)">ب) <code>.conf</code></button>
     <button onclick="selectOption(this)">ج) <code>.ko</code></button>
-    <button onclick="selectOption(this)">د) <code>.disk</code></button>
+    <button onclick="selectOption(this)">د) <code>.mod</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>Kernel Moduleها معمولاً با پسوند <code>.ko</code> شناخته می‌شوند.</div>
-</div>
-
-<div class="summary-box">
-    <h3>⭐ نکات طلایی جلسه ۳</h3>
-    <p>اگر فقط چند دقیقه برای مرور وقت داشتی، این قسمت را بخوان:</p>
-
-    <h4>Kernel Module چیست؟</h4>
-    <div class="code-container"><span class="code-label">تعریف</span><div class="code-block no-prompt">Module
- ↓
-قابلیت قابل اضافه شدن به Kernel</div></div>
-
-    <h4>دو روش اضافه کردن قابلیت</h4>
-    <div class="code-container"><span class="code-label">روش‌ها</span><div class="code-block no-prompt">1. Compile
-   ↓
-   کل Kernel
-
-2. Module
-   ↓
-   فقط بخش موردنیاز</div></div>
-
-    <h4>مزیت Module</h4>
-    <div class="code-container"><span class="code-label">مزایا</span><div class="code-block no-prompt">Fast
-Flexible
-Loadable
-Unloadable</div></div>
-
-    <h4>دستورات</h4>
-    <div class="code-container"><span class="code-label">دستورات</span><div class="code-block no-prompt">lsmod
- ↓
-Loaded Modules
-
-modinfo
- ↓
-Module Information
-
-insmod
- ↓
-Load Module
-(No automatic dependency handling)
-
-modprobe
- ↓
-Load Module
-(+ Dependency Handling)</div></div>
-
-    <h4>امنیت</h4>
-    <div class="code-container"><span class="code-label">تهدید</span><div class="code-block no-prompt">Malicious Module
-       ↓
-Kernel
-       ↓
-Potential Rootkit</div></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>.ko</code></strong><br>فایل‌های Kernel Module معمولاً با پسوند <code>.ko</code> (Kernel Object) شناخته می‌شوند.</div>
 </div>
 
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای جلسه ۳</strong><br>
-<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">                 Linux Kernel
-                      │
-          ┌───────────┴───────────┐
-          ↓                       ↓
-      Built-in              Kernel Module
-                                  │
-                         ┌────────┴────────┐
-                         ↓                 ↓
-                       Driver           Feature
-                         │
-                         ↓
-                      Hardware</div></div>
-
-<p>و:</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block no-prompt">lsmod     → لیست Moduleهای Load شده
-modinfo   → اطلاعات Module
-insmod    → Load بدون مدیریت خودکار Dependency
-modprobe  → Load + مدیریت Dependency</div></div>
-
-<p><strong>جلسه ۳ تمام شد.</strong></p>
-<p>در جلسه بعد وارد <strong>Disk Concepts — دیسک، Partition، Filesystem و Mount</strong> می‌شویم؛ این جلسه پایه‌ی مستقیم جلسات <code>fdisk</code>، LVM و RAID خواهد بود.</p>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>✅ جلسه ۳ به پایان رسید.</strong><br>
+<p>در جلسه بعدی به سراغ <strong>مفاهیم دیسک، پارتیشن‌بندی، سیستم‌فایل و Mount</strong> می‌رویم – پایه‌ای برای مباحث پیشرفته‌تر مانند LVM و RAID.</p>
 </div></div>
-` ,
+`
+,
 "ch3-disk-concepts": `
 <div class="section-header">
     <div class="section-badge">۳</div>
