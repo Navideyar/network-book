@@ -11898,15 +11898,13 @@ sudo insmod /path/to/my_driver.ko</div></div>
     </div>
 </div>
 
-<p>در سه جلسه قبل، مسیر را از <strong>Hardware</strong> و <strong>Kernel</strong> تا <strong>Kernel Module</strong> جلو آمدیم.</p>
+<p>در سه جلسه قبل، از <strong>Hardware</strong> و <strong>Kernel</strong> و <strong>Kernel Module</strong> عبور کردیم.</p>
 
-<p>حالا وارد یکی از مهم‌ترین بخش‌های فصل سوم می‌شویم:</p>
+<p>حالا می‌خواهیم یکی از مهم‌ترین بخش‌های کار با Linux را یاد بگیریم:</p>
 
-<blockquote><strong>Linux چگونه با Disk کار می‌کند؟</strong></blockquote>
+<blockquote><strong>Linux چگونه با Disk و Storage کار می‌کند؟</strong></blockquote>
 
-<p>در این جلسه هنوز قرار نیست وارد جزئیات <code>fdisk</code> شویم. هدف این است که اول ساختار ذهنی درستی بسازیم؛ چون اگر تفاوت <strong>Disk، Partition، Filesystem و Mount</strong> را نفهمیم، در جلسات <code>fdisk</code>، LVM و RAID دچار مشکل می‌شویم.</p>
-
-<p>در ادامه، ابتدا مفاهیم پایه را یاد می‌گیریم و در انتهای جلسه یک معرفی فشرده از <strong>LVM و RAID</strong> هم خواهیم داشت؛ جزئیات عملی آنها را در جلسات جداگانه انجام می‌دهیم.</p>
+<p>طبق درسنامه، در این جلسه هنوز وارد کار عملی <code>fdisk</code> نمی‌شویم؛ اول باید ساختار ذهنی درستی از Disk، Partition، Filesystem و Mount داشته باشیم.</p>
 
 <h2>اول از همه: Disk چیست؟</h2>
 
@@ -11914,140 +11912,76 @@ sudo insmod /path/to/my_driver.ko</div></div>
 
 <div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">Disk</div></div>
 
-<p>منظور یک وسیله ذخیره‌سازی فیزیکی است.</p>
+<p>منظورمان یک وسیله‌ی ذخیره‌سازی است.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">HDD
 SSD</div></div>
 
-<p>می‌توانند Disk باشند.</p>
+<p>هر دو می‌توانند به عنوان Disk در سیستم استفاده شوند.</p>
 
-<p>فرض کن یک هارد 500GB به سیستم اضافه کرده‌ای.</p>
-
-<p>در ابتدا چیزی شبیه این داریم:</p>
+<p>فرض کن یک SSD با ظرفیت 500GB به سیستم وصل کرده‌ای:</p>
 
 <div class="code-container"><span class="code-label">دیسک فیزیکی</span><div class="code-block no-prompt">Physical Disk
-      ↓
+     ↓
    500 GB</div></div>
 
-<p>اما Linux هنوز نمی‌داند دقیقاً چه ساختاری باید روی این فضا قرار بگیرد.</p>
+<p>اما آیا همین الان می‌توانی داخل آن فایل ایجاد کنی؟</p>
 
-<p>برای استفاده منطقی از Disk، معمولاً چند لایه داریم:</p>
+<p><strong>نه.</strong></p>
+
+<p>چون هنوز باید مشخص کنیم فضای Disk چگونه سازمان‌دهی شود.</p>
+
+<p>در یک سناریوی معمول، با این لایه‌ها روبه‌رو می‌شویم:</p>
 
 <div class="code-container"><span class="code-label">لایه‌ها</span><div class="code-block no-prompt">Physical Disk
       ↓
-Partition
+   Partition
       ↓
-Filesystem
+  Filesystem
       ↓
-Mount
+    Mount
       ↓
 Files & Directories</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>این نمودار را <strong>خیلی خوب یاد بگیر</strong>؛ پایه‌ی جلسات بعدی است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ این زنجیره یکی از مهم‌ترین چیزهای کل جلسه است.</strong></div></div>
 
-<h2>رابط‌های اتصال Disk</h2>
+<h2>Disk در Linux کجا دیده می‌شود؟</h2>
 
-<p>Diskها از طریق رابط‌های مختلفی می‌توانند به سیستم متصل شوند.</p>
-
-<p>سه موردی که در این مبحث باید بشناسی:</p>
-
-<div class="code-container"><span class="code-label">رابط‌ها</span><div class="code-block no-prompt">PATA
-SATA
-SCSI</div></div>
-
-<h3>PATA</h3>
-
-<p><code>PATA</code> یکی از رابط‌های قدیمی‌تر است.</p>
-
-<p>ویژگی‌های کلی:</p>
-<ul>
-    <li>Parallel</li>
-    <li>کابل پهن</li>
-    <li>قدیمی‌تر</li>
-    <li>نسبت به رابط‌های جدید محدودتر و کندتر</li>
-</ul>
-
-<p>تصویر ذهنی:</p>
-
-<div class="code-container"><span class="code-label">PATA</span><div class="code-block no-prompt">PATA
- ↓
-Parallel
- ↓
-Old / Wide Cable</div></div>
-
-<p>امروزه بیشتر با جنبه تاریخی آن مواجه می‌شویم.</p>
-
-<h3>SATA</h3>
-
-<p><code>SATA</code> یکی از رابط‌های بسیار رایج برای Storage است.</p>
-
-<p>SATA مخفف:</p>
-
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Serial ATA</div></div>
-
-<p>است.</p>
-
-<p>در مقایسه با PATA، انتقال داده به صورت Serial انجام می‌شود و طراحی کابل و رابط نیز متفاوت است.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">PATA → Parallel → قدیمی
-
-SATA → Serial → رایج</div></div>
-
-<h3>SCSI</h3>
-
-<p><code>SCSI</code> نیز یکی از رابط‌ها/استانداردهای مهم Storage است که به‌خصوص در محیط‌های Server اهمیت تاریخی و فنی زیادی داشته است.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">SCSI</span><div class="code-block no-prompt">SCSI
- ↓
-Storage / Server
- ↓
-High performance / Multiple devices</div></div>
-
-<p>در Linux نیز بسیاری از Diskها در قالب نام‌گذاری <code>sdX</code> دیده می‌شوند.</p>
-
-<h2>نام‌گذاری Disk در Linux</h2>
-
-<p>یکی از چیزهایی که از همین جلسه باید به آن عادت کنی، مسیرهای داخل:</p>
+<p>Linux سخت‌افزارها را از طریق Device Fileها در مسیر:</p>
 
 <div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev</div></div>
 
-<p>است.</p>
+<p>در اختیار سیستم قرار می‌دهد.</p>
+
+<p>بنابراین ممکن است Diskها را به شکل زیر ببینی:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda
+/dev/sdb
+/dev/sdc</div></div>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">/dev/sda
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">/dev/sda
+   ↓
+Disk اول
+
 /dev/sdb
-/dev/sdc</div></div>
+   ↓
+Disk دوم</div></div>
 
-<p>ممکن است Diskهای سیستم باشند.</p>
+<h2><code>sda</code> یعنی چه؟</h2>
 
-<p>به شکل ساده:</p>
+<p>به این نام دقت کن:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">/dev/sda
-      ↑
-      Disk A</div></div>
+<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">/dev/sda</div></div>
 
-<p>و:</p>
+<p>قسمت:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">/dev/sdb
-      ↑
-      Disk B</div></div>
+<div class="code-container"><span class="code-label">sd</span><div class="code-block no-prompt">sd</div></div>
 
-<h3><code>sda</code> یعنی چه؟</h3>
-
-<p>در نام‌هایی مانند:</p>
-
-<div class="code-container"><span class="code-label">نام‌گذاری</span><div class="code-block no-prompt">/dev/sda
-/dev/sdb
-/dev/sdc</div></div>
-
-<p>حرف آخر معمولاً Disk را از Disk دیگر متمایز می‌کند.</p>
+<p>به خانواده نام‌گذاری دستگاه‌های Storage اشاره می‌کند و حرف آخر معمولاً Diskها را از یکدیگر متمایز می‌کند.</p>
 
 <p>مثلاً:</p>
 
@@ -12055,45 +11989,69 @@ High performance / Multiple devices</div></div>
 sdb → Disk دوم
 sdc → Disk سوم</div></div>
 
-<p>پس اگر سیستم سه Disk داشته باشد، ممکن است چیزی شبیه این ببینیم:</p>
+<p>پس اگر سه Disk داشته باشیم، ممکن است:</p>
 
 <div class="code-container"><span class="code-label">سه دیسک</span><div class="code-block no-prompt">/dev/sda
 /dev/sdb
 /dev/sdc</div></div>
 
-<h3>Partition چگونه نام‌گذاری می‌شود؟</h3>
+<p>را ببینیم.</p>
 
-<p>اگر روی:</p>
+<h2>Interfaceهای Disk</h2>
 
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sda</div></div>
+<p>Diskها از طریق Interfaceهای مختلفی به سیستم متصل می‌شوند.</p>
 
-<p>Partition ایجاد کنیم، ممکن است داشته باشیم:</p>
+<p>در این مبحث سه مورد را بشناس:</p>
 
-<div class="code-container"><span class="code-label">پارتیشن‌ها</span><div class="code-block no-prompt">/dev/sda1
-/dev/sda2
-/dev/sda3</div></div>
+<div class="code-container"><span class="code-label">رابط‌ها</span><div class="code-block no-prompt">PATA
+SATA
+SCSI</div></div>
 
-<p>اینجا عدد نشان‌دهنده شماره Partition است.</p>
+<h3>PATA</h3>
 
-<p>پس:</p>
+<p>PATA یک Interface قدیمی‌تر است.</p>
 
-<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">/dev/sda
-     ↓
-     Disk
+<p>ویژگی کلی:</p>
 
-/dev/sda1
-     ↓
-     Partition 1
+<div class="code-container"><span class="code-label">PATA</span><div class="code-block no-prompt">PATA
+ ↓
+Parallel
+ ↓
+قدیمی‌تر
+ ↓
+کابل پهن</div></div>
 
-/dev/sda2
-     ↓
-     Partition 2</div></div>
+<p>امروزه بیشتر از نظر تاریخی با آن مواجه می‌شویم.</p>
 
-<p>این نام‌گذاری را در کار با <code>fdisk</code> بسیار زیاد خواهی دید.</p>
+<h3>SATA</h3>
+
+<p>SATA مخفف:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Serial ATA</div></div>
+
+<p>است.</p>
+
+<p>در مقایسه با PATA، انتقال داده به صورت Serial انجام می‌شود.</p>
+
+<p>برای حفظ کردن:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">PATA → Parallel → قدیمی
+
+SATA → Serial → رایج</div></div>
+
+<h3>SCSI</h3>
+
+<p>SCSI هم یکی از استانداردهای مهم Storage است که به‌خصوص در محیط‌های Server اهمیت دارد.</p>
+
+<p>برای این جلسه همین مقدار کافی است:</p>
+
+<div class="code-container"><span class="code-label">SCSI</span><div class="code-block no-prompt">SCSI
+ ↓
+Storage / Server</div></div>
 
 <h2>Partition چیست؟</h2>
 
-<p>حالا به مفهوم اصلی برسیم.</p>
+<p>حالا به یکی از مهم‌ترین مفاهیم می‌رسیم.</p>
 
 <p>فرض کن یک Disk داریم:</p>
 
@@ -12103,9 +12061,7 @@ sdc → Disk سوم</div></div>
 
 <div class="code-container"><span class="code-label">ظرفیت</span><div class="code-block no-prompt">500 GB</div></div>
 
-<p>می‌توانیم آن را به قسمت‌های منطقی تقسیم کنیم.</p>
-
-<p>مثلاً:</p>
+<p>می‌توانیم این Disk را به قسمت‌های منطقی تقسیم کنیم:</p>
 
 <div class="code-container"><span class="code-label">تقسیم</span><div class="code-block no-prompt">/dev/sda
 │
@@ -12113,55 +12069,87 @@ sdc → Disk سوم</div></div>
 ├── /dev/sda2 → 200 GB
 └── /dev/sda3 → 200 GB</div></div>
 
-<p>هر قسمت یک:</p>
+<p>هر کدام از این قسمت‌ها یک:</p>
 
 <div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">Partition</div></div>
 
-<p>است.</p>
+<p>هستند.</p>
 
-<p>بنابراین:</p>
+<p>پس:</p>
 
 <blockquote><strong>Partition یعنی تقسیم کردن فضای یک Disk به بخش‌های منطقی.</strong></blockquote>
 
+<h2>نام‌گذاری Partitionها</h2>
+
+<p>به این دو دقت کن:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">/dev/sda
+/dev/sda1</div></div>
+
+<p>اولی:</p>
+
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sda
+↓
+Disk</div></div>
+
+<p>دومی:</p>
+
+<div class="code-container"><span class="code-label">پارتیشن</span><div class="code-block no-prompt">/dev/sda1
+↓
+Partition اول</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sda
+│
+├── /dev/sda1
+├── /dev/sda2
+└── /dev/sda3</div></div>
+
+<p>یعنی Disk <code>sda</code> سه Partition دارد.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ پس:</strong><br>
+<code>/dev/sda  → Disk</code><br>
+<code>/dev/sda1 → Partition 1</code><br>
+<code>/dev/sda2 → Partition 2</code><br>
+<code>/dev/sda3 → Partition 3</code><br>
+این نام‌گذاری را در جلسه بعد هنگام کار با <code>fdisk</code> بسیار زیاد خواهی دید.</div></div>
+
 <h2>چرا Disk را Partition می‌کنیم؟</h2>
 
-<p>یکی از اهداف مهم Partitioning این است که بخش‌های مختلف اطلاعات را از هم جدا کنیم.</p>
-
-<p>مثلاً می‌توانیم بخشی از Disk را برای سیستم‌عامل و بخش دیگری را برای Data در نظر بگیریم.</p>
-
-<p>تصور کن همه چیز روی یک فضای واحد باشد:</p>
+<p>فرض کن تمام فضای Disk یک فضای واحد باشد:</p>
 
 <div class="code-container"><span class="code-label">بدون Partition</span><div class="code-block no-prompt">Disk
  ↓
 Everything</div></div>
 
-<p>اگر این فضا کاملاً پر شود، می‌تواند برای عملکرد و سرویس‌های سیستم مشکل ایجاد کند.</p>
+<p>می‌توانیم با Partition کردن، بخش‌های مختلف را از هم جدا کنیم.</p>
 
-<p>اما اگر فضا را منطقی تقسیم کنیم:</p>
+<p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">با Partition</span><div class="code-block no-prompt">Disk
- │
- ├── System
- │
- └── Data</div></div>
+│
+├── System
+│
+└── Data</div></div>
 
-<p>مدیریت فضا راحت‌تر می‌شود.</p>
+<p>این جداسازی می‌تواند مدیریت فضا را راحت‌تر کند.</p>
 
-<p>پس یکی از اهداف مهم Partitioning:</p>
+<p>پس یکی از اهداف Partitioning:</p>
 
-<blockquote><strong>جدا کردن داده‌های سیستم‌عامل از داده‌های کاربر و سایر داده‌ها است.</strong></blockquote>
+<blockquote><strong>جدا کردن بخش‌های مختلف داده و فضای سیستم است.</strong></blockquote>
 
 <h2>Partition Table چیست؟</h2>
 
-<p>حالا سؤال مهم‌تر:</p>
+<p>حالا یک سؤال مهم:</p>
 
-<p>Linux از کجا می‌فهمد Disk چگونه Partition شده است؟</p>
+<p>Linux از کجا می‌فهمد Partitionهای یک Disk کجا هستند؟</p>
 
-<p>اطلاعات مربوط به Partitionها در یک ساختار مشخص روی Disk نگهداری می‌شود که به آن:</p>
+<p>اطلاعات مربوط به ساختار Partitionهای Disk در چیزی به نام:</p>
 
 <div class="code-container"><span class="code-label">Partition Table</span><div class="code-block no-prompt">Partition Table</div></div>
 
-<p>می‌گوییم.</p>
+<p>نگهداری می‌شود.</p>
 
 <p>دو نوع بسیار مهم:</p>
 
@@ -12170,19 +12158,21 @@ GPT</div></div>
 
 <p>هستند.</p>
 
+<p>این قسمت برای LPIC-1 <strong>خیلی مهم</strong> است.</p>
+
 <h2>MBR چیست؟</h2>
 
-<p><code>MBR</code> مخفف:</p>
+<p>MBR مخفف:</p>
 
 <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Master Boot Record</div></div>
 
 <p>است.</p>
 
-<p>MBR روش قدیمی‌تر Partitioning است.</p>
+<p>یک روش قدیمی‌تر برای Partitioning است.</p>
 
-<p>یکی از محدودیت‌های مهم آن:</p>
+<p>یکی از محدودیت‌های معروف MBR:</p>
 
-<blockquote>حداکثر <strong>۴ Primary Partition</strong> داریم.</blockquote>
+<blockquote>حداکثر <strong>۴ Primary Partition</strong>.</blockquote>
 
 <p>مثلاً:</p>
 
@@ -12193,25 +12183,23 @@ GPT</div></div>
 ├── Primary 3
 └── Primary 4</div></div>
 
-<p>اما یک راه‌حل تاریخی برای این محدودیت وجود داشت.</p>
+<p>اما Linux و سیستم‌های قدیمی برای حل این محدودیت راهکاری داشتند.</p>
 
-<h2>Extended Partition</h2>
+<h2>Extended و Logical Partition</h2>
 
-<p>در MBR می‌توان یکی از Primary Partitionها را به:</p>
+<p>یکی از Primary Partitionها می‌توانست:</p>
 
 <div class="code-container"><span class="code-label">Extended</span><div class="code-block no-prompt">Extended Partition</div></div>
 
-<p>تبدیل کرد.</p>
+<p>باشد.</p>
 
-<p>سپس داخل Extended Partition می‌توان:</p>
+<p>بعد داخل آن می‌توان Partitionهای منطقی ایجاد کرد:</p>
 
 <div class="code-container"><span class="code-label">Logical</span><div class="code-block no-prompt">Logical Partition</div></div>
 
-<p>ساخت.</p>
+<p>مثلاً:</p>
 
-<p>به شکل ساده:</p>
-
-<div class="code-container"><span class="code-label">ساختار Extended</span><div class="code-block no-prompt">Disk
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
 │
 ├── Primary
 ├── Primary
@@ -12222,33 +12210,32 @@ GPT</div></div>
        ├── Logical
        └── Logical</div></div>
 
-<p>این ساختار برای عبور از محدودیت ۴ Primary Partition استفاده می‌شد.</p>
+<p>بنابراین:</p>
 
-<h3>شماره‌گذاری MBR در Linux</h3>
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Primary
+Extended
+Logical</div></div>
 
-<p>در ساختار سنتی MBR، Partitionهای Primary معمولاً از:</p>
+<p>را بیشتر در ساختار <strong>MBR</strong> می‌بینی.</p>
 
-<div class="code-container"><span class="code-label">شماره</span><div class="code-block no-prompt">1
-2
-3
-4</div></div>
+<h2>شماره‌گذاری در MBR</h2>
 
-<p>شماره‌گذاری می‌شوند.</p>
+<p>در مدل سنتی MBR معمولاً:</p>
 
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
+<div class="code-container"><span class="code-label">شماره‌گذاری</span><div class="code-block no-prompt">/dev/sda1
 /dev/sda2
 /dev/sda3
 /dev/sda4</div></div>
 
-<p>Partitionهای Logical معمولاً از شماره‌های بالاتر شروع می‌شوند؛ در مدل سنتی رایج:</p>
+<p>برای چهار Partition ابتدایی استفاده می‌شوند.</p>
+
+<p>Partitionهای Logical معمولاً از شماره‌های بالاتر شروع می‌شوند:</p>
 
 <div class="code-container"><span class="code-label">Logical</span><div class="code-block no-prompt">/dev/sda5
 /dev/sda6
 /dev/sda7</div></div>
 
-<p>بنابراین یک نکته مهم:</p>
+<p>پس یک تصویر ذهنی خوب:</p>
 
 <div class="code-container"><span class="code-label">شناسایی</span><div class="code-block no-prompt">sda1 → Primary
 sda2 → Primary
@@ -12259,11 +12246,9 @@ sda5 → Logical
 sda6 → Logical
 ...</div></div>
 
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>جزئیات شماره‌گذاری به ساختار Partition Table و ابزار مورد استفاده بستگی دارد؛ برای LPIC-1 همین مدل سنتی را باید بشناسی.</div></div>
+<p>این همان مدل سنتی‌ای است که برای LPIC-1 باید بشناسی.</p>
 
 <h2>GPT چیست؟</h2>
-
-<p><code>GPT</code> روش جدیدتر Partitioning است.</p>
 
 <p>GPT مخفف:</p>
 
@@ -12271,99 +12256,69 @@ sda6 → Logical
 
 <p>است.</p>
 
-<p>GPT برای رفع بسیاری از محدودیت‌های MBR طراحی شده است.</p>
+<p>GPT روش جدیدتر Partitioning است و برای برطرف کردن بسیاری از محدودیت‌های MBR طراحی شده است.</p>
 
-<p>در محیط‌های جدید معمولاً:</p>
+<p>به صورت آموزشی معمولاً این دو را کنار هم می‌بینیم:</p>
 
-<div class="code-container"><span class="code-label">UEFI + GPT</span><div class="code-block no-prompt">UEFI
-   ↓
-   GPT</div></div>
+<div class="code-container"><span class="code-label">جفت‌ها</span><div class="code-block no-prompt">BIOS  → MBR
+UEFI  → GPT</div></div>
 
-<p>را در کنار هم می‌بینیم.</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اما این را به عنوان یک قانون مطلق حفظ نکن.</strong><br>این فقط یک <strong>جفت آموزشی رایج</strong> است؛ از نظر فنی UEFI الزاماً به GPT محدود نیست.</div></div>
 
-<p>در مقابل، ساختار سنتی:</p>
+<h2>MBR در مقابل GPT</h2>
 
-<div class="code-container"><span class="code-label">BIOS + MBR</span><div class="code-block no-prompt">BIOS
-   ↓
-   MBR</div></div>
-
-<p>قرار می‌گیرد.</p>
-
-<h3>تعداد Partition در GPT</h3>
-
-<p>در محیط Linux و ابزارهای رایج، معمولاً با:</p>
-
-<div class="code-container"><span class="code-label">تعداد</span><div class="code-block no-prompt">128 Partitions</div></div>
-
-<p>به صورت پیش‌فرض مواجه می‌شوی.</p>
-
-<p>یکی از مزیت‌های مهم GPT این است که دیگر محدودیت:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">4 Primary Partition</div></div>
-
-<p>را مثل MBR ندارد.</p>
-
-<p>همچنین نیازی به:</p>
-
-<div class="code-container"><span class="code-label">Extended</span><div class="code-block no-prompt">Extended Partition</div></div>
-
-<p>برای عبور از این محدودیت نداریم.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">MBR
- ↓
-4 Primary
- ↓
-Extended / Logical
-
-GPT
- ↓
-Many Partitions
- ↓
-No Extended Partition Needed</div></div>
-
-<h3>مقایسه MBR و GPT</h3>
+<p>این جدول را خوب یاد بگیر:</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th>ویژگی</th><th>MBR</th><th>GPT</th></tr></thead>
 <tbody>
 <tr><td>نسل</td><td>قدیمی‌تر</td><td>جدیدتر</td></tr>
-<tr><td>ارتباط رایج با Boot</td><td>BIOS</td><td>UEFI</td></tr>
-<tr><td>Primary Partition</td><td>حداکثر ۴</td><td>معمولاً ۱۲۸ در Linux</td></tr>
-<tr><td>Extended Partition</td><td>دارد</td><td>نیاز ندارد</td></tr>
-<tr><td>Logical Partition</td><td>دارد</td><td>ساختار متفاوت، بدون Extended</td></tr>
+<tr><td>محدودیت Primary</td><td>حداکثر ۴</td><td>محدودیت مشابه ندارد</td></tr>
+<tr><td>Extended</td><td>دارد</td><td>ندارد</td></tr>
+<tr><td>Logical</td><td>دارد</td><td>ندارد</td></tr>
 <tr><td>کاربرد امروزی</td><td>سیستم‌های قدیمی</td><td>سیستم‌های جدید</td></tr>
 </tbody>
 </table>
 </div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>این را به صورت یک جفت حفظ کن:
-<div class="code-container"><span class="code-label">جفت‌ها</span><div class="code-block no-prompt">BIOS → MBR
-UEFI → GPT</div></div>
-<p>این یک ساده‌سازی آموزشی است؛ از نظر فنی UEFI می‌تواند با MBR هم کار کند، اما در طراحی‌های مدرن معمولاً UEFI + GPT را می‌بینیم.</p>
-</div></div>
+<p>در Linux و ابزارهای رایج، GPT معمولاً با <strong>۱۲۸ Partition</strong> به صورت پیش‌فرض دیده می‌شود.</p>
 
-<h2>Partition به تنهایی کافی نیست</h2>
+<h3>نکته امتحانی</h3>
 
-<p>فرض کن این را داریم:</p>
+<div class="code-container"><span class="code-label">MBR</span><div class="code-block no-prompt">MBR
+ ↓
+4 Primary
+ ↓
+Extended / Logical</div></div>
+
+<p>در مقابل:</p>
+
+<div class="code-container"><span class="code-label">GPT</span><div class="code-block no-prompt">GPT
+ ↓
+Many Partitions
+ ↓
+No Extended Partition</div></div>
+
+<h2>یک Partition به تنهایی کافی نیست</h2>
+
+<p>فرض کن داریم:</p>
 
 <div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1</div></div>
 
-<p>آیا همین الان می‌توانیم فایل‌هایی مثل:</p>
+<p>آیا می‌توانی همین الان فایل ایجاد کنی؟</p>
 
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file.txt
 photo.jpg
 database.db</div></div>
 
-<p>داخل آن ذخیره کنیم؟</p>
+<p><strong>نه.</strong></p>
 
-<p>نه.</p>
+<p>چون:</p>
 
-<p>Partition فقط یک <strong>فضای تقسیم‌شده</strong> در Disk است.</p>
+<blockquote>Partition فقط یک فضای تقسیم‌شده از Disk است.</blockquote>
 
-<p>برای اینکه بتوانیم فایل و Directory روی آن داشته باشیم، به:</p>
+<p>برای مدیریت فایل‌ها به چیزی به نام:</p>
 
 <div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">Filesystem</div></div>
 
@@ -12371,24 +12326,24 @@ database.db</div></div>
 
 <h2>Filesystem چیست؟</h2>
 
-<p>Filesystem ساختاری است که مشخص می‌کند فایل‌ها و Directoryها چگونه روی فضای Storage ذخیره و مدیریت شوند.</p>
+<p>Filesystem ساختاری است که مشخص می‌کند فایل‌ها و Directoryها چگونه روی Storage ذخیره و مدیریت شوند.</p>
 
-<p>مثلاً در Linux با Filesystemهایی مثل:</p>
+<p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">ext4
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">ext4
 XFS</div></div>
 
-<p>مواجه می‌شوی.</p>
+<p>دو Filesystem مهمی هستند که در Linux با آنها مواجه می‌شوی.</p>
 
-<p>به صورت ساده:</p>
+<p>تصویر ذهنی:</p>
 
 <div class="code-container"><span class="code-label">لایه</span><div class="code-block no-prompt">Partition
     ↓
 Filesystem
     ↓
-Files / Directories</div></div>
+Files & Directories</div></div>
 
-<h3>یک مثال</h3>
+<h2>مثال Partition + Filesystem</h2>
 
 <p>فرض کن:</p>
 
@@ -12396,13 +12351,13 @@ Files / Directories</div></div>
 
 <p>یک Partition است.</p>
 
-<p>حالا روی آن یک Filesystem مثل:</p>
+<p>حالا روی آن:</p>
 
 <div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4</div></div>
 
-<p>ایجاد می‌کنیم.</p>
+<p>می‌سازیم.</p>
 
-<p>پس:</p>
+<p>نتیجه:</p>
 
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sda1
      ↓
@@ -12410,39 +12365,37 @@ Files / Directories</div></div>
      ↓
 Files & Directories</div></div>
 
-<p>حالا این فضا آماده استفاده به عنوان یک Filesystem است.</p>
+<p>حالا این فضا از نظر Filesystem آماده استفاده است.</p>
 
-<h2>ساخت Filesystem یعنی چه؟</h2>
+<h2>ساخت Filesystem با <code>mkfs</code></h2>
 
-<p>برای ساخت Filesystem معمولاً از ابزارهای <code>mkfs</code> استفاده می‌کنیم.</p>
+<p>برای ساخت Filesystem می‌توان از ابزارهای <code>mkfs</code> استفاده کرد.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mkfs.ext4 /dev/sda1</div></div>
 
-<p>این دستور یک Filesystem از نوع <code>ext4</code> روی:</p>
+<p>یعنی:</p>
 
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1</div></div>
-
-<p>ایجاد می‌کند.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">فرآیند</span><div class="code-block no-prompt">Partition
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sda1
      ↓
 mkfs.ext4
      ↓
 ext4 Filesystem</div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته بسیار مهم</strong><br>ساخت Filesystem روی یک Partition می‌تواند اطلاعات موجود روی آن را از بین ببرد. بنابراین این دستور را روی Disk/Partition واقعی بدون اطمینان اجرا نمی‌کنیم.</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ هشدار مهم:</strong><br>اجرای <code>mkfs</code> روی یک Partition موجود می‌تواند اطلاعات آن را از بین ببرد. پس روی Disk واقعی بدون اطمینان اجرا نمی‌کنیم.</div></div>
 
-<h2>Mount چیست؟</h2>
+<h2>حالا Mount چیست؟</h2>
 
-<p>حالا Filesystem داریم.</p>
+<p>فرض کن Filesystem داریم:</p>
 
-<p>اما هنوز یک سؤال وجود دارد:</p>
+<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">/dev/sdb1
+     ↓
+    ext4</div></div>
 
-<blockquote>چطور Linux این Filesystem را در ساختار Directoryهای خودش در اختیار کاربر قرار دهد؟</blockquote>
+<p>یک سؤال:</p>
+
+<blockquote>Linux چطور این Filesystem را داخل ساختار Directoryهای خودش قرار دهد؟</blockquote>
 
 <p>اینجا مفهوم:</p>
 
@@ -12450,37 +12403,27 @@ ext4 Filesystem</div></div>
 
 <p>وارد می‌شود.</p>
 
-<p>فرض کن:</p>
+<p>مثلاً می‌توانیم آن را روی:</p>
 
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sdb1</div></div>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/data</div></div>
 
-<p>یک Partition است و روی آن:</p>
-
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4</div></div>
-
-<p>ساخته‌ایم.</p>
-
-<p>می‌توانیم آن را روی مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">/data</div></div>
-
-<p>Mount کنیم.</p>
+<p>Mount کنیم:</p>
 
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb1
     ↓
-  ext4
+   ext4
     ↓
- /data
+  /data
     ↓
 Files</div></div>
 
 <h2>Mount Point چیست؟</h2>
 
-<p>مسیر:</p>
+<p>در مثال بالا:</p>
 
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/data</div></div>
+<div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">/data</div></div>
 
-<p>در مثال بالا یک:</p>
+<p>یک:</p>
 
 <div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">Mount Point</div></div>
 
@@ -12497,15 +12440,15 @@ Files</div></div>
 ├── usr
 └── data   ← Mount Point</div></div>
 
-<p>اگر Filesystem را روی <code>/data</code> Mount کنیم، محتوای آن Filesystem از طریق <code>/data</code> قابل دسترسی خواهد بود.</p>
+<p>پس:</p>
+
+<blockquote><strong>Mount Point = محلی در Directory Tree که Filesystem روی آن Mount می‌شود.</strong></blockquote>
 
 <h2>دستور <code>mount</code></h2>
 
-<p>برای Mount کردن می‌توانیم از:</p>
+<p>برای Mount کردن می‌توانیم بنویسیم:</p>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mount /dev/sdb1 /data</div></div>
-
-<p>استفاده کنیم.</p>
 
 <p>یعنی:</p>
 
@@ -12515,74 +12458,74 @@ Filesystem
     ↓
 /data</div></div>
 
-<p>بعد از Mount:</p>
+<p>بعد:</p>
 
 <div class="code-container"><span class="code-label">دسترسی</span><div class="code-block">cd /data</div></div>
 
-<p>می‌توانیم وارد Filesystem شویم.</p>
+<p>وارد فضای آن Filesystem می‌شوی.</p>
 
-<h2>Mount کردن چه مفهومی دارد؟</h2>
+<h2>مفهوم واقعی Mount</h2>
 
-<p>یکی از مهم‌ترین چیزهایی که باید بفهمی این است:</p>
+<p>این تعریف را خوب یاد بگیر:</p>
 
 <blockquote><strong>Mount کردن یعنی متصل کردن یک Filesystem به درخت Directoryهای Linux.</strong></blockquote>
 
-<p>Linux یک ساختار درختی دارد که ریشه آن:</p>
+<p>Linux برخلاف Windows، یک درخت Directory واحد دارد که ریشه آن:</p>
 
 <div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
 
 <p>است.</p>
 
-<p>Filesystemهای مختلف می‌توانند در نقاط مختلف این درخت Mount شوند.</p>
-
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">                /
-        ┌───────┼────────┐
-        ↓       ↓        ↓
-      /home    /data    /backup
-                 ↑
-              Filesystem</div></div>
+<div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">/
+├── home
+├── var
+├── usr
+├── data
+└── backup</div></div>
 
-<h2>تفاوت Partition و Filesystem و Mount</h2>
+<p>می‌توانیم Filesystemهای مختلف را در قسمت‌های مختلف این درخت Mount کنیم.</p>
 
-<p>این سه مفهوم را نباید با هم قاطی کنی.</p>
+<h2>تفاوت مهم: Partition، Filesystem، Mount Point</h2>
+
+<p>این سه را <strong>هرگز با هم قاطی نکن.</strong></p>
 
 <h3>Partition</h3>
-<p>یک بخش از Disk است:</p>
+<p>بخشی از Disk:</p>
 <div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
 <h3>Filesystem</h3>
-<p>ساختار ذخیره فایل روی آن فضاست:</p>
+<p>ساختار مدیریت فایل:</p>
 <div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4</div></div>
 
 <h3>Mount Point</h3>
-<p>محلی در Directory Tree است که Filesystem به آن متصل می‌شود:</p>
+<p>محلی که Filesystem به Directory Tree متصل می‌شود:</p>
 <div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">/data</div></div>
 
 <p>پس:</p>
 
 <div class="code-container"><span class="code-label">زنجیره کامل</span><div class="code-block no-prompt">/dev/sdb1
      ↓
-  Partition
+ Partition
      ↓
-   ext4
+    ext4
      ↓
-Filesystem
+ Filesystem
      ↓
-  /data
+   /data
      ↓
 Mount Point</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>این یکی از مهم‌ترین زنجیره‌های این جلسه است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ این یکی از مهم‌ترین قسمت‌های جلسه است.</strong></div></div>
 
-<h2>آیا هر Disk الزاماً Partition دارد؟</h2>
+<h2>آیا هر Disk حتماً Partition دارد؟</h2>
 
-<p>نه.</p>
+<p><strong>نه.</strong></p>
 
-<p>از نظر فنی می‌توان بعضی Filesystemها را مستقیماً روی یک Block Device ایجاد کرد، اما در سناریوهای معمول، Disk را Partition می‌کنیم و روی Partitionها Filesystem می‌سازیم.</p>
+<p>از نظر فنی می‌توان در بعضی سناریوها مستقیماً روی یک Block Device Filesystem ایجاد کرد.</p>
 
-<p>برای دوره LPIC-1 فعلاً مدل اصلی را این‌طور در ذهن داشته باش:</p>
+<p>اما برای مدل اصلی LPIC-1 فعلاً این ساختار را در ذهن داشته باش:</p>
 
 <div class="code-container"><span class="code-label">مدل اصلی</span><div class="code-block no-prompt">Disk
  ↓
@@ -12592,13 +12535,17 @@ Filesystem
  ↓
 Mount</div></div>
 
-<h2><code>/</code> چیست؟</h2>
+<p>بعداً وقتی وارد LVM و RAID شویم، می‌بینی که این مسیر همیشه دقیقاً همین نیست.</p>
 
-<p>در Linux، همه چیز از یک ریشه شروع می‌شود:</p>
+<h2><code>/</code> در Linux</h2>
 
-<div class="code-container"><span class="code-label">Root</span><div class="code-block no-prompt">/</div></div>
+<p>همه Directoryها در Linux در نهایت زیر:</p>
 
-<p>که به آن:</p>
+<div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
+
+<p>قرار دارند.</p>
+
+<p>به آن:</p>
 
 <div class="code-container"><span class="code-label">Root Directory</span><div class="code-block no-prompt">Root Directory</div></div>
 
@@ -12607,51 +12554,73 @@ Mount</div></div>
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/
-├── bin
 ├── boot
 ├── dev
 ├── etc
 ├── home
-├── var
 ├── usr
+├── var
 └── ...</div></div>
 
-<p>برخلاف Windows که معمولاً با:</p>
+<p>این با مدل رایج Windows متفاوت است:</p>
 
-<div class="code-container"><span class="code-label">Windows</span><div class="code-block no-prompt">C:
+<div class="code-container"><span class="code-label">ویندوز</span><div class="code-block no-prompt">C:
 D:
 E:</div></div>
 
-<p>کار می‌کنیم، Linux یک Directory Tree واحد دارد.</p>
+<p>Linux یک Directory Tree واحد دارد.</p>
 
-<p>Filesystemهای مختلف می‌توانند در قسمت‌های مختلف این Tree Mount شوند.</p>
+<h2>Mount دائمی و <code>/etc/fstab</code></h2>
+
+<p>اگر با:</p>
+
+<div class="code-container"><span class="code-label">mount</span><div class="code-block">mount</div></div>
+
+<p>Filesystem را Mount کنی، این Mount معمولاً دستی است.</p>
+
+<p>اما اگر بخواهی بعد از Reboot نیز Filesystem دوباره Mount شود، معمولاً از:</p>
+
+<div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
+
+<p>استفاده می‌کنیم.</p>
+
+<p>تصویر ذهنی:</p>
+
+<div class="code-container"><span class="code-label">نقش fstab</span><div class="code-block no-prompt">/etc/fstab
+     ↓
+Persistent Mount Configuration
+     ↓
+Mount هنگام Boot</div></div>
+
+<p>فعلاً همین مقدار برای جلسه کافی است؛ در اینجا وارد جزئیات <code>fstab</code> نمی‌شویم.</p>
 
 <h2>یک مثال کامل</h2>
 
-<p>فرض کن دو Disk داریم:</p>
+<p>حالا همه چیز را کنار هم قرار بده.</p>
 
-<div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">/dev/sda
-/dev/sdb</div></div>
+<p>فرض کن Disk داریم:</p>
 
-<p>روی Disk دوم یک Partition ایجاد می‌کنیم:</p>
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
+
+<p>ابتدا یک Partition داریم:</p>
 
 <div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
-<p>بعد Filesystem می‌سازیم:</p>
+<p>بعد روی آن Filesystem می‌سازیم:</p>
 
 <div class="code-container"><span class="code-label">ساخت</span><div class="code-block">sudo mkfs.ext4 /dev/sdb1</div></div>
 
-<p>بعد یک Directory ایجاد می‌کنیم:</p>
+<p>بعد Directory می‌سازیم:</p>
 
 <div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">sudo mkdir /data</div></div>
 
-<p>و آن را Mount می‌کنیم:</p>
+<p>و در نهایت:</p>
 
 <div class="code-container"><span class="code-label">Mount</span><div class="code-block">sudo mount /dev/sdb1 /data</div></div>
 
-<p>در نهایت:</p>
+<p>نتیجه:</p>
 
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb
+<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">/dev/sdb
     ↓
 /dev/sdb1
     ↓
@@ -12659,41 +12628,17 @@ E:</div></div>
     ↓
   /data
     ↓
-Files</div></div>
+ Files</div></div>
 
-<p>این دقیقاً همان مسیری است که در کار عملی با Disk دنبال می‌کنیم.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ اگر این زنجیره را بفهمی، بخش بزرگی از پایه Storage در Linux را فهمیده‌ای.</strong></div></div>
 
-<h2>Mount دائمی و <code>/etc/fstab</code></h2>
+<h2>حالا LVM کجای داستان قرار می‌گیرد؟</h2>
 
-<p>یک نکته مهم دیگر:</p>
+<p>فعلاً فقط <strong>اشاره‌ای</strong> داشته باشیم.</p>
 
-<p>Mount با دستور:</p>
+<p>در حالت ساده:</p>
 
-<div class="code-container"><span class="code-label">mount</span><div class="code-block">mount</div></div>
-
-<p>معمولاً به شکل دستی انجام می‌شود.</p>
-
-<p>اگر سیستم Reboot شود، برای Mountهای دائمی معمولاً از:</p>
-
-<div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
-
-<p>استفاده می‌کنیم.</p>
-
-<p>در جلسات آینده بیشتر با این موضوع کار خواهیم کرد.</p>
-
-<p>فعلاً فقط این رابطه را بدان:</p>
-
-<div class="code-container"><span class="code-label">رابطه</span><div class="code-block no-prompt">/etc/fstab
-     ↓
-Persistent Mount Configuration</div></div>
-
-<p>یعنی اطلاعات لازم برای Mount شدن Filesystemها هنگام Boot می‌تواند در این فایل قرار گیرد.</p>
-
-<h2>حالا LVM را کجا قرار دهیم؟</h2>
-
-<p>تا اینجا داشتیم:</p>
-
-<div class="code-container"><span class="code-label">تا اینجا</span><div class="code-block no-prompt">Disk
+<div class="code-container"><span class="code-label">ساده</span><div class="code-block no-prompt">Disk
  ↓
 Partition
  ↓
@@ -12701,27 +12646,17 @@ Filesystem
  ↓
 Mount</div></div>
 
-<p>اما LVM یک لایه جدید ایجاد می‌کند.</p>
+<p>اما LVM یک لایه منطقی اضافه می‌کند.</p>
 
-<p>LVM مخفف:</p>
+<p>LVM یعنی:</p>
 
 <div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Logical Volume Manager</div></div>
 
-<p>است.</p>
-
-<p>هدف اصلی آن این است که مدیریت فضای Storage را انعطاف‌پذیرتر کند.</p>
-
-<p>به جای اینکه مستقیماً فقط با Partitionهای فیزیکی کار کنیم، یک لایه منطقی ایجاد می‌کنیم.</p>
-
-<h2>ساختار LVM</h2>
-
-<p>سه مفهوم اصلی LVM:</p>
+<p>و سه مفهوم اصلی دارد:</p>
 
 <div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">PV
 VG
 LV</div></div>
-
-<p>هستند.</p>
 
 <p>یعنی:</p>
 
@@ -12729,606 +12664,189 @@ LV</div></div>
 Volume Group
 Logical Volume</div></div>
 
-<h3>Physical Volume — PV</h3>
+<p>ساختار کلی:</p>
 
-<p>اول Disk یا Partition را به LVM معرفی می‌کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">sudo pvcreate /dev/sdb</div></div>
-
-<p>در اینجا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb
-    ↓
-Physical Volume</div></div>
-
-<p>می‌شود.</p>
-
-<p>PV می‌تواند بر اساس سناریو روی Disk یا Partition قرار بگیرد.</p>
-
-<h3>Volume Group — VG</h3>
-
-<p>حالا می‌توانیم یک یا چند PV را در یک گروه قرار دهیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">sudo vgcreate my_vg /dev/sdb /dev/sdc</div></div>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sdb ──┐
-           ├──→ my_vg
-/dev/sdc ──┘</div></div>
-
-<p>این:</p>
-
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">my_vg</div></div>
-
-<p>یک:</p>
-
-<div class="code-container"><span class="code-label">Volume Group</span><div class="code-block no-prompt">Volume Group</div></div>
-
-<p>است.</p>
-
-<h3>Logical Volume — LV</h3>
-
-<p>حالا از فضای VG می‌توانیم Logical Volume بسازیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">sudo lvcreate -L 10G -n my_lv my_vg</div></div>
-
-<p>یعنی از:</p>
-
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">my_vg</div></div>
-
-<p>یک Logical Volume با اندازه:</p>
-
-<div class="code-container"><span class="code-label">اندازه</span><div class="code-block no-prompt">10G</div></div>
-
-<p>و نام:</p>
-
-<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">my_lv</div></div>
-
-<p>ایجاد می‌کنیم.</p>
-
-<p>ساختار:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sdb ──┐
-           │
-           ├──→ VG: my_vg
-           │        ↓
-/dev/sdc ──┘       LV: my_lv</div></div>
-
-<h2>چرا LVM مهم است؟</h2>
-
-<p>فرض کن یک Partition معمولی داری و بعداً فضای آن کم می‌شود.</p>
-
-<p>در ساختار سنتی، تغییر اندازه Partition می‌تواند محدودیت‌ها و پیچیدگی‌های خودش را داشته باشد.</p>
-
-<p>LVM یک لایه انعطاف‌پذیرتر ایجاد می‌کند.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Physical Storage
-       ↓
-      LVM
-       ↓
-Logical Volumes
-       ↓
+<div class="code-container"><span class="code-label">ساختار LVM</span><div class="code-block no-prompt">Disk / Partition
+      ↓
+     PV
+      ↓
+     VG
+      ↓
+     LV
+      ↓
 Filesystem
-       ↓
+      ↓
 Mount</div></div>
 
-<p>پس LVM به ما اجازه می‌دهد Storage را به شکل منطقی‌تر مدیریت کنیم.</p>
+<p>در جلسات ۶ و ۷ دقیقاً می‌رویم سراغ این ساختار و پیاده‌سازی آن.</p>
 
-<h2>ساختار کامل LVM</h2>
+<p>فعلاً فقط این را بدان:</p>
 
-<p>این نمودار را حفظ کن:</p>
+<blockquote><strong>LVM یک لایه مدیریت منطقی Storage است که بین فضای فیزیکی و Filesystem قرار می‌گیرد.</strong></blockquote>
 
-<div class="code-container"><span class="code-label">ساختار LVM</span><div class="code-block no-prompt">Physical Disk / Partition
-          ↓
-         PV
-          ↓
-         VG
-          ↓
-         LV
-          ↓
-     Filesystem
-          ↓
-        Mount</div></div>
+<h2>RAID کجای داستان قرار می‌گیرد؟</h2>
 
-<p>مثلاً:</p>
+<p>RAID هم یک چیز متفاوت است.</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb
-   ↓
-PV
-   ↓
-my_vg
-   ↓
-my_lv
-   ↓
-ext4
-   ↓
-/data</div></div>
+<p>RAID برای ترکیب چند Disk با هدف‌هایی مثل:</p>
 
-<p>این ساختار در جلسه LVM به صورت عملی پیاده‌سازی خواهد شد.</p>
-
-<h2>RAID چیست؟</h2>
-
-<p>حالا یک مفهوم دیگر که در فصل سوم داریم:</p>
-
-<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">RAID</div></div>
-
-<p>RAID برای ترکیب چند Disk و ایجاد ویژگی‌هایی مانند:</p>
-<ul>
-    <li>افزایش Performance</li>
-    <li>افزایش Redundancy</li>
-    <li>تحمل خرابی Disk</li>
-</ul>
+<div class="code-container"><span class="code-label">اهداف RAID</span><div class="code-block no-prompt">Performance
+Redundancy
+Fault Tolerance</div></div>
 
 <p>استفاده می‌شود.</p>
 
-<p>RAID مخفف:</p>
+<p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Redundant Array of Independent Disks</div></div>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk 1 ─┐
+Disk 2 ─┼──→ RAID
+Disk 3 ─┤
+Disk 4 ─┘</div></div>
 
-<p>است.</p>
+<p>بعد می‌توانیم روی حاصل آن Filesystem داشته باشیم:</p>
 
-<h2>چرا RAID؟</h2>
+<div class="code-container"><span class="code-label">RAID + Filesystem</span><div class="code-block no-prompt">Multiple Disks
+      ↓
+     RAID
+      ↓
+RAID Device
+      ↓
+Filesystem
+      ↓
+Mount</div></div>
 
-<p>فرض کن یک Disk داری:</p>
+<p>پس:</p>
 
-<div class="code-container"><span class="code-label">یک دیسک</span><div class="code-block no-prompt">Disk A</div></div>
+<blockquote><strong>RAID ≠ Filesystem</strong></blockquote>
 
-<p>اگر Disk خراب شود، اطلاعات ممکن است از دست بروند.</p>
-
-<p>اما اگر چند Disk را به شکل خاصی کنار هم قرار دهیم، بسته به RAID Level می‌توانیم:</p>
-
-<div class="code-container"><span class="code-label">مزایا</span><div class="code-block no-prompt">Speed
-+
-Redundancy</div></div>
-
-<p>داشته باشیم.</p>
-
-<p>اما نکته بسیار مهم:</p>
+<p>و:</p>
 
 <blockquote><strong>RAID جای Backup را نمی‌گیرد.</strong></blockquote>
 
-<p>RAID برای تحمل خرابی Hardware طراحی شده، نه برای محافظت در برابر همه انواع از دست رفتن اطلاعات.</p>
+<p>جزئیات RAID Levelها را در جلسات ۸ و ۹ یاد می‌گیریم.</p>
 
-<h2>RAID 0</h2>
+<h2>LVM و RAID را قاطی نکن</h2>
 
-<p>RAID 0 از:</p>
-
-<div class="code-container"><span class="code-label">Striping</span><div class="code-block no-prompt">Striping</div></div>
-
-<p>استفاده می‌کند.</p>
-
-<p>یعنی داده بین چند Disk پخش می‌شود.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Data
- ↓
-┌─────────┬─────────┐
-↓         ↓
-Disk 1    Disk 2</div></div>
-
-<p>مزیت:</p>
-
-<div class="code-container"><span class="code-label">مزیت</span><div class="code-block no-prompt">Performance ↑</div></div>
-
-<p>اما مشکل بزرگ:</p>
-
-<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">Fault Tolerance = 0</div></div>
-
-<p>اگر یکی از Diskها خراب شود، کل Array ممکن است غیرقابل استفاده شود.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">RAID 0
- ↓
-Speed
- ↓
-No Redundancy</div></div>
-
-<h2>RAID 1</h2>
-
-<p>RAID 1 از:</p>
-
-<div class="code-container"><span class="code-label">Mirroring</span><div class="code-block no-prompt">Mirroring</div></div>
-
-<p>استفاده می‌کند.</p>
-
-<p>یعنی داده روی دو Disk به صورت Mirror ذخیره می‌شود.</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Data
- ↓
-┌─────────┬─────────┐
-↓         ↓
-Disk 1    Disk 2
-  ↑         ↑
-  └── Same Data ──┘</div></div>
-
-<p>اگر یکی از Diskها خراب شود، Disk دیگر نسخه داده را دارد.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">RAID 1
- ↓
-Mirroring
- ↓
-Fault Tolerance</div></div>
-
-<h2>RAID 5</h2>
-
-<p>RAID 5 ترکیبی از:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">Striping
-+
-Distributed Parity</div></div>
-
-<p>است.</p>
-
-<p>یعنی داده و اطلاعات Parity بین Diskها توزیع می‌شوند.</p>
-
-<p>ویژگی مهم:</p>
-
-<blockquote>RAID 5 می‌تواند خرابی <strong>یک Disk</strong> را تحمل کند.</blockquote>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">RAID 5
- ↓
-Speed + Redundancy
- ↓
-1 Disk Failure</div></div>
-
-<h2>RAID 6</h2>
-
-<p>RAID 6 شبیه RAID 5 است، اما دو مجموعه Parity دارد.</p>
-
-<p>بنابراین:</p>
-
-<blockquote>RAID 6 می‌تواند خرابی <strong>دو Disk</strong> را به صورت همزمان تحمل کند.</blockquote>
-
-<p>به شکل ساده:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">RAID 5
- ↓
-1 Disk Failure
-
-RAID 6
- ↓
-2 Disk Failures</div></div>
-
-<h2>RAID 10</h2>
-
-<p>RAID 10 ترکیبی از:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">RAID 1
-+
-RAID 0</div></div>
-
-<p>است.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">جزئیات</span><div class="code-block no-prompt">RAID 1 → Mirroring
-RAID 0 → Striping</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">RAID 10
- ↓
-Mirroring + Striping
- ↓
-Speed + Redundancy</div></div>
-
-<p>حداقل معمول:</p>
-
-<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">4 Disks</div></div>
-
-<p>است.</p>
-
-<h2>RAID 4</h2>
-
-<p>RAID 4 از:</p>
-
-<div class="code-container"><span class="code-label">Striping</span><div class="code-block no-prompt">Striping
-+
-Dedicated Parity Disk</div></div>
-
-<p>استفاده می‌کند.</p>
-
-<p>مشکل آن این است که Disk مخصوص Parity می‌تواند به یک:</p>
-
-<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">Bottleneck</div></div>
-
-<p>تبدیل شود.</p>
-
-<p>به همین دلیل RAID 4 امروزه بسیار کمتر استفاده می‌شود و بیشتر برای شناخت مفهوم RAID مطرح است.</p>
-
-<h2>مقایسه RAIDها</h2>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>RAID</th><th>مکانیزم</th><th>مزیت اصلی</th><th>تحمل خرابی</th></tr></thead>
-<tbody>
-<tr><td>RAID 0</td><td>Striping</td><td>سرعت</td><td>❌ ندارد</td></tr>
-<tr><td>RAID 1</td><td>Mirroring</td><td>Redundancy</td><td>۱ Disk</td></tr>
-<tr><td>RAID 4</td><td>Striping + Dedicated Parity</td><td>Parity</td><td>۱ Disk</td></tr>
-<tr><td>RAID 5</td><td>Striping + Distributed Parity</td><td>تعادل Speed/Redundancy</td><td>۱ Disk</td></tr>
-<tr><td>RAID 6</td><td>Striping + Double Parity</td><td>تحمل خرابی بیشتر</td><td>۲ Disk</td></tr>
-<tr><td>RAID 10</td><td>RAID 1 + RAID 0</td><td>Speed + Redundancy</td><td>وابسته به چیدمان Mirrorها</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>Disk، Partition، LVM و RAID را قاطی نکن</h2>
-
-<p>حالا یکی از مهم‌ترین بخش‌های جلسه:</p>
-
-<p>این‌ها چهار مفهوم متفاوت هستند.</p>
-
-<h3>Disk</h3>
-<p>سخت‌افزار ذخیره‌سازی:</p>
-<div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">/dev/sda</div></div>
-
-<h3>Partition</h3>
-<p>تقسیم منطقی Disk:</p>
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1</div></div>
+<p>این دو هدف متفاوتی دارند.</p>
 
 <h3>LVM</h3>
-<p>یک لایه مدیریت منطقی Storage:</p>
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">PV → VG → LV</div></div>
+<p>تمرکز روی:</p>
+<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">مدیریت انعطاف‌پذیر فضای Storage</div></div>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">PV
+ ↓
+VG
+ ↓
+LV</div></div>
 
 <h3>RAID</h3>
-<p>ترکیب چند Disk برای اهدافی مانند:</p>
+<p>تمرکز روی مواردی مثل:</p>
 <div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">Performance
 Redundancy
 Fault Tolerance</div></div>
 
-<h2>یک نقشه کامل از Storage</h2>
+<p>پس:</p>
 
-<p>حالا کل فصل را از دید Storage ببین:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">LVM ≠ RAID</div></div>
 
-<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">                    Physical Disks
-                         │
-          ┌──────────────┴──────────────┐
-          ↓                             ↓
-     Partitioning                     RAID
-          │                             │
-       Partition                    RAID Array
-          │                             │
-          └──────────────┬──────────────┘
-                         ↓
-                        LVM
-                         │
-                   PV → VG → LV
-                         │
-                         ↓
-                    Filesystem
-                         │
-                         ↓
-                       Mount
-                         │
-                         ↓
-                 Files & Directories</div></div>
+<p>البته در معماری‌های واقعی ممکن است این تکنولوژی‌ها حتی با هم ترکیب شوند؛ اما فعلاً وارد آن نمی‌شویم.</p>
 
-<p>این نمودار کمک می‌کند بفهمی هر تکنولوژی <strong>در چه لایه‌ای</strong> قرار می‌گیرد.</p>
+<div class="summary-box">
+    <h3>🧠 نقشه ذهنی جلسه</h3>
+    <p>حالا کل چیزی که تا اینجا یاد گرفتیم:</p>
+    <div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                 Physical Storage
+                       │
+                       ↓
+                      Disk
+                       │
+                       ↓
+                   Partition
+                       │
+                       ↓
+                  Filesystem
+                       │
+                       ↓
+                     Mount
+                       │
+                       ↓
+              Files & Directories</div></div>
 
-<h2>یک مثال واقعی‌تر</h2>
+    <p>و دو تکنولوژی‌ای که بعداً به این معماری اضافه می‌شوند:</p>
+    <div class="code-container"><span class="code-label">LVM و RAID</span><div class="code-block no-prompt">              Storage
+                 │
+        ┌────────┴────────┐
+        ↓                 ↓
+       LVM               RAID
+        │                 │
+   PV → VG → LV       RAID Array
+        │                 │
+        └────────┬────────┘
+                 ↓
+            Filesystem
+                 ↓
+               Mount</div></div>
+</div>
 
-<p>فرض کن دو Disk داریم:</p>
+<h2>⭐ چیزهایی که باید تا اینجا بلد باشی</h2>
 
-<div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">/dev/sdb
-/dev/sdc</div></div>
+<p>اگر الان این موارد را می‌فهمی، مسیر را درست آمده‌ای:</p>
 
-<p>می‌توانیم آنها را وارد LVM کنیم:</p>
+<div class="code-container"><span class="code-label">مرور</span><div class="code-block no-prompt">/dev/sda
+   ↓
+Disk
 
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">/dev/sdb ──→ PV ──┐
-                  ├──→ VG
-/dev/sdc ──→ PV ──┘
-                    ↓
-                   LV
-                    ↓
-                  ext4
-                    ↓
-                  /data</div></div>
+/dev/sda1
+   ↓
+Partition
 
-<p>در این سناریو دیگر کاربر مستقیماً با <code>/dev/sdb</code> کار نمی‌کند؛ بلکه با Logical Volume کار می‌کند.</p>
-
-<p>این موضوع را در جلسه‌های ۶ و ۷ بسیار عمیق‌تر و عملی بررسی می‌کنیم.</p>
-
-<h2>یک مثال برای RAID</h2>
-
-<p>فرض کن چهار Disk داریم:</p>
-
-<div class="code-container"><span class="code-label">چهار دیسک</span><div class="code-block no-prompt">/dev/sdb
-/dev/sdc
-/dev/sdd
-/dev/sde</div></div>
-
-<p>می‌توانیم آنها را برای RAID 10 در نظر بگیریم:</p>
-
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">Disk 1 ── Mirror ── Disk 2
-              │
-              └── Stripe
-              
-Disk 3 ── Mirror ── Disk 4</div></div>
-
-<p>جزئیات ساخت Array و مدیریت آن را در جلسه RAID انجام می‌دهیم.</p>
-
-<p>فعلاً مهم این است که بدانیم RAID یک <strong>Storage Architecture</strong> است، نه Filesystem.</p>
-
-<h2>RAID و Filesystem یکی نیستند</h2>
-
-<p>این اشتباه رایج است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">RAID 5</div></div>
-
-<p>یک RAID Level است.</p>
-
-<p>ولی:</p>
-
-<div class="code-container"><span class="code-label">ext4</span><div class="code-block no-prompt">ext4</div></div>
-
-<p>یک Filesystem است.</p>
-
-<p>این دو یک چیز نیستند.</p>
-
-<p>ممکن است یک RAID Array داشته باشیم و بعد روی آن یک Filesystem بسازیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">Multiple Disks
-      ↓
-    RAID 5
-      ↓
- RAID Device
-      ↓
-    Filesystem
-      ↓
-      Mount</div></div>
-
-<h2>LVM و Filesystem هم یکی نیستند</h2>
-
-<p>همین موضوع درباره LVM نیز صدق می‌کند.</p>
-
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">LVM
+MBR
  ↓
-Logical Volume</div></div>
+Primary / Extended / Logical
 
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">Filesystem
+GPT
  ↓
-ext4 / XFS / ...</div></div>
+Partitioning جدیدتر
 
-<p>اینها دو لایه مختلف هستند.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">PV
- ↓
-VG
- ↓
-LV
- ↓
-ext4
- ↓
-/data</div></div>
-
-<h2>سناریوی نهایی برای جمع‌بندی</h2>
-
-<p>فرض کن یک Storage داریم و می‌خواهیم از آن برای <code>/data</code> استفاده کنیم.</p>
-
-<h3>روش ساده:</h3>
-<div class="code-container"><span class="code-label">روش ساده</span><div class="code-block no-prompt">Disk
- ↓
 Partition
  ↓
 Filesystem
  ↓
-Mount</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb
- ↓
+Mount
+
 /dev/sdb1
- ↓
-ext4
- ↓
-/data</div></div>
+     ↓
+    ext4
+     ↓
+   /data</div></div>
 
-<h3>روش LVM:</h3>
-<div class="code-container"><span class="code-label">روش LVM</span><div class="code-block no-prompt">Disk
- ↓
-PV
- ↓
-VG
- ↓
-LV
- ↓
-Filesystem
- ↓
-Mount</div></div>
+<p>و:</p>
 
-<h3>روش RAID:</h3>
-<div class="code-container"><span class="code-label">روش RAID</span><div class="code-block no-prompt">Multiple Disks
- ↓
-RAID
- ↓
-Filesystem
- ↓
-Mount</div></div>
+<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">LVM → PV → VG → LV</div></div>
 
-<p>و حتی می‌توان در معماری‌های پیشرفته‌تر چند لایه را ترکیب کرد:</p>
+<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">RAID → ترکیب چند Disk برای اهدافی مثل
+       Performance / Redundancy</div></div>
 
-<div class="code-container"><span class="code-label">ترکیب پیشرفته</span><div class="code-block no-prompt">Multiple Disks
-      ↓
-     RAID
-      ↓
-     LVM
-      ↓
-Filesystem
-      ↓
-Mount</div></div>
+<h2>🧩 یک سؤال مفهومی برای خودت</h2>
 
-<h2>جمع‌بندی جلسه</h2>
+<p>قبل از اینکه برویم سراغ ادامه جلسه، این را خودت جواب بده:</p>
 
-<p>در این جلسه چند مفهوم پایه‌ای را از هم جدا کردیم.</p>
+<p>اگر داشته باشیم:</p>
 
-<h3>Disk</h3>
-<p>وسیله فیزیکی ذخیره‌سازی:</p>
-<div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">/dev/sda
-/dev/sdb</div></div>
+<div class="code-container"><span class="code-label">سؤال</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
-<h3>Partition</h3>
-<p>تقسیم منطقی Disk:</p>
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1
-/dev/sda2</div></div>
+<p>و روی آن:</p>
 
-<h3>Partition Table</h3>
-<p>ساختار نگهداری اطلاعات Partitionها:</p>
-<div class="code-container"><span class="code-label">Partition Table</span><div class="code-block no-prompt">MBR
-GPT</div></div>
+<div class="code-container"><span class="code-label">سؤال</span><div class="code-block no-prompt">ext4</div></div>
 
-<h3>Filesystem</h3>
-<p>ساختاری برای مدیریت فایل‌ها:</p>
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4
-XFS
-...</div></div>
+<p>ساخته باشیم و بعد آن را روی:</p>
 
-<h3>Mount</h3>
-<p>وصل کردن Filesystem به Directory Tree:</p>
-<div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">/dev/sdb1
-   ↓
-Filesystem
-   ↓
-/data</div></div>
+<div class="code-container"><span class="code-label">سؤال</span><div class="code-block no-prompt">/data</div></div>
 
-<h3>LVM</h3>
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">PV
- ↓
-VG
- ↓
-LV
- ↓
-Filesystem
- ↓
-Mount</div></div>
+<p>Mount کنیم، هرکدام از این سه دقیقاً چه هستند؟</p>
 
-<h3>RAID</h3>
-<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">Multiple Disks
- ↓
-RAID Level
- ↓
-Speed / Redundancy / Fault Tolerance</div></div>
+<p><strong><code>/dev/sdb1</code> — <code>ext4</code> — <code>/data</code></strong></p>
+
+<p>اگر این سه را بدون نگاه کردن بتوانی توضیح بدهی، یعنی مهم‌ترین مفهوم جلسه را گرفته‌ای.</p>
 
 <h2>خودآزمایی</h2>
 
@@ -13404,118 +12922,7 @@ Speed / Redundancy / Fault Tolerance</div></div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>/dev/sdb1</code> Device مورد Mount و <code>/data</code> Mount Point است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: کدام گزینه ترتیب صحیح LVM را نشان می‌دهد؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) LV → PV → VG</button>
-    <button onclick="selectOption(this)">ب) VG → LV → PV</button>
-    <button onclick="selectOption(this)">ج) PV → VG → LV</button>
-    <button onclick="selectOption(this)">د) Filesystem → PV → VG</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>ساختار اصلی LVM: PV → VG → LV</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۹: دستور زیر چه کاری انجام می‌دهد؟</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">pvcreate /dev/sdb</div></div>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) ایجاد Filesystem</button>
-    <button onclick="selectOption(this)">ب) ایجاد Physical Volume برای LVM</button>
-    <button onclick="selectOption(this)">ج) ایجاد RAID 1</button>
-    <button onclick="selectOption(this)">د) Mount کردن Disk</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>pvcreate</code> یک Physical Volume برای LVM ایجاد می‌کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۰: کدام RAID برای افزایش سرعت با Striping استفاده می‌شود اما تحمل خرابی ندارد؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 0</button>
-    <button onclick="selectOption(this)">ب) RAID 1</button>
-    <button onclick="selectOption(this)">ج) RAID 5</button>
-    <button onclick="selectOption(this)">د) RAID 6</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br>RAID 0 از Striping برای افزایش سرعت استفاده می‌کند اما تحمل خرابی ندارد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۱: کدام RAID از Mirroring استفاده می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 0</button>
-    <button onclick="selectOption(this)">ب) RAID 1</button>
-    <button onclick="selectOption(this)">ج) RAID 5</button>
-    <button onclick="selectOption(this)">د) RAID 6</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>RAID 1 از Mirroring استفاده می‌کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۲: کدام RAID می‌تواند خرابی دو Disk را به صورت همزمان تحمل کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 0</button>
-    <button onclick="selectOption(this)">ب) RAID 1</button>
-    <button onclick="selectOption(this)">ج) RAID 5</button>
-    <button onclick="selectOption(this)">د) RAID 6</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: د</strong><br>RAID 6 با Double Parity می‌تواند خرابی دو Disk را تحمل کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۳: کدام گزینه درباره RAID 10 صحیح است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) ترکیب RAID 5 و RAID 6 است.</button>
-    <button onclick="selectOption(this)">ب) ترکیب RAID 1 و RAID 0 است.</button>
-    <button onclick="selectOption(this)">ج) فقط برای یک Disk استفاده می‌شود.</button>
-    <button onclick="selectOption(this)">د) هیچ Redundancy ندارد.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>RAID 10 ترکیبی از RAID 1 (Mirroring) و RAID 0 (Striping) است.</div>
-</div>
-
-<div class="summary-box">
-    <h3>⭐ نکات طلایی جلسه ۴</h3>
-    <p>اگر برای آزمون فقط چند دقیقه وقت داشتی، این قسمت را مرور کن:</p>
-    <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/dev/sda
- ↓
-Disk
-
-/dev/sda1
- ↓
-Partition</div></div>
-    <div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Partition
- ↓
-Filesystem
- ↓
-Mount Point</div></div>
-    <div class="code-container"><span class="code-label">MBR vs GPT</span><div class="code-block no-prompt">MBR
- ↓
-4 Primary
- ↓
-Extended / Logical
-
-GPT
- ↓
-معمولاً 128 Partition در Linux
- ↓
-No Extended Partition</div></div>
-    <div class="code-container"><span class="code-label">جفت‌ها</span><div class="code-block no-prompt">UEFI ↔ GPT
-BIOS ↔ MBR</div></div>
-    <div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">PV
- ↓
-VG
- ↓
-LV
- ↓
-Filesystem
- ↓
-Mount</div></div>
-    <div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">RAID 0 → Speed / No Fault Tolerance
-RAID 1 → Mirroring / 1 Disk Failure
-RAID 5 → Distributed Parity / 1 Disk Failure
-RAID 6 → Double Parity / 2 Disk Failures
-RAID 10 → RAID 1 + RAID 0 / Speed + Redundancy</div></div>
-    <p>و مهم‌تر از همه:</p>
-    <div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">Disk ≠ Partition
-Partition ≠ Filesystem
-Filesystem ≠ Mount
-LVM ≠ RAID
-RAID ≠ Filesystem</div></div>
-</div>
-
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای جلسه ۴</strong><br>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای</strong><br>
 <div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">Physical Disk
      ↓
 Partition
@@ -13524,13 +12931,19 @@ Filesystem
      ↓
 Mount
      ↓
-Files</div></div>
-<div class="code-container"><span class="code-label">نام‌گذاری</span><div class="code-block no-prompt">/dev/sda  → Disk
-/dev/sda1 → Partition</div></div>
-<div class="code-container"><span class="code-label">Partition Table</span><div class="code-block no-prompt">MBR → 4 Primary → Extended / Logical
-GPT → معمولاً 128 Partition در Linux</div></div>
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">PV → VG → LV → Filesystem → Mount</div></div>
-<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">0  → Speed
+Files
+
+/dev/sda  → Disk
+/dev/sda1 → Partition
+
+MBR → 4 Primary → Extended / Logical
+GPT → معمولاً 128 Partition در Linux
+
+LVM:
+PV → VG → LV → Filesystem → Mount
+
+RAID:
+0  → Speed
 1  → Mirror
 5  → 1 Disk Failure
 6  → 2 Disk Failures
@@ -13538,7 +12951,8 @@ GPT → معمولاً 128 Partition در Linux</div></div>
 <p><strong>جلسه ۴ تمام شد.</strong></p>
 <p>جلسه بعد وارد <strong><code>fdisk</code> — پارتیشن‌بندی عملی دیسک</strong> می‌شویم؛ آنجا همین مفاهیم را روی یک Disk واقعی در Lab پیاده می‌کنیم و با <code>fdisk</code>، Partition Table، ایجاد/حذف Partition و بررسی نتیجه با <code>lsblk</code> کار خواهیم کرد.</p>
 </div></div>
-` ,
+`
+,
 "ch3-fdisk": `
 <div class="section-header">
     <div class="section-badge">۳</div>
