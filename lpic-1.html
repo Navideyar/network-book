@@ -11091,1086 +11091,352 @@ RAID</div></div>
     </div>
 </div>
 
-<p>در جلسه قبل یک تصویر کلی از فصل سوم ساختیم و دیدیم که Linux برای کار با سخت‌افزار، دیسک و Storage به چند لایه مختلف متکی است.</p>
+<p>در این جلسه می‌خواهیم درک کنیم که <strong>سیستم‌عامل Linux چگونه سخت‌افزار را شناسایی، مدیریت و در اختیار کاربر قرار می‌دهد</strong>. فرقی نمی‌کند با یک دیسک سخت، کارت شبکه، درایو USB یا یک دستگاه PCI سروکار داشته باشیم؛ باید بدانیم:</p>
 
-<p>در این جلسه می‌خواهیم دقیق‌تر ببینیم:</p>
+<ul>
+    <li><strong>از کجا</strong> باید اطلاعات آن را پیدا کنیم (<code>/dev</code>, <code>/proc</code>, <code>/sys</code>)</li>
+    <li><strong>با چه ابزاری</strong> می‌توانیم آن را شناسایی و عیب‌یابی کنیم (<code>lshw</code>, <code>lsblk</code>, <code>lspci</code>, <code>lsusb</code>, ...)</li>
+    <li><strong>فرآیند بوت</strong> چگونه از روشن شدن دستگاه تا لاگین کاربر پیش می‌رود</li>
+</ul>
 
-<blockquote><strong>Linux سخت‌افزار را چطور می‌بیند و از چه ابزارهایی برای شناسایی و عیب‌یابی آن استفاده می‌کنیم؟</strong></blockquote>
+<p>این جلسه پایه‌ای برای مباحث بعدی مانند <strong>Kernel Modules</strong>, <strong>Disk Management</strong>, <strong>LVM</strong>, <strong>RAID</strong> و <strong>Systemd</strong> خواهد بود.</p>
 
-<p>هدف این جلسه فقط حفظ کردن چند دستور نیست. باید در پایان بتوانی وقتی مثلاً یک Disk، کارت شبکه، USB یا PCI Device داری، تشخیص بدهی <strong>از کجا باید اطلاعات آن را پیدا کنی.</strong></p>
+<h2>مرور کلی: لایه‌های سخت‌افزار در Linux</h2>
 
-<p>ساختار مفهومی جلسه:</p>
+<p>قبل از ورود به جزئیات، بیایید یک نمای کلی از لایه‌های مختلف سیستم را ببینیم:</p>
 
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Computer
-   ↓
-BIOS / UEFI
-   ↓
-GRUB
-   ↓
-Linux Kernel
-   ↓
-systemd
-   ↓
-Hardware Information
-   │
-   ├── /dev
-   ├── /proc
-   ├── /sys
-   │
-   └── Commands
-       ├── lshw
-       ├── lsdev
-       ├── lsblk
-       ├── lspci
-       └── lsusb</div></div>
+<div class="code-container"><span class="code-label">لایه‌ها</span><div class="code-block no-prompt">Computer (Hardware)
+        ↓
+BIOS / UEFI (Firmware)
+        ↓
+GRUB (Boot Loader)
+        ↓
+Linux Kernel (هسته)
+        ↓
+systemd (اولین فرایند در User Space)
+        ↓
+سرویس‌ها و Targetها
+        ↓
+ورود کاربر (Login)</div></div>
 
-<h2>فرآیند راه‌اندازی سیستم از صفر تا ورود کاربر</h2>
+<p>در ادامه هر مرحله را با دقت بیشتری بررسی می‌کنیم.</p>
 
-<p>قبل از اینکه سراغ <code>lshw</code> برویم، باید یک بار دیگر مسیر Boot را از ابتدا ببینیم؛ این بار کمی دقیق‌تر.</p>
+<h2>فرآیند بوت (Boot Process) از صفر تا ورود کاربر</h2>
 
-<p>وقتی سیستم را روشن می‌کنی، Linux هنوز اجرا نشده است.</p>
+<h3>روشن شدن دستگاه (Power On)</h3>
 
-<p>مراحل کلی:</p>
+<p>وقتی دکمه پاور را می‌زنید، <strong>Firmware</strong> سیستم (که روی مادربرد قرار دارد) کنترل را به دست می‌گیرد. این Firmware می‌تواند به دو نوع باشد:</p>
 
-<div class="code-container"><span class="code-label">مراحل Boot</span><div class="code-block no-prompt">Power On
-   ↓
-BIOS / UEFI
-   ↓
-GRUB
-   ↓
-Linux Kernel
-   ↓
-systemd
-   ↓
-.target / Startup
-   ↓
-Login</div></div>
+<ul>
+    <li><strong>BIOS</strong> (قدیمی‌تر)</li>
+    <li><strong>UEFI</strong> (جدیدتر)</li>
+</ul>
 
-<p>حالا هر مرحله را بررسی کنیم.</p>
+<p>در این مرحله، هنوز هیچ سیستم‌عاملی اجرا نشده است.</p>
 
-<h3>Power On</h3>
+<h3>POST (Power‑On Self‑Test)</h3>
 
-<p>اولین مرحله:</p>
+<p>پس از روشن شدن، Firmware یک سری تست‌های اولیه روی سخت‌افزارهای اصلی انجام می‌دهد تا مطمئن شود که همه چیز برای راه‌اندازی آماده است. به این تست‌ها <strong>POST</strong> گفته می‌شود.</p>
 
-<div class="code-container"><span class="code-label">روشن شدن</span><div class="code-block no-prompt">Power On</div></div>
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>در صورت بروز خطا در POST، ممکن است سیستم با یک سری بوق (Beep) یا پیغام خطا مواجه شود.</div></div>
 
-<p>است.</p>
+<h3>انتخاب دستگاه بوت و اجرای Boot Loader</h3>
 
-<p>یعنی سیستم روشن می‌شود و Firmware سیستم کنترل اولیه را به دست می‌گیرد.</p>
+<p>بعد از POST، Firmware به دنبال یک <strong>دستگاه بوت</strong> (مثل هارددیسک، SSD، USB یا DVD) می‌گردد و <strong>Boot Loader</strong> را از روی آن بارگیری می‌کند.</p>
 
-<p>در سیستم‌های قدیمی‌تر معمولاً:</p>
+<p>در اکثر سیستم‌های Linux، Boot Loader محبوب <strong>GRUB</strong> (GRand Unified Bootloader) است.</p>
 
-<div class="code-container"><span class="code-label">BIOS</span><div class="code-block no-prompt">BIOS</div></div>
+<p>وظیفه GRUB:</p>
 
-<p>و در سیستم‌های جدیدتر:</p>
+<ul>
+    <li>نمایش منوی بوت (در صورت وجود چندین سیستم‌عامل یا چندین کرنل)</li>
+    <li>بارگذاری <strong>Kernel</strong> و <strong>initramfs</strong> (یا initrd) در حافظه</li>
+    <li>انتقال کنترل به کرنل</li>
+</ul>
 
-<div class="code-container"><span class="code-label">UEFI</span><div class="code-block no-prompt">UEFI</div></div>
+<h3>بارگذاری Linux Kernel</h3>
 
-<p>را داریم.</p>
+<p>پس از اینکه GRUB کرنل را بارگذاری کرد، کرنل اجرا می‌شود. کرنل <strong>قلب</strong> سیستم‌عامل است و مسئولیت‌های کلیدی زیر را بر عهده دارد:</p>
 
-<h3>BIOS / UEFI</h3>
+<ul>
+    <li>شناسایی و مقداردهی اولیه سخت‌افزارها</li>
+    <li>راه‌اندازی درایورهای مورد نیاز</li>
+    <li>ایجاد ساختارهای داده برای مدیریت حافظه، پردازنده، و دستگاه‌ها</li>
+    <li>راه‌اندازی اولین فرایند در <strong>User Space</strong> (که معمولاً systemd است)</li>
+</ul>
 
-<p>BIOS یا UEFI در ابتدای فرآیند Boot اجرا می‌شود.</p>
+<p>در این مرحله، کرنل دستگاه‌های متصل را شناسایی می‌کند و اطلاعات مربوط به آنها را در ساختارهای مجازی مانند <code>/proc</code> و <code>/sys</code> در اختیار قرار می‌دهد.</p>
 
-<p>یکی از کارهای مهم این مرحله، انجام تست‌های اولیه سخت‌افزار است.</p>
+<h3>systemd – اولین فرایند در User Space</h3>
 
-<p>به این تست:</p>
+<p>بعد از اینکه کرنل بارگذاری شد، اولین فرایند در فضای کاربر (User Space) اجرا می‌شود. در توزیع‌های مدرن Linux، این فرایند <strong>systemd</strong> است (با PID=1).</p>
 
-<div class="code-container"><span class="code-label">POST</span><div class="code-block no-prompt">POST</div></div>
+<p>systemd وظیفه دارد:</p>
 
-<p>یا:</p>
+<ul>
+    <li>سرویس‌های سیستمی را راه‌اندازی کند</li>
+    <li>به <strong>Target</strong> (وضعیت هدف) مشخصی برسد (مثلاً multi‑user.target یا graphical.target)</li>
+    <li>در نهایت، محیط ورود کاربر (مانند getty یا Display Manager) را فعال کند</li>
+</ul>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Power-On Self-Test</div></div>
+<h3>Target و سرویس‌ها</h3>
 
-<p>می‌گوییم.</p>
+<p>systemd بر اساس <strong>Target</strong>ها عمل می‌کند. یک Target مجموعه‌ای از سرویس‌ها و وابستگی‌ها را تعریف می‌کند که باید در آن حالت خاص اجرا شوند. برای مثال:</p>
 
-<p>به زبان ساده:</p>
+<ul>
+    <li><code>multi-user.target</code> → حالت چندکاربری با خط فرمان</li>
+    <li><code>graphical.target</code> → حالت چندکاربری با محیط گرافیکی</li>
+</ul>
 
-<blockquote>سیستم بررسی می‌کند که سخت‌افزارهای اصلی برای شروع کار در وضعیت قابل استفاده هستند یا نه.</blockquote>
+<p>پس از اینکه سرویس‌های مورد نیاز راه‌اندازی شدند، سیستم آماده پذیرش کاربر است.</p>
 
-<p>مثلاً می‌توانیم به صورت ذهنی تصور کنیم:</p>
+<h3>ورود کاربر (Login)</h3>
 
-<div class="code-container"><span class="code-label">مراحل اولیه</span><div class="code-block no-prompt">Power On
-   ↓
-BIOS / UEFI
-   ↓
-POST
-   ↓
-Hardware Detection</div></div>
+<p>در نهایت، یک <strong>Getty</strong> (برای ورود از طریق کنسول) یا <strong>Display Manager</strong> (برای ورود گرافیکی) اجرا می‌شود و کاربر می‌تواند وارد سیستم شود.</p>
 
-<p>در این مرحله هنوز Linux Kernel اجرا نشده است.</p>
+<h2>BIOS در مقابل UEFI (نکات کلیدی)</h2>
 
-<h3>GRUB — Boot Loader</h3>
+<p>درک تفاوت بین BIOS و UEFI برای مدیریت بوت و دیسک بسیار مهم است.</p>
 
-<p>بعد از Firmware، نوبت به Boot Loader می‌رسد.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ویژگی</th><th>BIOS (Legacy)</th><th>UEFI</th></tr></thead>
+<tbody>
+<tr><td>نوع Firmware</td><td>قدیمی</td><td>جدید</td></tr>
+<tr><td>روش بوت</td><td>از روی <strong>MBR</strong> (Master Boot Record)</td><td>از روی <strong>ESP</strong> (EFI System Partition)</td></tr>
+<tr><td>پشتیبانی از دیسک‌های بزرگ</td><td>محدود (تا ۲ ترابایت)</td><td>پشتیبانی کامل از GPT</td></tr>
+<tr><td>پارتیشن مخصوص</td><td>ندارد</td><td>دارد (<code>/boot/efi</code> در Linux)</td></tr>
+<tr><td>سیستم فایل ESP</td><td>—</td><td>معمولاً FAT32</td></tr>
+</tbody>
+</table>
+</div>
 
-<p>در بسیاری از سیستم‌های Linux:</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته مهم برای LPIC-1</strong><br>
+<ul>
+    <li><strong>MBR</strong> در بوت سنتی (BIOS) استفاده می‌شود.</li>
+    <li><strong>GPT</strong> و <strong>ESP</strong> در بوت UEFI استفاده می‌شوند.</li>
+    <li>در سیستم‌های UEFI، معمولاً مسیر <code>/boot/efi</code> به ESP mount شده است.</li>
+</ul>
+</div></div>
 
-<div class="code-container"><span class="code-label">GRUB</span><div class="code-block no-prompt">GRUB</div></div>
+<h2>نمایش سخت‌افزار در Linux: سه شاخه کلیدی</h2>
 
-<p>را به عنوان Boot Loader می‌بینیم.</p>
+<p>Linux برای نمایش سخت‌افزار و دستگاه‌ها از <strong>سه شاخه مجازی</strong> اصلی استفاده می‌کند:</p>
 
-<p>GRUB وظیفه دارد Kernel مناسب را برای Boot انتخاب و بارگذاری کند.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>مسیر</th><th>نقش</th><th>نوع</th></tr></thead>
+<tbody>
+<tr><td><code>/dev</code></td><td>شامل <strong>فایل‌های دستگاه</strong> (Device Files) برای تعامل با سخت‌افزار</td><td>فایل‌های ویژه (Special Files)</td></tr>
+<tr><td><code>/proc</code></td><td>اطلاعات لحظه‌ای درباره کرنل، فرایندها، و سخت‌افزار (مجازی)</td><td>Virtual Filesystem</td></tr>
+<tr><td><code>/sys</code></td><td>اطلاعات ساختاریافته و سلسله‌مراتبی درباره دستگاه‌ها و درایورها</td><td>Virtual Filesystem</td></tr>
+</tbody>
+</table>
+</div>
 
-<p>به صورت ساده:</p>
+<p>بیایید هر کدام را دقیق‌تر ببینیم.</p>
 
-<div class="code-container"><span class="code-label">جایگاه GRUB</span><div class="code-block no-prompt">BIOS / UEFI
-      ↓
-     GRUB
-      ↓
-Linux Kernel</div></div>
+<h3><code>/dev</code> – فایل‌های دستگاه</h3>
 
-<p>بنابراین این سه مفهوم را با هم اشتباه نکن:</p>
+<p>در Unix/Linux، تقریباً همه چیز به صورت <strong>فایل</strong> در نظر گرفته می‌شود. دستگاه‌های سخت‌افزاری نیز از طریق فایل‌های مخصوصی در <code>/dev</code> قابل دسترسی هستند.</p>
 
-<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">BIOS / UEFI
-→ Firmware
+<ul>
+    <li>یک دیسک سخت ممکن است به صورت <code>/dev/sda</code> یا <code>/dev/nvme0n1</code> ظاهر شود.</li>
+    <li>پارتیشن‌های آن: <code>/dev/sda1</code>, <code>/dev/sda2</code> و ...</li>
+    <li>یک ترمینال سریال: <code>/dev/ttyS0</code></li>
+    <li>یک دستگاه USB: ممکن است به صورت <code>/dev/ttyUSB0</code> (اگر شبیه‌ساز سریال باشد) یا به صورت یک فایل بلوکی برای حافظه ذخیره‌سازی ظاهر شود.</li>
+</ul>
 
-GRUB
-→ Boot Loader
+<h4>دو نوع اصلی فایل دستگاه</h4>
 
-Linux Kernel
-→ هسته سیستم‌عامل</div></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>نوع</th><th>ویژگی</th><th>مثال</th></tr></thead>
+<tbody>
+<tr><td><strong>Character Device</strong></td><td>داده را به صورت <strong>جریانی</strong> (Stream) و ترتیبی منتقل می‌کند؛ دسترسی بایت‌به‌بایت</td><td>ترمینال (<code>/dev/tty</code>)، موس، صفحه کلید، پورت سریال</td></tr>
+<tr><td><strong>Block Device</strong></td><td>داده را به صورت <strong>بلوک‌هایی</strong> با اندازه ثابت منتقل می‌کند؛ دسترسی تصادفی (Random Access) امکان‌پذیر است</td><td>دیسک‌ها (<code>/dev/sda</code>، <code>/dev/nvme0n1</code>)</td></tr>
+</tbody>
+</table>
+</div>
 
-<h3>اجرای Linux Kernel</h3>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته آزمون</strong><br>دیسک‌ها همیشه <strong>Block Device</strong> هستند، در حالی که دستگاه‌های ورودی/خروجی کاراکتری معمولاً <strong>Character Device</strong> محسوب می‌شوند.</div></div>
 
-<p>بعد از GRUB، Kernel اجرا می‌شود:</p>
+<h3><code>/proc</code> – اطلاعات کرنل و سیستم</h3>
 
-<div class="code-container"><span class="code-label">ورود به Kernel</span><div class="code-block no-prompt">GRUB
- ↓
-Linux Kernel</div></div>
+<p><code>/proc</code> یک <strong>فایل‌سیستم مجازی</strong> است که توسط کرنل ساخته می‌شود و اطلاعات پویا درباره:</p>
 
-<p>Kernel هسته اصلی سیستم Linux است و نقش بسیار مهمی در مدیریت منابع و ارتباط با Hardware دارد.</p>
+<ul>
+    <li>فرایندهای در حال اجرا (هر فرایند یک زیرشاخه به نام PID دارد)</li>
+    <li>سخت‌افزار و پیکربندی کرنل</li>
+    <li>آمار سیستم</li>
+</ul>
+
+<p>را در اختیار کاربر قرار می‌دهد.</p>
+
+<p>دو فایل مهم در این جلسه:</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>فایل</th><th>محتوا</th></tr></thead>
+<tbody>
+<tr><td><code>/proc/interrupts</code></td><td>نشان‌دهنده <strong>IRQ</strong>ها (Interrupt Request) و تعداد وقفه‌های هر دستگاه</td></tr>
+<tr><td><code>/proc/ioports</code></td><td>نشان‌دهنده محدوده <strong>I/O Port</strong>هایی که دستگاه‌ها از آنها استفاده می‌کنند</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>کاربرد عملی</strong><br>اگر دستگاهی به درستی کار نمی‌کند، بررسی <code>/proc/interrupts</code> و <code>/proc/ioports</code> می‌تواند به شناسایی تداخل‌های سخت‌افزاری کمک کند.</div></div>
+
+<h3><code>/sys</code> – اطلاعات ساختاریافته دستگاه‌ها</h3>
+
+<p><code>/sys</code> نیز یک فایل‌سیستم مجازی است که اطلاعات دقیق‌تری درباره <strong>دستگاه‌ها، درایورها و روابط بین آنها</strong> در اختیار می‌گذارد. برخلاف <code>/proc</code> که بیشتر جنبه آماری و فرایندی دارد، <code>/sys</code> به صورت سلسله‌مراتبی بر اساس <strong>bus</strong>ها، <strong>device</strong>ها و <strong>driver</strong>ها سازماندهی شده است.</p>
 
 <p>برای مثال:</p>
 
-<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Hardware
-    ↑
-    │
-Linux Kernel
-    ↑
-    │
-Applications</div></div>
+<ul>
+    <li><code>/sys/block/sda/</code> → اطلاعات مربوط به دیسک <code>sda</code></li>
+    <li><code>/sys/class/net/eth0/</code> → اطلاعات مربوط به رابط شبکه <code>eth0</code></li>
+</ul>
 
-<p>در این مرحله Kernel سخت‌افزارهای مختلف را شناسایی و مدیریت می‌کند و ساختارهای لازم برای دسترسی به Hardware را در اختیار سیستم قرار می‌دهد.</p>
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>ابزارهایی مانند <code>udev</code> از <code>/sys</code> برای مدیریت پویای دستگاه‌ها استفاده می‌کنند.</div></div>
 
-<h3><code>systemd</code></h3>
+<h2>ابزارهای شناسایی سخت‌افزار (عملی)</h2>
 
-<p>بعد از راه‌اندازی Kernel، وارد فضای کاربر یا:</p>
+<p>حالا که با مکان‌های ذخیره اطلاعات آشنا شدیم، نوبت به <strong>دستورات عملی</strong> می‌رسد که می‌توانیم برای مشاهده و عیب‌یابی سخت‌افزار از آنها استفاده کنیم.</p>
 
-<div class="code-container"><span class="code-label">User Space</span><div class="code-block no-prompt">User Space</div></div>
+<h3><code>lshw</code> – اطلاعات جامع سخت‌افزار</h3>
 
-<p>می‌شویم.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lshw</div></div>
 
-<p>در سیستم‌های Linux مدرن، معمولاً:</p>
+<p>این دستور گزارشی <strong>کامل</strong> از تمام سخت‌افزارهای شناسایی شده شامل CPU، حافظه، مادربرد، دیسک‌ها، کارت‌های شبکه، دستگاه‌های PCI و USB ارائه می‌دهد.</p>
 
-<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd</div></div>
-
-<p>به عنوان اولین Process اصلی در User Space اجرا می‌شود.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">مراحل پس از Kernel</span><div class="code-block no-prompt">Linux Kernel
-      ↓
-   systemd
-      ↓
-   Services</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی آزمون</strong><br>
-<code>systemd</code> در سیستم‌های مبتنی بر systemd معمولاً اولین Process در User Space است.</div></div>
-
-<h3><code>.target</code> و Startup</h3>
-
-<p>بعد از شروع <code>systemd</code>، سیستم باید به وضعیت یا Target مناسب برسد و سرویس‌های موردنیاز را راه‌اندازی کند.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">systemd
-   ↓
-.target
-   ↓
-Services / Startup
-   ↓
-Login</div></div>
-
-<p><code>target</code> را فعلاً می‌توانی به عنوان یک <strong>هدف یا وضعیت مشخص از سیستم</strong> در نظر بگیری که مشخص می‌کند چه مجموعه‌ای از سرویس‌ها باید در دسترس باشند.</p>
-
-<p>در فصل پنجم که به <code>systemd</code> می‌رسیم، این موضوع را عمیق‌تر بررسی خواهیم کرد.</p>
-
-<h3>ورود کاربر</h3>
-
-<p>در نهایت سیستم به مرحله‌ای می‌رسد که کاربر می‌تواند وارد سیستم شود:</p>
-
-<div class="code-container"><span class="code-label">آماده</span><div class="code-block no-prompt">Users can login now</div></div>
-
-<p>پس کل مسیر:</p>
-
-<div class="code-container"><span class="code-label">چرخه کامل Boot</span><div class="code-block no-prompt">Power On
-    ↓
-BIOS / UEFI
-    ↓
-POST
-    ↓
-GRUB
-    ↓
-Linux Kernel
-    ↓
-systemd
-    ↓
-.target / Startup
-    ↓
-Login</div></div>
-
-<p>این مسیر را برای LPIC-1 خوب در ذهن داشته باش.</p>
-
-<h2>BIOS در مقابل UEFI</h2>
-
-<p>حالا باید تفاوت ساختاری BIOS و UEFI را بهتر بفهمیم.</p>
-
-<p>این تفاوت بعداً در بحث Disk Structure هم مهم می‌شود.</p>
-
-<h3>BIOS چیست؟</h3>
-
-<p>BIOS روش قدیمی‌تر Firmware برای راه‌اندازی سیستم است.</p>
-
-<p>در ساختار سنتی BIOS، Boot معمولاً با ساختار:</p>
-
-<div class="code-container"><span class="code-label">MBR</span><div class="code-block no-prompt">MBR</div></div>
-
-<p>ارتباط دارد.</p>
-
-<p>یکی از محدودیت‌های مهم BIOS این است که Firmware فضای بسیار محدودی برای کد اجرایی دارد.</p>
-
-<p>همچنین در مدل سنتی Boot:</p>
-
-<div class="code-container"><span class="code-label">BIOS سنتی</span><div class="code-block no-prompt">BIOS
- ↓
-MBR
- ↓
-Boot Loader
- ↓
-Operating System</div></div>
-
-<p>را داریم.</p>
-
-<h3>MBR چیست؟</h3>
-
-<p>در اینجا فعلاً فقط مفهوم کلی را یاد بگیر.</p>
-
-<p><code>MBR</code> در ابتدای Disk قرار می‌گیرد و در سیستم‌های BIOS/Legacy نقش مهمی در فرآیند Boot دارد.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">MBR</span><div class="code-block no-prompt">Disk
-└── MBR
-     ↓
-  Boot Loader
-     ↓
-   Kernel</div></div>
-
-<p>جزئیات MBR و Partition Table را در جلسه‌های مربوط به Disk و <code>fdisk</code> دقیق‌تر بررسی خواهیم کرد.</p>
-
-<h3>UEFI چیست؟</h3>
-
-<p>UEFI نسل جدیدتر Firmware است.</p>
-
-<p>در UEFI، روش Boot با BIOS سنتی تفاوت دارد.</p>
-
-<p>یکی از مفاهیم بسیار مهم در UEFI:</p>
-
-<div class="code-container"><span class="code-label">ESP</span><div class="code-block no-prompt">ESP</div></div>
-
-<p>است.</p>
-
-<p>ESP مخفف:</p>
-
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">EFI System Partition</div></div>
-
-<p>است.</p>
-
-<h3>EFI System Partition</h3>
-
-<p>در سیستم UEFI، یک Partition مخصوص برای فایل‌های مربوط به EFI وجود دارد.</p>
-
-<p>این Partition معمولاً با:</p>
-
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">FAT</div></div>
-
-<p>فرمت می‌شود.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
-   │
-   ├── EFI System Partition
-   │       ↓
-   │      FAT
-   │
-   └── Other Partitions</div></div>
-
-<p>در Linux معمولاً می‌توان آن را در مسیر:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/boot/efi</div></div>
-
-<p>مشاهده کرد.</p>
-
-<p>بنابراین:</p>
-
-<div class="code-container"><span class="code-label">رابطه</span><div class="code-block no-prompt">UEFI
- ↓
-ESP
- ↓
-/boot/efi</div></div>
-
-<p>را به عنوان یک رابطه مهم به خاطر بسپار.</p>
-
-<h3>مقایسه BIOS و UEFI</h3>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>ویژگی</th><th>BIOS</th><th>UEFI</th></tr></thead>
-<tbody>
-<tr><td>نسل</td><td>قدیمی‌تر</td><td>جدیدتر</td></tr>
-<tr><td>Boot سنتی</td><td>MBR</td><td>EFI System Partition</td></tr>
-<tr><td>Partition مخصوص EFI</td><td>ندارد</td><td>دارد</td></tr>
-<tr><td>مسیر رایج در Linux</td><td>—</td><td><code>/boot/efi</code></td></tr>
-<tr><td>Filesystem رایج ESP</td><td>—</td><td>FAT</td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>BIOS و UEFI هر دو Firmware هستند؛ GRUB Boot Loader است.</div></div>
-
-<h2>Linux سخت‌افزار را چگونه نمایش می‌دهد؟</h2>
-
-<p>حالا به موضوع اصلی جلسه می‌رسیم.</p>
-
-<p>Linux برای دستگاه‌های Hardware یک مدل خاص دارد.</p>
-
-<p>یکی از مهم‌ترین قسمت‌ها:</p>
-
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev</div></div>
-
-<p>است.</p>
-
-<h3>شاخه <code>/dev</code></h3>
-
-<p>در Linux بسیاری از Deviceها از طریق <strong>Device File</strong> در:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/dev</div></div>
-
-<p>نمایش داده می‌شوند.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Hardware
-   ↓
-Kernel
-   ↓
-Device Representation
-   ↓
-/dev</div></div>
-
-<p>برای مثال Diskها ممکن است به شکل:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda
-/dev/sdb</div></div>
-
-<p>دیده شوند.</p>
-
-<p>و Partitionهای آنها:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
-/dev/sda2</div></div>
-
-<p>باشند.</p>
-
-<h3>چرا Linux از File برای Device استفاده می‌کند؟</h3>
-
-<p>یکی از ایده‌های مهم Unix/Linux این است که بسیاری از منابع سیستم از طریق یک interface شبیه File در اختیار برنامه‌ها قرار می‌گیرند.</p>
-
-<p>بنابراین در <code>/dev</code> با فایل‌های معمولی مثل فایل‌های متنی سر و کار نداریم.</p>
-
-<p>اینها <strong>Special File</strong> هستند که Kernel از آنها برای دسترسی به Deviceها استفاده می‌کند.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">/dev/sda</div></div>
-
-<p>یک فایل معمولی نیست؛ نماینده یک Device است.</p>
-
-<h2>دو نوع مهم Device File</h2>
-
-<p>در Linux دو نوع مهم Device File داریم:</p>
-
-<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Character Device
-Block Device</div></div>
-
-<h3>Character Device</h3>
-
-<p>Character Device داده را به صورت جریانی از کاراکترها منتقل می‌کند.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Terminal
-Serial Device</div></div>
-
-<p>می‌توانند در این دسته قرار بگیرند.</p>
-
-<p>به شکل ذهنی:</p>
-
-<div class="code-container"><span class="code-label">Character Device</span><div class="code-block no-prompt">Character Device
-       ↓
-Data Stream
-       ↓
-Character by Character</div></div>
-
-<p>البته منظور از Character این نیست که فقط حروف الفبا منتقل می‌شوند؛ مفهوم اصلی، <strong>دسترسی جریانی و ترتیبی به داده</strong> است.</p>
-
-<h3>Block Device</h3>
-
-<p>Block Device برای دسترسی به داده در قالب Block استفاده می‌شود.</p>
-
-<p>دیسک‌ها نمونه بسیار مهمی هستند:</p>
-
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">HDD
-SSD
-Storage Device</div></div>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">Block Device</span><div class="code-block no-prompt">Block Device
-      ↓
-    Blocks
-      ↓
-Storage</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda</div></div>
-
-<p>یک نمونه مهم از Block Device است.</p>
-
-<h3>تفاوت Character و Block</h3>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>ویژگی</th><th>Character Device</th><th>Block Device</th></tr></thead>
-<tbody>
-<tr><td>روش دسترسی</td><td>جریانی</td><td>بلوکی</td></tr>
-<tr><td>نمونه</td><td>Terminal / Serial</td><td>HDD / SSD</td></tr>
-<tr><td>کاربرد اصلی</td><td>داده‌های جریانی</td><td>Storage</td></tr>
-<tr><td>مثال در <code>/dev</code></td><td>Deviceهای کاراکتری</td><td>Diskها</td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی آزمون</strong><br>
-<code>Disk → Block Device</code><br>
-<code>Terminal → Character Device</code></div></div>
-
-<h2><code>/proc</code> چیست؟</h2>
-
-<p>حالا یک شاخه مهم دیگر:</p>
-
-<div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">/proc</div></div>
-
-<p>را بررسی کنیم.</p>
-
-<p><code>/proc</code> یک <strong>Virtual Filesystem</strong> است.</p>
-
-<p>یعنی فایل‌های آن مانند فایل‌های معمولی روی Disk ذخیره نشده‌اند.</p>
-
-<p>Kernel اطلاعات موردنیاز را در اختیار این ساختار قرار می‌دهد.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Kernel
-   ↓
-/proc
-   ↓
-Information</div></div>
-
-<h3><code>/proc</code> چه کاربردی دارد؟</h3>
-
-<p><code>/proc</code> برای مشاهده اطلاعات مختلف سیستم و Kernel بسیار مفید است.</p>
-
-<p>همچنین برای <strong>عیب‌یابی Hardware و Kernel</strong> کاربرد دارد.</p>
-
-<p>در این جلسه دو مورد مهم را یاد می‌گیریم:</p>
-
-<div class="code-container"><span class="code-label">دو فایل</span><div class="code-block no-prompt">/proc/interrupts
-/proc/ioports</div></div>
-
-<h3><code>/proc/interrupts</code></h3>
-
-<p>فایل:</p>
-
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/proc/interrupts</div></div>
-
-<p>اطلاعات مربوط به Interruptها را نمایش می‌دهد.</p>
-
-<p>Interrupt یعنی یک Device یا رویداد سخت‌افزاری به CPU اعلام می‌کند که نیاز به توجه دارد.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Hardware Device
-      ↓
-   Interrupt
-      ↓
-     CPU</div></div>
-
-<p>در Linux اطلاعات مربوط به این Interruptها را می‌توان در:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block">/proc/interrupts</div></div>
-
-<p>دید.</p>
-
-<h3>IRQ چیست؟</h3>
-
-<p>Interrupt Request را معمولاً با:</p>
-
-<div class="code-container"><span class="code-label">IRQ</span><div class="code-block no-prompt">IRQ</div></div>
-
-<p>می‌شناسیم.</p>
-
-<p>پس وقتی می‌بینی:</p>
-
-<div class="code-container"><span class="code-label">/proc/interrupts</span><div class="code-block no-prompt">/proc/interrupts</div></div>
-
-<p>یادت باشد این فایل اطلاعات مربوط به Interrupt و IRQها را نشان می‌دهد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/proc/interrupts
-        ↓
-      IRQ
-        ↓
-Hardware Interrupt</div></div>
-
-<p>این اطلاعات برای عیب‌یابی Hardware می‌تواند مفید باشد.</p>
-
-<h3><code>/proc/ioports</code></h3>
-
-<p>فایل دیگری که در این مبحث مهم است:</p>
-
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/proc/ioports</div></div>
-
-<p>است.</p>
-
-<p>این فایل اطلاعات مربوط به <strong>I/O Ports</strong> را نشان می‌دهد.</p>
-
-<p>به زبان ساده، بعضی Deviceها برای ارتباط با CPU از محدوده‌های مشخصی از I/O Portها استفاده می‌کنند.</p>
-
-<p>بنابراین:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">/proc/ioports
-      ↓
-I/O Port Information</div></div>
-
-<p>در کنار <code>/proc/interrupts</code> می‌توان از این اطلاعات برای بررسی و عیب‌یابی Hardware استفاده کرد.</p>
-
-<h2><code>/sys</code> چیست؟</h2>
-
-<p>شاخه مهم بعدی:</p>
-
-<div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys</div></div>
-
-<p>است.</p>
-
-<p><code>/sys</code> نیز یک Virtual Filesystem است که توسط Kernel ارائه می‌شود و اطلاعات مربوط به Deviceها و Hardware را در اختیار User Space قرار می‌دهد.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Hardware
-   ↓
-Kernel
-   ↓
-/sys
-   ↓
-Hardware / Device Information</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">/proc
-→ اطلاعات مختلف Kernel و سیستم
-
-/sys
-→ اطلاعات ساختاریافته‌تر مربوط به Deviceها و Hardware</div></div>
-
-<h3>تفاوت <code>/dev</code>، <code>/proc</code> و <code>/sys</code></h3>
-
-<p>این سه را با هم اشتباه نکن.</p>
-
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev
- ↓
-Device Files</div></div>
-
-<div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">/proc
- ↓
-Kernel / Process / System Information</div></div>
-
-<div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys
- ↓
-Device / Hardware Information</div></div>
-
-<p>یک جدول خیلی مهم:</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>مسیر</th><th>مفهوم اصلی</th></tr></thead>
-<tbody>
-<tr><td><code>/dev</code></td><td>Device Fileها</td></tr>
-<tr><td><code>/proc</code></td><td>اطلاعات Virtual مربوط به Kernel/System</td></tr>
-<tr><td><code>/sys</code></td><td>اطلاعات Virtual مربوط به Device و Hardware</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>ابزارهای شناسایی Hardware</h2>
-
-<p>حالا می‌رسیم به قسمت مهم عملی.</p>
-
-<p>Linux ابزارهای مختلفی برای مشاهده Hardware دارد.</p>
-
-<p>مهم‌ترین‌هایی که در این جلسه می‌خواهیم بشناسیم:</p>
-
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lshw
-lsdev
-lsblk
-lspci
-lsusb</div></div>
-
-<p>هر کدام برای یک هدف متفاوت هستند.</p>
-
-<h2><code>lshw</code></h2>
-
-<p><code>lshw</code> یکی از ابزارهای اصلی برای مشاهده اطلاعات Hardware است.</p>
-
-<p>نام آن را می‌توان به صورت:</p>
-
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">lshw
- ↓
-list hardware</div></div>
-
-<p>در ذهن نگه داشت.</p>
-
-<p>دستور:</p>
-
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">sudo lshw</div></div>
-
-<p>اطلاعات گسترده‌ای درباره Hardware سیستم نمایش می‌دهد.</p>
-
-<p>مثلاً ممکن است اطلاعات مربوط به:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">CPU
-Memory
-Disk
-Network
-PCI Devices
-USB</div></div>
-
-<p>را ببینی.</p>
-
-<h3>چرا معمولاً <code>sudo lshw</code>؟</h3>
-
-<p>بعضی اطلاعات Hardware برای کاربر عادی به طور کامل قابل دسترسی نیستند.</p>
-
-<p>به همین دلیل معمولاً:</p>
-
-<div class="code-container"><span class="code-label">با sudo</span><div class="code-block">sudo lshw</div></div>
-
-<p>اطلاعات کامل‌تری در اختیار می‌گذارد.</p>
-
-<p>پس اگر:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">lshw</div></div>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">sudo lshw</div></div>
-
-<p>را مقایسه کنی، ممکن است خروجی دوم کامل‌تر باشد.</p>
-
-<h3>خروجی <code>lshw</code></h3>
-
-<p>خروجی <code>lshw</code> می‌تواند نسبتاً بزرگ باشد.</p>
-
-<p>به همین دلیل گزینه‌هایی برای محدود کردن خروجی هم وجود دارند.</p>
-
-<p>مثلاً:</p>
-
+<ul>
+    <li>به دلیل نیاز به دسترسی به اطلاعات سطح پایین، معمولاً باید با <code>sudo</code> اجرا شود.</li>
+    <li>با گزینه <code>-short</code> خروجی خلاصه‌تر می‌شود:</li>
+</ul>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block">sudo lshw -short</div></div>
 
-<p>یک نمای خلاصه‌تر از Hardware می‌دهد.</p>
+<ul>
+    <li>با گزینه <code>-class</code> می‌توانید یک دسته خاص مانند <code>disk</code> یا <code>network</code> را فیلتر کنید:</li>
+</ul>
+<div class="code-container"><span class="code-label">فیلتر</span><div class="code-block">sudo lshw -class disk</div></div>
 
-<p>به صورت مفهومی:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">lshw
- ↓
-Full Hardware Information
-
-lshw -short
- ↓
-Short Summary</div></div>
-
-<h2><code>lsdev</code></h2>
-
-<p>دستور:</p>
+<h3><code>lsdev</code> – اطلاعات دستگاه‌ها (از طریق <code>/proc</code>)</h3>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsdev</div></div>
 
-<p>برای نمایش اطلاعات کلی مربوط به Deviceها استفاده می‌شود.</p>
+<p>این دستور اطلاعات کلی درباره دستگاه‌ها، از جمله <strong>IRQ</strong> و <strong>I/O Port</strong> مربوط به هر دستگاه را نشان می‌دهد. در واقع اطلاعات خود را از <code>/proc/interrupts</code>، <code>/proc/ioports</code> و <code>/proc/dma</code> می‌گیرد.</p>
 
-<p>یکی از نکاتی که در خروجی آن می‌توان دید، ارتباط Deviceها با مواردی مانند:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">IRQ
-I/O Port</div></div>
-
-<p>است.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">lsdev
- ↓
-Device Information
- ↓
-IRQ / I/O</div></div>
-
-<h2><code>lsblk</code></h2>
-
-<p>یکی از مهم‌ترین دستورهای فصل Storage:</p>
+<h3><code>lsblk</code> – لیست Block Deviceها (دیسک‌ها و پارتیشن‌ها)</h3>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsblk</div></div>
 
-<p>است.</p>
+<p>این دستور به صورت <strong>درختی</strong> تمام دیسک‌ها و پارتیشن‌های سیستم را نمایش می‌دهد. خروجی شامل اطلاعاتی مانند اندازه، نوع (disk/part) و نقطه اتصال (mount point) است.</p>
 
-<p>نام آن را می‌توان این‌طور به خاطر سپرد:</p>
+<p>مثال خروجی:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">lsblk
- ↓
-list block devices</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda           8:0    0   50G  0 disk
+├─sda1        8:1    0    1G  0 part /boot
+└─sda2        8:2    0   49G  0 part /</div></div>
 
-<p>یعنی:</p>
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>این دستور برای شروع کار با دیسک‌ها بسیار مفید است و در مباحث بعدی (<code>fdisk</code>, <code>parted</code>, <code>LVM</code>) بارها از آن استفاده خواهید کرد.</div></div>
 
-<blockquote>نمایش Block Deviceها.</blockquote>
-
-<p>و همان‌طور که گفتیم، Diskها Block Device هستند.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">lsblk</div></div>
-
-<p>می‌تواند ساختاری شبیه این نشان دهد:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME        SIZE TYPE
-sda          50G disk
-├─sda1       1G part
-└─sda2      49G part</div></div>
-
-<p>اینجا:</p>
-
-<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">sda
- ↓
-Disk</div></div>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">sda1
-sda2
- ↓
-Partitions</div></div>
-
-<p>هستند.</p>
-
-<h3>چرا <code>lsblk</code> مهم است؟</h3>
-
-<p>قبل از Partition کردن Disk باید بدانیم چه Diskهایی داریم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-
-<p>یک انتخاب بسیار مناسب برای شروع بررسی Storage است.</p>
-
-<p>بعداً وقتی به:</p>
-
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">fdisk
-LVM
-RAID</div></div>
-
-<p>رسیدیم، <code>lsblk</code> بارها مورد استفاده قرار خواهد گرفت.</p>
-
-<h2><code>lspci</code></h2>
-
-<p>حالا اگر بخواهیم Deviceهای متصل به:</p>
-
-<div class="code-container"><span class="code-label">PCI Bus</span><div class="code-block no-prompt">PCI Bus</div></div>
-
-<p>را ببینیم، از:</p>
+<h3><code>lspci</code> – دستگاه‌های PCI</h3>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lspci</div></div>
 
-<p>استفاده می‌کنیم.</p>
+<p>تمام دستگاه‌های متصل به <strong>PCI Bus</strong> (مانند کارت گرافیک، کارت شبکه، کنترلرهای ذخیره‌سازی) را لیست می‌کند.</p>
 
-<p>مثلاً ممکن است کارت شبکه یا Controllerهای مختلف روی PCI قرار داشته باشند.</p>
+<ul>
+    <li>با گزینه <code>-v</code> یا <code>-vv</code> جزئیات بیشتری دریافت می‌کنید.</li>
+    <li>با گزینه <code>-k</code> می‌توانید ببینید که کدام <strong>درایور کرنل</strong> برای هر دستگاه استفاده شده است.</li>
+</ul>
 
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">lspci
- ↓
-PCI Devices</div></div>
-
-<h3>مثال ذهنی</h3>
-
-<p>فرض کن می‌خواهی بفهمی کارت شبکه سیستم چیست.</p>
-
-<p>اگر Device روی PCI باشد، می‌توانی:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lspci</div></div>
-
-<p>را بررسی کنی.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">lspci -k</div></div>
 
 <p>خروجی ممکن است چیزی شبیه این باشد:</p>
 
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Ethernet controller: ...</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">00:1f.2 SATA controller: Intel Corporation 82801IR/IO/IH (ICH9R/DO/DH) 6 port SATA Controller [AHCI mode]
+        Kernel driver in use: ahci</div></div>
 
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">PCI
- ↓
-lspci</div></div>
-
-<p>را حفظ کن.</p>
-
-<h2><code>lsusb</code></h2>
-
-<p>برای Deviceهای متصل به USB:</p>
+<h3><code>lsusb</code> – دستگاه‌های USB</h3>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsusb</div></div>
 
-<p>را داریم.</p>
-
-<p>نام آن:</p>
-
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">lsusb
- ↓
-list USB</div></div>
-
-<p>است.</p>
-
-<p>مثلاً اگر یک USB Device به سیستم متصل کرده باشی، می‌توانی با:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
-
-<p>لیست Deviceهای USB را مشاهده کنی.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">USB
- ↓
-lsusb</div></div>
-
-<h2>مقایسه ابزارها</h2>
-
-<p>این جدول را خوب یاد بگیر:</p>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
-<tbody>
-<tr><td><code>lshw</code></td><td>اطلاعات کلی و گسترده Hardware</td></tr>
-<tr><td><code>lsdev</code></td><td>اطلاعات کلی Deviceها</td></tr>
-<tr><td><code>lsblk</code></td><td>Block Deviceها، مخصوصاً Disk و Partition</td></tr>
-<tr><td><code>lspci</code></td><td>Deviceهای PCI</td></tr>
-<tr><td><code>lsusb</code></td><td>Deviceهای USB</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>یک روش سریع برای حفظ:</p>
-
-<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">lshw
- ↓
-Hardware
-
-lsdev
- ↓
-Devices
-
-lsblk
- ↓
-Block Devices
-
-lspci
- ↓
-PCI
-
-lsusb
- ↓
-USB</div></div>
-
-<h2>اگر بخواهیم یک Hardware را عیب‌یابی کنیم چه کنیم؟</h2>
-
-<p>فرض کن کاربر می‌گوید:</p>
-
-<blockquote>«یک Disk جدید به Linux وصل کرده‌ام ولی نمی‌دانم سیستم آن را شناخته یا نه.»</blockquote>
-
-<p>بهتر است از یک مسیر منطقی جلو برویم.</p>
-
-<h3>مرحله اول — Hardware</h3>
-<p>می‌توانیم اطلاعات کلی را بررسی کنیم:</p>
-<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">sudo lshw</div></div>
-
-<h3>مرحله دوم — Block Device</h3>
-<p>بعد:</p>
-<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">lsblk</div></div>
-<p>را بررسی می‌کنیم.</p>
-
-<h3>مرحله سوم — Kernel Information</h3>
-<p>در صورت نیاز:</p>
-<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block no-prompt">/proc
-/sys</div></div>
-<p>را بررسی می‌کنیم.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Hardware Problem
-      ↓
-lshw
-      ↓
-lsblk
-      ↓
-/proc
-      ↓
-/sys</div></div>
-
-<p>البته ابزار مناسب دقیقاً به نوع مشکل بستگی دارد.</p>
-
-<h2>یک سناریوی دیگر — مشکل USB</h2>
-
-<p>فرض کن یک USB Device وصل کرده‌ای و می‌خواهی ببینی Linux آن را شناسایی کرده یا نه.</p>
-
-<p>اول می‌توانی:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
-
-<p>را بررسی کنی.</p>
-
-<p>چون مسئله ما:</p>
-
-<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">USB Device</div></div>
-
-<p>است.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">USB Problem
-    ↓
-lsusb</div></div>
-
-<h2>یک سناریوی PCI</h2>
-
-<p>اگر مسئله مربوط به کارت شبکه یا Controllerای باشد که روی PCI قرار دارد:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lspci</div></div>
-
-<p>می‌تواند اطلاعات خوبی بدهد.</p>
-
-<p>بنابراین:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">PCI Problem
-    ↓
-lspci</div></div>
-
-<h2>یک سناریوی Disk</h2>
-
-<p>اگر مسئله مربوط به Disk و Partition باشد:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-
-<p>یکی از اولین ابزارهایی است که باید بررسی کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
-lsblk</div></div>
-
-<p>و در مراحل بعدی:</p>
-
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">fdisk</div></div>
-
-<p>را برای Partitioning بررسی خواهیم کرد.</p>
-
-<h2>ارتباط <code>/dev</code> با <code>lsblk</code></h2>
-
-<p>یک نکته مهم دیگر.</p>
-
-<p>فرض کن <code>lsblk</code> به ما می‌گوید:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">sda
-├── sda1
-└── sda2</div></div>
-
-<p>این Deviceها در:</p>
-
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev</div></div>
-
-<p>هم قابل مشاهده هستند:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sda
-/dev/sda1
-/dev/sda2</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">lsblk
-   ↓
-Block Device Information
-   ↓
-/dev/sda
-/dev/sda1
-/dev/sda2</div></div>
-
-<p>این ارتباط بعداً هنگام کار با <code>fdisk</code> و Mount بسیار مهم خواهد شد.</p>
-
-<h2>ارتباط <code>/sys</code> با Hardware</h2>
-
-<p>در این جلسه لازم نیست ساختار <code>/sys</code> را حفظ کنی.</p>
-
-<p>فعلاً مفهوم اصلی کافی است:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Kernel
-  ↓
-/sys
-  ↓
-Device / Hardware Information</div></div>
-
-<p>در واقع <code>/sys</code> یکی از مکان‌هایی است که Kernel اطلاعات Deviceها و روابط آنها را در اختیار User Space قرار می‌دهد.</p>
-
-<p>پس اگر در آزمون پرسید:</p>
-
-<blockquote>کدام Virtual Filesystem اطلاعات مربوط به Hardware و Deviceها را در اختیار سیستم قرار می‌دهد؟</blockquote>
-
-<p>یکی از پاسخ‌های مهم:</p>
-
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">/sys</div></div>
-
-<p>است.</p>
-
-<h2>ارتباط همه مفاهیم جلسه</h2>
-
-<p>حالا کل جلسه را در یک نمودار قرار دهیم:</p>
-
-<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">                    Computer
+<p>دستگاه‌های متصل به <strong>USB</strong> را نمایش می‌دهد. با گزینه <code>-v</code> جزئیات بیشتر (مانند سرعت، شناسه‌های محصول و فروشنده) قابل مشاهده است.</p>
+
+<h3>ابزارهای تکمیلی (مفید برای LPIC-1)</h3>
+
+<p>علاوه بر دستورات اصلی، این ابزارها نیز در عیب‌یابی سخت‌افزار کاربرد دارند:</p>
+
+<ul>
+    <li><strong><code>lscpu</code></strong> – اطلاعات مربوط به CPU (معماری، هسته‌ها، فرکانس)</li>
+    <li><strong><code>lsmem</code></strong> – اطلاعات مربوط به حافظه فیزیکی (در برخی توزیع‌ها)</li>
+    <li><strong><code>dmidecode</code></strong> – اطلاعات کامل سخت‌افزار از طریق DMI (SMBIOS) که حتی مدل مادربرد و شماره سریال را نشان می‌دهد.</li>
+    <li><strong><code>dmesg</code></strong> – نمایش پیام‌های حلقه کرنل که شامل اطلاعات شناسایی دستگاه‌ها در زمان بوت است. بسیار مفید برای عیب‌یابی اولیه.</li>
+</ul>
+
+<h2>سناریوهای عیب‌یابی (تشخیص مشکل)</h2>
+
+<p>بیایید چند سناریوی رایج را بررسی کنیم تا بدانیم در هر موقعیت از کدام ابزار استفاده کنیم.</p>
+
+<h3>سناریو ۱: یک دیسک جدید وصل کرده‌ایم، اما در سیستم دیده نمی‌شود</h3>
+
+<ol>
+    <li>بررسی کلی سخت‌افزار:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo lshw -class disk</div></div>
+    </li>
+    <li>بررسی Block Deviceها:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
+    </li>
+    <li>بررسی پیام‌های کرنل برای مشاهده رویدادهای شناسایی:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | tail -20</div></div>
+    </li>
+    <li>اگر دیسک از نوع USB است، ابتدا:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
+    </li>
+</ol>
+
+<h3>سناریو ۲: کارت شبکه عملکرد مناسبی ندارد</h3>
+
+<ol>
+    <li>بررسی دستگاه PCI:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lspci -k | grep -i network</div></div>
+    </li>
+    <li>بررسی درایور بارگذاری شده:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsmod | grep &lt;driver_name&gt;</div></div>
+    </li>
+    <li>بررسی interrupts:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">cat /proc/interrupts | grep -i &lt;interface_name&gt;</div></div>
+    </li>
+</ol>
+
+<h3>سناریو ۳: یک دستگاه USB متصل شده اما شناسایی نمی‌شود</h3>
+
+<ol>
+    <li>بررسی USB:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
+    </li>
+    <li>بررسی کرنل برای رویدادهای USB:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | grep -i usb</div></div>
+    </li>
+    <li>اگر دستگاه یک حافظه فلش است، در <code>/dev</code> ظاهر می‌شود؛ پس:
+        <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
+    </li>
+</ol>
+
+<h2>جمع‌بندی مفهومی (نمودار نهایی)</h2>
+
+<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">                   Computer
                        ↓
                    Power On
                        ↓
                   BIOS / UEFI
                        ↓
-                      GRUB
+                     POST
+                       ↓
+                     GRUB
                        ↓
                  Linux Kernel
                        ↓
@@ -12183,245 +11449,172 @@ Device / Hardware Information</div></div>
       /dev           /proc           /sys
         │              │              │
    Device Files    Kernel Info    Hardware Info
+        │              │              │
+   ┌────┴────┐   ┌─────┴─────┐   ┌────┴────┐
+   │Block Dev│   │interrupts │   │class/net│
+   │Char Dev │   │ioports    │   │block/   │
+   └─────────┘   └───────────┘   └─────────┘
         │
-        └──────────────┬──────────────┐
-                       ↓              ↓
-                     Tools
-                       │
-      ┌────────┬───────┼───────┬──────┐
-      ↓        ↓       ↓       ↓      ↓
-    lshw     lsdev   lsblk   lspci  lsusb
-      ↓        ↓       ↓       ↓      ↓
- Hardware   Device   Block    PCI    USB
-                     Device</div></div>
+   ┌────┴──────────────────────┐
+   │          ابزارها           │
+   │  lshw  lsdev  lsblk       │
+   │  lspci lsusb  lscpu       │
+   └───────────────────────────┘</div></div>
 
-<p>اگر این نمودار را بفهمی، بخش زیادی از جلسه را یاد گرفته‌ای.</p>
+<h2>جدول نهایی دستورات (برای مرور سریع)</h2>
 
-<h2>جمع‌بندی جلسه</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>دستور</th><th>کاربرد اصلی</th></tr></thead>
+<tbody>
+<tr><td><code>lshw</code></td><td>گزارش جامع سخت‌افزار</td></tr>
+<tr><td><code>lsdev</code></td><td>اطلاعات دستگاه‌ها از <code>/proc</code></td></tr>
+<tr><td><code>lsblk</code></td><td>لیست Block Deviceها (دیسک و پارتیشن)</td></tr>
+<tr><td><code>lspci</code></td><td>دستگاه‌های PCI</td></tr>
+<tr><td><code>lsusb</code></td><td>دستگاه‌های USB</td></tr>
+<tr><td><code>lscpu</code></td><td>اطلاعات CPU</td></tr>
+<tr><td><code>dmidecode</code></td><td>اطلاعات کامل سخت‌افزار از BIOS/UEFI</td></tr>
+<tr><td><code>dmesg</code></td><td>پیام‌های کرنل (بوت و زمان اجرا)</td></tr>
+</tbody>
+</table>
+</div>
 
-<p>در این جلسه چند لایه مهم را به هم وصل کردیم.</p>
-
-<h3>Boot</h3>
-<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Power On
- ↓
-BIOS / UEFI
- ↓
-GRUB
- ↓
-Kernel
- ↓
-systemd
- ↓
-.target / Startup
- ↓
-Login</div></div>
-
-<h3>Device Files</h3>
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev
- ↓
-Device Files</div></div>
-
-<h3>Virtual Filesystems</h3>
-<div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">/proc
- ↓
-Kernel / System Information</div></div>
-<div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys
- ↓
-Hardware / Device Information</div></div>
-
-<h3>Device Types</h3>
-<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Character Device
-→ Terminal / Serial
-
-Block Device
-→ Disk / Storage</div></div>
-
-<h3>ابزارها</h3>
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lshw
-→ Hardware
-
-lsdev
-→ Devices
-
-lsblk
-→ Block Devices
-
-lspci
-→ PCI Devices
-
-lsusb
-→ USB Devices</div></div>
+<div class="summary-box">
+    <h3>⭐ نکات طلایی برای LPIC-1</h3>
+    <ul>
+        <li><strong>ترتیب بوت</strong>: <code>BIOS/UEFI → GRUB → Kernel → systemd → Login</code></li>
+        <li><strong>فایل‌های دستگاه</strong>: در <code>/dev</code> قرار دارند و دو نوع <code>Character</code> و <code>Block</code> دارند.</li>
+        <li><strong><code>/proc</code></strong>: مجازی، حاوی اطلاعات کرنل و فرایندها (از جمله <code>interrupts</code> و <code>ioports</code>).</li>
+        <li><strong><code>/sys</code></strong>: مجازی، حاوی اطلاعات ساختاریافته دستگاه‌ها و درایورها.</li>
+        <li><strong>تفاوت Firmware و Boot Loader</strong>: <code>BIOS/UEFI</code> = Firmware، <code>GRUB</code> = Boot Loader.</li>
+        <li><strong>UEFI</strong> از <code>ESP</code> (EFI System Partition) استفاده می‌کند که معمولاً در <code>/boot/efi</code> mount می‌شود و با FAT فرمت می‌شود.</li>
+        <li><strong>ابزارهای شناسایی</strong>: هر کدام برای نوع خاصی از سخت‌افزار طراحی شده‌اند؛ انتخاب درست ابزار به نوع مشکل بستگی دارد.</li>
+    </ul>
+</div>
 
 <h2>خودآزمایی</h2>
 
-<div class="quiz-card"><p>❓ تست ۱: کدام گزینه ترتیب صحیح فرآیند Boot را نشان می‌دهد؟</p>
+<div class="quiz-card"><p>❓ سوال ۱: کدام گزینه ترتیب صحیح فرآیند بوت را نشان می‌دهد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) GRUB → BIOS → Kernel → systemd</button>
     <button onclick="selectOption(this)">ب) BIOS/UEFI → GRUB → Kernel → systemd</button>
     <button onclick="selectOption(this)">ج) Kernel → GRUB → BIOS → systemd</button>
     <button onclick="selectOption(this)">د) systemd → Kernel → GRUB → BIOS</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>ترتیب کلی: BIOS/UEFI → GRUB → Kernel → systemd</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>ابتدا Firmware (BIOS/UEFI) اجرا می‌شود، سپس Boot Loader (GRUB)، بعد Kernel و در نهایت systemd به عنوان اولین فرایند در User Space اجرا می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۲: در سیستم مبتنی بر systemd، اولین Process اصلی در User Space معمولاً کدام است؟</p>
+<div class="quiz-card"><p>❓ سوال ۲: در یک سیستم مبتنی بر systemd، اولین فرایند با PID=1 کدام است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) GRUB</button>
     <button onclick="selectOption(this)">ب) BIOS</button>
     <button onclick="selectOption(this)">ج) systemd</button>
-    <button onclick="selectOption(this)">د) <code>bash</code></button>
+    <button onclick="selectOption(this)">د) bash</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>GRUB قبل از Kernel قرار دارد و <code>bash</code> بعداً اجرا می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>systemd اولین فرایند در User Space است و PID=1 را دارد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۳: کدام مسیر برای Device Fileها استفاده می‌شود؟</p>
+<div class="quiz-card"><p>❓ سوال ۳: کدام مسیر برای فایل‌های دستگاه (Device Files) استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>/proc</code></button>
     <button onclick="selectOption(this)">ب) <code>/sys</code></button>
     <button onclick="selectOption(this)">ج) <code>/dev</code></button>
     <button onclick="selectOption(this)">د) <code>/boot</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/dev</code> برای Device Fileها استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/dev</code> شامل فایل‌های ویژه دستگاه‌هاست. <code>/proc</code> و <code>/sys</code> مجازی هستند و اطلاعات سیستمی ارائه می‌دهند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۴: کدام مورد نمونه‌ای از Block Device است؟</p>
+<div class="quiz-card"><p>❓ سوال ۴: کدام یک نمونه‌ای از Block Device است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Terminal</button>
-    <button onclick="selectOption(this)">ب) Serial Device</button>
-    <button onclick="selectOption(this)">ج) Hard Disk</button>
-    <button onclick="selectOption(this)">د) Shell</button>
+    <button onclick="selectOption(this)">الف) ترمینال</button>
+    <button onclick="selectOption(this)">ب) پورت سریال</button>
+    <button onclick="selectOption(this)">ج) هارد دیسک</button>
+    <button onclick="selectOption(this)">د) صفحه کلید</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>Diskها نمونه مهم Block Device هستند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>دیسک‌ها از نوع Block Device هستند. ترمینال، پورت سریال و صفحه کلید از نوع Character Device محسوب می‌شوند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۵: کدام فایل اطلاعات مربوط به Interruptها و IRQها را نشان می‌دهد؟</p>
+<div class="quiz-card"><p>❓ سوال ۵: برای مشاهده اطلاعات وقفه‌ها (Interrupts) و IRQها از کدام فایل استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>/proc/interrupts</code></button>
     <button onclick="selectOption(this)">ب) <code>/sys/interrupts</code></button>
     <button onclick="selectOption(this)">ج) <code>/dev/interrupts</code></button>
     <button onclick="selectOption(this)">د) <code>/boot/interrupts</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>/proc/interrupts</code> اطلاعات Interrupt/IRQ را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br>فایل <code>/proc/interrupts</code> اطلاعات مربوط به IRQها و تعداد وقفه‌های هر دستگاه را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۶: برای مشاهده Block Deviceهایی مانند Disk و Partition از کدام دستور استفاده می‌کنیم؟</p>
+<div class="quiz-card"><p>❓ سوال ۶: برای نمایش لیست Block Deviceها (دیسک‌ها و پارتیشن‌ها) کدام دستور مناسب است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>lsusb</code></button>
     <button onclick="selectOption(this)">ب) <code>lspci</code></button>
     <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
     <button onclick="selectOption(this)">د) <code>lsdev</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lsblk</code> مخفف list block devices است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lsblk</code> به طور خاص برای نمایش Block Deviceها طراحی شده است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۷: برای مشاهده Deviceهای متصل به USB از کدام دستور استفاده می‌شود؟</p>
+<div class="quiz-card"><p>❓ سوال ۷: کدام دستور دستگاه‌های متصل به USB را نشان می‌دهد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>lsusb</code></button>
     <button onclick="selectOption(this)">ب) <code>lspci</code></button>
     <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
     <button onclick="selectOption(this)">د) <code>lshw</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>lsusb</code> برای نمایش Deviceهای USB استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>lsusb</code> دستگاه‌های USB را لیست می‌کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: برای مشاهده Deviceهای متصل به PCI از کدام دستور استفاده می‌شود؟</p>
+<div class="quiz-card"><p>❓ سوال ۸: برای مشاهده دستگاه‌های متصل به PCI از کدام دستور استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>lsusb</code></button>
     <button onclick="selectOption(this)">ب) <code>lspci</code></button>
     <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
     <button onclick="selectOption(this)">د) <code>lsdev</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lspci</code> برای نمایش Deviceهای PCI استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lspci</code> اطلاعات دستگاه‌های PCI را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۹: کدام گزینه درباره UEFI صحیح است؟</p>
+<div class="quiz-card"><p>❓ سوال ۹: کدام عبارت درباره UEFI صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) UEFI همان Boot Loader است.</button>
-    <button onclick="selectOption(this)">ب) UEFI یک Firmware است و می‌تواند از EFI System Partition استفاده کند.</button>
+    <button onclick="selectOption(this)">الف) UEFI یک Boot Loader است.</button>
+    <button onclick="selectOption(this)">ب) UEFI یک Firmware است که می‌تواند از EFI System Partition استفاده کند.</button>
     <button onclick="selectOption(this)">ج) UEFI فقط روی USB اجرا می‌شود.</button>
     <button onclick="selectOption(this)">د) UEFI همان Linux Kernel است.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>UEFI Firmware است و از EFI System Partition استفاده می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>UEFI نسل جدید Firmware است و از ESP (EFI System Partition) برای بوت استفاده می‌کند. Boot Loader مانند GRUB جدا از Firmware است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۱۰: کدام تطابق صحیح است؟</p>
+<div class="quiz-card"><p>❓ سوال ۱۰: کدام تطابق بین مسیر و محتوای آن صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/dev</code> → فقط اطلاعات Kernel</button>
-    <button onclick="selectOption(this)">ب) <code>/proc</code> → Device Files</button>
-    <button onclick="selectOption(this)">ج) <code>/sys</code> → اطلاعات Device و Hardware</button>
-    <button onclick="selectOption(this)">د) <code>/dev</code> → فقط اطلاعات Processها</button>
+    <button onclick="selectOption(this)">الف) <code>/dev</code> → فقط اطلاعات کرنل</button>
+    <button onclick="selectOption(this)">ب) <code>/proc</code> → فایل‌های دستگاه</button>
+    <button onclick="selectOption(this)">ج) <code>/sys</code> → اطلاعات دستگاه و سخت‌افزار</button>
+    <button onclick="selectOption(this)">د) <code>/dev</code> → اطلاعات فرایندها</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/sys</code> اطلاعات Device و Hardware را نمایش می‌دهد.</div>
-</div>
-
-<div class="summary-box">
-    <h3>⭐ نکات طلایی جلسه ۲</h3>
-    <p>این‌ها را برای LPIC-1 حتماً بلد باش:</p>
-    <div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">BIOS / UEFI
-     ↓
-GRUB
-     ↓
-Kernel
-     ↓
-systemd
-     ↓
-Login</div></div>
-    <div class="code-container"><span class="code-label">مسیرها</span><div class="code-block no-prompt">/dev
-→ Device Files
-
-/proc
-→ Kernel / System Information
-
-/sys
-→ Hardware / Device Information</div></div>
-    <div class="code-container"><span class="code-label">Device Types</span><div class="code-block no-prompt">Character Device
-→ Terminal / Serial
-
-Block Device
-→ Disk / Storage</div></div>
-    <div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lshw
-→ Hardware
-
-lsdev
-→ Devices
-
-lsblk
-→ Block Devices
-
-lspci
-→ PCI
-
-lsusb
-→ USB</div></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/sys</code> شامل اطلاعات ساختاریافته دستگاه‌ها و سخت‌افزار است. <code>/dev</code> شامل فایل‌های دستگاه، <code>/proc</code> شامل اطلاعات کرنل و فرایندهاست.</div>
 </div>
 
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای</strong><br>
-<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">Hardware Detection
-───────────────────
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای (برای شب قبل از آزمون)</strong><br>
+<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">Boot: BIOS/UEFI → GRUB → Kernel → systemd → Login
 
-General Hardware
-       ↓
-     lshw
+Device Files: /dev  (Character / Block)
 
-Devices
-       ↓
-    lsdev
+Virtual FS:
+  /proc → کرنل، فرایندها، interrupts, ioports
+  /sys  → دستگاه‌ها، درایورها، اطلاعات ساختاریافته
 
-Disk / Partition
-       ↓
-     lsblk
-
-PCI
-       ↓
-    lspci
-
-USB
-       ↓
-    lsusb</div></div>
-<p><strong>جلسه ۲ تمام شد.</strong></p>
-<p>قدم طبیعی بعدی <strong>جلسه ۳ — Linux Kernel & Kernel Modules</strong> است؛ آنجا دقیقاً ارتباطی را که امروز بین Hardware، Kernel، Device و Driver دیدیم باز می‌کنیم.</p>
+ابزارها:
+  lshw   → سخت‌افزار کلی
+  lsdev  → دستگاه‌ها از /proc
+  lsblk  → دیسک و پارتیشن
+  lspci  → PCI
+  lsusb  → USB
+  dmesg  → پیام‌های کرنل</div></div>
+<p><strong>✅ جلسه ۲ به پایان رسید.</strong></p>
+<p>در جلسه بعدی به سراغ <strong>Kernel و Kernel Modules</strong> خواهیم رفت و نحوه بارگذاری، مدیریت و عیب‌یابی درایورهای کرنل را بررسی می‌کنیم.</p>
 </div></div>
-`,
+`
+,
 "ch3-kernel-modules": `
 <div class="section-header">
     <div class="section-badge">۳</div>
