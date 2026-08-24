@@ -10160,63 +10160,65 @@ kill %number    → پایان دادن به یک Job پس‌زمینه</div></d
     </div>
 </div>
 
-<p>در فصل سوم وارد یکی از بخش‌های مهم LPIC-1 می‌شویم: <strong>سخت‌افزار، دیسک، پارتیشن‌بندی، RAID، LVM و سیستم فایل</strong>.
-طبق ساختار اسلاید فصل سوم، این فصل چهار بخش اصلی دارد:</p>
+<h2>هدف جلسه</h2>
 
-<div class="code-container"><span class="code-label">سرفصل‌های فصل سوم</span><div class="code-block no-prompt">سرفصل‌های فصل سوم
-        │
-        ├── بخش اول
-        │   بررسی مراحل راه‌اندازی در Linux
-        │
-        ├── بخش دوم
-        │   سخت‌افزار در Linux
-        │
-        ├── بخش سوم
-        │   Partition + RAID + LVM
-        │
-        └── بخش چهارم
-            آشنایی با ساختار Disk</div></div>
+<p>در فصل سوم LPIC-1 وارد دنیای <strong>Hardware، Storage، Disk، Partition، Filesystem، RAID و LVM</strong> می‌شویم.</p>
 
-<p>در این جلسه قرار نیست هنوز وارد <code>fdisk</code>، LVM یا RAID شویم. ابتدا باید <strong>تصویر کلی</strong> را بسازیم تا جلسات بعدی را راحت‌تر بفهمی.</p>
+<p>اما قبل از اینکه سراغ دستورهایی مثل:</p>
 
-<h2>چرا Hardware در Linux مهم است؟</h2>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">lshw
+fdisk</div></div>
 
-<p>وقتی Linux را روی یک کامپیوتر نصب می‌کنیم، سیستم‌عامل باید بتواند با سخت‌افزارهای مختلف ارتباط برقرار کند.</p>
+<p>یا فناوری‌هایی مثل:</p>
 
-<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">فناوری‌ها</span><div class="code-block no-prompt">LVM
+RAID</div></div>
 
-<div class="code-container"><span class="code-label">سخت‌افزارها</span><div class="code-block no-prompt">CPU
-RAM
-Disk
-Network Card
-USB
-Keyboard
-Mouse
-Graphics Card</div></div>
+<p>برویم، باید یک <strong>مدل ذهنی درست</strong> از ارتباط این مفاهیم داشته باشیم.</p>
 
-<p>Linux باید این سخت‌افزارها را شناسایی کند و بتواند از آنها استفاده کند.</p>
+<p>هدف این جلسه این نیست که همه این موارد را عمیق یاد بگیریم.</p>
 
-<p>به صورت ساده:</p>
+<p>هدف این است که بدانیم:</p>
 
-<div class="code-container"><span class="code-label">لایه‌های ارتباطی</span><div class="code-block no-prompt">Hardware
-    ↓
-Linux Kernel
-    ↓
-Operating System
-    ↓
-Applications</div></div>
+<ul>
+    <li>Linux هنگام Boot چه مراحلی را طی می‌کند؟</li>
+    <li>Hardware چه ارتباطی با Kernel دارد؟</li>
+    <li>Disk و Partition چه تفاوتی دارند؟</li>
+    <li>Filesystem کجای Storage قرار می‌گیرد؟</li>
+    <li>Mount چیست؟</li>
+    <li>RAID و LVM چه مسئله‌ای را حل می‌کنند؟</li>
+    <li>در جلسات بعدی هر کدام را کجا یاد خواهیم گرفت؟</li>
+</ul>
 
-<p>یعنی برنامه‌های معمولی مستقیماً با سخت‌افزار صحبت نمی‌کنند؛ <strong>Kernel</strong> نقش بسیار مهمی در این ارتباط دارد.</p>
+<h2>نقشه کلی فصل سوم</h2>
 
-<h2>Linux از لحظه روشن شدن سیستم چه مسیری را طی می‌کند؟</h2>
+<p>فصل سوم را می‌توان به چهار حوزه اصلی تقسیم کرد:</p>
 
-<p>یکی از موضوعات مهم این فصل، <strong>مراحل راه‌اندازی Linux</strong> است.</p>
+<div class="code-container"><span class="code-label">ساختار فصل</span><div class="code-block no-prompt">                    فصل سوم
+                       │
+       ┌───────────────┼────────────────┐
+       │               │                │
+      Boot          Hardware          Storage
+       │               │                │
+       │             lshw               │
+       │               │                │
+       │          Kernel Modules        │
+       │                                │
+       └────────────────────────────────┤
+                                        │
+                              Disk / Partition
+                                        │
+                              Filesystem / Mount
+                                        │
+                                  LVM / RAID</div></div>
 
-<p>وقتی کامپیوتر را روشن می‌کنی، Linux همان لحظه شروع به اجرای <code>bash</code> یا برنامه‌های معمولی نمی‌کند.</p>
+<p>در جلسات بعدی هر بخش را جداگانه بررسی می‌کنیم.</p>
 
-<p>چند مرحله پشت سر هم اتفاق می‌افتد.</p>
+<h2>وقتی سیستم را روشن می‌کنیم چه اتفاقی می‌افتد؟</h2>
 
-<p>به صورت ساده:</p>
+<p>Linux بلافاصله بعد از فشردن Power شروع به اجرای Shell یا برنامه‌های کاربر نمی‌کند.</p>
+
+<p>یک زنجیره از مراحل پشت سر هم اتفاق می‌افتد:</p>
 
 <div class="code-container"><span class="code-label">مراحل Boot</span><div class="code-block no-prompt">Power On
    ↓
@@ -10226,141 +10228,133 @@ Boot Loader
    ↓
 Linux Kernel
    ↓
-Init / Systemd
+systemd
    ↓
 Services
    ↓
 Login</div></div>
 
-<p>این تصویر کلی را فعلاً در ذهن داشته باش.</p>
+<p>فعلاً همین تصویر کلی را به خاطر بسپار.</p>
 
-<p>در فصل پنجم دوباره موضوع Boot و Systemd را به شکل تخصصی‌تر بررسی خواهیم کرد، اما در این فصل لازم است بدانیم <strong>Hardware و Disk در کجای این زنجیره قرار می‌گیرند.</strong></p>
+<h3>مرحله اول: Power On</h3>
 
-<h2>مرحله اول — Power On</h2>
-
-<p>اولین اتفاق بسیار ساده است:</p>
+<p>با روشن شدن کامپیوتر:</p>
 
 <div class="code-container"><span class="code-label">روشن شدن</span><div class="code-block no-prompt">Power ON</div></div>
 
-<p>سیستم روشن می‌شود و Firmware سیستم اجرا می‌شود.</p>
+<p>سیستم وارد مرحله Firmware می‌شود.</p>
 
-<p>در سیستم‌های امروزی معمولاً با:</p>
+<p>در کامپیوترهای امروزی معمولاً با:</p>
 
 <div class="code-container"><span class="code-label">UEFI</span><div class="code-block no-prompt">UEFI</div></div>
 
-<p>سر و کار داریم.</p>
+<p>مواجه هستیم.</p>
 
 <p>در سیستم‌های قدیمی‌تر:</p>
 
 <div class="code-container"><span class="code-label">BIOS</span><div class="code-block no-prompt">BIOS</div></div>
 
-<p>را می‌بینیم.</p>
+<p>رایج بوده است.</p>
 
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">زنجیره اولیه</span><div class="code-block no-prompt">Computer
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Computer
    ↓
 BIOS / UEFI</div></div>
 
-<p>این مرحله هنوز Linux Kernel را اجرا نکرده است.</p>
-
 <h2>Firmware چیست؟</h2>
 
-<p>Firmware نرم‌افزاری است که در سطح بسیار پایین با سخت‌افزار سیستم کار می‌کند.</p>
+<p>Firmware نرم‌افزاری در سطح پایین است که در تعامل اولیه با Hardware سیستم قرار دارد.</p>
 
-<p>در کامپیوترهای PC معمولاً:</p>
+<p>در PCها نمونه‌های معروف آن:</p>
 
-<div class="code-container"><span class="code-label">BIOS</span><div class="code-block no-prompt">BIOS</div></div>
+<div class="code-container"><span class="code-label">نمونه‌ها</span><div class="code-block no-prompt">BIOS
+UEFI</div></div>
 
-<p>یا:</p>
+<p>هستند.</p>
 
-<div class="code-container"><span class="code-label">UEFI</span><div class="code-block no-prompt">UEFI</div></div>
+<p>به‌صورت ساده:</p>
 
-<p>را می‌بینیم.</p>
-
-<p>وظیفه Firmware این است که محیط اولیه لازم برای شروع فرآیند Boot را فراهم کند و سخت‌افزارهای لازم را شناسایی و آماده کند.</p>
-
-<p>به صورت ذهنی:</p>
-
-<div class="code-container"><span class="code-label">نقش Firmware</span><div class="code-block no-prompt">Hardware
+<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Hardware
    ↓
 Firmware
    ↓
 Boot Process</div></div>
 
-<h2>BIOS و UEFI</h2>
+<p>Firmware محیط اولیه لازم برای شروع فرآیند Boot را فراهم می‌کند.</p>
 
-<p>در LPIC-1 بهتر است تفاوت کلی این دو را بدانی.</p>
+<h3>BIOS و UEFI</h3>
 
-<h3>BIOS</h3>
-<p>روش قدیمی‌تر Firmware در PCها است.</p>
+<p>برای LPIC-1 فعلاً تفاوت کلی را بدان:</p>
 
-<h3>UEFI</h3>
-<p>نسل جدیدتر Firmware است که امروزه در سیستم‌های جدید بسیار رایج است.</p>
+<h4>BIOS</h4>
+<p>Firmware قدیمی‌تر در PCهاست.</p>
+
+<h4>UEFI</h4>
+<p>Firmware مدرن‌تر است که در سیستم‌های جدید بسیار رایج است.</p>
 
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">سیستم‌های قدیمی و جدید</span><div class="code-block no-prompt">Old Systems
-    ↓
-  BIOS
+<div class="code-container"><span class="code-label">سیستم‌ها</span><div class="code-block no-prompt">سیستم‌های قدیمی‌تر
+       ↓
+      BIOS
 
-Modern Systems
-    ↓
-  UEFI</div></div>
+سیستم‌های جدیدتر
+       ↓
+      UEFI</div></div>
 
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>این دو را نباید با Boot Loader اشتباه بگیری. Firmware و Boot Loader دو مفهوم متفاوت هستند.</div></div>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>
+Firmware با Boot Loader یکی نیست.
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Firmware ≠ Boot Loader</div></div>
+این دو مرحله متفاوتی از فرآیند Boot هستند.</div></div>
 
 <h2>Boot Loader چیست؟</h2>
 
-<p>بعد از مرحله Firmware، فرآیند Boot باید Linux را پیدا کرده و اجرا کند.</p>
+<p>بعد از Firmware، سیستم باید بتواند Linux را پیدا کرده و Kernel را برای اجرا آماده کند.</p>
 
-<p>اینجا <strong>Boot Loader</strong> وارد می‌شود.</p>
+<p>اینجاست که <strong>Boot Loader</strong> وارد می‌شود.</p>
 
 <p>در بسیاری از سیستم‌های Linux با:</p>
 
-<div class="code-container"><span class="code-label">Boot Loader معروف</span><div class="code-block no-prompt">GRUB</div></div>
+<div class="code-container"><span class="code-label">Boot Loader</span><div class="code-block no-prompt">GRUB</div></div>
 
 <p>مواجه می‌شویم.</p>
 
-<p>به صورت ساده:</p>
+<p>مدل ساده:</p>
 
 <div class="code-container"><span class="code-label">جایگاه GRUB</span><div class="code-block no-prompt">BIOS / UEFI
       ↓
-   GRUB
+     GRUB
       ↓
 Linux Kernel</div></div>
 
-<p>GRUB می‌تواند Kernel مناسب را انتخاب و برای اجرا آماده کند.</p>
+<p>Boot Loader می‌تواند Kernel مناسب را انتخاب کرده و فرآیند اجرای آن را آغاز کند.</p>
 
-<h2>Linux Kernel</h2>
+<h2>Kernel چیست؟</h2>
 
-<p>بعد از Boot Loader، نوبت به Kernel می‌رسد.</p>
+<p>Kernel هسته اصلی سیستم‌عامل Linux است.</p>
 
-<div class="code-container"><span class="code-label">ورود به Kernel</span><div class="code-block no-prompt">Boot Loader
-     ↓
-Linux Kernel</div></div>
+<p>Kernel در ارتباط میان نرم‌افزار و Hardware نقش بسیار مهمی دارد.</p>
 
-<p>Kernel یکی از مهم‌ترین اجزای Linux است.</p>
+<p>مدل ساده:</p>
 
-<p>Kernel بین نرم‌افزارها و سخت‌افزار سیستم قرار می‌گیرد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ارتباط نرم‌افزار و سخت‌افزار</span><div class="code-block no-prompt">Application
+<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Application
      ↓
 System Calls
      ↓
-Kernel
+Linux Kernel
      ↓
 Hardware</div></div>
 
-<p>فرض کن یک برنامه می‌خواهد اطلاعاتی را از Disk بخواند.</p>
+<p>برنامه‌های معمولی مستقیماً مسئول مدیریت سخت‌افزار نیستند؛ Kernel این نقش را بر عهده دارد.</p>
 
-<p>برنامه معمولاً مستقیماً به کنترلر Disk دسترسی ندارد.</p>
+<h3>یک مثال ساده: خواندن اطلاعات از Disk</h3>
 
-<p>در عوض:</p>
+<p>فرض کن یک Application می‌خواهد اطلاعاتی را از Disk بخواند.</p>
 
-<div class="code-container"><span class="code-label">مسیر خواندن از دیسک</span><div class="code-block no-prompt">Application
+<p>به شکل ساده:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Application
      ↓
 Kernel
      ↓
@@ -10368,19 +10362,20 @@ Storage Driver
      ↓
 Disk</div></div>
 
-<h3>Kernel چرا برای فصل سوم مهم است؟</h3>
+<p>یعنی Application از لایه‌های Kernel و Driver برای دسترسی به Hardware استفاده می‌کند.</p>
 
-<p>چون در جلسات بعدی به موضوع:</p>
+<h3>چرا Kernel در فصل Hardware مهم است؟</h3>
 
-<blockquote>Linux Kernel Module</blockquote>
+<p>چون در جلسه بعدی و جلسه سوم با مفاهیمی مانند:</p>
 
-<p>می‌رسیم.</p>
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">Driver
+Kernel Module</div></div>
 
-<p>بسیاری از قابلیت‌های سخت‌افزاری Linux از طریق Kernel و Driverها در اختیار سیستم قرار می‌گیرند.</p>
+<p>روبرو می‌شویم.</p>
 
-<p>به صورت ساده:</p>
+<p>مدل ذهنی:</p>
 
-<div class="code-container"><span class="code-label">نقش Kernel Module</span><div class="code-block no-prompt">Hardware
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Hardware
     ↓
 Driver / Kernel Module
     ↓
@@ -10388,13 +10383,13 @@ Linux Kernel
     ↓
 Linux System</div></div>
 
-<p>بنابراین وقتی در جلسه دوم با <code>lshw</code> سخت‌افزار را بررسی کنیم و در جلسه سوم Kernel Module را یاد بگیریم، این مفاهیم به هم متصل خواهند شد.</p>
+<p>پس وقتی بعداً درباره Hardware Detection و Kernel Modules صحبت می‌کنیم، این زنجیره را باید در ذهن داشته باشی.</p>
 
-<h2>بعد از Kernel چه اتفاقی می‌افتد؟</h2>
+<h2>systemd</h2>
 
-<p>بعد از راه‌اندازی Kernel، سیستم باید محیط کاربری را راه‌اندازی کند.</p>
+<p>بعد از راه‌اندازی Kernel، سیستم باید محیط کاربری و سرویس‌های لازم را راه‌اندازی کند.</p>
 
-<p>در سیستم‌های Linux مدرن معمولاً:</p>
+<p>در بسیاری از سیستم‌های Linux مدرن:</p>
 
 <div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd</div></div>
 
@@ -10402,49 +10397,48 @@ Linux System</div></div>
 
 <p>به شکل ساده:</p>
 
-<div class="code-container"><span class="code-label">مراحل پس از Kernel</span><div class="code-block no-prompt">Linux Kernel
+<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">Linux Kernel
       ↓
-systemd
+   systemd
       ↓
-Services
+   Services
       ↓
-Login</div></div>
+    Login</div></div>
 
-<p><code>systemd</code> سرویس‌های موردنیاز سیستم را راه‌اندازی می‌کند.</p>
+<p>در این جلسه نیازی نیست وارد جزئیات <code>systemd</code> شویم؛ این موضوع در بخش‌های دیگر LPIC-1 با جزئیات بیشتری بررسی می‌شود.</p>
 
-<p>مثلاً سرویس‌های مختلف شبکه، لاگ و سایر سرویس‌های سیستم.</p>
+<h2>کل فرآیند را یک‌جا ببین</h2>
 
-<h2>تصویر کلی Boot</h2>
+<div class="code-container"><span class="code-label">تصویر کامل Boot</span><div class="code-block no-prompt">             Power On
+                 ↓
+             BIOS / UEFI
+                 ↓
+             Boot Loader
+                 ↓
+             Linux Kernel
+                 ↓
+               systemd
+                 ↓
+              Services
+                 ↓
+                Login</div></div>
 
-<p>تا اینجا می‌توانیم کل فرآیند را این‌طور ببینیم:</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته LPIC-1</strong><br>
+ترتیب مفهومی مهم است:
+<div class="code-container"><span class="code-label">ترتیب</span><div class="code-block no-prompt">Firmware
+   ↓
+Boot Loader
+   ↓
+Kernel
+   ↓
+systemd</div></div>
+</div></div>
 
-<div class="code-container"><span class="code-label">چرخه کامل Boot</span><div class="code-block no-prompt">                Computer Power On
-                       ↓
-                  BIOS / UEFI
-                       ↓
-                   Boot Loader
-                       ↓
-                  Linux Kernel
-                       ↓
-                    systemd
-                       ↓
-                    Services
-                       ↓
-                     Login</div></div>
+<h2>Linux با چه Hardwareهایی کار می‌کند؟</h2>
 
-<p>این زنجیره را فعلاً به عنوان <strong>نقشه ذهنی</strong> نگه دار.</p>
+<p>یک سیستم Linux می‌تواند Hardwareهای مختلفی داشته باشد:</p>
 
-<p>در فصل پنجم دوباره به Boot و Systemd برمی‌گردیم و آنجا جزئیات بیشتری بررسی می‌کنیم.</p>
-
-<h2>Hardware در Linux</h2>
-
-<p>حالا از Boot کمی فاصله بگیریم و خود Hardware را بررسی کنیم.</p>
-
-<p>Linux باید بتواند سخت‌افزارهای مختلف را شناسایی کند.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">سخت‌افزارهای قابل شناسایی</span><div class="code-block no-prompt">CPU
+<div class="code-container"><span class="code-label">سخت‌افزارها</span><div class="code-block no-prompt">CPU
 RAM
 Disk
 Network Controller
@@ -10452,112 +10446,91 @@ USB Controller
 Audio Device
 GPU</div></div>
 
-<p>یکی از ابزارهایی که برای مشاهده اطلاعات Hardware استفاده می‌کنیم:</p>
+<p>سیستم‌عامل باید بتواند این Hardwareها را شناسایی کرده و از آن‌ها استفاده کند.</p>
+
+<h3><code>lshw</code></h3>
+
+<p>یکی از ابزارهای Linux برای مشاهده اطلاعات Hardware:</p>
 
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lshw</div></div>
 
 <p>است.</p>
 
-<h3><code>lshw</code> چیست؟</h3>
-
-<p>نام <code>lshw</code> از:</p>
+<p>نام آن از:</p>
 
 <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">List Hardware</div></div>
 
 <p>می‌آید.</p>
 
-<p>این ابزار برای نمایش اطلاعات Hardware سیستم استفاده می‌شود.</p>
-
-<p>مثلاً می‌توانی اجرا کنی:</p>
+<p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">اجرا</span><div class="code-block">sudo lshw</div></div>
 
-<p>خروجی می‌تواند اطلاعات مختلف سخت‌افزاری سیستم را نشان دهد.</p>
+<p>اطلاعات مختلفی درباره Hardware سیستم نمایش می‌دهد.</p>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><code>lshw</code> ابزار مدیریت Hardware نیست؛ ابزار <strong>مشاهده و گزارش اطلاعات Hardware</strong> است.</div></div>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>
+<code>lshw</code> ابزار <strong>مشاهده و گزارش اطلاعات Hardware</strong> است، نه ابزار مدیریت Hardware.</div></div>
 
-<h3>چرا <code>lshw</code> را یاد می‌گیریم؟</h3>
-
-<p>فرض کن یک سرور Linux داری و می‌خواهی بفهمی:</p>
-
-<div class="code-container"><span class="code-label">سوالات متداول</span><div class="code-block no-prompt">چه CPUای دارد؟
-چه RAMای دارد؟
-چه Diskهایی دارد؟
-چه کارت شبکه‌ای دارد؟
-چه Controllerهایی دارد؟</div></div>
-
-<p>به جای اینکه همه چیز را از روی ظاهر سیستم حدس بزنی، می‌توانی از ابزارهای Linux استفاده کنی.</p>
-
-<p>یکی از آنها:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lshw</div></div>
-
-<p>است.</p>
-
-<p>در جلسه دوم فصل سوم به صورت کامل‌تر سراغ <code>lshw</code> خواهیم رفت.</p>
+<p>جزئیات <code>lshw</code> را در <strong>جلسه ۲</strong> بررسی خواهیم کرد.</p>
 
 <h2>Storage چیست؟</h2>
 
-<p>حالا وارد بخش مهم‌تر فصل می‌شویم.</p>
+<p>یکی از مهم‌ترین بخش‌های Hardware سیستم، Storage است.</p>
 
-<p>یکی از مهم‌ترین سخت‌افزارهای یک سیستم Linux، <strong>Storage</strong> است.</p>
-
-<p>مثلاً:</p>
+<p>نمونه‌هایی از Storage:</p>
 
 <div class="code-container"><span class="code-label">انواع Storage</span><div class="code-block no-prompt">HDD
 SSD
 NVMe SSD
 USB Storage</div></div>
 
-<p>این تجهیزات برای ذخیره اطلاعات استفاده می‌شوند.</p>
+<p>Storage برای نگهداری اطلاعات استفاده می‌شود.</p>
 
-<p>به صورت ساده:</p>
+<p>اما در Linux، برای اینکه Storage بتواند در ساختار فایل سیستم استفاده شود، چند لایه مختلف داریم.</p>
 
-<div class="code-container"><span class="code-label">لایه‌های ذخیره‌سازی</span><div class="code-block no-prompt">Application
-     ↓
-Filesystem
-     ↓
-Partition
-     ↓
-Disk</div></div>
+<h2>Disk چیست؟</h2>
 
-<p>اما این تصویر هنوز کامل نیست؛ چون در Linux معمولاً مفاهیم بیشتری بین این لایه‌ها وجود دارد.</p>
+<p>به‌صورت ساده:</p>
 
-<h3>Disk چیست؟</h3>
+<blockquote>Disk وسیله‌ای برای ذخیره اطلاعات است.</blockquote>
 
-<p>به صورت ساده، Disk وسیله‌ای برای ذخیره اطلاعات است.</p>
+<p>Linux برای Diskها نام‌هایی مانند:</p>
 
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نمونه نام دیسک</span><div class="code-block no-prompt">/dev/sda</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda</div></div>
 
 <p>یا:</p>
 
-<div class="code-container"><span class="code-label">نمونه NVMe</span><div class="code-block no-prompt">/dev/nvme0n1</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/nvme0n1</div></div>
 
-<p>ممکن است نماینده یک Disk در Linux باشند.</p>
-
-<p>این نام‌ها را در جلسه <code>fdisk</code> و Disk Concepts دقیق‌تر بررسی خواهیم کرد.</p>
-
-<h3>Partition چیست؟</h3>
-
-<p>یک Disk می‌تواند به چند بخش تقسیم شود.</p>
-
-<p>به هر بخش:</p>
-
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">Partition</div></div>
-
-<p>می‌گوییم.</p>
+<p>استفاده می‌کند.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">ساختار Partition</span><div class="code-block no-prompt">Disk
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda</div></div>
+
+<p>می‌تواند نماینده یک Disk باشد.</p>
+
+<p>جزئیات نام‌گذاری Diskها را در جلسه <strong>Disk Concepts</strong> بررسی خواهیم کرد.</p>
+
+<h2>Partition چیست؟</h2>
+
+<p>یک Disk می‌تواند به چند بخش تقسیم شود.</p>
+
+<p>هر بخش:</p>
+
+<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">Partition</div></div>
+
+<p>نام دارد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
 │
 ├── Partition 1
 ├── Partition 2
 └── Partition 3</div></div>
 
-<p>یا به شکل Linux:</p>
+<p>در Linux ممکن است چنین چیزی ببینیم:</p>
 
 <div class="code-container"><span class="code-label">نمایش در Linux</span><div class="code-block no-prompt">/dev/sda
    │
@@ -10565,29 +10538,29 @@ Disk</div></div>
    ├── /dev/sda2
    └── /dev/sda3</div></div>
 
-<p>در اینجا:</p>
+<p>در این مثال:</p>
 
-<div class="code-container"><span class="code-label">خود دیسک</span><div class="code-block no-prompt">/dev/sda</div></div>
+<div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">/dev/sda</div></div>
 
-<p>خود Disk است.</p>
+<p>Disk است.</p>
 
 <p>و:</p>
 
-<div class="code-container"><span class="code-label">پارتیشن‌ها</span><div class="code-block no-prompt">/dev/sda1
+<div class="code-container"><span class="code-label">Partition‌ها</span><div class="code-block no-prompt">/dev/sda1
 /dev/sda2
 /dev/sda3</div></div>
 
 <p>Partitionهای آن هستند.</p>
 
-<h3>آیا Partition همان Filesystem است؟</h3>
+<h2>آیا Partition همان Filesystem است؟</h2>
 
 <p><strong>خیر.</strong></p>
 
-<p>این یکی از نکات مهم فصل است.</p>
+<p>این یکی از مهم‌ترین نکات جلسه است.</p>
 
 <p>Partition و Filesystem دو مفهوم متفاوت هستند.</p>
 
-<p>مثلاً:</p>
+<p>مدل ساده:</p>
 
 <div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Disk
   ↓
@@ -10595,35 +10568,43 @@ Partition
   ↓
 Filesystem</div></div>
 
-<p>یعنی ابتدا یک Partition داریم و می‌توانیم روی آن یک Filesystem ایجاد کنیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
+     ↓
+    ext4</div></div>
+
+<p>اینجا:</p>
+
+<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1 → Partition</div></div>
+<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4      → Filesystem</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>
+<strong>Partition یک بخش از Disk است؛ Filesystem ساختاری است که برای سازمان‌دهی و ذخیره فایل‌ها استفاده می‌شود.</strong></div></div>
+
+<h2>Filesystem کجای Storage قرار دارد؟</h2>
+
+<p>Filesystem ساختاری است که Linux از آن برای سازمان‌دهی فایل‌ها و Directoryها استفاده می‌کند.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
      ↓
-   ext4</div></div>
+    ext4</div></div>
 
-<p>اینجا:</p>
+<p>در اینجا <code>ext4</code> نوع Filesystem است.</p>
 
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1</div></div>
+<p>در جلسات بعدی، Filesystem را در کنار Disk و Mount به شکل دقیق‌تر بررسی می‌کنیم.</p>
 
-<p>Partition است.</p>
+<h2>Mount چیست؟</h2>
 
-<p>و:</p>
+<p>داشتن یک Filesystem به‌تنهایی به این معنی نیست که از طریق یک مسیر در Directory Tree لینوکس قابل دسترسی است.</p>
 
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4</div></div>
-
-<p>Filesystem است.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong>این تفاوت را حتماً یاد بگیر.</div></div>
-
-<h3>Mount چیست؟</h3>
-
-<p>Filesystem زمانی که می‌خواهیم از آن در ساختار فایل Linux استفاده کنیم، باید در یک مسیر مناسب <strong>Mount</strong> شود.</p>
+<p>Filesystem را می‌توان در یک مسیر مشخص <strong>Mount</strong> کرد.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">مراحل Mount</span><div class="code-block no-prompt">/dev/sda1
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb1
     ↓
 Filesystem
     ↓
@@ -10631,82 +10612,164 @@ Mount
     ↓
 /data</div></div>
 
-<p>بعد از Mount شدن، می‌توانیم از مسیر:</p>
+<p>بعد از Mount شدن، اطلاعات آن Filesystem از طریق:</p>
 
-<div class="code-container"><span class="code-label">مسیر دسترسی</span><div class="code-block no-prompt">/data</div></div>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/data</div></div>
 
-<p>به اطلاعات آن Filesystem دسترسی داشته باشیم.</p>
+<p>قابل دسترسی است.</p>
 
-<p>پس:</p>
+<h3>Mount Point چیست؟</h3>
 
-<div class="code-container"><span class="code-label">زنجیره کامل</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
+<p>مسیر یا Directoryای که Filesystem در آن Mount می‌شود:</p>
+
+<div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">Mount Point</div></div>
+
+<p>نام دارد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/data</div></div>
+
+<p>می‌تواند یک Mount Point باشد.</p>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Partition
+    ↓
 Filesystem
- ↓
+    ↓
 Mount Point</div></div>
 
-<p>این زنجیره یکی از مهم‌ترین مفاهیم فصل سوم است.</p>
+<p>را به‌عنوان یک زنجیره مهم به خاطر بسپار.</p>
 
-<h3>یک مثال کامل</h3>
+<h2>یک مثال کامل Storage</h2>
 
 <p>فرض کن یک Disk داریم:</p>
 
 <div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
 
-<p>آن را Partition می‌کنیم:</p>
+<p>آن را به دو Partition تقسیم می‌کنیم:</p>
 
 <div class="code-container"><span class="code-label">پارتیشن‌ها</span><div class="code-block no-prompt">/dev/sdb
-    │
-    ├── /dev/sdb1
-    └── /dev/sdb2</div></div>
+   │
+   ├── /dev/sdb1
+   └── /dev/sdb2</div></div>
 
 <p>روی <code>/dev/sdb1</code> یک Filesystem ایجاد می‌کنیم:</p>
 
 <div class="code-container"><span class="code-label">ساخت Filesystem</span><div class="code-block no-prompt">/dev/sdb1
-    ↓
-ext4</div></div>
+     ↓
+    ext4</div></div>
 
-<p>بعد آن را Mount می‌کنیم:</p>
+<p>و سپس آن را روی <code>/data</code> Mount می‌کنیم:</p>
 
 <div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">/dev/sdb1
-    ↓
-ext4
-    ↓
-/data</div></div>
+     ↓
+    ext4
+     ↓
+   /data</div></div>
 
-<p>حالا کاربر می‌تواند از:</p>
+<p>در نتیجه:</p>
 
-<div class="code-container"><span class="code-label">دسترسی</span><div class="code-block">/data</div></div>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/data</div></div>
 
-<p>برای دسترسی به اطلاعات استفاده کند.</p>
+<p>مسیر دسترسی به اطلاعات آن Filesystem خواهد بود.</p>
 
-<h2>Partition، RAID و LVM چه ارتباطی دارند؟</h2>
+<h2>این زنجیره را حفظ کن</h2>
 
-<p>طبق سرفصل فصل سوم، یکی از بخش‌های اصلی:</p>
+<div class="code-container"><span class="code-label">زنجیره طلایی Storage</span><div class="code-block no-prompt">Physical Disk
+      ↓
+   Partition
+      ↓
+   Filesystem
+      ↓
+   Mount Point
+      ↓
+ Directory Tree
+      ↓
+     Files</div></div>
 
-<blockquote>پارتیشن‌بندی RAID و LVM</blockquote>
+<p>این یکی از مهم‌ترین مدل‌های ذهنی فصل سوم است.</p>
 
-<p>است.</p>
+<h2>RAID چیست؟</h2>
 
-<p>این سه مفهوم را نباید یکی فرض کنیم.</p>
+<p>RAID یک فناوری برای کار با چند Disk است.</p>
 
-<h3>Partition</h3>
-<p>تقسیم کردن فضای Disk به بخش‌های مختلف.</p>
+<p>بسته به RAID Level، اهدافی مانند:</p>
 
-<h3>RAID</h3>
-<p>ترکیب چند Disk برای اهدافی مانند:</p>
-<div class="code-container"><span class="code-label">اهداف RAID</span><div class="code-block no-prompt">Performance
+<div class="code-container"><span class="code-label">اهداف</span><div class="code-block no-prompt">Performance
 Redundancy
 Fault Tolerance</div></div>
 
+<p>مطرح می‌شوند.</p>
+
+<p>فعلاً لازم نیست Levelهای مختلف RAID را حفظ کنیم.</p>
+
+<p>در جلسات ۸ و ۹ به‌صورت جداگانه آن را بررسی خواهیم کرد.</p>
+
+<h2>LVM چیست؟</h2>
+
+<p>LVM یک لایه مدیریت Storage است که انعطاف بیشتری برای مدیریت فضای ذخیره‌سازی فراهم می‌کند.</p>
+
+<p>مدل بسیار ساده:</p>
+
+<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Disk / Partition
+       ↓
+      LVM
+       ↓
+Logical Volume
+       ↓
+Filesystem</div></div>
+
+<p>در جلسات ۶ و ۷ به‌صورت مفهومی و عملی LVM را یاد می‌گیریم.</p>
+
+<h2>RAID و LVM یکی نیستند</h2>
+
+<p>این سه مفهوم را با هم قاطی نکن:</p>
+
+<div class="code-container"><span class="code-label">سه مفهوم</span><div class="code-block no-prompt">Partition
+RAID
+LVM</div></div>
+
+<h3>Partition</h3>
+<p>تقسیم Disk به بخش‌ها.</p>
+
+<h3>RAID</h3>
+<p>ترکیب چند Disk طبق یک RAID Level با اهداف مشخص.</p>
+
 <h3>LVM</h3>
-<p>ایجاد یک لایه مدیریت انعطاف‌پذیر برای فضای Storage.</p>
+<p>مدیریت انعطاف‌پذیر فضای Storage از طریق لایه Logical Volume.</p>
 
-<p>به صورت خیلی ساده:</p>
+<p>پس:</p>
 
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Disk
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Partition ≠ RAID ≠ LVM</div></div>
+
+<h2>تصویر کلی Storage</h2>
+
+<p>یک سناریوی ساده:</p>
+
+<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">             Physical Disk
+                  │
+                  ▼
+              Partition
+                  │
+                  ▼
+             Filesystem
+                  │
+                  ▼
+             Mount Point
+                  │
+                  ▼
+            Linux Directory
+                  │
+                  ▼
+                Files</div></div>
+
+<p>در سناریوهای پیچیده‌تر ممکن است LVM یا RAID نیز در این زنجیره قرار بگیرند.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">با LVM</span><div class="code-block no-prompt">Disk
  ↓
 Partition
  ↓
@@ -10714,145 +10777,92 @@ LVM
  ↓
 Logical Volume
  ↓
-Filesystem</div></div>
+Filesystem
+ ↓
+Mount</div></div>
 
-<p>یا در یک سناریوی دیگر:</p>
+<p>یا:</p>
 
-<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">Multiple Disks
+<div class="code-container"><span class="code-label">با RAID</span><div class="code-block no-prompt">Multiple Disks
       ↓
      RAID
       ↓
    Storage
       ↓
-Filesystem</div></div>
+ Filesystem
+      ↓
+    Mount</div></div>
 
-<p>بعداً هر کدام را جداگانه و عمیق بررسی می‌کنیم.</p>
+<h2>اصل مهم کار با Storage</h2>
 
-<h2>ساختار کلی Storage در Linux</h2>
+<p>کار با Disk می‌تواند خطرناک باشد.</p>
 
-<p>حالا می‌توانیم یک تصویر ذهنی بزرگ‌تر بسازیم:</p>
+<p>دستورهایی مانند:</p>
 
-<div class="code-container"><span class="code-label">نقشه کلی Storage</span><div class="code-block no-prompt">                    Linux Storage
-                         │
-          ┌──────────────┴──────────────┐
-          ↓                             ↓
-       Hardware                       Software
-          │                             │
-        Disk                        Filesystem
-          │                             │
-      Partition                    Mount Point
-          │
-     ┌────┴────┐
-     ↓         ↓
-    LVM       RAID</div></div>
-
-<p>البته این نمودار صرفاً برای درک ارتباط مفاهیم است و همه سناریوهای واقعی Storage را نشان نمی‌دهد.</p>
-
-<h2>چرا شناخت Disk مهم است؟</h2>
-
-<p>فرض کن سرور شرکت دارای چهار Disk باشد:</p>
-
-<div class="code-container"><span class="code-label">دیسک‌های سرور</span><div class="code-block no-prompt">Disk 1
-Disk 2
-Disk 3
-Disk 4</div></div>
-
-<p>اگر بخواهی روی آن‌ها RAID ایجاد کنی، باید اول بتوانی تشخیص بدهی:</p>
-
-<div class="code-container"><span class="code-label">سوالات کلیدی</span><div class="code-block no-prompt">کدام Disk چیست؟
-نام Linux آن چیست؟
-ظرفیت آن چقدر است؟
-آیا Disk موردنظر همان Diskی است که فکر می‌کنم؟</div></div>
-
-<p>اگر اشتباه کنی و Disk اشتباهی را Partition یا Format کنی، ممکن است اطلاعات مهم از بین برود.</p>
-
-<p>بنابراین قبل از دستورات خطرناک مثل:</p>
-
-<div class="code-container"><span class="code-label">دستورات پرخطر</span><div class="code-block">fdisk
+<div class="code-container"><span class="code-label">دستورات خطرناک</span><div class="code-block">fdisk
 mkfs
 pvcreate
 mdadm</div></div>
 
-<p>باید <strong>Hardware و Disk را درست شناسایی کنیم.</strong></p>
+<p>ممکن است باعث تغییرات مهم در Storage شوند.</p>
 
-<p>این موضوع از نظر Lab بسیار مهم است.</p>
+<p>بنابراین یک اصل مهم:</p>
 
-<h2>یک اصل مهم در کار با Disk</h2>
-
-<p>قبل از هر عملیات Storage:</p>
-
-<blockquote>اول شناسایی، بعد بررسی، سپس تغییر.</blockquote>
+<blockquote><strong>Identify → Inspect → Plan → Change</strong></blockquote>
 
 <p>یعنی:</p>
 
-<div class="code-container"><span class="code-label">روش صحیح</span><div class="code-block no-prompt">Identify
+<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">شناسایی
    ↓
-Inspect
+بررسی
    ↓
-Plan
+برنامه‌ریزی
    ↓
-Change</div></div>
+تغییر</div></div>
 
-<p>نه اینکه مستقیماً دستور Partition یا Format را اجرا کنیم.</p>
+<p>نه اینکه ابتدا دستور تغییر را اجرا کنیم و بعد بفهمیم روی کدام Disk بوده‌ایم.</p>
 
-<p>مثلاً:</p>
+<h3>مثال</h3>
 
-<div class="code-container"><span class="code-label">روش غلط</span><div class="code-block no-prompt">❌ fdisk
-   ↓
-   بعد ببینیم روی چه Diskی هستیم</div></div>
+<p>روش خطرناک:</p>
+
+<div class="code-container"><span class="code-label">روش غلط</span><div class="code-block no-prompt">fdisk
+  ↓
+بعداً بفهمیم Disk درست بوده یا نه</div></div>
 
 <p>روش صحیح:</p>
 
-<div class="code-container"><span class="code-label">روش درست</span><div class="code-block no-prompt">✅ شناسایی Disk
-   ↓
-بررسی Disk
-   ↓
+<div class="code-container"><span class="code-label">روش درست</span><div class="code-block no-prompt">شناسایی Disk
+     ↓
+بررسی مشخصات
+     ↓
 انتخاب Disk صحیح
+     ↓
+Partitioning</div></div>
+
+<p>این اصل در Lab و محیط واقعی بسیار مهم است.</p>
+
+<h2>ارتباط Boot و Storage</h2>
+
+<p>تا اینجا دو زنجیره مهم داریم.</p>
+
+<h3>زنجیره Boot</h3>
+<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Power On
    ↓
-fdisk</div></div>
-
-<p>این عادت در محیط واقعی Linux بسیار مهم است.</p>
-
-<h2>ارتباط چهار بخش اصلی فصل</h2>
-
-<p>حالا چهار بخش اسلاید فصل سوم را کنار هم قرار دهیم.</p>
-
-<h3>بخش اول — Boot</h3>
-<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Power
- ↓
 BIOS / UEFI
- ↓
+   ↓
 Boot Loader
- ↓
+   ↓
 Kernel
- ↓
+   ↓
 systemd
- ↓
-Services</div></div>
+   ↓
+Services
+   ↓
+Login</div></div>
 
-<h3>بخش دوم — Hardware</h3>
-<div class="code-container"><span class="code-label">Hardware</span><div class="code-block no-prompt">CPU
-RAM
-Disk
-Network
-USB
-GPU
-...</div></div>
-<p>و ابزارهایی مثل:</p>
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">lshw</div></div>
-<p>برای مشاهده Hardware.</p>
-
-<h3>بخش سوم — Partition / RAID / LVM</h3>
-<div class="code-container"><span class="code-label">Storage Technologies</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
- ┌───────┬───────┐
- ↓       ↓       ↓
-LVM     RAID    Normal</div></div>
-
-<h3>بخش چهارم — Disk Structure</h3>
-<div class="code-container"><span class="code-label">ساختار دیسک</span><div class="code-block no-prompt">Disk
+<h3>زنجیره Storage</h3>
+<div class="code-container"><span class="code-label">Storage</span><div class="code-block no-prompt">Disk
  ↓
 Partition
  ↓
@@ -10860,83 +10870,108 @@ Filesystem
  ↓
 Mount
  ↓
-Directory</div></div>
+Directory
+ ↓
+Files</div></div>
 
-<p>این چهار بخش در جلسات بعدی به هم متصل می‌شوند.</p>
+<p>و Kernel در هر دو دنیا نقش مهمی دارد:</p>
 
-<h2>نقشه راه فصل سوم</h2>
+<div class="code-container"><span class="code-label">نقش Kernel</span><div class="code-block no-prompt">Hardware
+    ↓
+Kernel
+    ↓
+Storage / Devices
+    ↓
+Filesystem
+    ↓
+Applications</div></div>
 
-<p>در این فصل قدم‌به‌قدم جلو می‌رویم:</p>
+<h2>نقشه راه جلسات فصل سوم</h2>
 
-<div class="code-container"><span class="code-label">نقشه راه</span><div class="code-block no-prompt">Session 1
-Intro
-   ↓
-Boot + Hardware + Storage Concepts
+<div class="code-container"><span class="code-label">جلسات</span><div class="code-block no-prompt">Session 1
+Intro — Hardware & Storage Concepts
+          ↓
+   ساخت مدل ذهنی
+
 
 Session 2
 lshw
-   ↓
-Hardware Detection
+          ↓
+   Hardware Detection
+
 
 Session 3
-Kernel Modules
-   ↓
-Hardware ↔ Kernel
+Linux Kernel & Kernel Modules
+          ↓
+   Hardware ↔ Kernel
+
 
 Session 4
 Disk Concepts
-   ↓
-Disk + Partition + Filesystem + Mount
+          ↓
+   Disk + Partition
+   Filesystem + Mount
+
 
 Session 5
 fdisk
-   ↓
-Partitioning
+          ↓
+   Partitioning
+
 
 Session 6
 LVM Concepts
-   ↓
-PV + VG + LV
+          ↓
+   PV + VG + LV
+
 
 Session 7
 LVM Practical
-   ↓
-Implementation + Management
+          ↓
+   Implementation + Management
+
 
 Session 8
 RAID Concepts
-   ↓
-RAID Levels
+          ↓
+   RAID Levels
+
 
 Session 9
 RAID Practical
-   ↓
-Implementation + Management
+          ↓
+   Implementation + Management
+
 
 Session 10
 df + du
-   ↓
-Disk Space Analysis</div></div>
+          ↓
+   Disk Space Analysis</div></div>
 
 <h2>جمع‌بندی جلسه</h2>
 
-<p>در این جلسه هنوز وارد دستورات تخصصی Storage نشدیم؛ هدف این بود که <strong>نقشه کلی فصل سوم</strong> را بسازیم.</p>
-
-<p>مهم‌ترین چیزهایی که باید تا اینجا متوجه شده باشی:</p>
-
-<div class="code-container"><span class="code-label">خلاصه Boot</span><div class="code-block no-prompt">BIOS / UEFI
-     ↓
+<h3>Boot</h3>
+<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">BIOS / UEFI
+      ↓
 Boot Loader
-     ↓
-Linux Kernel
-     ↓
-systemd
-     ↓
-Services</div></div>
+      ↓
+Kernel
+      ↓
+systemd</div></div>
 
-<p>و در بخش Storage:</p>
+<h3>Hardware</h3>
+<div class="code-container"><span class="code-label">Hardware</span><div class="code-block no-prompt">CPU
+RAM
+Disk
+Network
+USB
+GPU
+...</div></div>
+<p>ابزار آشنایی:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">lshw</div></div>
 
-<div class="code-container"><span class="code-label">خلاصه Storage</span><div class="code-block no-prompt">Disk
+<h3>Storage</h3>
+<div class="code-container"><span class="code-label">Storage</span><div class="code-block no-prompt">Disk
  ↓
 Partition
  ↓
@@ -10944,28 +10979,71 @@ Filesystem
  ↓
 Mount Point</div></div>
 
-<p>و همچنین:</p>
+<h3>Storage Technologies</h3>
+<div class="code-container"><span class="code-label">فناوری‌ها</span><div class="code-block no-prompt">RAID
+LVM</div></div>
 
-<div class="code-container"><span class="code-label">ارتباط Hardware و Kernel</span><div class="code-block no-prompt">Hardware
-    ↓
-Kernel
-    ↓
-Drivers / Kernel Modules
-    ↓
-Linux</div></div>
+<div class="summary-box">
+    <h3>⭐ نکات طلایی LPIC-1</h3>
 
-<p>در ادامه فصل، این مفاهیم را با ابزارهای واقعی Linux بررسی می‌کنیم.</p>
+    <h4>نکته ۱</h4>
+    <p>Firmware و Boot Loader یکی نیستند:</p>
+    <div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Firmware ≠ Boot Loader</div></div>
+
+    <h4>نکته ۲</h4>
+    <p>ترتیب ساده Boot:</p>
+    <div class="code-container"><span class="code-label">ترتیب</span><div class="code-block no-prompt">BIOS/UEFI
+→ Boot Loader
+→ Kernel
+→ systemd</div></div>
+
+    <h4>نکته ۳</h4>
+    <p><code>lshw</code> برای مشاهده اطلاعات Hardware است:</p>
+    <div class="code-container"><span class="code-label">lshw</span><div class="code-block">sudo lshw</div></div>
+
+    <h4>نکته ۴</h4>
+    <p>Disk و Partition یکی نیستند:</p>
+    <div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/dev/sda  → Disk
+/dev/sda1 → Partition</div></div>
+
+    <h4>نکته ۵</h4>
+    <p>Partition و Filesystem یکی نیستند:</p>
+    <div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/dev/sda1 → Partition
+ext4      → Filesystem</div></div>
+
+    <h4>نکته ۶</h4>
+    <p>Mount Point یک مسیر در Directory Tree است:</p>
+    <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
+   ↓
+ ext4
+   ↓
+ /data</div></div>
+
+    <h4>نکته ۷</h4>
+    <p>این سه را با هم اشتباه نکن:</p>
+    <div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Partition ≠ RAID ≠ LVM</div></div>
+
+    <h4>نکته ۸</h4>
+    <p>قبل از عملیات خطرناک روی Storage:</p>
+    <div class="code-container"><span class="code-label">اصل</span><div class="code-block no-prompt">Identify
+   ↓
+Inspect
+   ↓
+Plan
+   ↓
+Change</div></div>
+</div>
 
 <h2>خودآزمایی</h2>
 
-<div class="quiz-card"><p>❓ تست ۱: کدام گزینه ترتیب ساده‌شده و صحیح فرآیند Boot در Linux را نشان می‌دهد؟</p>
+<div class="quiz-card"><p>❓ تست ۱: ترتیب ساده‌شده صحیح Boot کدام است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) Kernel → BIOS → GRUB → systemd</button>
     <button onclick="selectOption(this)">ب) BIOS/UEFI → Boot Loader → Kernel → systemd</button>
     <button onclick="selectOption(this)">ج) systemd → Kernel → BIOS → Boot Loader</button>
-    <button onclick="selectOption(this)">د) Boot Loader → BIOS/UEFI → systemd → Kernel</button>
+    <button onclick="selectOption(this)">د) Boot Loader → BIOS → systemd → Kernel</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>ترتیب ساده‌شده: BIOS/UEFI → Boot Loader → Kernel → systemd. گزینه‌های A، C و D ترتیب اشتباهی دارند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>ترتیب صحیح: BIOS/UEFI → Boot Loader → Kernel → systemd</div>
 </div>
 
 <div class="quiz-card"><p>❓ تست ۲: وظیفه اصلی <code>lshw</code> چیست؟</p>
@@ -10975,95 +11053,106 @@ Linux</div></div>
     <button onclick="selectOption(this)">ج) نمایش اطلاعات Hardware</button>
     <button onclick="selectOption(this)">د) ایجاد RAID</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lshw</code> برای مشاهده و گزارش اطلاعات سخت‌افزار سیستم استفاده می‌شود. گزینه‌های A، B و D مربوط به ابزارهای دیگر هستند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lshw</code> برای نمایش اطلاعات Hardware استفاده می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۳: کدام گزینه تفاوت صحیح Partition و Filesystem را نشان می‌دهد؟</p>
+<div class="quiz-card"><p>❓ تست ۳: کدام گزینه صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Partition و Filesystem دقیقاً یک مفهوم هستند.</button>
-    <button onclick="selectOption(this)">ب) Filesystem همیشه خود Disk است.</button>
-    <button onclick="selectOption(this)">ج) Partition یک بخش از Disk است و Filesystem ساختار ذخیره‌سازی داده روی آن است.</button>
-    <button onclick="selectOption(this)">د) Partition فقط روی RAID وجود دارد.</button>
+    <button onclick="selectOption(this)">الف) Partition و Filesystem یکی هستند.</button>
+    <button onclick="selectOption(this)">ب) Partition یک بخش از Disk است.</button>
+    <button onclick="selectOption(this)">ج) Filesystem همان Disk فیزیکی است.</button>
+    <button onclick="selectOption(this)">د) Mount Point یک Partition است.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>Partition بخشی از Disk است و Filesystem روی آن ساخته می‌شود. گزینه‌های A، B و D نادرست هستند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>Partition یک بخش از Disk است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۴: در ساختار زیر:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sda1
+<div class="quiz-card"><p>❓ تست ۴: در مثال زیر:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1
     ↓
-ext4
+  ext4
     ↓
-/data</div></div>
-<p>کدام گزینه صحیح است؟</p>
+ /data</div></div>
+<p>کدام گزینه درست است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/dev/sda1</code> یک Mount Point است.</button>
-    <button onclick="selectOption(this)">ب) <code>ext4</code> یک Filesystem است.</button>
-    <button onclick="selectOption(this)">ج) <code>/data</code> یک Disk فیزیکی است.</button>
-    <button onclick="selectOption(this)">د) <code>/dev/sda1</code> یک Directory است.</button>
+    <button onclick="selectOption(this)">الف) <code>/dev/sda1</code> یک Filesystem است.</button>
+    <button onclick="selectOption(this)">ب) <code>ext4</code> یک Partition است.</button>
+    <button onclick="selectOption(this)">ج) <code>/data</code> یک Mount Point است.</button>
+    <button onclick="selectOption(this)">د) <code>/data</code> یک Disk فیزیکی است.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>/dev/sda1</code> Partition، <code>ext4</code> Filesystem و <code>/data</code> Mount Point است. گزینه‌های A، C و D نادرست هستند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/data</code> یک Mount Point است. <code>/dev/sda1</code> Partition و <code>ext4</code> Filesystem است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۵: کدام گزینه ارتباط صحیح Hardware و Kernel را نشان می‌دهد؟</p>
+<div class="quiz-card"><p>❓ تست ۵: کدام گزینه مفهوم LVM را بهتر توصیف می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Application → Hardware بدون Kernel</button>
-    <button onclick="selectOption(this)">ب) Hardware → Kernel → Application</button>
-    <button onclick="selectOption(this)">ج) Kernel → BIOS → Application → Hardware</button>
-    <button onclick="selectOption(this)">د) Filesystem → Hardware → BIOS</button>
+    <button onclick="selectOption(this)">الف) ابزار مشاهده Hardware</button>
+    <button onclick="selectOption(this)">ب) لایه‌ای برای مدیریت انعطاف‌پذیر Storage</button>
+    <button onclick="selectOption(this)">ج) Firmware سیستم</button>
+    <button onclick="selectOption(this)">د) Boot Loader</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>Kernel نقش واسط بین نرم‌افزار و سخت‌افزار دارد. گزینه‌های A، C و D ترتیب اشتباهی دارند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>LVM یک لایه مدیریت انعطاف‌پذیر Storage است.</div>
 </div>
 
-<div class="summary-box">
-    <h3>⭐ نکات طلایی جلسه ۱</h3>
-    <p>اگر بخواهی این جلسه را برای آزمون خیلی سریع مرور کنی:</p>
-    <div class="code-container"><span class="code-label">خلاصه Boot</span><div class="code-block no-prompt">BIOS / UEFI
-    ↓
-Boot Loader
-    ↓
-Linux Kernel
-    ↓
-systemd
-    ↓
-Services</div></div>
-    <div class="code-container"><span class="code-label">lshw</span><div class="code-block no-prompt">lshw
-↓
-Hardware Information</div></div>
-    <div class="code-container"><span class="code-label">ساختار Storage</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
-Filesystem
- ↓
-Mount Point</div></div>
-    <p>و مهم‌تر از همه:</p>
-    <div class="code-container"><span class="code-label">نکات کلیدی</span><div class="code-block no-prompt">Partition ≠ Filesystem
-RAID ≠ LVM ≠ Partition</div></div>
-    <p>هر سه مفهوم متفاوتی هستند و در جلسات بعدی جداگانه بررسی می‌شوند.</p>
+<div class="quiz-card"><p>❓ تست ۶: کدام گزینه درباره RAID صحیح‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) RAID همان Filesystem است.</button>
+    <button onclick="selectOption(this)">ب) RAID همان Partition است.</button>
+    <button onclick="selectOption(this)">ج) RAID برای کار با چند Disk و اهدافی مانند Redundancy و Performance استفاده می‌شود.</button>
+    <button onclick="selectOption(this)">د) RAID فقط برای Boot استفاده می‌شود.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>RAID برای کار با چند Disk و اهدافی مانند Redundancy و Performance استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۷: کدام گزینه ترتیب صحیح Storage را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Filesystem → Disk → Partition → Mount</button>
+    <button onclick="selectOption(this)">ب) Disk → Partition → Filesystem → Mount</button>
+    <button onclick="selectOption(this)">ج) Mount → Disk → Filesystem → Partition</button>
+    <button onclick="selectOption(this)">د) Partition → Mount → Disk → Filesystem</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>ترتیب صحیح Storage: Disk → Partition → Filesystem → Mount</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۸ — سناریویی: قبل از اجرای <code>fdisk</code> روی یک Server، اولین کار مناسب چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) اجرای مستقیم <code>fdisk</code></button>
+    <button onclick="selectOption(this)">ب) اجرای <code>mkfs</code></button>
+    <button onclick="selectOption(this)">ج) شناسایی و بررسی Diskها</button>
+    <button onclick="selectOption(this)">د) اجرای <code>mdadm</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>قبل از هر عملیات تغییر روی Disk، ابتدا باید Diskها را شناسایی و بررسی کرد.</div>
 </div>
 
 <div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای جلسه ۱</strong><br>
-<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">Linux Boot
-───────────
+<p>اگر فقط ۳۰ ثانیه برای مرور جلسه وقت داری، این را بخوان:</p>
+
+<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">BOOT
+────
 BIOS / UEFI
-     ↓
+      ↓
 Boot Loader
-     ↓
+      ↓
 Kernel
-     ↓
+      ↓
 systemd
 
 
-Hardware
+HARDWARE
 ────────
 CPU
 RAM
 Disk
 Network
-...
+USB
+GPU
+
+       ↓
+
+lshw
+       ↓
+Hardware Information
 
 
-Storage
+STORAGE
 ───────
 Disk
  ↓
@@ -11071,17 +11160,30 @@ Partition
  ↓
 Filesystem
  ↓
-Mount
+Mount Point
+ ↓
+Directory
+ ↓
+Files
 
 
-Storage Technologies
-────────────────────
-LVM
-RAID</div></div>
-<p><strong>جلسه ۱ تمام شد.</strong></p>
-<p>در <strong>جلسه ۲ — <code>lshw</code></strong> وارد بخش عملی‌تر می‌شویم و دقیق بررسی می‌کنیم Linux چطور Hardware را می‌بیند، <code>lshw</code> چه اطلاعاتی می‌دهد و چطور خروجی آن را بخوانیم.</p>
+TECHNOLOGIES
+─────────────
+RAID
+LVM</div></div>
+
+<p>و سه تفاوت مهم:</p>
+<div class="code-container"><span class="code-label">سه تفاوت</span><div class="code-block no-prompt">Disk       ≠ Partition
+Partition  ≠ Filesystem
+Partition  ≠ RAID ≠ LVM</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>🎯 جمله طلایی جلسه</strong><br>
+<strong>جلسه ۱ قرار نیست تو را درگیر جزئیات ابزارها کند؛ قرار است مدل ذهنی Hardware → Kernel و Disk → Partition → Filesystem → Mount را در ذهنت بسازد.</strong>
+<p>این مدل ذهنی پایه تمام جلسات بعدی فصل سوم است.</p>
 </div></div>
-`,
+</div></div>
+`
+,
 "ch3-lshw": `
 <div class="section-header">
     <div class="section-badge">۳</div>
