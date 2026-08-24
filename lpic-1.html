@@ -11188,436 +11188,832 @@ Partition  ≠ RAID ≠ LVM</div></div>
 <div class="section-header">
     <div class="section-badge">۳</div>
     <div>
-        <h1>lshw — شناسایی سخت‌افزار</h1>
+        <h1>lshw — شناسایی سخت‌افزار در Linux</h1>
         <div class="meta">سخت‌افزار، دیسک و سیستم فایل · بخش ۲ از ۱۰</div>
     </div>
 </div>
 
-<p>در جلسه قبل یک تصویر کلی از Hardware و Storage ساختیم.</p>
+<h2>هدف جلسه</h2>
 
-<p>در این جلسه وارد بخش عملی‌تر می‌شویم:</p>
+<p>در جلسه قبل با تصویر کلی Hardware و Storage آشنا شدیم.</p>
 
-<blockquote><strong>Linux چگونه Hardware سیستم را می‌شناسد و ما چگونه می‌توانیم اطلاعات آن را مشاهده کنیم؟</strong></blockquote>
+<p>در این جلسه می‌خواهیم یاد بگیریم:</p>
 
-<p>در پایان جلسه باید بتوانی:</p>
+<blockquote><strong>Linux سخت‌افزارهای سیستم را چگونه می‌شناسد و ما از کجا می‌توانیم اطلاعات آن‌ها را ببینیم؟</strong></blockquote>
+
+<p>برای رسیدن به این هدف، ابتدا باید چند مفهوم پایه را یاد بگیریم:</p>
+
 <ul>
-    <li>مفهوم Hardware Discovery را توضیح بدهی.</li>
-    <li>تفاوت <code>/dev</code>، <code>/proc</code> و <code>/sys</code> را بفهمی.</li>
-    <li>با <code>lshw</code> اطلاعات Hardware سیستم را مشاهده کنی.</li>
-    <li>خروجی <code>lshw</code> را در سطح پایه بخوانی.</li>
-    <li>خروجی را با <code>-short</code> و <code>-class</code> محدود کنی.</li>
-    <li>تفاوت <code>lshw</code>، <code>lspci</code>، <code>lsusb</code>، <code>lsblk</code> و <code>lscpu</code> را بدانی.</li>
-    <li>برای یک مشکل Hardware ابزار مناسب را انتخاب کنی.</li>
-    <li>ارتباط Hardware → Kernel → Device Files را درک کنی.</li>
+    <li>Device چیست؟</li>
+    <li>Device File چیست؟</li>
+    <li>Block Device چیست؟</li>
+    <li>Character Device چیست؟</li>
+    <li><code>/dev</code> چیست؟</li>
+    <li><code>/proc</code> چیست؟</li>
+    <li><code>/sys</code> چیست؟</li>
+    <li>Bus چیست؟</li>
+    <li>Hardware Discovery چیست؟</li>
+    <li><code>lshw</code> چه کاری انجام می‌دهد؟</li>
+    <li>چه زمانی از <code>lsblk</code>، <code>lspci</code>، <code>lsusb</code> و <code>lscpu</code> استفاده می‌کنیم؟</li>
 </ul>
 
-<h2>پیش‌نیاز جلسه</h2>
+<p>در پایان جلسه باید بتوانی یک سیستم Linux را بررسی کنی و بفهمی:</p>
 
-<p>در جلسه ۱ با این زنجیره آشنا شدیم:</p>
+<div class="code-container"><span class="code-label">هدف نهایی</span><div class="code-block no-prompt">چه Hardwareهایی وجود دارند؟
+        ↓
+Linux آن‌ها را چگونه نمایش می‌دهد؟
+        ↓
+برای هر Hardware از چه ابزاری استفاده کنیم؟</div></div>
 
-<div class="code-container"><span class="code-label">مرور جلسه ۱</span><div class="code-block no-prompt">Hardware
-    ↓
-Firmware
-    ↓
-Boot Loader
-    ↓
-Linux Kernel
-    ↓
-User Space</div></div>
+<h2>تصویر کلی جلسه</h2>
 
-<p>در این جلسه روی این بخش تمرکز می‌کنیم:</p>
+<p>قبل از ورود به جزئیات، این تصویر را در ذهن داشته باش:</p>
 
-<div class="code-container"><span class="code-label">تمرکز جلسه</span><div class="code-block no-prompt">Hardware
-    ↓
-Linux Kernel
-    ↓
-Hardware Information
-    ↓
-Tools</div></div>
+<div class="code-container"><span class="code-label">نقشه ذهنی</span><div class="code-block no-prompt">                Physical Hardware
+                       │
+                       ▼
+                Linux Kernel
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+        /dev          /proc        /sys
+          │            │            │
+          │            │            │
+     Device Files   Kernel Info   Device Info
+          │
+          ▼
+       Commands
+          │
+   ┌──────┼────────┬────────┐
+   ▼      ▼        ▼        ▼
+ lshw   lsblk    lspci    lsusb</div></div>
 
-<p>یعنی سؤال اصلی ما دیگر این نیست که:</p>
+<p>این جلسه در واقع می‌خواهد همین نمودار را برایت قابل فهم کند.</p>
 
-<blockquote>Linux چگونه Boot می‌شود؟</blockquote>
+<h2>Device چیست؟</h2>
 
-<p>بلکه:</p>
-
-<blockquote><strong>Linux بعد از شناسایی Hardware، اطلاعات آن را کجا نگه می‌دارد و چگونه می‌توانیم آن را ببینیم؟</strong></blockquote>
-
-<h2>Hardware Discovery چیست؟</h2>
-
-<p>وقتی Linux اجرا می‌شود، باید Hardwareهای موجود در سیستم را شناسایی کند.</p>
+<p>در Linux وقتی می‌گوییم <strong>Device</strong>، منظور یک وسیله یا جزء سخت‌افزاری است که سیستم‌عامل می‌تواند با آن ارتباط برقرار کند.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">سخت‌افزارها</span><div class="code-block no-prompt">CPU
+<div class="code-container"><span class="code-label">نمونه Deviceها</span><div class="code-block no-prompt">CPU
 RAM
-Disk
+Hard Disk
+SSD
 Network Card
-USB Devices
-GPU
-Storage Controller</div></div>
+Keyboard
+Mouse
+USB Device
+GPU</div></div>
 
-<p>Kernel اطلاعات مربوط به این دستگاه‌ها را جمع‌آوری و مدیریت می‌کند.</p>
+<p>اما Linux برای کار کردن با این Hardwareها باید یک روش استاندارد برای ارتباط با آن‌ها داشته باشد.</p>
 
-<p>سپس ابزارهای مختلف می‌توانند این اطلاعات را در اختیار Administrator قرار دهند.</p>
+<p>اینجاست که مفهوم <strong>Device File</strong> مطرح می‌شود.</p>
 
-<p>مدل کلی:</p>
+<h2>Device File چیست؟</h2>
 
-<div class="code-container"><span class="code-label">مدل Discovery</span><div class="code-block no-prompt">Physical Hardware
-       ↓
-Linux Kernel
-       ↓
-Kernel Device Model
-       ↓
-System Interfaces
-       ↓
-Tools</div></div>
+<p>در Linux بسیاری از Deviceها از طریق فایل‌های ویژه‌ای در مسیر:</p>
 
-<h3>چرا Hardware Discovery مهم است؟</h3>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block">/dev</div></div>
 
-<p>فرض کن یک Server داریم ولی نمی‌دانیم:</p>
-<ul>
-    <li>چه CPUای دارد؟</li>
-    <li>چند RAM دارد؟</li>
-    <li>چه Diskهایی دارد؟</li>
-    <li>کارت شبکه چیست؟</li>
-    <li>Controller ذخیره‌سازی چیست؟</li>
-    <li>دستگاه USB به سیستم متصل شده یا نه؟</li>
-    <li>Driver مربوط به یک Device چیست؟</li>
-</ul>
+<p>نمایش داده می‌شوند.</p>
 
-<p>قبل از اینکه چیزی را تغییر دهیم، باید ابتدا <strong>سیستم را بشناسیم</strong>.</p>
+<p>مثلاً:</p>
 
-<p>این همان اصل مهم جلسه قبل است:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">/dev/sda
+/dev/nvme0n1
+/dev/tty
+/dev/ttyS0</div></div>
 
-<div class="code-container"><span class="code-label">اصل مهم</span><div class="code-block no-prompt">Identify
-   ↓
-Inspect
-   ↓
-Plan
-   ↓
-Change</div></div>
+<p>این‌ها فایل معمولی مثل فایل متنی نیستند.</p>
 
-<h2>Linux اطلاعات Hardware را کجا نشان می‌دهد؟</h2>
+<p>به آن‌ها:</p>
 
-<p>سه مسیر مهم را باید بشناسی:</p>
+<blockquote><strong>Device File</strong> یا <strong>Device Node</strong></blockquote>
 
-<div class="code-container"><span class="code-label">سه مسیر</span><div class="code-block no-prompt">/dev
-/proc
-/sys</div></div>
+<p>می‌گوییم.</p>
 
-<p>اما این سه مسیر <strong>کار یکسانی ندارند</strong>.</p>
+<h3>چرا Hardware به شکل File دیده می‌شود؟</h3>
 
-<h3><code>/dev</code> — Device Files</h3>
+<p>یکی از ایده‌های مهم Unix/Linux این است که بسیاری از منابع سیستم از طریق یک Interface شبیه File در اختیار برنامه‌ها قرار می‌گیرند.</p>
 
-<p>در Linux بسیاری از Deviceها از طریق <strong>Device File</strong> در <code>/dev</code> قابل دسترسی هستند.</p>
+<p>بنابراین برنامه لازم نیست برای هر Hardware یک روش کاملاً متفاوت داشته باشد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">لایه‌ها</span><div class="code-block no-prompt">Application
+     ↓
+  File Interface
+     ↓
+  Kernel / Driver
+     ↓
+   Hardware</div></div>
+
+<p>البته این یک مدل ساده‌شده است، اما برای درک موضوع بسیار مفید است.</p>
+
+<h2>دو نوع مهم Device</h2>
+
+<p>Device Fileها در Linux می‌توانند انواع مختلفی داشته باشند.</p>
+
+<p>دو نوع بسیار مهم:</p>
+
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Character Device
+Block Device</div></div>
+
+<p>هستند.</p>
+
+<p>این تفاوت برای LPIC-1 مهم است.</p>
+
+<h3>Character Device چیست؟</h3>
+
+<p><strong>Character Device</strong> دستگاهی است که داده را به شکل یک <strong>جریان از کاراکترها / بایت‌ها</strong> در اختیار سیستم قرار می‌دهد.</p>
+
+<p>یعنی می‌توانیم تصور کنیم داده به شکل یک Stream منتقل می‌شود:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">A → B → C → D → E → ...</div></div>
+
+<p>دسترسی معمولاً به شکل ترتیبی است و مفهوم اصلی آن Stream است.</p>
+
+<p>نمونه‌های رایج:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Terminal
+Serial Port
+Keyboard
+Mouse</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/tty
+/dev/ttyS0</div></div>
+
+<h3>Block Device چیست؟</h3>
+
+<p>حالا مهم‌ترین قسمت این جلسه.</p>
+
+<p><strong>Block Device</strong> دستگاهی است که داده‌های آن در قالب <strong>بلوک‌های قابل آدرس‌دهی</strong> مدیریت می‌شود.</p>
+
+<p>نمونه اصلی:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Hard Disk
+SSD
+NVMe</div></div>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda
-/dev/nvme0n1
-/dev/tty</div></div>
-
-<h4>Block Device</h4>
-<p>Diskها معمولاً Block Device هستند.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Block Device</span><div class="code-block no-prompt">/dev/sda
-/dev/sda1
+/dev/sdb
 /dev/nvme0n1</div></div>
-<p>مدل ساده:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Disk
-  ↓
-Block Device
-  ↓
-/dev/sda</div></div>
+
+<h3>چرا به آن Block Device می‌گوییم؟</h3>
+
+<p>فرض کن یک Disk داریم.</p>
+
+<p>اطلاعات روی Disk به صورت یک جریان نامحدود و بدون ساختار برای Kernel ارائه نمی‌شود.</p>
+
+<p>Storage در سطح Kernel به واحدهایی تقسیم می‌شود که می‌توان آن‌ها را به‌صورت Block مدیریت کرد.</p>
+
+<p>به شکل ساده:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
+│
+├── Block 0
+├── Block 1
+├── Block 2
+├── Block 3
+├── Block 4
+└── ...</div></div>
+
+<p>Kernel می‌تواند درخواست‌هایی مانند:</p>
+
+<div class="code-container"><span class="code-label">درخواست‌ها</span><div class="code-block no-prompt">Read Block
+Write Block</div></div>
+
+<p>را مدیریت کند.</p>
+
+<h3>مزیت مهم Block Device</h3>
+
+<p>یکی از ویژگی‌های مهم Block Device این است که سیستم می‌تواند به قسمت‌های مختلف داده <strong>مستقیماً دسترسی داشته باشد</strong>.</p>
+
+<p>مثلاً فرض کن اطلاعات ما روی این بخش‌ها قرار دارند:</p>
+
+<div class="code-container"><span class="code-label">بلوک‌ها</span><div class="code-block no-prompt">Block 0
+Block 1
+Block 2
+Block 3
+Block 4
+...</div></div>
+
+<p>اگر بخواهیم اطلاعات Block 1000 را بخوانیم، لازم نیست حتماً تمام Blockهای قبل از آن را یکی‌یکی بخوانیم.</p>
+
+<p>این همان مفهوم <strong>Random Access</strong> است.</p>
+
+<h3>مثال ساده برای تفاوت</h3>
 
 <h4>Character Device</h4>
-<p>برخی Deviceها به شکل Character Device ارائه می‌شوند.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Character Device</span><div class="code-block no-prompt">/dev/tty
-/dev/ttyS0</div></div>
-<p>به‌صورت ساده:</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Character Device
-→ جریان داده
+<p>مثل خواندن یک جریان:</p>
+<div class="code-container"><span class="code-label">Character</span><div class="code-block no-prompt">1 → 2 → 3 → 4 → 5 → ...</div></div>
 
-Block Device
-→ داده در قالب Block</div></div>
+<h4>Block Device</h4>
+<p>مثل دسترسی به خانه‌های شماره‌گذاری‌شده:</p>
+<div class="code-container"><span class="code-label">Block</span><div class="code-block no-prompt">[0] [1] [2] [3] [4] [5] [6] ...</div></div>
+<p>می‌توانیم مشخص کنیم:</p>
+<div class="code-container"><span class="code-label">درخواست</span><div class="code-block no-prompt">Block 5</div></div>
+<p>را می‌خواهیم.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته LPIC-1</strong><br>
-<code>Disk → Block Device</code><br>
-<code>Terminal / Serial → Character Device</code></div></div>
+<p>این مثال فقط برای ساختن مدل ذهنی است؛ جزئیات داخلی سخت‌افزار و Kernel پیچیده‌تر از این هستند.</p>
 
-<h3><code>/proc</code> — اطلاعات Kernel و Process</h3>
-
-<p><code>/proc</code> یک <strong>Virtual Filesystem</strong> است.</p>
-
-<p>یعنی فایل‌های آن مانند فایل‌های معمولی روی Disk ذخیره نشده‌اند؛ Kernel این اطلاعات را در اختیار سیستم قرار می‌دهد.</p>
-
-<p><code>/proc</code> اطلاعاتی درباره:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات /proc</span><div class="code-block no-prompt">Processes
-Kernel
-Memory
-Interrupts
-CPU
-System State</div></div>
-
-<p>فراهم می‌کند.</p>
-
-<h4>مثال‌های مهم</h4>
-
-<div class="code-container"><span class="code-label">/proc/cpuinfo</span><div class="code-block no-prompt">/proc/cpuinfo</div></div>
-<p>اطلاعات CPU.</p>
-
-<div class="code-container"><span class="code-label">/proc/meminfo</span><div class="code-block no-prompt">/proc/meminfo</div></div>
-<p>اطلاعات Memory.</p>
-
-<div class="code-container"><span class="code-label">/proc/interrupts</span><div class="code-block no-prompt">/proc/interrupts</div></div>
-<p>اطلاعات Interruptها.</p>
-
-<div class="code-container"><span class="code-label">/proc/ioports</span><div class="code-block no-prompt">/proc/ioports</div></div>
-<p>اطلاعات I/O Portها.</p>
-
-<h3><code>/sys</code> — اطلاعات Device Model</h3>
-
-<p><code>/sys</code> نیز یک Virtual Filesystem است.</p>
-
-<p>تمرکز اصلی آن:</p>
-
-<div class="code-container"><span class="code-label">تمرکز /sys</span><div class="code-block no-prompt">Devices
-Drivers
-Buses
-Classes</div></div>
-
-<p>است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">/sys/block</span><div class="code-block no-prompt">/sys/block/</div></div>
-<p>برای اطلاعات Block Deviceها.</p>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">/sys/class/net</span><div class="code-block no-prompt">/sys/class/net/</div></div>
-<p>برای اطلاعات Network Interfaceها.</p>
-
-<h3>تفاوت <code>/dev</code>، <code>/proc</code> و <code>/sys</code></h3>
-
-<p>این جدول را خوب یاد بگیر:</p>
+<h3>مثال‌های مهم</h3>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>مسیر</th><th>تمرکز اصلی</th></tr></thead>
+<thead><tr><th>Device</th><th>نوع</th></tr></thead>
 <tbody>
-<tr><td><code>/dev</code></td><td>Device Files</td></tr>
-<tr><td><code>/proc</code></td><td>Kernel / Processes / Runtime Info</td></tr>
-<tr><td><code>/sys</code></td><td>Devices / Drivers / Kernel Device Model</td></tr>
+<tr><td>HDD</td><td>Block Device</td></tr>
+<tr><td>SSD</td><td>Block Device</td></tr>
+<tr><td>NVMe SSD</td><td>Block Device</td></tr>
+<tr><td><code>/dev/sda</code></td><td>Block Device</td></tr>
+<tr><td><code>/dev/nvme0n1</code></td><td>Block Device</td></tr>
+<tr><td>Terminal</td><td>Character Device</td></tr>
+<tr><td>Serial Port</td><td>Character Device</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>روش ساده برای حفظ کردن:</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته LPIC-1</strong><br>
+وقتی دیدی:
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Disk
+SSD
+Partition
+/dev/sda
+/dev/nvme0n1</div></div>
+به مفهوم:
+<div class="code-container"><span class="code-label">Block Device</span><div class="code-block no-prompt">Block Device</div></div>
+فکر کن.
+</div></div>
 
-<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">/dev
- ↓
-دستگاه را "استفاده" می‌کنیم
+<h2><code>/dev</code> چیست؟</h2>
 
-/proc
- ↓
-اطلاعات Runtime و Kernel
+<p>حالا که Device File را فهمیدیم، مسیر:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block">/dev</div></div>
+
+<p>معنی بیشتری پیدا می‌کند.</p>
+
+<p><code>/dev</code> جایی است که <strong>Device Nodeهای سیستم</strong> در آن قرار دارند.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev
+│
+├── sda
+├── sda1
+├── sda2
+├── nvme0n1
+├── tty
+├── ttyS0
+└── ...</div></div>
+
+<h3>Disk در <code>/dev</code></h3>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sda</div></div>
+
+<p>می‌تواند یک Disk باشد.</p>
+
+<p>اگر Disk Partition شده باشد:</p>
+
+<div class="code-container"><span class="code-label">پارتیشن‌ها</span><div class="code-block no-prompt">/dev/sda
+   │
+   ├── /dev/sda1
+   ├── /dev/sda2
+   └── /dev/sda3</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sda
+خود Disk است و:
+
+/dev/sda1
+/dev/sda2
+Partitionهای آن هستند.</div></div>
+
+<h3><code>/dev</code> را با خود Hardware اشتباه نکن</h3>
+
+<p>یک نکته مهم:</p>
+
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">/dev/sda</div></div>
+
+<p>خودِ فلز و سخت‌افزار SSD یا HDD نیست.</p>
+
+<p>بلکه <strong>Device Node</strong>ای است که Linux برای دسترسی به آن Device در اختیار سیستم قرار داده است.</p>
+
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Physical Disk
+      ↓
+Linux Kernel + Driver
+      ↓
+Device Representation
+      ↓
+/dev/sda</div></div>
+
+<h2><code>/proc</code> چیست؟</h2>
+
+<p><code>/proc</code> یک <strong>Virtual Filesystem</strong> است.</p>
+
+<p>یعنی مثل یک Directory معمولی نیست که فایل‌های واقعی آن را روی Disk ذخیره کرده باشیم.</p>
+
+<p>Kernel این اطلاعات را در اختیار ما قرار می‌دهد.</p>
+
+<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">/proc
+   ↓
+Kernel Information</div></div>
+
+<h3><code>/proc</code> چه اطلاعاتی دارد؟</h3>
+
+<p>مواردی مانند:</p>
+
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">Process Information
+Kernel Information
+System Statistics
+Hardware-related Information</div></div>
+
+<p>را می‌توان در <code>/proc</code> پیدا کرد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">/proc/interrupts
+/proc/ioports</div></div>
+
+<h3>Interrupt چیست؟</h3>
+
+<p>برای فهم <code>/proc/interrupts</code> باید مفهوم Interrupt را بدانیم.</p>
+
+<p>فرض کن یک Network Card اتفاقی دارد که باید به CPU اطلاع دهد.</p>
+
+<p>به‌جای اینکه CPU دائماً بپرسد:</p>
+
+<div class="code-container"><span class="code-label">پرسش</span><div class="code-block no-prompt">آیا اتفاقی افتاده؟
+آیا اتفاقی افتاده؟
+آیا اتفاقی افتاده؟
+...</div></div>
+
+<p>Device می‌تواند یک <strong>Interrupt Request</strong> ارسال کند.</p>
+
+<p>یعنی به‌صورت ساده:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Device
+   ↓
+Interrupt Request
+   ↓
+CPU / Kernel</div></div>
+
+<h3>IRQ چیست؟</h3>
+
+<p>IRQ مخفف:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Interrupt Request</div></div>
+
+<p>است.</p>
+
+<p>اطلاعات IRQها را می‌توان در:</p>
+
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/proc/interrupts</div></div>
+
+<p>مشاهده کرد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">cat /proc/interrupts</div></div>
+
+<p>فایل اصلی نیز <code>/proc/interrupts</code> را به‌عنوان محل مشاهده IRQها و تعداد Interruptهای Deviceها معرفی می‌کند.</p>
+
+<h3>I/O Port چیست؟</h3>
+
+<p>برخی Deviceها برای ارتباط با CPU و سیستم از محدوده‌هایی از فضای I/O استفاده می‌کنند.</p>
+
+<p>اطلاعات این محدوده‌ها را می‌توان در:</p>
+
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/proc/ioports</div></div>
+
+<p>دید.</p>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/proc/interrupts
+        ↓
+IRQ / Interrupt
+
+/proc/ioports
+        ↓
+I/O Port Information</div></div>
+
+<p>برای LPIC-1 لازم نیست وارد جزئیات سخت‌افزاری بسیار عمیق این موضوع شوی؛ مفهوم کلی را بدان.</p>
+
+<h2><code>/sys</code> چیست؟</h2>
+
+<p><code>/sys</code> نیز مانند <code>/proc</code> یک <strong>Virtual Filesystem</strong> است.</p>
+
+<p>اما تمرکز <code>/sys</code> بیشتر روی:</p>
+
+<div class="code-container"><span class="code-label">تمرکز</span><div class="code-block no-prompt">Devices
+Drivers
+Buses
+Hardware Relationships</div></div>
+
+<p>است.</p>
+
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">/proc
+   ↓
+Kernel / Process / Runtime Information
 
 /sys
- ↓
-ساختار Deviceها و Driverها</div></div>
+   ↓
+Devices / Drivers / Hardware Structure</div></div>
+
+<h3>چرا <code>/sys</code> مهم است؟</h3>
+
+<p>فرض کن می‌خواهی بفهمی یک Device:</p>
+<ul>
+    <li>به کدام Bus وصل است؟</li>
+    <li>چه Driverای دارد؟</li>
+    <li>چه ارتباطی با Hardwareهای دیگر دارد؟</li>
+</ul>
+
+<p><code>/sys</code> اطلاعات ساختاریافته‌ای برای این کار در اختیار قرار می‌دهد.</p>
+
+<p>مثلاً در فایل اصلی:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/sys/block/sda/</div></div>
+
+<p>برای اطلاعات مربوط به <code>sda</code> معرفی شده و:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/sys/class/net/eth0/</div></div>
+
+<p>برای اطلاعات رابط شبکه آمده است.</p>
+
+<h2>Bus چیست؟</h2>
+
+<p>حالا به یکی از کلمات پرتکرار این فصل می‌رسیم:</p>
+
+<div class="code-container"><span class="code-label">Bus</span><div class="code-block no-prompt">Bus</div></div>
+
+<p>Bus را می‌توان به‌صورت ساده یک <strong>مسیر یا ساختار ارتباطی برای اتصال و ارتباط Deviceها با سیستم</strong> در نظر گرفت.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">CPU / Memory
+      │
+      │
+    Bus
+   ┌──┼───────┐
+   ↓  ↓       ↓
+ Network GPU  Storage</div></div>
+
+<h3>PCI چیست؟</h3>
+
+<p>یکی از Busهای بسیار مهم در کامپیوترها:</p>
+
+<div class="code-container"><span class="code-label">PCI</span><div class="code-block no-prompt">PCI</div></div>
+
+<p>و انواع جدیدتر آن:</p>
+
+<div class="code-container"><span class="code-label">PCIe</span><div class="code-block no-prompt">PCI Express (PCIe)</div></div>
+
+<p>هستند.</p>
+
+<p>Deviceهایی مانند:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Network Controller
+GPU
+Storage Controller</div></div>
+
+<p>می‌توانند از PCI/PCIe استفاده کنند.</p>
+
+<p>برای مشاهده PCI Devices ابزار معروف:</p>
+
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">lspci</div></div>
+
+<p>است.</p>
+
+<h2>Hardware Discovery چیست؟</h2>
+
+<p>تا اینجا فهمیدیم:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Hardware
+   ↓
+Kernel
+   ↓
+/dev
+/proc
+/sys</div></div>
+
+<p>حالا سؤال:</p>
+
+<blockquote>اگر بخواهیم این اطلاعات را به شکل قابل فهم ببینیم چه کنیم؟</blockquote>
+
+<p>اینجاست که ابزارهای Hardware Discovery وارد می‌شوند.</p>
+
+<p>یکی از مهم‌ترین آن‌ها:</p>
+
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">lshw</div></div>
+
+<p>است.</p>
 
 <h2><code>lshw</code> چیست؟</h2>
 
 <p><code>lshw</code> مخفف:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">List Hardware</div></div>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Hardware Lister</div></div>
 
 <p>است.</p>
 
 <p>هدف آن:</p>
 
-<blockquote><strong>نمایش اطلاعات Hardware سیستم</strong></blockquote>
-
-<p>دستور پایه:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lshw</div></div>
-
-<h3>چرا معمولاً <code>sudo</code>؟</h3>
-
-<p>بخشی از اطلاعات Hardware ممکن است نیاز به دسترسی بالاتر داشته باشد.</p>
-
-<p>بنابراین معمولاً:</p>
-
-<div class="code-container"><span class="code-label">با sudo</span><div class="code-block">sudo lshw</div></div>
-
-<p>استفاده می‌کنیم.</p>
-
-<p>اگر فقط بنویسیم:</p>
-
-<div class="code-container"><span class="code-label">بدون sudo</span><div class="code-block">lshw</div></div>
-
-<p>ممکن است اطلاعات کامل در اختیارمان قرار نگیرد.</p>
-
-<h3>خروجی <code>lshw</code> چه چیزهایی دارد؟</h3>
-
-<p><code>lshw</code> می‌تواند اطلاعات بخش‌های مختلف سیستم را نشان دهد، از جمله:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">CPU
-Memory
-Motherboard
-Storage
-Network
-PCI Devices
-USB Devices</div></div>
-
-<p>بنابراین <code>lshw</code> یک ابزار <strong>General Hardware Inventory</strong> محسوب می‌شود.</p>
-
-<h3>مفهوم مهم: Hardware Inventory</h3>
-
-<p>وقتی می‌گوییم:</p>
-
-<div class="code-container"><span class="code-label">Hardware Inventory</span><div class="code-block no-prompt">Hardware Inventory</div></div>
-
-<p>یعنی می‌خواهیم بدانیم:</p>
-
-<blockquote>«این سیستم دقیقاً چه Hardwareهایی دارد؟»</blockquote>
-
-<p>برای این کار:</p>
-
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">sudo lshw</div></div>
-
-<p>یکی از ابزارهای مهم است.</p>
-
-<h2>خروجی <code>lshw</code> را چطور بخوانیم؟</h2>
-
-<h3>خروجی <code>lshw</code> سلسله‌مراتبی است</h3>
-
-<p>خروجی <code>lshw</code> معمولاً ساختار درختی دارد.</p>
-
-<p>به‌صورت مفهومی:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">computer
-├── core
-├── memory
-├── cpu
-├── disk
-├── network
-└── ...</div></div>
-
-<p>این ساختار به ما کمک می‌کند بفهمیم Hardwareهای مختلف چگونه در سیستم سازمان‌دهی شده‌اند.</p>
-
-<h3>مفهوم <code>class</code></h3>
-
-<p>یکی از مفاهیم مهم در <code>lshw</code>:</p>
-
-<div class="code-container"><span class="code-label">class</span><div class="code-block no-prompt">class</div></div>
+<blockquote><strong>نمایش اطلاعات Hardware شناسایی‌شده توسط Linux</strong></blockquote>
 
 <p>است.</p>
 
-<p>Hardwareها را می‌توان بر اساس نوعشان بررسی کرد.</p>
+<p>دستور اصلی:</p>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">sudo lshw</div></div>
+
+<p>فایل اصلی نیز <code>lshw</code> را به‌عنوان ابزاری برای ارائه گزارش جامع Hardware معرفی می‌کند.</p>
+
+<h3>چرا <code>sudo</code>؟</h3>
+
+<p><code>lshw</code> برای جمع‌آوری بعضی اطلاعات Hardware به دسترسی سطح بالاتر نیاز دارد.</p>
+
+<p>بنابراین معمولاً آن را با:</p>
+
+<div class="code-container"><span class="code-label">با دسترسی root</span><div class="code-block">sudo lshw</div></div>
+
+<p>اجرا می‌کنیم.</p>
+
+<h2>اجرای کامل <code>lshw</code></h2>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">sudo lshw</div></div>
+
+<p>ممکن است خروجی بسیار طولانی باشد.</p>
+
+<p>اطلاعاتی درباره مواردی مانند:</p>
+
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">System
+CPU
+Memory
+Storage
+Disk
+Network
+Display
+Bus</div></div>
+
+<p>ممکن است نمایش داده شود.</p>
+
+<h3>چرا خروجی <code>lshw</code> طولانی است؟</h3>
+
+<p>چون <code>lshw</code> فقط نمی‌گوید:</p>
+
+<div class="code-container"><span class="code-label">ساده</span><div class="code-block no-prompt">یک Disk داری.</div></div>
+
+<p>بلکه می‌تواند اطلاعات جزئی‌تری از ساختار Hardware بدهد.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">disk
-network
-memory
-processor
-display</div></div>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Computer
+ ├── CPU
+ ├── Memory
+ ├── Bus
+ │    ├── Storage Controller
+ │    └── Network Controller
+ ├── Disk
+ └── Network</div></div>
 
-<h3><code>lshw -class</code></h3>
-
-<p>اگر فقط یک نوع Hardware را بخواهیم:</p>
-
-<div class="code-container"><span class="code-label">Disk</span><div class="code-block">sudo lshw -class disk</div></div>
-
-<p>یا:</p>
-
-<div class="code-container"><span class="code-label">Network</span><div class="code-block">sudo lshw -class network</div></div>
-
-<p>یا:</p>
-
-<div class="code-container"><span class="code-label">Memory</span><div class="code-block">sudo lshw -class memory</div></div>
-
-<p>این روش بسیار کاربردی‌تر از خواندن خروجی کامل <code>lshw</code> است.</p>
-
-<h3>چرا <code>-class</code> مهم است؟</h3>
-
-<p>فرض کن خروجی کامل:</p>
-
-<div class="code-container"><span class="code-label">کامل</span><div class="code-block">sudo lshw</div></div>
-
-<p>هزاران خط داشته باشد.</p>
-
-<p>اگر فقط Disk برایت مهم است:</p>
-
-<div class="code-container"><span class="code-label">فقط Disk</span><div class="code-block">sudo lshw -class disk</div></div>
-
-<p>به‌مراتب بهتر است.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">lshw
- ↓
-Everything
-
-lshw -class disk
- ↓
-Disk-related information</div></div>
+<p>به همین دلیل خروجی آن می‌تواند بزرگ باشد.</p>
 
 <h2><code>lshw -short</code></h2>
 
-<h3>خروجی خلاصه</h3>
-
-<p>برای دیدن نمای خلاصه:</p>
+<p>اگر فقط یک دید کلی می‌خواهیم:</p>
 
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block">sudo lshw -short</div></div>
 
-<p>استفاده می‌کنیم.</p>
+<p>این گزینه خروجی را خلاصه‌تر می‌کند.</p>
 
-<p>این گزینه برای زمانی مناسب است که فقط می‌خواهیم:</p>
+<p>مثلاً:</p>
 
-<blockquote><strong>یک نمای سریع از Hardware سیستم داشته باشیم.</strong></blockquote>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">H/W path       Device      Class       Description
+====================================================
+/0                         system      Computer
+/0/0                       memory      System Memory
+/0/1                       processor   CPU
+/0/100                     bridge      Host bridge
+/0/100/1       /dev/sda    disk        Disk
+/0/100/2       eth0        network     Ethernet</div></div>
 
-<p>مدل ذهنی:</p>
+<p>هدف:</p>
 
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">lshw
-→ جزئیات زیاد
+<blockquote><strong>نمای سریع Hardware سیستم</strong></blockquote>
 
-lshw -short
-→ نمای خلاصه</div></div>
+<h2><code>-class</code></h2>
 
-<h3>سه دستور اصلی <code>lshw</code></h3>
+<p>وقتی فقط یک نوع Hardware را می‌خواهیم</p>
 
-<p>در این جلسه حداقل این سه را باید مسلط باشی:</p>
+<p>فرض کن فقط Disk برایمان مهم است.</p>
 
-<h4>اطلاعات کامل</h4>
+<p>به‌جای:</p>
+
 <div class="code-container"><span class="code-label">کامل</span><div class="code-block">sudo lshw</div></div>
 
-<h4>اطلاعات خلاصه</h4>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block">sudo lshw -short</div></div>
+<p>می‌توانیم بگوییم:</p>
 
-<h4>یک Class خاص</h4>
+<div class="code-container"><span class="code-label">فقط دیسک</span><div class="code-block">sudo lshw -class disk</div></div>
+
+<p>یعنی:</p>
+
+<blockquote>فقط Hardwareهایی از Class مربوط به Disk را نشان بده.</blockquote>
+
+<h3>مثال‌های مهم</h3>
+
+<h4>CPU</h4>
+<div class="code-container"><span class="code-label">CPU</span><div class="code-block">sudo lshw -class processor</div></div>
+
+<h4>Memory</h4>
+<div class="code-container"><span class="code-label">Memory</span><div class="code-block">sudo lshw -class memory</div></div>
+
+<h4>Disk</h4>
 <div class="code-container"><span class="code-label">Disk</span><div class="code-block">sudo lshw -class disk</div></div>
-<p>یا:</p>
+
+<h4>Network</h4>
 <div class="code-container"><span class="code-label">Network</span><div class="code-block">sudo lshw -class network</div></div>
 
-<h2>ابزارهای تخصصی Hardware</h2>
+<h4>Display</h4>
+<div class="code-container"><span class="code-label">Display</span><div class="code-block">sudo lshw -class display</div></div>
 
-<p><code>lshw</code> ابزار جامع است، اما همیشه بهترین ابزار برای هر سؤال نیست.</p>
+<h3>ترکیب <code>-class</code> و <code>-short</code></h3>
 
-<p>به همین دلیل ابزارهای تخصصی دیگری داریم.</p>
+<p>می‌توانیم آن‌ها را ترکیب کنیم:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">sudo lshw -class disk -short</div></div>
+
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">فقط Disk
++
+به شکل خلاصه</div></div>
+
+<p>این روش برای Troubleshooting خیلی کاربردی است.</p>
+
+<h2><code>storage</code> و <code>disk</code> را قاطی نکن</h2>
+
+<p>یکی از نکات ظریف خروجی <code>lshw</code> این است که:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">storage
+و:
+disk</div></div>
+
+<p>لزومـاً یک چیز نیستند.</p>
+
+<p>به‌صورت ساده:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Storage Controller
+        ↓
+      Disk</div></div>
+
+<p>مثلاً سیستم ممکن است یک SATA Controller داشته باشد که Disk از طریق آن متصل شده است.</p>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">storage</span><div class="code-block">sudo lshw -class storage</div></div>
+
+<p>بیشتر برای دیدن Storage Controller / subsystem مفید است.</p>
+
+<p>در حالی که:</p>
+
+<div class="code-container"><span class="code-label">disk</span><div class="code-block">sudo lshw -class disk</div></div>
+
+<p>برای خود Disk مناسب‌تر است.</p>
+
+<h2>ابزارهای مکمل</h2>
+
+<p>آیا <code>lshw</code> تنها ابزار Hardware Discovery است؟</p>
+
+<p>خیر.</p>
+
+<p>در Linux ابزارهای مختلفی داریم و هر کدام برای سؤال خاصی مناسب‌تر هستند.</p>
+
+<p>فایل اصلی نیز ابزارهای <code>lsdev</code>، <code>lsblk</code>، <code>lspci</code>، <code>lsusb</code> و <code>lscpu</code> را در کنار <code>lshw</code> معرفی می‌کند.</p>
+
+<h3><code>lsblk</code></h3>
+
+<p>برای <strong>Block Deviceها</strong> بسیار مهم است:</p>
+
+<div class="code-container"><span class="code-label">lsblk</span><div class="code-block">lsblk</div></div>
+
+<p>این دستور Diskها و Partitionها را به شکل درختی نمایش می‌دهد.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME   SIZE TYPE MOUNTPOINTS
+sda     50G disk
+├─sda1   1G part /boot
+└─sda2  49G part /</div></div>
+
+<p>اینجا:</p>
+
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">sda
+ ↓
+Disk
+
+sda1
+ ↓
+Partition
+
+sda2
+ ↓
+Partition</div></div>
+
+<p>فایل اصلی نیز <code>lsblk</code> را ابزار نمایش Block Deviceها، Diskها و Partitionها معرفی کرده است.</p>
+
+<h4>چرا <code>lsblk</code> مهم است؟</h4>
+
+<p>چون وقتی وارد مباحث:</p>
+
+<div class="code-container"><span class="code-label">مباحث</span><div class="code-block no-prompt">fdisk
+Partition
+Filesystem
+Mount
+LVM</div></div>
+
+<p>شویم، دائماً نیاز داریم بدانیم:</p>
+
+<div class="code-container"><span class="code-label">سوالات</span><div class="code-block no-prompt">چه Diskهایی داریم؟
+چه Partitionهایی داریم؟
+کدام Mount شده‌اند؟</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Block Device
+      ↓
+     lsblk</div></div>
+
+<p>را به خاطر بسپار.</p>
+
+<h3><code>lspci</code></h3>
+
+<p>برای مشاهده Deviceهای متصل به PCI:</p>
+
+<div class="code-container"><span class="code-label">lspci</span><div class="code-block">lspci</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Network Controller
+VGA Controller
+Storage Controller
+Audio Controller</div></div>
+
+<p>فایل اصلی نیز <code>lspci</code> را برای Deviceهای متصل به PCI Bus معرفی می‌کند.</p>
+
+<h4><code>lspci -k</code></h4>
+
+<p>یک گزینه مهم:</p>
+
+<div class="code-container"><span class="code-label">با driver</span><div class="code-block">lspci -k</div></div>
+
+<p>این گزینه می‌تواند نشان دهد چه Kernel Driverای برای Device استفاده می‌شود.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">SATA controller
+    Kernel driver in use: ahci</div></div>
+
+<p>این موضوع پلی است به <strong>جلسه ۳: Kernel & Kernel Modules</strong>.</p>
+
+<h3><code>lsusb</code></h3>
+
+<p>برای مشاهده USB Devices:</p>
+
+<div class="code-container"><span class="code-label">lsusb</span><div class="code-block">lsusb</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">USB Keyboard
+USB Mouse
+USB Flash Drive
+USB Wi-Fi Adapter</div></div>
+
+<p>را می‌توان با این دستور مشاهده کرد.</p>
+
+<p>فایل اصلی نیز <code>lsusb</code> را برای نمایش Deviceهای متصل به USB معرفی کرده است.</p>
 
 <h3><code>lscpu</code></h3>
 
-<p>برای اطلاعات CPU:</p>
+<p>برای CPU:</p>
 
-<div class="code-container"><span class="code-label">CPU</span><div class="code-block">lscpu</div></div>
+<div class="code-container"><span class="code-label">lscpu</span><div class="code-block">lscpu</div></div>
 
-<p>مثلاً اطلاعاتی درباره:</p>
+<p>اطلاعاتی مانند:</p>
 
 <div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">Architecture
 CPU(s)
@@ -11625,654 +12021,624 @@ Core(s)
 Thread(s)
 Model</div></div>
 
-<p>نمایش می‌دهد.</p>
+<p>را نمایش می‌دهد.</p>
 
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">CPU Question
-     ↓
-   lscpu</div></div>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">CPU
+ ↓
+lscpu</div></div>
 
-<h3><code>lsblk</code></h3>
+<h3><code>lsdev</code></h3>
 
-<p>برای Block Deviceها:</p>
+<p><code>lsdev</code> برای نمایش اطلاعات مربوط به Deviceها استفاده می‌شود و اطلاعاتی مانند:</p>
 
-<div class="code-container"><span class="code-label">Block</span><div class="code-block">lsblk</div></div>
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">IRQ
+I/O Port
+DMA</div></div>
 
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME        SIZE TYPE MOUNTPOINT
-sda          50G disk
-├─sda1        1G part /boot
-└─sda2       49G part /</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Disk / Partition
-       ↓
-     lsblk</div></div>
-
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong><br><code>lsblk</code> تخصصی‌تر از <code>lshw</code> برای بررسی ساختار Disk و Partition است.</div></div>
-
-<h3><code>lspci</code></h3>
-
-<p>برای Deviceهای متصل به PCI Bus:</p>
-
-<div class="code-container"><span class="code-label">PCI</span><div class="code-block">lspci</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Network Controller
-VGA Controller
-SATA Controller</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">PCI Device
-    ↓
-  lspci</div></div>
-
-<h3><code>lspci -k</code></h3>
-
-<p>یکی از گزینه‌های مهم:</p>
-
-<div class="code-container"><span class="code-label">با Driver</span><div class="code-block">lspci -k</div></div>
-
-<p>است.</p>
-
-<p>این گزینه می‌تواند اطلاعات مربوط به Driver مورد استفاده Kernel را نیز نشان دهد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Kernel driver in use: ...
-Kernel modules: ...</div></div>
-
-<p>این موضوع ما را به جلسه بعدی، یعنی <strong>Kernel Modules</strong>، وصل می‌کند.</p>
-
-<h3><code>lsusb</code></h3>
-
-<p>برای مشاهده USB Deviceها:</p>
-
-<div class="code-container"><span class="code-label">USB</span><div class="code-block">lsusb</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Bus 001 Device 002: ...
-Bus 001 Device 003: ...</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">USB Device
-    ↓
-  lsusb</div></div>
+<p>را از منابعی مانند <code>/proc</code> جمع‌آوری می‌کند.</p>
 
 <h3><code>dmesg</code></h3>
 
-<p><code>dmesg</code> پیام‌های Kernel را نمایش می‌دهد:</p>
+<p>گاهی می‌خواهیم بفهمیم Kernel هنگام اتصال یا شناسایی یک Device چه اتفاقی را ثبت کرده است.</p>
 
-<div class="code-container"><span class="code-label">Kernel Messages</span><div class="code-block">dmesg</div></div>
+<p>برای این کار:</p>
 
-<p>این پیام‌ها می‌توانند هنگام شناسایی Hardware بسیار مفید باشند.</p>
+<div class="code-container"><span class="code-label">dmesg</span><div class="code-block">dmesg</div></div>
 
-<p>مثلاً وقتی یک USB Device وصل می‌کنیم، Kernel ممکن است پیام‌هایی درباره آن ثبت کند.</p>
+<p>مفید است.</p>
 
-<p>پس:</p>
+<p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Hardware Event
-      ↓
-Kernel
-      ↓
-dmesg</div></div>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">dmesg | tail</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">جستجو</span><div class="code-block">dmesg | grep -i usb</div></div>
+
+<p>فایل اصلی نیز <code>dmesg</code> را برای مشاهده پیام‌های Kernel و اطلاعات شناسایی Deviceها در زمان Boot و Runtime معرفی می‌کند.</p>
 
 <h3><code>dmidecode</code></h3>
 
-<p>برای اطلاعات Hardware مربوط به DMI/SMBIOS:</p>
+<p>گاهی اطلاعاتی مانند:</p>
 
-<div class="code-container"><span class="code-label">DMI</span><div class="code-block">sudo dmidecode</div></div>
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">Motherboard
+BIOS
+System Manufacturer
+Serial Number</div></div>
 
-<p>استفاده می‌شود.</p>
+<p>می‌خواهیم.</p>
 
-<p>می‌تواند اطلاعاتی مانند:</p>
+<p>ابزار:</p>
 
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">BIOS
-Motherboard
-System
-Memory</div></div>
+<div class="code-container"><span class="code-label">dmidecode</span><div class="code-block">sudo dmidecode</div></div>
 
-<p>را ارائه کند.</p>
+<p>می‌تواند اطلاعات DMI/SMBIOS را در اختیارمان قرار دهد. این ابزار در درسنامه اصلی نیز به‌عنوان ابزار تکمیلی Hardware معرفی شده است.</p>
 
-<p>اما در این جلسه کافی است بدانیم:</p>
+<h2>جدول بسیار مهم</h2>
 
-<blockquote><code>dmidecode</code> برای اطلاعات Hardware سطح Firmware/DMI بسیار مفید است.</blockquote>
+<p>هر سؤال → کدام دستور؟</p>
 
-<h2>ابزار مناسب برای سؤال مناسب</h2>
-
-<p>این بخش را برای آزمون خیلی خوب یاد بگیر.</p>
+<p>این جدول را خوب یاد بگیر:</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>سؤال</th><th>ابزار</th></tr></thead>
+<thead><tr><th>سؤال</th><th>دستور</th></tr></thead>
 <tbody>
-<tr><td>کل Hardware سیستم چیست؟</td><td><code>lshw</code></td></tr>
-<tr><td>نمای خلاصه Hardware؟</td><td><code>lshw -short</code></td></tr>
-<tr><td>فقط Disk؟</td><td><code>lshw -class disk</code></td></tr>
-<tr><td>CPU چیست؟</td><td><code>lscpu</code></td></tr>
-<tr><td>Disk و Partition چیست؟</td><td><code>lsblk</code></td></tr>
-<tr><td>PCI Device چیست؟</td><td><code>lspci</code></td></tr>
-<tr><td>Driver مربوط به PCI چیست؟</td><td><code>lspci -k</code></td></tr>
-<tr><td>USB Device چیست؟</td><td><code>lsusb</code></td></tr>
-<tr><td>Kernel چه چیزی درباره Device گفته؟</td><td><code>dmesg</code></td></tr>
-<tr><td>اطلاعات Firmware/DMI؟</td><td><code>dmidecode</code></td></tr>
+<tr><td>اطلاعات کلی Hardware</td><td><code>lshw</code></td></tr>
+<tr><td>نمای خلاصه Hardware</td><td><code>lshw -short</code></td></tr>
+<tr><td>فقط یک Class خاص</td><td><code>lshw -class ...</code></td></tr>
+<tr><td>Disk و Partition</td><td><code>lsblk</code></td></tr>
+<tr><td>PCI Devices</td><td><code>lspci</code></td></tr>
+<tr><td>USB Devices</td><td><code>lsusb</code></td></tr>
+<tr><td>CPU</td><td><code>lscpu</code></td></tr>
+<tr><td>IRQ / I/O / DMA</td><td><code>lsdev</code></td></tr>
+<tr><td>پیام‌های Kernel</td><td><code>dmesg</code></td></tr>
+<tr><td>اطلاعات DMI/SMBIOS</td><td><code>dmidecode</code></td></tr>
 </tbody>
 </table>
 </div>
 
-<h2>یک روش بسیار مهم برای انتخاب ابزار</h2>
+<h2>سناریوی واقعی: یک Disk جدید اضافه کرده‌ایم</h2>
 
-<h3>سؤال را به Device تبدیل کن</h3>
+<p>فرض کن یک Disk جدید به Server وصل کرده‌ایم، اما مطمئن نیستیم Linux آن را شناخته یا نه.</p>
 
-<p>قبل از اجرای دستور، ابتدا سؤال را مشخص کن.</p>
+<h3>مرحله ۱ — Hardware</h3>
+<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">sudo lshw -class disk</div></div>
+<p>می‌خواهیم ببینیم آیا Hardware شناسایی شده است یا نه.</p>
 
-<p>مثلاً:</p>
+<h3>مرحله ۲ — Block Device</h3>
+<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">lsblk</div></div>
+<p>می‌خواهیم ببینیم آیا Disk به‌عنوان Block Device ظاهر شده است یا نه.</p>
 
-<h4>«CPU من چیست؟»</h4>
+<h3>مرحله ۳ — Kernel Messages</h3>
+<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">dmesg | tail -20</div></div>
+<p>می‌خواهیم ببینیم Kernel هنگام اتصال Device چه چیزی ثبت کرده است.</p>
+
+<p>اگر Disk از USB باشد:</p>
+
+<div class="code-container"><span class="code-label">USB</span><div class="code-block">lsusb</div></div>
+
+<p>هم بررسی می‌کنیم.</p>
+
+<p>این دقیقاً یکی از سناریوهای عیب‌یابی موجود در درسنامه اصلی است.</p>
+
+<h2>سناریوی کارت شبکه</h2>
+
+<p>Network Card مشکل دارد</p>
+
+<p>ابتدا:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lspci -k | grep -i network</div></div>
+
+<p>برای بررسی Device و Driver.</p>
+
+<p>سپس می‌توانیم Driver را بررسی کنیم:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsmod | grep &lt;driver_name&gt;</div></div>
+
+<p>و در صورت نیاز:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">cat /proc/interrupts</div></div>
+
+<p>را بررسی کنیم.</p>
+
+<p>درسنامه اصلی نیز همین مسیر را برای Troubleshooting کارت شبکه پیشنهاد می‌کند.</p>
+
+<h2>سناریوی USB</h2>
+
+<p>USB وصل شده ولی شناسایی نمی‌شود</p>
+
+<p>ابتدا:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
+
+<p>بعد:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | grep -i usb</div></div>
+
+<p>اگر USB Device از نوع Storage باشد:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
+
+<p>را نیز بررسی می‌کنیم.</p>
+
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">USB Device
+    ↓
+lsusb
+    ↓
+Kernel Messages
+    ↓
+اگر Storage بود
+    ↓
+lsblk</div></div>
+
+<p>این ترتیب در سناریوی اصلی فایل نیز آمده است.</p>
+
+<h2>ارتباط همه مفاهیم</h2>
+
+<p>حالا همه چیز را کنار هم بگذار</p>
+
+<p>این مهم‌ترین نمودار جلسه است:</p>
+
+<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">                     Physical Hardware
+                            │
+                            ▼
+                       Linux Kernel
+                            │
+             ┌──────────────┼──────────────┐
+             │              │              │
+             ▼              ▼              ▼
+           /dev           /proc          /sys
+             │              │              │
+             │              │              │
+       Device Files    Kernel Info    Device Structure
+             │
+       ┌─────┴─────┐
+       │           │
+       ▼           ▼
+    Character     Block
+     Device      Device
+                    │
+              ┌─────┴─────┐
+              ▼           ▼
+            Disk       Partition
+              │
+              ▼
+            lsblk</div></div>
+
+<p>و برای شناسایی کلی Hardware:</p>
+
+<div class="code-container"><span class="code-label">Hardware</span><div class="code-block no-prompt">Hardware
+    ↓
+  lshw</div></div>
+
+<p>برای PCI:</p>
+
+<div class="code-container"><span class="code-label">PCI</span><div class="code-block no-prompt">PCI Hardware
+    ↓
+  lspci</div></div>
+
+<p>برای USB:</p>
+
+<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">USB Hardware
+    ↓
+  lsusb</div></div>
+
+<p>برای CPU:</p>
+
 <div class="code-container"><span class="code-label">CPU</span><div class="code-block no-prompt">CPU
  ↓
 lscpu</div></div>
 
-<h4>«چه Diskهایی دارم؟»</h4>
-<div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">Disk
- ↓
-lsblk</div></div>
+<h2>نکته مهم درباره Block Device</h2>
 
-<h4>«چه USBهایی وصل هستند؟»</h4>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">USB
- ↓
-lsusb</div></div>
+<p>Block Device فقط «هارد» نیست</p>
 
-<h4>«چه PCI Deviceهایی دارم؟»</h4>
-<div class="code-container"><span class="code-label">PCI</span><div class="code-block no-prompt">PCI
- ↓
-lspci</div></div>
+<p>در این جلسه نباید Block Device را فقط با «هارد دیسک» یکی بدانی.</p>
 
-<h4>«کل Hardware چیست؟»</h4>
-<div class="code-container"><span class="code-label">همه</span><div class="code-block no-prompt">Everything
- ↓
-lshw</div></div>
+<p>هارد و SSD نمونه‌های مهم Block Device هستند، اما در Linux لایه Block می‌تواند Deviceهای منطقی دیگری را هم شامل شود.</p>
 
-<p>این روش از حفظ کردن کورکورانه دستورات بهتر است.</p>
+<p>مثلاً در مباحث بعدی با چیزهایی مثل:</p>
 
-<h2><code>lshw</code> در برابر ابزارهای تخصصی</h2>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">LVM
+RAID
+Device Mapper
+Loop Device</div></div>
 
-<h3>تفاوت مهم</h3>
+<p>مواجه خواهیم شد.</p>
 
-<p><code>lshw</code> را مثل یک <strong>نمای کلی از Hardware</strong> ببین.</p>
+<p>این‌ها می‌توانند در زنجیره Block Storage قرار بگیرند.</p>
 
-<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                 lshw
-                  │
-       ┌──────────┼──────────┐
-       ↓          ↓          ↓
-      CPU        Disk       Network
-       │          │           │
-     lscpu      lsblk       lspci
-                              │
-                             ...</div></div>
+<p>پس مدل دقیق‌تر:</p>
 
-<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Physical Storage
+      ↓
+Block Layer
+      ↓
+Block Devices
+      ↓
+Filesystem
+      ↓
+Mount</div></div>
 
-<blockquote><code>lshw</code> ابزار جامع است؛ ابزارهایی مانند <code>lscpu</code>، <code>lsblk</code>، <code>lspci</code> و <code>lsusb</code> برای حوزه‌های مشخص تخصصی‌تر هستند.</blockquote>
+<p>این نکته در جلسات آینده، مخصوصاً هنگام ورود به <strong>LVM و RAID</strong>، اهمیت زیادی پیدا می‌کند.</p>
 
-<h2>سناریوی عملی ۱ — «چه Hardwareهایی روی Server وجود دارد؟»</h2>
+<h2>تفاوت <code>/dev</code>، <code>/proc</code> و <code>/sys</code></h2>
 
-<h3>مرحله اول</h3>
-<p>نمای کلی:</p>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block">sudo lshw -short</div></div>
-<p>اگر اطلاعات بیشتری لازم داشتیم:</p>
-<div class="code-container"><span class="code-label">کامل</span><div class="code-block">sudo lshw</div></div>
-
-<h3>مرحله دوم</h3>
-<p>اگر CPU مهم است:</p>
-<div class="code-container"><span class="code-label">CPU</span><div class="code-block">lscpu</div></div>
-<p>اگر Storage مهم است:</p>
-<div class="code-container"><span class="code-label">Storage</span><div class="code-block">lsblk</div></div>
-<p>اگر Network Controller مهم است:</p>
-<div class="code-container"><span class="code-label">Network</span><div class="code-block">lspci -k</div></div>
-
-<h2>سناریوی عملی ۲ — «یک Disk جدید وصل کرده‌ام ولی آن را نمی‌بینم»</h2>
-
-<h3>مرحله اول — Hardware</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo lshw -class disk</div></div>
-<p>می‌خواهیم بفهمیم آیا Linux اصلاً Hardware را شناسایی کرده است یا نه.</p>
-
-<h3>مرحله دوم — Block Device</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-<p>اگر Disk شناسایی شده باشد، معمولاً در ساختار Block Device قابل مشاهده است.</p>
-
-<h3>مرحله سوم — Kernel Messages</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | tail -20</div></div>
-<p>برای دیدن پیام‌های اخیر Kernel.</p>
-<p>اگر Disk USB باشد:</p>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block">lsusb</div></div>
-<p>نیز مفید است.</p>
-
-<h3>مدل Troubleshooting</h3>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Disk دیده نمی‌شود
-       ↓
-lshw -class disk
-       ↓
-lsblk
-       ↓
-dmesg
-       ↓
-اگر USB است → lsusb</div></div>
-<p>این ترتیب یک مدل عملی خوب برای عیب‌یابی اولیه است.</p>
-
-<h2>سناریوی عملی ۳ — «کارت شبکه مشکل دارد»</h2>
-
-<h3>Hardware را پیدا کن</h3>
-<div class="code-container"><span class="code-label">پیدا کردن</span><div class="code-block">lspci | grep -i network</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">با Driver</span><div class="code-block">lspci -k | grep -A 3 -i network</div></div>
-<p>با <code>-k</code> می‌توانیم به Driver مربوط به دستگاه نیز نگاه کنیم.</p>
-
-<h3>Kernel را بررسی کن</h3>
-<p>اگر مشکل Hardware/Driver وجود دارد:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | grep -i network</div></div>
-<p>یا بر اساس نام Driver بررسی می‌کنیم.</p>
-<p>این بخش عمداً فقط در حد آشنایی است؛ <strong>مدیریت Kernel Modules در جلسه ۳</strong> بررسی خواهد شد.</p>
-
-<h2>سناریوی عملی ۴ — «USB Device شناسایی نمی‌شود»</h2>
-
-<h3>بررسی USB</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsusb</div></div>
-<p>اگر Device در اینجا دیده شود، Kernel آن را در USB Bus شناسایی کرده است.</p>
-
-<h3>بررسی پیام‌های Kernel</h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">dmesg | grep -i usb</div></div>
-
-<h3>اگر USB Storage است</h3>
-<p>اگر USB یک Flash Drive یا Storage باشد:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-<p>را نیز بررسی می‌کنیم.</p>
-
-<p>پس:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">USB Device
-    ↓
-lsusb
-    ↓
-dmesg
-    ↓
-اگر Storage است → lsblk</div></div>
-
-<h2>ارتباط <code>/dev</code>، <code>/sys</code> و ابزارها</h2>
-
-<h3>تصویر مهم</h3>
-
-<p>حالا می‌توانیم ارتباط مفاهیم را این‌طور ببینیم:</p>
-
-<div class="code-container"><span class="code-label">تصویر</span><div class="code-block no-prompt">                Hardware
-                    ↓
-               Linux Kernel
-                    ↓
-          ┌─────────┴─────────┐
-          ↓                   ↓
-        /sys                  /dev
-          ↓                   ↓
- Device / Driver          Device Files
-          │
-          └──────────┐
-                     ↓
-                   Tools</div></div>
-
-<p>و <code>/proc</code> نیز اطلاعات Runtime و Kernel را در اختیار قرار می‌دهد:</p>
-
-<div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">Kernel
-  ↓
-/proc
-  ↓
-Runtime / Kernel Information</div></div>
-
-<h2>آیا <code>lshw</code> مستقیماً Hardware را مدیریت می‌کند؟</h2>
-
-<h3>یک سوءتفاهم مهم</h3>
-
-<p><code>lshw</code> برای:</p>
-
-<div class="code-container"><span class="code-label">کاربرد</span><div class="code-block no-prompt">Information
-Discovery
-Inventory</div></div>
-
-<p>است.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">lshw
- ↓
-می‌بینیم</div></div>
-
-<p>نه:</p>
-
-<div class="code-container"><span class="code-label">نه</span><div class="code-block no-prompt">lshw
- ↓
-تغییر می‌دهیم</div></div>
-
-<p><code>lshw</code> ابزار Partitioning یا مدیریت Disk نیست.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">lshw       → شناخت Hardware
-fdisk      → Partitioning
-mkfs       → ساخت Filesystem
-mount      → اتصال Filesystem</div></div>
-
-<p>این تفاوت در فصل سوم بسیار مهم است.</p>
-
-<h2>اشتباهات رایج</h2>
-
-<h3>اشتباه اول</h3>
-<p>فکر کنیم:</p>
-<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block no-prompt">lshw = فقط Disk</div></div>
-<p>❌ غلط.</p>
-<p><code>lshw</code> اطلاعات طیف گسترده‌ای از Hardware را نمایش می‌دهد.</p>
-
-<h3>اشتباه دوم</h3>
-<p>فکر کنیم:</p>
-<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block no-prompt">lsblk = تمام Hardware</div></div>
-<p>❌ غلط.</p>
-<p><code>lsblk</code> روی <strong>Block Deviceها</strong> تمرکز دارد.</p>
-
-<h3>اشتباه سوم</h3>
-<p>فکر کنیم:</p>
-<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block no-prompt">lspci = تمام PCI + USB</div></div>
-<p>❌ غلط.</p>
-<p><code>lspci</code> برای PCI است.</p>
-<p>برای USB:</p>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block">lsusb</div></div>
-
-<h3>اشتباه چهارم</h3>
-<p>فکر کنیم:</p>
-<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block no-prompt">/dev = اطلاعات Hardware</div></div>
-<p>به این شکل کلی درست نیست.</p>
-<p><code>/dev</code> محل <strong>Device Files</strong> است.</p>
-<p>برای اطلاعات ساختاریافته Deviceها:</p>
-<div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys</div></div>
-<p>مهم‌تر است.</p>
-
-<div class="summary-box">
-    <h3>⭐ نکات LPIC-1</h3>
-    <div class="code-container"><span class="code-label">نکته ۱</span><div class="code-block no-prompt">lshw
- ↓
-List Hardware</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۲</span><div class="code-block">sudo lshw -short</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۳</span><div class="code-block">sudo lshw -class disk</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۴</span><div class="code-block no-prompt">/dev
-→ Device Files</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۵</span><div class="code-block no-prompt">/proc
-→ اطلاعات Runtime مربوط به Kernel و Processها</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۶</span><div class="code-block no-prompt">/sys
-→ اطلاعات ساختاریافته Deviceها و Driverها</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۷</span><div class="code-block no-prompt">lsblk
-→ Block Deviceها</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۸</span><div class="code-block no-prompt">lspci
-→ PCI Devices</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۹</span><div class="code-block no-prompt">lsusb
-→ USB Devices</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۱۰</span><div class="code-block no-prompt">lscpu
-→ CPU Information</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۱۱</span><div class="code-block no-prompt">dmesg
-→ Kernel Messages</div></div>
-
-    <div class="code-container"><span class="code-label">نکته ۱۲</span><div class="code-block no-prompt">lspci -k
-→ اطلاعات Device + Kernel Driver</div></div>
-</div>
-
-<h2>چیت‌شیت جلسه</h2>
-
-<div class="code-container"><span class="code-label">چیت‌شیت</span><div class="code-block no-prompt">                HARDWARE
-                    │
-                    ▼
-              Linux Kernel
-                    │
-        ┌───────────┼───────────┐
-        ▼           ▼           ▼
-      /dev        /proc        /sys
- Device Files   Runtime Info  Device Model
-        │
-        └──────────────┐
-                       ▼
-                     TOOLS
-                       │
-      ┌────────────────┼────────────────┐
-      ▼                ▼                ▼
-    lshw             lscpu            lsblk
-  Hardware             CPU          Disk/Partition
-      │
-      ├── lspci → PCI
-      ├── lsusb → USB
-      ├── dmesg → Kernel Messages
-      └── dmidecode → DMI/Firmware</div></div>
-
-<h2>جدول نهایی دستورات</h2>
+<p>این سه را حفظ کن</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
+<thead><tr><th>مسیر</th><th>مفهوم ساده</th></tr></thead>
 <tbody>
-<tr><td><code>lshw</code></td><td>گزارش جامع Hardware</td></tr>
-<tr><td><code>lshw -short</code></td><td>نمای خلاصه Hardware</td></tr>
-<tr><td><code>lshw -class disk</code></td><td>اطلاعات Disk</td></tr>
-<tr><td><code>lshw -class network</code></td><td>اطلاعات Network</td></tr>
-<tr><td><code>lscpu</code></td><td>اطلاعات CPU</td></tr>
-<tr><td><code>lsblk</code></td><td>Disk / Partition / Block Device</td></tr>
-<tr><td><code>lspci</code></td><td>PCI Devices</td></tr>
-<tr><td><code>lspci -k</code></td><td>PCI + Kernel Driver</td></tr>
-<tr><td><code>lsusb</code></td><td>USB Devices</td></tr>
-<tr><td><code>dmesg</code></td><td>Kernel Messages</td></tr>
-<tr><td><code>dmidecode</code></td><td>اطلاعات DMI/SMBIOS</td></tr>
-<tr><td><code>lsdev</code></td><td>اطلاعات Device از منابع <code>/proc</code></td></tr>
+<tr><td><code>/dev</code></td><td>Device Fileها</td></tr>
+<tr><td><code>/proc</code></td><td>اطلاعات Kernel و Processها</td></tr>
+<tr><td><code>/sys</code></td><td>اطلاعات ساختاریافته Deviceها و Driverها</td></tr>
 </tbody>
 </table>
 </div>
 
-<h2>خودآزمایی</h2>
+<p>مثلاً:</p>
 
-<div class="quiz-card"><p>❓ تست ۱: دستور اصلی برای مشاهده اطلاعات جامع Hardware چیست؟</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda
+یعنی: Device Node مربوط به یک Block Device</div></div>
+
+<p>ولی:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/proc/interrupts
+یعنی: اطلاعات مربوط به Interruptها</div></div>
+
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/sys/block/sda/
+یعنی: اطلاعات ساختاریافته مربوط به Block Device sda</div></div>
+
+<p>فایل اصلی نیز دقیقاً همین تفکیک سه‌گانه را ارائه می‌کند.</p>
+
+<h2>چیزی که نباید با هم قاطی شود</h2>
+
+<p>این مفاهیم متفاوت‌اند</p>
+
+<h3>Hardware</h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Hardware</span><div class="code-block no-prompt">Physical SSD</div></div>
+
+<h3>Device</h3>
+<p>نمایش Hardware توسط Kernel.</p>
+
+<h3>Device File</h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Device File</span><div class="code-block no-prompt">/dev/sda</div></div>
+
+<h3>Block Device</h3>
+<p>نوعی Device برای Block-oriented I/O.</p>
+
+<h3>Partition</h3>
+<p>بخشی از Block Storage:</p>
+<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sda1</div></div>
+
+<h3>Filesystem</h3>
+<p>ساختار ذخیره فایل‌ها مثل:</p>
+<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">ext4
+XFS</div></div>
+
+<h3>Mount Point</h3>
+<p>مسیری که Filesystem در آن قابل دسترسی می‌شود:</p>
+<div class="code-container"><span class="code-label">Mount Point</span><div class="code-block no-prompt">/data</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Physical Disk
+      ↓
+Block Device
+      ↓
+Partition
+      ↓
+Filesystem
+      ↓
+Mount Point</div></div>
+
+<p>این زنجیره را برای جلسات بعدی خیلی جدی بگیر.</p>
+
+<div class="summary-box">
+    <h3>⭐ نکات مهم LPIC-1</h3>
+
+    <h4>⭐ نکته ۱</h4>
+    <div class="code-container"><span class="code-label">lshw</span><div class="code-block">lshw</div></div>
+    <p>برای مشاهده اطلاعات جامع Hardware است.</p>
+
+    <h4>⭐ نکته ۲</h4>
+    <div class="code-container"><span class="code-label">lshw -short</span><div class="code-block">lshw -short</div></div>
+    <p>نمای خلاصه ارائه می‌دهد.</p>
+
+    <h4>⭐ نکته ۳</h4>
+    <div class="code-container"><span class="code-label">lshw -class disk</span><div class="code-block">lshw -class disk</div></div>
+    <p>برای فیلتر کردن یک Class خاص است.</p>
+
+    <h4>⭐ نکته ۴</h4>
+    <p>Diskها نمونه مهم:</p>
+    <div class="code-container"><span class="code-label">Block Device</span><div class="code-block no-prompt">Block Device</div></div>
+    <p>هستند.</p>
+
+    <h4>⭐ نکته ۵</h4>
+    <div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev</div></div>
+    <p>محل Device Fileهاست.</p>
+
+    <h4>⭐ نکته ۶</h4>
+    <div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">/proc</div></div>
+    <p>Virtual Filesystem مربوط به اطلاعات Kernel، Process و اطلاعات Runtime است.</p>
+
+    <h4>⭐ نکته ۷</h4>
+    <div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys</div></div>
+    <p>اطلاعات ساختاریافته‌تری درباره Deviceها، Busها و Driverها ارائه می‌کند.</p>
+
+    <h4>⭐ نکته ۸</h4>
+    <p>برای Disk و Partition:</p>
+    <div class="code-container"><span class="code-label">lsblk</span><div class="code-block">lsblk</div></div>
+    <p>خیلی مهم است.</p>
+
+    <h4>⭐ نکته ۹</h4>
+    <p>برای PCI:</p>
+    <div class="code-container"><span class="code-label">lspci</span><div class="code-block">lspci</div></div>
+    <p>برای USB:</p>
+    <div class="code-container"><span class="code-label">lsusb</span><div class="code-block">lsusb</div></div>
+
+    <h4>⭐ نکته ۱۰</h4>
+    <p>برای CPU:</p>
+    <div class="code-container"><span class="code-label">lscpu</span><div class="code-block">lscpu</div></div>
+</div>
+
+<h2>تست‌های مفهومی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱: کدام گزینه نمونه‌ای از Block Device است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lsblk</code></button>
-    <button onclick="selectOption(this)">ب) <code>lshw</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsusb</code></button>
-    <button onclick="selectOption(this)">د) <code>lspci</code></button>
+    <button onclick="selectOption(this)">الف) Keyboard</button>
+    <button onclick="selectOption(this)">ب) Terminal</button>
+    <button onclick="selectOption(this)">ج) SSD</button>
+    <button onclick="selectOption(this)">د) Serial Port</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lshw</code> ابزار جامع مشاهده Hardware است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — SSD</strong><br>چون SSD یک Storage Device است و در Linux به‌صورت Block Device مدیریت می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۲: برای مشاهده نمای خلاصه <code>lshw</code> از کدام گزینه استفاده می‌کنیم؟</p>
+<div class="quiz-card"><p>❓ سؤال ۲: کدام گزینه بهترین توصیف Block Device است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>-s</code></button>
-    <button onclick="selectOption(this)">ب) <code>-short</code></button>
-    <button onclick="selectOption(this)">ج) <code>-brief</code></button>
-    <button onclick="selectOption(this)">د) <code>-summary</code></button>
+    <button onclick="selectOption(this)">الف) Deviceای که فقط داده متنی منتقل می‌کند</button>
+    <button onclick="selectOption(this)">ب) Deviceای که داده را به شکل Blockهای قابل آدرس‌دهی مدیریت می‌کند</button>
+    <button onclick="selectOption(this)">ج) Deviceای که فقط برای Network استفاده می‌شود</button>
+    <button onclick="selectOption(this)">د) Deviceای که فقط در <code>/proc</code> وجود دارد</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lshw -short</code> نمای خلاصه Hardware را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>Block Device داده را به شکل Blockهای قابل آدرس‌دهی مدیریت می‌کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۳: کدام دستور برای مشاهده Block Deviceها مناسب‌تر است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۳: <code>/dev/sda</code> چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lsusb</code></button>
-    <button onclick="selectOption(this)">ب) <code>lspci</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
-    <button onclick="selectOption(this)">د) <code>lscpu</code></button>
+    <button onclick="selectOption(this)">الف) خود فایل سیستم ext4</button>
+    <button onclick="selectOption(this)">ب) یک Mount Point</button>
+    <button onclick="selectOption(this)">ج) Device Node مربوط به یک Block Device</button>
+    <button onclick="selectOption(this)">د) یک فایل معمولی متنی</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lsblk</code> مخصوص نمایش Block Deviceهاست.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۴: کدام مسیر شامل Device Files است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/proc</code></button>
-    <button onclick="selectOption(this)">ب) <code>/sys</code></button>
-    <button onclick="selectOption(this)">ج) <code>/dev</code></button>
-    <button onclick="selectOption(this)">د) <code>/etc</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/dev</code> شامل Device Files است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/dev/sda</code> یک Device Node مربوط به Block Device است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۵: کدام مسیر بیشتر با Device Model و Driverها مرتبط است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۴: کدام مسیر بیشتر برای اطلاعات ساختاریافته Deviceها و Driverها استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>/dev</code></button>
-    <button onclick="selectOption(this)">ب) <code>/sys</code></button>
-    <button onclick="selectOption(this)">ج) <code>/home</code></button>
+    <button onclick="selectOption(this)">ب) <code>/proc</code></button>
+    <button onclick="selectOption(this)">ج) <code>/sys</code></button>
     <button onclick="selectOption(this)">د) <code>/boot</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>/sys</code> اطلاعات Device Model و Driverها را دارد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>/sys</code></strong><br><code>/sys</code> اطلاعات ساختاریافته Deviceها و Driverها را ارائه می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۶: برای مشاهده USB Deviceها کدام دستور مناسب است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۵: کدام مسیر شامل Device Fileهاست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>/dev</code></button>
+    <button onclick="selectOption(this)">ب) <code>/proc</code></button>
+    <button onclick="selectOption(this)">ج) <code>/sys</code></button>
+    <button onclick="selectOption(this)">د) <code>/etc</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>/dev</code></strong><br><code>/dev</code> محل Device Fileهاست.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶: برای مشاهده Block Deviceها کدام دستور مناسب‌تر است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>lspci</code></button>
     <button onclick="selectOption(this)">ب) <code>lsblk</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsusb</code></button>
-    <button onclick="selectOption(this)">د) <code>lshw</code></button>
+    <button onclick="selectOption(this)">ج) <code>lscpu</code></button>
+    <button onclick="selectOption(this)">د) <code>lsusb</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lsusb</code> دستگاه‌های USB را نمایش می‌دهد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۷: کدام دستور برای مشاهده CPU Information مناسب‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lscpu</code></button>
-    <button onclick="selectOption(this)">ب) <code>lsusb</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsdev</code></button>
-    <button onclick="selectOption(this)">د) <code>dmesg</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>lscpu</code> اطلاعات CPU را نمایش می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>lsblk</code></strong><br><code>lsblk</code> برای مشاهده Block Deviceها مناسب است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: گزینه <code>-k</code> در <code>lspci</code> برای چه چیزی مفید است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) نمایش USB</button>
-    <button onclick="selectOption(this)">ب) نمایش Kernel Driver مربوط به Device</button>
-    <button onclick="selectOption(this)">ج) نمایش Disk Space</button>
-    <button onclick="selectOption(this)">د) نمایش Partition Table</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lspci -k</code> Kernel Driver مربوط به Device را نشان می‌دهد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۹: کدام مورد یک Block Device است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/dev/tty</code></button>
-    <button onclick="selectOption(this)">ب) <code>/dev/ttyS0</code></button>
-    <button onclick="selectOption(this)">ج) <code>/dev/sda</code></button>
-    <button onclick="selectOption(this)">د) Keyboard</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>/dev/sda</code> یک Block Device (دیسک) است.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۰ — سناریویی: یک USB Flash Drive به سیستم متصل شده اما مشخص نیست Linux آن را شناسایی کرده یا نه. کدام مسیر منطقی‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lsusb</code> سپس <code>lsblk</code></button>
-    <button onclick="selectOption(this)">ب) <code>lscpu</code> سپس <code>lspci</code></button>
-    <button onclick="selectOption(this)">ج) <code>df -h</code> سپس <code>du -sh</code></button>
-    <button onclick="selectOption(this)">د) <code>fdisk</code> سپس <code>mkfs</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br>ابتدا <code>lsusb</code> و سپس <code>lsblk</code> برای بررسی Storage.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۱ — مفهومی: کدام گزینه بهترین توصیف برای <code>lshw</code> است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) ابزار Partitioning</button>
-    <button onclick="selectOption(this)">ب) ابزار Filesystem Creation</button>
-    <button onclick="selectOption(this)">ج) ابزار Hardware Inventory</button>
-    <button onclick="selectOption(this)">د) ابزار Mount کردن Disk</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lshw</code> ابزار Hardware Inventory است.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۲ — سناریویی: می‌خواهی بفهمی کارت شبکه چه Driverی توسط Kernel استفاده می‌کند. کدام دستور مناسب‌تر است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۷: برای مشاهده PCI Devices از چه دستوری استفاده می‌کنیم؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>lsusb</code></button>
-    <button onclick="selectOption(this)">ب) <code>lspci -k</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">ب) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">ج) <code>lspci</code></button>
     <button onclick="selectOption(this)">د) <code>lscpu</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lspci -k</code> اطلاعات PCI Device همراه با Kernel Driver را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>lspci</code></strong><br><code>lspci</code> برای مشاهده PCI Devices استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۸: کدام دستور اطلاعات جامع Hardware را نمایش می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>lshw</code></button>
+    <button onclick="selectOption(this)">ب) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">ج) <code>lsusb</code></button>
+    <button onclick="selectOption(this)">د) <code>lsdev</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>lshw</code></strong><br><code>lshw</code> اطلاعات جامع Hardware را نمایش می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۹: اگر فقط Diskها را با <code>lshw</code> بخواهیم:</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>sudo lshw -class disk</code></button>
+    <button onclick="selectOption(this)">ب) <code>sudo lshw -disk</code></button>
+    <button onclick="selectOption(this)">ج) <code>sudo lshw --only-disk</code></button>
+    <button onclick="selectOption(this)">د) <code>sudo lshw -storage-only</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>sudo lshw -class disk</code> فقط Diskها را نمایش می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۱۰: کدام دستور برای دیدن Kernel Driver مورد استفاده یک PCI Device مفید است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>lspci -k</code></button>
+    <button onclick="selectOption(this)">ب) <code>lsblk -k</code></button>
+    <button onclick="selectOption(this)">ج) <code>lshw -usb</code></button>
+    <button onclick="selectOption(this)">د) <code>lscpu -k</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>lspci -k</code></strong><br><code>lspci -k</code> Kernel Driver مورد استفاده یک PCI Device را نشان می‌دهد.</div>
+</div>
+
+<div class="summary-box">
+    <h3>📋 Cheat Sheet جلسه</h3>
+    <div class="code-container"><span class="code-label">HARDWARE DISCOVERY</span><div class="code-block no-prompt">══════════════════════════════════════
+        HARDWARE DISCOVERY
+══════════════════════════════════════
+
+/dev
+ ↓
+Device Files
+ ↓
+Character / Block
+
+
+Block Device
+ ↓
+Disk / SSD / NVMe
+ ↓
+lsblk
+
+
+/proc
+ ↓
+Kernel / Process / Runtime Info
+ ↓
+/proc/interrupts
+/proc/ioports
+
+
+/sys
+ ↓
+Device / Driver / Bus Information
+
+
+lshw
+ ↓
+General Hardware
+
+
+lshw -short
+ ↓
+Summary
+
+
+lshw -class disk
+ ↓
+Disk
+
+
+lshw -class network
+ ↓
+Network Hardware
+
+
+lspci
+ ↓
+PCI Devices
+
+
+lsusb
+ ↓
+USB Devices
+
+
+lscpu
+ ↓
+CPU
+
+
+lsdev
+ ↓
+IRQ / I/O / DMA
+
+
+dmesg
+ ↓
+Kernel Messages
+
+
+dmidecode
+ ↓
+DMI / SMBIOS Information</div></div>
 </div>
 
 <div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور ۳۰ ثانیه‌ای</strong><br>
-<p>اگر شب قبل آزمون فقط ۳۰ ثانیه وقت داشتی:</p>
+<p>اگر شب امتحان فقط ۳۰ ثانیه فرصت داشتی، این را بخوان:</p>
+<div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">/dev
+→ Device Files
 
-<div class="code-container"><span class="code-label">lshw</span><div class="code-block no-prompt">lshw
- ↓
-Hardware Inventory</div></div>
+Character Device
+→ Stream / Character-oriented I/O
+→ Terminal / Serial
 
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev
- ↓
-Device Files</div></div>
+Block Device
+→ Block-oriented Storage I/O
+→ Disk / SSD / NVMe
 
-<div class="code-container"><span class="code-label">/proc</span><div class="code-block no-prompt">/proc
- ↓
-Kernel / Process Runtime Info</div></div>
+/proc
+→ Kernel + Process + Runtime Information
 
-<div class="code-container"><span class="code-label">/sys</span><div class="code-block no-prompt">/sys
- ↓
-Devices / Drivers / Device Model</div></div>
+/sys
+→ Device + Driver + Bus Structure
 
-<p>و:</p>
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lscpu  → CPU
-lsblk  → Disk / Partition
-lspci  → PCI
-lsusb  → USB
-dmesg  → Kernel Messages</div></div>
+lshw
+→ General Hardware
 
-<p>و برای <code>lshw</code>:</p>
-<div class="code-container"><span class="code-label">lshw</span><div class="code-block">sudo lshw
-sudo lshw -short
-sudo lshw -class disk</div></div>
-</div></div>
+lsblk
+→ Block Devices / Disk / Partition
 
-<div class="summary-box">
-    <h3>🧠 مدل ذهنی نهایی جلسه ۲</h3>
-    <p>کل جلسه را می‌توان در یک سؤال خلاصه کرد:</p>
-    <blockquote><strong>«من Hardware را دارم؛ Linux آن را شناسایی کرده؛ حالا از کجا بفهمم چه Hardwareای دارم و چه اطلاعاتی درباره آن وجود دارد؟»</strong></blockquote>
+lspci
+→ PCI
 
-    <p>پاسخ:</p>
-    <div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">                     HARDWARE
-                         ↓
-                   Linux Kernel
-                         ↓
-          ┌──────────────┼──────────────┐
-          ↓              ↓              ↓
-        /dev           /proc           /sys
-          │              │              │
-     Device Files    Runtime Info    Device Model
-          │
-          └──────────────┬──────────────┘
-                         ↓
-                       TOOLS
-                         ↓
-       ┌─────────────────┼──────────────────┐
-       ↓                 ↓                  ↓
-     lshw              lscpu              lsblk
-  همه Hardware           CPU             Storage
+lsusb
+→ USB
+
+lscpu
+→ CPU
+
+dmesg
+→ Kernel Messages</div></div>
+
+<p>و مهم‌تر از همه:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Hardware
+   ↓
+Kernel
+   ↓
+┌───────────────┐
+│               │
+/dev          /proc          /sys
+│               │              │
+Device Files   Kernel Info   Device Info
+│
+├── Character
+│
+└── Block
        │
-       ├──────── lspci  → PCI
-       ├──────── lsusb  → USB
-       ├──────── dmesg  → Kernel Events
-       └──────── dmidecode → DMI</div></div>
+       └── Disk / SSD
+              │
+              └── lsblk</div></div>
 
-    <div class="box important"><i class="fas fa-star"></i><div><strong>🎯 جمله طلایی جلسه</strong><br>
-    <code>lshw</code> ابزار جامع Hardware Inventory است؛ اما برای سؤال‌های تخصصی، ابزار مناسب همان حوزه مثل <code>lscpu</code>، <code>lsblk</code>، <code>lspci</code> و <code>lsusb</code> را انتخاب می‌کنیم.</div></div>
-</div>
+<h3>🎯 جمله طلایی جلسه</h3>
+<blockquote><strong><code>lshw</code> ابزار عمومی برای شناسایی Hardware است؛ اما برای اینکه خروجی آن را واقعاً بفهمیم باید بدانیم Linux Deviceها را چگونه در <code>/dev</code>، <code>/proc</code> و <code>/sys</code> نمایش می‌دهد و تفاوت Character Device و Block Device چیست.</strong></blockquote>
 
-<p>این ساختار باعث می‌شود جلسه ۲ دیگر تکرار جلسه ۱ نباشد: <strong>Boot فقط یک پیش‌نیاز کوتاه است، <code>/dev</code>/<code>/proc</code>/<code>/sys</code> نقش زیرساختی دارند، <code>lshw</code> محور اصلی است و ابزارهای دیگر در اطراف آن به‌عنوان ابزارهای تخصصی قرار می‌گیرند.</strong> همچنین بخش Kernel Modules فقط به اندازه‌ای مطرح شده که زمینه ورود طبیعی به <strong>جلسه ۳</strong> را بسازد.</p>
+<p><strong>جلسه ۲ تمام شد.</strong></p>
+<p>قدم طبیعی بعدی <strong>جلسه ۳ — Linux Kernel & Kernel Modules</strong> است؛ آنجا دقیقاً ارتباطی را که امروز بین Hardware، Kernel، Device و Driver دیدیم باز می‌کنیم.</p>
+</div></div>
 `
 ,
 "ch3-kernel-modules": `
