@@ -14276,25 +14276,11 @@ o → MBR/DOS</div></div>
     </div>
 </div>
 
-<p>در جلسه قبل با <code>fdisk</code> یاد گرفتیم که چگونه یک Disk را به Partition تقسیم کنیم.</p>
+<p>در جلسه‌های قبل با Disk، Partition و Filesystem آشنا شدیم.</p>
 
-<p>اما یک سؤال مهم:</p>
+<p>در حالت ساده می‌توانیم Storage را این‌طور تصور کنیم:</p>
 
-<blockquote>اگر بعداً فضای <code>/home</code> یا <code>/data</code> کم شد، آیا باید دوباره Partition‌بندی کنیم؟</blockquote>
-
-<p>اینجاست که <strong>LVM</strong> وارد می‌شود.</p>
-
-<h2>LVM چیست؟</h2>
-
-<p><strong>LVM = Logical Volume Manager</strong></p>
-
-<p>LVM یک لایه مدیریتی بین Storage فیزیکی و فضای منطقی سیستم‌عامل ایجاد می‌کند.</p>
-
-<p>به زبان ساده:</p>
-
-<p>بدون LVM معمولاً ذهنمان این‌طور است:</p>
-
-<div class="code-container"><span class="code-label">بدون LVM</span><div class="code-block no-prompt">Disk
+<div class="code-container"><span class="code-label">ساختار ساده</span><div class="code-block no-prompt">Disk
  ↓
 Partition
  ↓
@@ -14302,9 +14288,41 @@ Filesystem
  ↓
 Mount</div></div>
 
-<p>اما با LVM:</p>
+<p>اما یک مشکل مهم وجود دارد.</p>
 
-<div class="code-container"><span class="code-label">با LVM</span><div class="code-block no-prompt">Disk / Partition
+<p>فرض کن یک سرور داریم و فضای <code>/data</code> بعد از مدتی پر می‌شود.</p>
+
+<p>اگر Storage را به شکل سنتی مدیریت کرده باشیم، ممکن است برای افزایش فضا مجبور شویم Partitionها را تغییر دهیم یا ساختار Storage را دوباره تنظیم کنیم.</p>
+
+<p>اینجاست که <strong>LVM</strong> وارد می‌شود.</p>
+
+<h2>LVM چیست؟</h2>
+
+<p>LVM مخفف:</p>
+
+<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Logical Volume Manager</div></div>
+
+<p>است.</p>
+
+<p>LVM یک لایه مدیریتی بین Storage فیزیکی و فضای منطقی سیستم ایجاد می‌کند.</p>
+
+<p>به زبان ساده:</p>
+
+<blockquote>LVM اجازه می‌دهد فضای Storage را به شکل انعطاف‌پذیرتری مدیریت کنیم.</blockquote>
+
+<p>در حالت معمول:</p>
+
+<div class="code-container"><span class="code-label">معمول</span><div class="code-block no-prompt">Disk
+ ↓
+Partition
+ ↓
+Filesystem
+ ↓
+Mount</div></div>
+
+<p>اما در LVM:</p>
+
+<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Disk / Partition
        ↓
       PV
        ↓
@@ -14312,355 +14330,264 @@ Mount</div></div>
        ↓
       LV
        ↓
-   Filesystem
+  Filesystem
        ↓
      Mount</div></div>
 
-<p>سه مفهوم اصلی که باید در LVM کاملاً بلد باشی:</p>
+<p>سه مفهوم اصلی LVM:</p>
 
-<div class="code-container"><span class="code-label">سه مفهوم</span><div class="code-block no-prompt">PV → Physical Volume
-VG → Volume Group
-LV → Logical Volume</div></div>
+<div class="code-container"><span class="code-label">سه مفهوم</span><div class="code-block no-prompt">PV = Physical Volume
 
-<h2>چرا اصلاً LVM به وجود آمد؟</h2>
+VG = Volume Group
 
-<p>فرض کن یک سرور داریم:</p>
+LV = Logical Volume</div></div>
+
+<p>این سه مفهوم، پایه اصلی LVM هستند.</p>
+
+<h2>چرا LVM به وجود آمد؟</h2>
+
+<p>فرض کن دو Disk داریم:</p>
 
 <div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">/dev/sdb = 100GB
 /dev/sdc = 100GB</div></div>
 
-<p>بدون LVM ممکن است هر Disk را جداگانه مدیریت کنیم:</p>
+<p>در حالت معمول هر Disk را جداگانه مدیریت می‌کنیم.</p>
 
-<div class="code-container"><span class="code-label">بدون LVM</span><div class="code-block no-prompt">sdb → 100GB
-sdc → 100GB</div></div>
+<p>اما با LVM می‌توانیم فضای این Storageها را وارد یک Pool کنیم:</p>
 
-<p>اما LVM می‌تواند فضای این دو را در یک گروه قرار دهد:</p>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">/dev/sdb ──┐
+           ├── VG
+/dev/sdc ──┘</div></div>
 
-<div class="code-container"><span class="code-label">با LVM</span><div class="code-block no-prompt">/dev/sdb ─┐
-          ├── VG
-/dev/sdc ─┘</div></div>
-
-<p>مثلاً:</p>
+<p>در نتیجه می‌توانیم یک فضای منطقی بزرگ‌تر داشته باشیم:</p>
 
 <div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">VG = 200GB</div></div>
 
-<p>حالا می‌توانیم از این فضای مشترک Logical Volume بسازیم:</p>
+<p>و از آن چند Logical Volume بسازیم:</p>
 
-<div class="code-container"><span class="code-label">تقسیم VG</span><div class="code-block no-prompt">VG 200GB
+<div class="code-container"><span class="code-label">تقسیم VG</span><div class="code-block no-prompt">VG = 200GB
 │
 ├── LV1 = 50GB
 ├── LV2 = 100GB
 └── Free = 50GB</div></div>
 
-<p>این انعطاف‌پذیری یکی از مهم‌ترین مزایای LVM است.</p>
+<p>بنابراین یکی از مهم‌ترین ویژگی‌های LVM:</p>
 
-<h2>ساختار کلی LVM</h2>
+<blockquote><strong>مدیریت انعطاف‌پذیر فضای Storage</strong></blockquote>
 
-<p>این دیاگرام را خیلی خوب یاد بگیر:</p>
+<p>است.</p>
 
-<div class="code-container"><span class="code-label">ساختار LVM</span><div class="code-block no-prompt">Physical Disk / Partition
-          │
-          ▼
-   Physical Volume
-          │
-          ▼
-    Volume Group
-          │
-          ▼
-   Logical Volume
-          │
-          ▼
-     Filesystem
-          │
-          ▼
-       Mount</div></div>
+<h2>تصویر کلی LVM</h2>
 
-<p>یا با نام اختصاری:</p>
+<p>مهم‌ترین دیاگرام این جلسه:</p>
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Disk
- ↓
-PV
- ↓
-VG
- ↓
-LV
- ↓
+<div class="code-container"><span class="code-label">دیاگرام اصلی</span><div class="code-block no-prompt">Physical Storage
+       ↓
+      PV
+       ↓
+      VG
+       ↓
+      LV
+       ↓
 Filesystem
- ↓
+       ↓
+Mount Point</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">نسخه ساده</span><div class="code-block no-prompt">Disk / Partition
+       ↓
+Physical Volume
+       ↓
+Volume Group
+       ↓
+Logical Volume
+       ↓
+Filesystem
+       ↓
 Mount</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>این مهم‌ترین تصویر ذهنی کل جلسه است.</div></div>
+<p>این زنجیره را باید کاملاً بلد باشی:</p>
+
+<div class="code-container"><span class="code-label">فرمول طلایی</span><div class="code-block no-prompt">PV → VG → LV → Filesystem → Mount</div></div>
 
 <h2>PV چیست؟</h2>
 
 <h3>Physical Volume</h3>
 
-<p><strong>PV = Physical Volume</strong></p>
+<p>PV مخفف:</p>
 
-<p>یعنی یک Disk یا Partition را برای استفاده در LVM آماده می‌کنیم.</p>
+<div class="code-container"><span class="code-label">PV</span><div class="code-block no-prompt">Physical Volume</div></div>
+
+<p>است.</p>
+
+<p>PV اولین لایه LVM است.</p>
+
+<p>در واقع یک Disk یا Partition را برای استفاده توسط LVM به عنوان یک Physical Volume آماده می‌کنیم.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
-<p>را به عنوان PV معرفی می‌کنیم.</p>
+<p>می‌تواند به عنوان PV استفاده شود.</p>
 
-<p>دستور:</p>
+<p>پس:</p>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo pvcreate /dev/sdb1</div></div>
-
-<p>اگر چند Partition داشته باشیم:</p>
-
-<div class="code-container"><span class="code-label">چند</span><div class="code-block">sudo pvcreate /dev/sdb1 /dev/sdb2</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb1 ──→ PV
-/dev/sdb2 ──→ PV</div></div>
-
-<p>داریم.</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb1
+      ↓
+     PV</div></div>
 
 <h2>آیا PV حتماً باید Partition باشد؟</h2>
 
 <p>خیر.</p>
 
-<p>در LVM می‌توان از:</p>
-
-<div class="code-container"><span class="code-label">Disk</span><div class="code-block no-prompt">Disk</div></div>
-
-<p>یا:</p>
-
-<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">Partition</div></div>
-
-<p>به عنوان PV استفاده کرد.</p>
+<p>در Linux می‌توان یک Disk کامل یا یک Partition را به عنوان PV استفاده کرد.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo pvcreate /dev/sdb</div></div>
+<div class="code-container"><span class="code-label">کل دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
 
 <p>یا:</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo pvcreate /dev/sdb1</div></div>
+<div class="code-container"><span class="code-label">پارتیشن</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
-<p>اما در سناریویی که می‌خواهیم <strong>Partition</strong> را به LVM اختصاص دهیم، باید نوع Partition متناسب با LVM تنظیم شده باشد.</p>
+<p>بنابراین:</p>
 
-<h2>Linux LVM Partition Type</h2>
+<div class="code-container"><span class="code-label">دو حالت</span><div class="code-block no-prompt">Disk
+ ↓
+PV</div></div>
 
-<p>این نکته مخصوصاً برای ساختار <strong>MBR</strong> مهم است.</p>
+<p>یا:</p>
 
-<p>اگر بخواهیم یک Partition را برای LVM استفاده کنیم، Type آن باید:</p>
+<div class="code-container"><span class="code-label">دو حالت</span><div class="code-block no-prompt">Partition
+ ↓
+PV</div></div>
 
-<div class="code-container"><span class="code-label">Type</span><div class="code-block no-prompt">Linux LVM</div></div>
+<p>هر دو سناریو ممکن هستند.</p>
 
-<p>باشد.</p>
-
-<p>در MBR کد شناخته‌شده آن:</p>
-
-<div class="code-container"><span class="code-label">کد</span><div class="code-block no-prompt">8e</div></div>
-
-<p>است.</p>
-
-<p>پس در سناریوی MBR:</p>
-
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Partition
-   ↓
-Linux LVM
-   ↓
-8e</div></div>
-
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته LPIC-1</strong><br>در <code>fdisk</code> می‌توانیم با <code>t</code> نوع Partition را تغییر دهیم.</div></div>
-
-<h2>بررسی PV</h2>
-
-<p>بعد از ایجاد PV می‌توانیم وضعیت آن را بررسی کنیم.</p>
-
-<p>یکی از فرمان‌های مهم:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo pvdisplay</div></div>
-
-<p>است.</p>
-
-<p>این دستور اطلاعات PVها را نمایش می‌دهد.</p>
-
-<p>مثلاً از نظر مفهومی:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">PV Name       /dev/sdb1
-VG Name       ...
-PV Size       ...
-Free PE       ...</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">pvcreate
-   ↓
-ساخت PV
-
-pvdisplay
-   ↓
-نمایش اطلاعات PV</div></div>
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته مهم</strong><br>اگر از یک Partition برای LVM استفاده کنیم، نوع Partition را باید متناسب با LVM تنظیم کنیم. در ساختار سنتی MBR، نوع شناخته‌شده Linux LVM: <code>8e</code> است. در <code>fdisk</code> نیز می‌توان نوع Partition را با گزینه <code>t</code> تغییر داد. جزئیات Partition Type را در جلسه <code>fdisk</code> بررسی کرده‌ایم و در پیاده‌سازی LVM نیز دوباره با آن کار خواهیم کرد.</div></div>
 
 <h2>VG چیست؟</h2>
 
 <h3>Volume Group</h3>
 
-<p>حالا فرض کن دو PV داریم:</p>
+<p>VG مخفف:</p>
 
-<div class="code-container"><span class="code-label">دو PV</span><div class="code-block no-prompt">/dev/sdb1
-/dev/sdb2</div></div>
+<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">Volume Group</div></div>
 
-<p>هر دو را می‌توانیم داخل یک Volume Group قرار دهیم.</p>
+<p>است.</p>
 
-<p><strong>VG = Volume Group</strong></p>
+<p>اگر PVها را به عنوان منابع فیزیکی Storage در نظر بگیریم، VG یک <strong>Pool منطقی از فضای Storage</strong> است.</p>
 
-<p>می‌توان VG را مثل یک <strong>مخزن بزرگ Storage</strong> تصور کرد.</p>
+<p>فرض کن:</p>
 
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">PV1 = 50GB
+<div class="code-container"><span class="code-label">PVها</span><div class="code-block no-prompt">PV1 = 50GB
 PV2 = 50GB</div></div>
 
-<p>بعد:</p>
+<p>این دو PV را داخل یک VG قرار می‌دهیم:</p>
 
 <div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">PV1 ──┐
       ├── VG = 100GB
 PV2 ──┘</div></div>
 
-<p>حالا سیستم یک Pool منطقی 100GB در اختیار دارد.</p>
+<p>حالا VG یک فضای منطقی 100GB در اختیار ما قرار می‌دهد.</p>
 
-<h2>ساخت VG</h2>
+<h3>تشبیه ساده</h3>
 
-<p>برای ساخت Volume Group از:</p>
+<p>فرض کن چند اتاق انبار داریم:</p>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">vgcreate</div></div>
+<div class="code-container"><span class="code-label">اتاق‌ها</span><div class="code-block no-prompt">PV1
+PV2
+PV3</div></div>
 
-<p>استفاده می‌کنیم.</p>
+<p>و همه را به یک انبار بزرگ تبدیل می‌کنیم:</p>
 
-<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">انبار</span><div class="code-block no-prompt">          VG
+┌───────────────────┐
+│ PV1 │ PV2 │ PV3  │
+└───────────────────┘</div></div>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo vgcreate mabedini /dev/sdb1 /dev/sdb2</div></div>
-
-<p>اینجا:</p>
-
-<div class="code-container"><span class="code-label">نام VG</span><div class="code-block no-prompt">mabedini</div></div>
-
-<p>نام VG است.</p>
-
-<p>پس ساختار:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sdb1 ──┐
-            │
-            ├── mabedini
-            │
-/dev/sdb2 ──┘</div></div>
-
-<p>است.</p>
-
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>فرمول ذهنی</strong><br>
-<code>vgcreate &lt;VG-name&gt; &lt;PV1&gt; &lt;PV2&gt; ...</code></div></div>
-
-<h2>VG را چگونه تصور کنیم؟</h2>
-
-<p>بهترین تشبیه برای VG یک <strong>مخزن بزرگ Storage</strong> است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">PVها</span><div class="code-block no-prompt">PV1 = 10GB
-PV2 = 20GB
-PV3 = 30GB</div></div>
-
-<p>همه را وارد یک VG می‌کنیم:</p>
-
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">             Volume Group
-          ┌─────────────────┐
-PV1 10GB ─┤                 │
-PV2 20GB ─┤    60GB Pool    │
-PV3 30GB ─┤                 │
-          └─────────────────┘</div></div>
-
-<p>حالا از این Pool، LV می‌سازیم.</p>
+<p>این انبار بزرگ همان <strong>Volume Group</strong> است.</p>
 
 <h2>LV چیست؟</h2>
 
 <h3>Logical Volume</h3>
 
-<p><strong>LV = Logical Volume</strong></p>
+<p>LV مخفف:</p>
 
-<p>حالا که VG داریم، می‌توانیم از فضای آن Volumeهای منطقی بسازیم.</p>
+<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">Logical Volume</div></div>
+
+<p>است.</p>
+
+<p>حالا که VG داریم، می‌توانیم از فضای آزاد آن Logical Volume ایجاد کنیم.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">VG = 100GB</div></div>
 
-<p>می‌توانیم بسازیم:</p>
+<p>می‌توانیم داشته باشیم:</p>
 
-<div class="code-container"><span class="code-label">LVها</span><div class="code-block no-prompt">LV1 = 20GB
-LV2 = 30GB
-LV3 = 10GB</div></div>
+<div class="code-container"><span class="code-label">تقسیم</span><div class="code-block no-prompt">VG
+│
+├── LV1 = 20GB
+├── LV2 = 30GB
+├── LV3 = 10GB
+└── Free = 40GB</div></div>
 
-<p>و هنوز:</p>
+<p>بنابراین:</p>
 
-<div class="code-container"><span class="code-label">فضای آزاد</span><div class="code-block no-prompt">40GB Free</div></div>
+<blockquote>LV بخشی از فضای VG است که به عنوان یک Volume منطقی اختصاص داده شده است.</blockquote>
 
-<p>داشته باشیم.</p>
+<h2>رابطه PV، VG و LV</h2>
+
+<p>این قسمت را خیلی خوب یاد بگیر.</p>
+
+<div class="code-container"><span class="code-label">سلسله‌مراتب</span><div class="code-block no-prompt">PV
+│
+├── PV1
+├── PV2
+└── PV3
+      ↓
+     VG
+      ↓
+   ┌──┴──┐
+   ↓     ↓
+  LV1   LV2</div></div>
 
 <p>یعنی:</p>
 
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">VG
-│
-├── LV1 20GB
-├── LV2 30GB
-├── LV3 10GB
-└── Free 40GB</div></div>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">PVها
+ ↓
+VG
+ ↓
+LVها</div></div>
 
-<h2>ساخت LV</h2>
+<p>به زبان ساده:</p>
 
-<p>برای ساخت Logical Volume:</p>
+<ul>
+    <li><strong>PV</strong> = فضای فیزیکی آماده‌شده برای LVM</li>
+    <li><strong>VG</strong> = Pool یا مخزن بزرگ Storage</li>
+    <li><strong>LV</strong> = بخش منطقی اختصاص‌یافته از VG</li>
+</ul>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lvcreate</div></div>
+<h2>Partition با LV چه تفاوتی دارد؟</h2>
 
-<p>استفاده می‌کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo lvcreate -n part1 -L 14GiB mabedini</div></div>
-
-<p>اجزای دستور:</p>
-
-<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">lvcreate
-   │
-   ├── -n part1
-   │       ↓
-   │     نام LV
-   │
-   ├── -L 14GiB
-   │       ↓
-   │     اندازه LV
-   │
-   └── mabedini
-           ↓
-          VG</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">LV Name = part1
-LV Size = 14GiB
-VG      = mabedini</div></div>
-
-<h2>تفاوت Partition و Logical Volume</h2>
-
-<p>این دو مفهوم ممکن است در ابتدا شبیه هم به نظر برسند.</p>
+<p>این دو ممکن است در ابتدا شبیه هم به نظر برسند، اما یکی نیستند.</p>
 
 <h3>Partition</h3>
-<p>توسط ابزارهایی مثل:</p>
-<div class="code-container"><span class="code-label">fdisk</span><div class="code-block no-prompt">fdisk</div></div>
-<p>روی Disk ساخته می‌شود.</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Disk
+<p>Partition مستقیماً روی Disk ایجاد می‌شود:</p>
+<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">Disk
  ↓
 Partition</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb
+├── /dev/sdb1
+└── /dev/sdb2</div></div>
+<p>ابزارهایی مثل <code>fdisk</code> برای مدیریت Partition استفاده می‌شوند.</p>
 
 <h3>Logical Volume</h3>
-<p>داخل VG ساخته می‌شود:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">PV
+<p>LV داخل VG ساخته می‌شود:</p>
+<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">PV
  ↓
 VG
  ↓
@@ -14670,46 +14597,13 @@ LV</div></div>
 
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Partition ≠ LV</div></div>
 
-<p>البته LV از نظر کاربرد می‌تواند شبیه یک فضای ذخیره‌سازی مستقل باشد و روی آن Filesystem بسازیم.</p>
+<p>Partition بخشی از Disk است، در حالی که LV از فضای Volume Group ایجاد می‌شود.</p>
 
-<h2>مسیر LVها در Linux</h2>
+<h2>LV و Filesystem</h2>
 
-<p>بعد از ساخت LV معمولاً Device آن در ساختار:</p>
+<p>بعد از ساخت LV هنوز Filesystem نداریم.</p>
 
-<div class="code-container"><span class="code-label">/dev</span><div class="code-block no-prompt">/dev</div></div>
-
-<p>قابل مشاهده است.</p>
-
-<p>برای مثال:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/mabedini/part1</div></div>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev
-  └── mabedini
-        └── part1</div></div>
-
-<p>یا ممکن است از مسیرهای Device Mapper نیز آن را ببینیم.</p>
-
-<p>برای LPIC-1 مهم‌تر از حفظ مسیرهای جزئی این است که بدانیم:</p>
-
-<div class="code-container"><span class="code-label">شناسایی</span><div class="code-block no-prompt">VG = mabedini
-LV = part1</div></div>
-
-<h2>LV هنوز Filesystem ندارد</h2>
-
-<p>این نکته بسیار مهم است.</p>
-
-<p>بعد از:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lvcreate -n part1 -L 14GiB mabedini</div></div>
-
-<p>ما فقط LV ساخته‌ایم.</p>
-
-<p>هنوز Filesystem نداریم.</p>
-
-<p>یعنی:</p>
+<p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">وضعیت</span><div class="code-block no-prompt">PV
  ↓
@@ -14717,346 +14611,11 @@ VG
  ↓
 LV
  ↓
-????</div></div>
+???</div></div>
 
-<p>برای استفاده معمول باید روی LV یک Filesystem ایجاد کنیم.</p>
+<p>برای استفاده معمول از LV، باید روی آن Filesystem ایجاد کنیم:</p>
 
-<h2>ساخت Filesystem روی LV</h2>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mkfs.ext4 /dev/mabedini/part1</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">PV
- ↓
-VG
- ↓
-LV
- ↓
-ext4</div></div>
-
-<p>داریم.</p>
-
-<h2>Mount کردن LV</h2>
-
-<p>فرض کنیم می‌خواهیم آن را روی:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/data</div></div>
-
-<p>Mount کنیم.</p>
-
-<p>ابتدا:</p>
-
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">sudo mkdir /data</div></div>
-
-<p>سپس:</p>
-
-<div class="code-container"><span class="code-label">Mount</span><div class="code-block">sudo mount /dev/mabedini/part1 /data</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/mabedini/part1
-          │
-          ▼
-        ext4
-          │
-          ▼
-        /data</div></div>
-
-<p>و سیستم می‌تواند از آن استفاده کند.</p>
-
-<h2>کل فرآیند LVM از ابتدا تا انتها</h2>
-
-<p>حالا تمام مراحل را کنار هم قرار بده.</p>
-
-<p>فرض:</p>
-
-<div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">/dev/sdb1
-/dev/sdb2</div></div>
-
-<p>داریم.</p>
-
-<h3>مرحله ۱ — PV</h3>
-<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">sudo pvcreate /dev/sdb1 /dev/sdb2</div></div>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">sdb1 ──→ PV
-sdb2 ──→ PV</div></div>
-
-<h3>مرحله ۲ — VG</h3>
-<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">sudo vgcreate mabedini /dev/sdb1 /dev/sdb2</div></div>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">PV1 ──┐
-      ├── VG: mabedini
-PV2 ──┘</div></div>
-
-<h3>مرحله ۳ — LV</h3>
-<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">sudo lvcreate -n part1 -L 14GiB mabedini</div></div>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">VG
- ↓
-LV: part1</div></div>
-
-<h3>مرحله ۴ — Filesystem</h3>
-<div class="code-container"><span class="code-label">مرحله ۴</span><div class="code-block">sudo mkfs.ext4 /dev/mabedini/part1</div></div>
-
-<h3>مرحله ۵ — Mount</h3>
-<div class="code-container"><span class="code-label">مرحله ۵</span><div class="code-block">sudo mkdir /data
-sudo mount /dev/mabedini/part1 /data</div></div>
-
-<p>در نهایت:</p>
-
-<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">/dev/sdb1 ──┐
-            │
-            ├── PV ──┐
-/dev/sdb2 ──┘        │
-                     ▼
-                VG mabedini
-                     │
-                     ▼
-                LV part1
-                     │
-                     ▼
-                   ext4
-                     │
-                     ▼
-                   /data</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته طلایی</strong><br>این <strong>مهم‌ترین دیاگرام جلسه</strong> است.</div></div>
-
-<h2>مزیت اصلی LVM: افزایش فضا</h2>
-
-<p>حالا به مهم‌ترین دلیل استفاده از LVM می‌رسیم.</p>
-
-<p>فرض کن:</p>
-
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">VG = 100GB</div></div>
-
-<p>و داریم:</p>
-
-<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">LV = 50GB</div></div>
-
-<p>بعد از مدتی فضای LV کم می‌شود.</p>
-
-<p>در ساختار سنتی ممکن است مجبور شویم Partition را تغییر دهیم.</p>
-
-<p>اما LVM اجازه می‌دهد فضای بیشتری به VG اضافه کنیم.</p>
-
-<p>مثلاً یک Disk جدید:</p>
-
-<div class="code-container"><span class="code-label">دیسک جدید</span><div class="code-block no-prompt">/dev/sdc</div></div>
-
-<p>اضافه شده است.</p>
-
-<h2>اضافه کردن Disk جدید به VG</h2>
-
-<p>ابتدا Disk جدید را به عنوان PV آماده می‌کنیم:</p>
-
-<div class="code-container"><span class="code-label">ساخت PV</span><div class="code-block">sudo pvcreate /dev/sdc</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdc
- ↓
-PV</div></div>
-
-<p>سپس آن را به VG اضافه می‌کنیم.</p>
-
-<p>دستور:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">vgextend</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo vgextend mabedini /dev/sdc</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">PV1 ──┐
-PV2 ──┼──→ VG mabedini
-PV3 ──┘</div></div>
-
-<p>فضای VG افزایش پیدا کرده است.</p>
-
-<h2><code>vgextend</code> را خوب یاد بگیر</h2>
-
-<p>فرمول:</p>
-
-<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">vgextend &lt;VG-name&gt; &lt;new-PV&gt;</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo vgextend mabedini /dev/sdc</div></div>
-
-<p>یعنی:</p>
-
-<blockquote>PV جدید <code>/dev/sdc</code> را به VG به نام <code>mabedini</code> اضافه کن.</blockquote>
-
-<h2>افزایش اندازه LV</h2>
-
-<p>حالا VG فضای بیشتری دارد.</p>
-
-<p>اما نکته مهم:</p>
-
-<blockquote>اضافه شدن فضای VG به معنی افزایش خودکار LV نیست.</blockquote>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block no-prompt">VG = 200GB
-LV = 50GB</div></div>
-
-<p>هنوز LV همان 50GB است.</p>
-
-<p>برای افزایش LV:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lvextend</div></div>
-
-<p>استفاده می‌کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo lvextend -L +10G /dev/mabedini/part1</div></div>
-
-<p>یعنی:</p>
-
-<blockquote>10GB به اندازه LV اضافه کن.</blockquote>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">LV
-50GB
- ↓
-+10GB
- ↓
-60GB</div></div>
-
-<h2>چرا بعد از <code>lvextend</code> کار تمام نشده؟</h2>
-
-<p>این قسمت خیلی مهم است.</p>
-
-<p>فرض کن:</p>
-
-<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">LV = 60GB</div></div>
-
-<p>شده است.</p>
-
-<p>اما Filesystem قبلی ممکن است هنوز مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">50GB</div></div>
-
-<p>باشد.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">LV = 60GB
-Filesystem = 50GB</div></div>
-
-<p>پس سیستم‌عامل هنوز تمام فضای جدید را در Filesystem نمی‌بیند.</p>
-
-<p>باید Filesystem را نیز Resize کنیم.</p>
-
-<h2>افزایش Filesystem در ext4</h2>
-
-<p>برای <code>ext4</code> می‌توانیم از:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">resize2fs</div></div>
-
-<p>استفاده کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo resize2fs /dev/mabedini/part1</div></div>
-
-<p>در نتیجه:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">LV
-60GB
- ↓
-resize2fs
- ↓
-Filesystem
-60GB</div></div>
-
-<p>پس زنجیره افزایش فضا:</p>
-
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">New Disk
- ↓
-pvcreate
- ↓
-vgextend
- ↓
-LV space
- ↓
-lvextend
- ↓
-Filesystem
- ↓
-resize2fs</div></div>
-
-<h2>یک سناریوی کامل افزایش فضا</h2>
-
-<p>فرض کن:</p>
-
-<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block no-prompt">VG = mabedini
-LV = part1
-LV Size = 20GB</div></div>
-
-<p>فضای VG کم است.</p>
-
-<p>یک Disk جدید داریم:</p>
-
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdc</div></div>
-
-<h3>مرحله ۱</h3>
-<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">sudo pvcreate /dev/sdc</div></div>
-
-<h3>مرحله ۲</h3>
-<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">sudo vgextend mabedini /dev/sdc</div></div>
-<p>حالا VG فضای بیشتری دارد.</p>
-
-<h3>مرحله ۳</h3>
-<p>افزایش LV:</p>
-<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">sudo lvextend -L +10G /dev/mabedini/part1</div></div>
-
-<h3>مرحله ۴</h3>
-<p>افزایش Filesystem:</p>
-<div class="code-container"><span class="code-label">مرحله ۴</span><div class="code-block">sudo resize2fs /dev/mabedini/part1</div></div>
-
-<p>در نتیجه:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">20GB
- ↓
-+10GB
- ↓
-30GB</div></div>
-
-<p>و Filesystem نیز فضای جدید را می‌شناسد.</p>
-
-<h2>نکته بسیار مهم: سه لایه را قاطی نکن</h2>
-
-<p>وقتی فضای جدید اضافه می‌کنیم، سه چیز متفاوت داریم:</p>
-
-<h3>۱. PV</h3>
-<p>فضای فیزیکی جدید را وارد LVM می‌کنیم:</p>
-<div class="code-container"><span class="code-label">pvcreate</span><div class="code-block">pvcreate</div></div>
-
-<h3>۲. VG</h3>
-<p>فضای PV جدید را به Pool اضافه می‌کنیم:</p>
-<div class="code-container"><span class="code-label">vgextend</span><div class="code-block">vgextend</div></div>
-
-<h3>۳. LV</h3>
-<p>از فضای آزاد VG به LV اضافه می‌کنیم:</p>
-<div class="code-container"><span class="code-label">lvextend</span><div class="code-block">lvextend</div></div>
-
-<p>و در نهایت:</p>
-
-<h3>۴. Filesystem</h3>
-<p>Filesystem را نیز بزرگ می‌کنیم:</p>
-<div class="code-container"><span class="code-label">resize2fs</span><div class="code-block">resize2fs</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Disk
- ↓
-PV
+<div class="code-container"><span class="code-label">ساخت</span><div class="code-block no-prompt">PV
  ↓
 VG
  ↓
@@ -15064,122 +14623,238 @@ LV
  ↓
 Filesystem</div></div>
 
-<p>هر مرحله وظیفه خودش را دارد.</p>
+<p>مثلاً:</p>
 
-<h2>یک تشبیه خیلی ساده برای LVM</h2>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">LV
+ ↓
+ext4</div></div>
 
-<p>فرض کن یک انبار بزرگ داریم.</p>
+<p>بعد می‌توانیم آن را Mount کنیم:</p>
 
-<h3>PV</h3>
-<p>چند اتاق انبار:</p>
-<div class="code-container"><span class="code-label">PV</span><div class="code-block no-prompt">PV1
-PV2
-PV3</div></div>
+<div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">LV
+ ↓
+ext4
+ ↓
+/data</div></div>
 
-<h3>VG</h3>
-<p>همه اتاق‌ها را به یک انبار بزرگ تبدیل می‌کنیم:</p>
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">        VG
-┌─────────────────┐
-│ PV1 │ PV2 │ PV3 │
-└─────────────────┘</div></div>
+<p>بنابراین ساختار کامل:</p>
 
-<h3>LV</h3>
-<p>از انبار، قسمت‌هایی را به واحدهای مختلف اختصاص می‌دهیم:</p>
-<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">VG
-│
-├── LV1
-├── LV2
-└── LV3</div></div>
+<div class="code-container"><span class="code-label">ساختار کامل</span><div class="code-block no-prompt">PV
+ ↓
+VG
+ ↓
+LV
+ ↓
+Filesystem
+ ↓
+Mount Point</div></div>
 
-<h3>Filesystem</h3>
-<p>هر واحد را برای ذخیره فایل آماده می‌کنیم.</p>
+<h2>یک مثال کامل</h2>
 
-<h3>Mount</h3>
-<p>واحد را در یک مسیر سیستم قرار می‌دهیم:</p>
-<div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">/data
-/home
-/backup</div></div>
+<p>فرض کن دو Partition داریم:</p>
 
-<p>این تشبیه برای درک LVM خیلی مفید است.</p>
+<div class="code-container"><span class="code-label">پارتیشن‌ها</span><div class="code-block no-prompt">/dev/sdb1
+/dev/sdb2</div></div>
 
-<h2>تفاوت LVM با Partition معمولی</h2>
+<p>آن‌ها را برای LVM آماده می‌کنیم:</p>
 
-<h3>روش معمولی</h3>
-<div class="code-container"><span class="code-label">معمولی</span><div class="code-block no-prompt">Disk
-│
+<div class="code-container"><span class="code-label">ساخت PV</span><div class="code-block no-prompt">/dev/sdb1 ──→ PV
+/dev/sdb2 ──→ PV</div></div>
+
+<p>سپس آنها را در یک VG قرار می‌دهیم:</p>
+
+<div class="code-container"><span class="code-label">ساخت VG</span><div class="code-block no-prompt">PV1 ──┐
+      ├── VG
+PV2 ──┘</div></div>
+
+<p>از VG یک LV ایجاد می‌کنیم:</p>
+
+<div class="code-container"><span class="code-label">ساخت LV</span><div class="code-block no-prompt">VG
+ ↓
+LV</div></div>
+
+<p>روی LV یک Filesystem ایجاد می‌کنیم:</p>
+
+<div class="code-container"><span class="code-label">ساخت Filesystem</span><div class="code-block no-prompt">LV
+ ↓
+ext4</div></div>
+
+<p>و در نهایت آن را Mount می‌کنیم:</p>
+
+<div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">ext4
+ ↓
+/data</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">/dev/sdb1 ──┐
+            │
+            ├── PV ──┐
+/dev/sdb2 ──┘        │
+                     ↓
+                VG: storage
+                     ↓
+                LV: data
+                     ↓
+                    ext4
+                     ↓
+                   /data</div></div>
+
+<p>این تصویر را باید به عنوان مدل ذهنی LVM در نظر بگیری.</p>
+
+<h2>مهم‌ترین مزیت LVM</h2>
+
+<p>یکی از مهم‌ترین دلایل استفاده از LVM، <strong>انعطاف‌پذیری در مدیریت Storage</strong> است.</p>
+
+<p>فرض کن:</p>
+
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block no-prompt">VG = 200GB
+LV = 50GB</div></div>
+
+<p>بعداً متوجه می‌شویم LV به فضای بیشتری نیاز دارد.</p>
+
+<p>می‌توانیم یک Storage جدید به سیستم اضافه کنیم و فضای آن را وارد LVM کنیم.</p>
+
+<p>به صورت مفهومی:</p>
+
+<div class="code-container"><span class="code-label">اضافه کردن</span><div class="code-block no-prompt">New Disk
+   ↓
+   PV
+   ↓
+   VG</div></div>
+
+<p>حالا VG بزرگ‌تر شده است.</p>
+
+<p>سپس می‌توانیم از فضای آزاد VG برای بزرگ‌تر کردن LV استفاده کنیم:</p>
+
+<div class="code-container"><span class="code-label">افزایش LV</span><div class="code-block no-prompt">VG
+ ↓
+LV بزرگ‌تر</div></div>
+
+<p>و در نهایت Filesystem را نیز متناسب با آن بزرگ کنیم:</p>
+
+<div class="code-container"><span class="code-label">افزایش Filesystem</span><div class="code-block no-prompt">LV
+ ↓
+Filesystem Resize</div></div>
+
+<p>بنابراین زنجیره افزایش فضا:</p>
+
+<div class="code-container"><span class="code-label">زنجیره افزایش</span><div class="code-block no-prompt">New Storage
+    ↓
+   PV
+    ↓
+   VG
+    ↓
+   LV
+    ↓
+Filesystem</div></div>
+
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>اضافه شدن فضا به VG <strong>خودکار باعث بزرگ شدن LV نمی‌شود</strong>. و بزرگ شدن LV نیز لزوماً به معنی بزرگ شدن خودکار Filesystem نیست. این سه لایه را باید از هم جدا نگه داری.</div></div>
+
+<h2>مفهوم افزایش فضا در LVM</h2>
+
+<p>برای اینکه این موضوع را برای جلسه عملی آماده کنیم، فقط مفهوم دستورات را بشناس:</p>
+
+<div class="code-container"><span class="code-label">pvcreate</span><div class="code-block no-prompt">pvcreate
+   ↓
+ساخت PV</div></div>
+
+<div class="code-container"><span class="code-label">vgextend</span><div class="code-block no-prompt">vgextend
+   ↓
+اضافه کردن PV به VG</div></div>
+
+<div class="code-container"><span class="code-label">lvextend</span><div class="code-block no-prompt">lvextend
+   ↓
+افزایش اندازه LV</div></div>
+
+<p>و بعد Filesystem باید متناسب با نوع آن Resize شود.</p>
+
+<p>مثلاً برای Filesystemهای خانواده ext:</p>
+
+<div class="code-container"><span class="code-label">resize2fs</span><div class="code-block">resize2fs</div></div>
+
+<p>در جلسه بعد این فرآیند را <strong>واقعاً روی یک سناریوی عملی</strong> اجرا می‌کنیم.</p>
+
+<h2>LVM چه مشکلی را حل می‌کند؟</h2>
+
+<p>بدون LVM:</p>
+
+<div class="code-container"><span class="code-label">بدون LVM</span><div class="code-block no-prompt">Disk
 ├── Partition 1
 ├── Partition 2
 └── Partition 3</div></div>
-<p>اندازه‌ها مستقیماً به Partitionها وابسته‌اند.</p>
 
-<h3>LVM</h3>
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Disk(s)
+<p>اندازه و ساختار Storage بیشتر به Partitionها وابسته است.</p>
+
+<p>با LVM:</p>
+
+<div class="code-container"><span class="code-label">با LVM</span><div class="code-block no-prompt">Disk(s)
    ↓
- PV
+  PV
    ↓
- VG
+  VG
    ↓
-LV</div></div>
-<p>فضای VG به صورت Pool مدیریت می‌شود و می‌توانیم از آن LVهای مختلف ایجاد کنیم.</p>
+  LV</div></div>
 
-<p>بنابراین LVM انعطاف‌پذیری بیشتری در مدیریت Storage ایجاد می‌کند.</p>
+<p>فضای VG به صورت یک Pool مدیریت می‌شود و می‌توانیم از آن LVهای مختلف بسازیم.</p>
 
-<h2>آیا LVM باعث افزایش سرعت Disk می‌شود؟</h2>
+<p>بنابراین LVM بیشتر روی این موضوع تمرکز دارد:</p>
 
-<p><strong>هدف اصلی LVM افزایش سرعت نیست.</strong></p>
+<div class="code-container"><span class="code-label">تمرکز LVM</span><div class="code-block no-prompt">Flexible Storage Management</div></div>
 
-<p>LVM بیشتر برای:</p>
+<h2>LVM باعث افزایش سرعت Disk می‌شود؟</h2>
+
+<p>هدف اصلی LVM افزایش سرعت Disk نیست.</p>
+
+<p>LVM بیشتر برای موارد زیر استفاده می‌شود:</p>
+
 <ul>
     <li>مدیریت انعطاف‌پذیر Storage</li>
-    <li>ترکیب فضای چند PV</li>
+    <li>ترکیب فضای چند PV در یک VG</li>
     <li>ایجاد Logical Volume</li>
-    <li>افزایش اندازه Volumeها</li>
+    <li>افزایش یا کاهش اندازه Volumeها در شرایط پشتیبانی‌شده</li>
     <li>مدیریت بهتر فضای ذخیره‌سازی</li>
 </ul>
 
-<p>است.</p>
+<p>در مقابل، RAID بیشتر با مفاهیمی مثل:</p>
 
-<p>این را با RAID اشتباه نکن.</p>
-
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">LVM
- ↓
-Flexible Storage Management</div></div>
-
-<p>در حالی که RAID بیشتر با:</p>
-
-<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">Redundancy
-Performance
+<div class="code-container"><span class="code-label">RAID</span><div class="code-block no-prompt">Performance
+Redundancy
 Fault Tolerance</div></div>
 
 <p>مرتبط است.</p>
 
-<p>RAID را در جلسات بعدی به‌صورت جداگانه بررسی می‌کنیم.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">LVM ≠ RAID</div></div>
+
+<p>هر دو برای Storage مهم هستند، اما هدف اصلی آنها یکسان نیست.</p>
+
+<p>RAID را در جلسات بعدی جداگانه بررسی می‌کنیم.</p>
 
 <h2>دستورات مهم LVM</h2>
 
-<p>برای LPIC-1 این فرمان‌ها را باید بشناسی:</p>
+<p>در این جلسه قرار نیست هنوز تمام دستورات را عملی اجرا کنیم؛ فقط باید بدانیم هر دستور مربوط به کدام لایه است.</p>
 
 <div class="table-wrap">
 <table>
 <thead><tr><th>دستور</th><th>وظیفه</th></tr></thead>
 <tbody>
-<tr><td><code>pvcreate</code></td><td>ساخت Physical Volume</td></tr>
+<tr><td><code>pvcreate</code></td><td>ساخت PV</td></tr>
 <tr><td><code>pvdisplay</code></td><td>نمایش اطلاعات PV</td></tr>
-<tr><td><code>vgcreate</code></td><td>ساخت Volume Group</td></tr>
+<tr><td><code>vgcreate</code></td><td>ساخت VG</td></tr>
 <tr><td><code>vgextend</code></td><td>اضافه کردن PV به VG</td></tr>
-<tr><td><code>lvcreate</code></td><td>ساخت Logical Volume</td></tr>
+<tr><td><code>lvcreate</code></td><td>ساخت LV</td></tr>
 <tr><td><code>lvextend</code></td><td>افزایش اندازه LV</td></tr>
-<tr><td><code>mkfs</code></td><td>ایجاد Filesystem</td></tr>
-<tr><td><code>resize2fs</code></td><td>افزایش/تغییر اندازه ext2/ext3/ext4 Filesystem</td></tr>
+<tr><td><code>mkfs</code></td><td>ساخت Filesystem</td></tr>
+<tr><td><code>resize2fs</code></td><td>Resize کردن Filesystemهای ext2/ext3/ext4</td></tr>
 </tbody>
 </table>
 </div>
 
-<h2>زنجیره دستورات LVM</h2>
+<p>فرمول ذهنی:</p>
 
-<p>این قسمت را حفظ کن:</p>
-
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">pvcreate
+<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">pvcreate
    ↓
 PV
 
@@ -15199,169 +14874,154 @@ mount
    ↓
 Mount Point</div></div>
 
-<p>و برای افزایش فضا:</p>
+<h2>تفاوت وظایف دستورات</h2>
 
-<div class="code-container"><span class="code-label">افزایش</span><div class="code-block no-prompt">pvcreate
-   ↓
-vgextend
-   ↓
-lvextend
-   ↓
-resize2fs</div></div>
+<p>این قسمت را حفظ نکن؛ <strong>منطقش را بفهم.</strong></p>
 
-<h2>نکات مهم آزمونی ⭐</h2>
+<div class="code-container"><span class="code-label">pvcreate</span><div class="code-block no-prompt">pvcreate
+↓
+منبع فیزیکی را وارد دنیای LVM می‌کند.</div></div>
 
-<h3>نکته ۱</h3>
-<p>LVM مخفف چیست؟</p>
-<div class="code-container"><span class="code-label">LVM</span><div class="code-block no-prompt">Logical Volume Manager</div></div>
+<div class="code-container"><span class="code-label">vgcreate</span><div class="code-block no-prompt">vgcreate
+↓
+منابع فیزیکی را داخل یک Pool قرار می‌دهد.</div></div>
 
-<h3>نکته ۲</h3>
-<p>اولین لایه LVM چیست؟</p>
-<div class="code-container"><span class="code-label">اولین</span><div class="code-block no-prompt">PV</div></div>
+<div class="code-container"><span class="code-label">lvcreate</span><div class="code-block no-prompt">lvcreate
+↓
+از Pool یک Volume منطقی می‌سازد.</div></div>
 
-<h3>نکته ۳</h3>
-<p>PVها داخل چه چیزی قرار می‌گیرند؟</p>
-<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">VG</div></div>
+<div class="code-container"><span class="code-label">mkfs</span><div class="code-block no-prompt">mkfs
+↓
+LV را برای ذخیره فایل آماده می‌کند.</div></div>
 
-<h3>نکته ۴</h3>
-<p>LV از کجا ساخته می‌شود؟</p>
-<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">VG</div></div>
+<div class="code-container"><span class="code-label">mount</span><div class="code-block no-prompt">mount
+↓
+Filesystem را در ساختار Directoryهای Linux قابل دسترسی می‌کند.</div></div>
 
-<h3>نکته ۵</h3>
-<p>ساخت PV:</p>
-<div class="code-container"><span class="code-label">pvcreate</span><div class="code-block">pvcreate</div></div>
+<h2>یک تشبیه برای یادگیری LVM</h2>
 
-<h3>نکته ۶</h3>
-<p>ساخت VG:</p>
-<div class="code-container"><span class="code-label">vgcreate</span><div class="code-block">vgcreate</div></div>
+<p>فرض کن یک انبار بزرگ داریم.</p>
 
-<h3>نکته ۷</h3>
-<p>ساخت LV:</p>
-<div class="code-container"><span class="code-label">lvcreate</span><div class="code-block">lvcreate</div></div>
+<h3>PV</h3>
+<p>چند اتاق انبار:</p>
+<div class="code-container"><span class="code-label">PV</span><div class="code-block no-prompt">PV1
+PV2
+PV3</div></div>
 
-<h3>نکته ۸</h3>
-<p>اضافه کردن PV جدید به VG:</p>
-<div class="code-container"><span class="code-label">vgextend</span><div class="code-block">vgextend</div></div>
+<h3>VG</h3>
+<p>همه اتاق‌ها را به یک انبار بزرگ تبدیل می‌کنیم:</p>
+<div class="code-container"><span class="code-label">VG</span><div class="code-block no-prompt">             VG
+┌────────────────────────┐
+│ PV1 │ PV2 │ PV3        │
+└────────────────────────┘</div></div>
 
-<h3>نکته ۹</h3>
-<p>افزایش LV:</p>
-<div class="code-container"><span class="code-label">lvextend</span><div class="code-block">lvextend</div></div>
+<h3>LV</h3>
+<p>از انبار قسمت‌هایی را به واحدهای مختلف اختصاص می‌دهیم:</p>
+<div class="code-container"><span class="code-label">LV</span><div class="code-block no-prompt">VG
+│
+├── LV1
+├── LV2
+└── LV3</div></div>
 
-<h3>نکته ۱۰</h3>
-<p>برای <code>ext4</code> بعد از افزایش LV:</p>
-<div class="code-container"><span class="code-label">resize2fs</span><div class="code-block">resize2fs</div></div>
+<h3>Filesystem</h3>
+<p>هر واحد را برای ذخیره فایل آماده می‌کنیم:</p>
+<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">LV
+ ↓
+Filesystem</div></div>
 
-<h2>خودآزمایی</h2>
+<h3>Mount</h3>
+<p>آن را در یک مسیر Linux قرار می‌دهیم:</p>
+<div class="code-container"><span class="code-label">Mount</span><div class="code-block no-prompt">/data
+/home
+/backup</div></div>
 
-<div class="quiz-card"><p>❓ تست ۱: LVM مخفف چیست؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) Linux Virtual Machine</button>
-    <button onclick="selectOption(this)">ب) Logical Volume Manager</button>
-    <button onclick="selectOption(this)">ج) Linux Volume Module</button>
-    <button onclick="selectOption(this)">د) Logical Virtual Machine</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>LVM = Logical Volume Manager</div>
-</div>
+<p>پس:</p>
 
-<div class="quiz-card"><p>❓ تست ۲: کدام گزینه ترتیب صحیح ساختار LVM را نشان می‌دهد؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) LV → PV → VG</button>
-    <button onclick="selectOption(this)">ب) VG → PV → LV</button>
-    <button onclick="selectOption(this)">ج) PV → VG → LV</button>
-    <button onclick="selectOption(this)">د) PV → LV → VG</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>ساختار: PV → VG → LV</div>
-</div>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">PV
+ ↓
+VG
+ ↓
+LV
+ ↓
+Filesystem
+ ↓
+Mount</div></div>
 
-<div class="quiz-card"><p>❓ تست ۳: کدام دستور برای ایجاد Physical Volume استفاده می‌شود؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>vgcreate</code></button>
-    <button onclick="selectOption(this)">ب) <code>pvcreate</code></button>
-    <button onclick="selectOption(this)">ج) <code>lvcreate</code></button>
-    <button onclick="selectOption(this)">د) <code>mkfs</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>pvcreate /dev/sdb1</code> برای ایجاد Physical Volume استفاده می‌شود.</div>
-</div>
+<h2>نکته بسیار مهم درباره Disk و Partition</h2>
 
-<div class="quiz-card"><p>❓ تست ۴: دستور زیر چه کاری انجام می‌دهد؟</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">vgcreate mabedini /dev/sdb1 /dev/sdb2</div></div>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) دو LV می‌سازد.</button>
-    <button onclick="selectOption(this)">ب) دو Filesystem می‌سازد.</button>
-    <button onclick="selectOption(this)">ج) یک Volume Group به نام <code>mabedini</code> از PVهای مشخص‌شده می‌سازد.</button>
-    <button onclick="selectOption(this)">د) دو Partition ایجاد می‌کند.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>vgcreate</code> یک Volume Group از PVهای مشخص شده ایجاد می‌کند.</div>
-</div>
+<p>LVM جایگزین مفهوم Disk یا Partition نیست.</p>
 
-<div class="quiz-card"><p>❓ تست ۵: در دستور:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lvcreate -n part1 -L 14GiB mabedini</div></div>
-<p><code>part1</code> چیست؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) نام Disk</button>
-    <button onclick="selectOption(this)">ب) نام PV</button>
-    <button onclick="selectOption(this)">ج) نام LV</button>
-    <button onclick="selectOption(this)">د) نام Filesystem</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>گزینه <code>-n part1</code> نام Logical Volume را مشخص می‌کند.</div>
-</div>
+<p>LVM یک <strong>لایه مدیریت Storage</strong> است.</p>
 
-<div class="quiz-card"><p>❓ تست ۶: کدام دستور یک PV جدید را به VG موجود اضافه می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>vgcreate</code></button>
-    <button onclick="selectOption(this)">ب) <code>pvcreate</code></button>
-    <button onclick="selectOption(this)">ج) <code>vgextend</code></button>
-    <button onclick="selectOption(this)">د) <code>lvextend</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>vgextend mabedini /dev/sdc</code> یک PV جدید را به VG اضافه می‌کند.</div>
-</div>
+<p>ممکن است ساختار ما این باشد:</p>
 
-<div class="quiz-card"><p>❓ تست ۷: بعد از افزایش LV با <code>lvextend</code>، در صورتی که Filesystem از نوع ext4 باشد، برای افزایش Filesystem از کدام فرمان استفاده می‌شود؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>fdisk</code></button>
-    <button onclick="selectOption(this)">ب) <code>pvcreate</code></button>
-    <button onclick="selectOption(this)">ج) <code>resize2fs</code></button>
-    <button onclick="selectOption(this)">د) <code>vgcreate</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>resize2fs</code> برای افزایش Filesystem در ext4 استفاده می‌شود.</div>
-</div>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
+ ↓
+Partition
+ ↓
+PV
+ ↓
+VG
+ ↓
+LV
+ ↓
+Filesystem
+ ↓
+Mount</div></div>
 
-<div class="quiz-card"><p>❓ تست ۸: کدام گزینه وظیفه <code>lvcreate</code> را درست بیان می‌کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) ساخت PV</button>
-    <button onclick="selectOption(this)">ب) ساخت VG</button>
-    <button onclick="selectOption(this)">ج) ساخت Logical Volume از فضای VG</button>
-    <button onclick="selectOption(this)">د) ساخت Partition Table</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>lvcreate</code> از فضای VG یک Logical Volume می‌سازد.</div>
+<p>اما ممکن است PV مستقیماً روی یک Disk کامل قرار گرفته باشد:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
+ ↓
+PV
+ ↓
+VG
+ ↓
+LV
+ ↓
+Filesystem
+ ↓
+Mount</div></div>
+
+<p>بنابراین همیشه نباید تصور کنی:</p>
+
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Disk → Partition → PV</div></div>
+
+<p>تنها حالت ممکن است.</p>
+
+<div class="summary-box">
+    <h3>⭐ فرمول طلایی LVM</h3>
+    <p>اگر فقط یک چیز از این جلسه به خاطر بسپاری، این باشد:</p>
+    <div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">PV → VG → LV → Filesystem → Mount</div></div>
+
+    <p>معنی آنها:</p>
+    <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">PV
+Physical Volume
+↓
+فضای فیزیکی برای LVM
+
+VG
+Volume Group
+↓
+Pool فضای Storage
+
+LV
+Logical Volume
+↓
+Volume منطقی ساخته‌شده از VG
+
+Filesystem
+↓
+ساختار ذخیره فایل
+
+Mount
+↓
+قرار گرفتن Filesystem در یک مسیر Linux</div></div>
 </div>
 
 <div class="summary-box">
-    <h3>🧠 جمع‌بندی نهایی جلسه</h3>
-    <p>اگر بخواهم کل LVM را در یک تصویر خلاصه کنم:</p>
-    <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">              Physical Storage
-             /                \
-        /dev/sdb1          /dev/sdb2
-             │                  │
-             └──────┬───────────┘
-                    ↓
-                   PV
-                    │
-                    ↓
-              Volume Group
-               "mabedini"
-                    │
-              ┌─────┴─────┐
-              ↓           ↓
-             LV1         LV2
-              │           │
-              ↓           ↓
-            ext4         ext4
-              │           │
-              ↓           ↓
-            /data       /backup</div></div>
-
-    <p>و اگر بخواهیم فضا اضافه کنیم:</p>
+    <h3>⭐ فرمول افزایش فضا</h3>
+    <p>وقتی یک Storage جدید داریم و می‌خواهیم فضای موجود LVM را افزایش دهیم:</p>
     <div class="code-container"><span class="code-label">افزایش</span><div class="code-block no-prompt">New Disk
    ↓
 pvcreate
@@ -15376,31 +15036,219 @@ lvextend
    ↓
 LV بزرگ‌تر
    ↓
-resize2fs
-   ↓
-Filesystem بزرگ‌تر</div></div>
+Filesystem Resize</div></div>
 
-    <h3>فرمول طلایی LVM</h3>
-    <div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">PV → VG → LV → Filesystem → Mount</div></div>
+    <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>
+    <code>VG بزرگ‌تر ≠ LV بزرگ‌تر</code><br>
+    و:<br>
+    <code>LV بزرگ‌تر ≠ Filesystem بزرگ‌تر</code><br>
+    هر لایه وظیفه خودش را دارد.</div></div>
+</div>
 
-    <p>و برای افزایش فضا:</p>
-    <div class="code-container"><span class="code-label">افزایش</span><div class="code-block no-prompt">PV → VG → LV → Filesystem</div></div>
+<h2>جمع‌بندی جلسه</h2>
 
-    <p>با فرمان‌های:</p>
-    <div class="code-container"><span class="code-label">فرمان‌ها</span><div class="code-block no-prompt">pvcreate
-   ↓
-vgextend
-   ↓
-lvextend
-   ↓
-resize2fs</div></div>
+<p>LVM یک سیستم مدیریت انعطاف‌پذیر Storage است.</p>
+
+<p>ساختار اصلی:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Physical Storage
+      ↓
+     PV
+      ↓
+     VG
+      ↓
+     LV
+      ↓
+Filesystem
+      ↓
+Mount</div></div>
+
+<p>سه مفهوم اصلی:</p>
+
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">PV = Physical Volume
+VG = Volume Group
+LV = Logical Volume</div></div>
+
+<p>و تفاوت مهم:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Partition ≠ LV</div></div>
+
+<p>همچنین:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">LVM ≠ RAID</div></div>
+
+<p>LVM بیشتر برای مدیریت انعطاف‌پذیر Storage است، در حالی که RAID بیشتر برای ترکیب Diskها با اهدافی مانند Redundancy و Performance استفاده می‌شود.</p>
+
+<h2>خودآزمایی</h2>
+
+<div class="quiz-card"><p>❓ تست ۱: LVM مخفف چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Linux Virtual Machine</button>
+    <button onclick="selectOption(this)">ب) Logical Volume Manager</button>
+    <button onclick="selectOption(this)">ج) Linux Volume Module</button>
+    <button onclick="selectOption(this)">د) Logical Virtual Machine</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>LVM = Logical Volume Manager</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۲: کدام گزینه ترتیب صحیح ساختار اصلی LVM را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) LV → PV → VG</button>
+    <button onclick="selectOption(this)">ب) VG → PV → LV</button>
+    <button onclick="selectOption(this)">ج) PV → VG → LV</button>
+    <button onclick="selectOption(this)">د) PV → LV → VG</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>ساختار اصلی: PV → VG → LV</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۳: PV مخفف چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Physical Volume</button>
+    <button onclick="selectOption(this)">ب) Partition Volume</button>
+    <button onclick="selectOption(this)">ج) Primary Volume</button>
+    <button onclick="selectOption(this)">د) Physical Virtual</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br>PV = Physical Volume</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۴: VG را بهتر است چگونه تصور کنیم؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) یک Partition معمولی</button>
+    <button onclick="selectOption(this)">ب) یک Pool از فضای Storage</button>
+    <button onclick="selectOption(this)">ج) یک Filesystem</button>
+    <button onclick="selectOption(this)">د) یک Mount Point</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>VG یک Pool از فضای Storage است که از ترکیب PVها ایجاد می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۵: LV از کجا ساخته می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) مستقیماً از BIOS</button>
+    <button onclick="selectOption(this)">ب) از MBR</button>
+    <button onclick="selectOption(this)">ج) از فضای VG</button>
+    <button onclick="selectOption(this)">د) از Filesystem</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>LV از فضای Volume Group ساخته می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۶: کدام گزینه صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Partition و LV دقیقاً یکی هستند.</button>
+    <button onclick="selectOption(this)">ب) LV داخل VG ساخته می‌شود.</button>
+    <button onclick="selectOption(this)">ج) VG داخل Filesystem ساخته می‌شود.</button>
+    <button onclick="selectOption(this)">د) PV همیشه باید Mount شود.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>LV داخل VG ساخته می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۷: کدام دستور برای ساخت Physical Volume استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>vgcreate</code></button>
+    <button onclick="selectOption(this)">ب) <code>lvcreate</code></button>
+    <button onclick="selectOption(this)">ج) <code>pvcreate</code></button>
+    <button onclick="selectOption(this)">د) <code>mkfs</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>pvcreate</code> برای ساخت Physical Volume استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۸: کدام دستور برای ساخت Volume Group استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>vgcreate</code></button>
+    <button onclick="selectOption(this)">ب) <code>pvcreate</code></button>
+    <button onclick="selectOption(this)">ج) <code>lvcreate</code></button>
+    <button onclick="selectOption(this)">د) <code>vgextend</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف</strong><br><code>vgcreate</code> برای ساخت Volume Group استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۹: کدام دستور برای ساخت Logical Volume استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>pvcreate</code></button>
+    <button onclick="selectOption(this)">ب) <code>lvcreate</code></button>
+    <button onclick="selectOption(this)">ج) <code>vgcreate</code></button>
+    <button onclick="selectOption(this)">د) <code>mkfs</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>lvcreate</code> برای ساخت Logical Volume استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۱۰: اگر یک PV جدید داشته باشیم و بخواهیم آن را به یک VG موجود اضافه کنیم، کدام دستور مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>vgcreate</code></button>
+    <button onclick="selectOption(this)">ب) <code>lvcreate</code></button>
+    <button onclick="selectOption(this)">ج) <code>vgextend</code></button>
+    <button onclick="selectOption(this)">د) <code>pvdisplay</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>vgextend</code> برای اضافه کردن PV به VG موجود استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۱۱: بعد از ساخت LV، برای استفاده معمول از آن چه چیزی باید روی آن ایجاد شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) BIOS</button>
+    <button onclick="selectOption(this)">ب) Filesystem</button>
+    <button onclick="selectOption(this)">ج) GRUB</button>
+    <button onclick="selectOption(this)">د) Partition Table</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>بعد از ساخت LV باید روی آن Filesystem ایجاد شود تا قابل استفاده باشد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۱۲: کدام زنجیره صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) Disk → LV → PV → VG → Filesystem</button>
+    <button onclick="selectOption(this)">ب) PV → LV → VG → Filesystem</button>
+    <button onclick="selectOption(this)">ج) PV → VG → LV → Filesystem → Mount</button>
+    <button onclick="selectOption(this)">د) VG → Disk → PV → LV</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>زنجیره صحیح: PV → VG → LV → Filesystem → Mount</div>
 </div>
 
 <div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🧠 مرور نهایی</strong><br>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">                LVM
+                 │
+        ┌────────┴────────┐
+        ↓                 ↓
+       PV                VG
+                         ↓
+                        LV
+                         ↓
+                    Filesystem
+                         ↓
+                       Mount</div></div>
+
+<p>فرمول اصلی:</p>
+<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">PV → VG → LV → Filesystem → Mount</div></div>
+
+<p>فرمول افزایش فضا:</p>
+<div class="code-container"><span class="code-label">افزایش</span><div class="code-block no-prompt">New Storage
+    ↓
+   PV
+    ↓
+   VG
+    ↓
+   LV
+    ↓
+Filesystem</div></div>
+
+<p>و مهم‌ترین تفاوت‌ها:</p>
+<div class="code-container"><span class="code-label">تفاوت‌ها</span><div class="code-block no-prompt">Partition ≠ PV ≠ VG ≠ LV ≠ Filesystem</div></div>
+
+<p>هر کدام یک <strong>لایه متفاوت</strong> در Storage هستند.</p>
+
 <p><strong>جلسه ۶ — LVM مفاهیم و ساختار تمام شد.</strong></p>
-<p>جلسه بعدی می‌توانیم وارد <strong>LVM — پیاده‌سازی عملی و مدیریت</strong> شویم؛ یعنی همین مفاهیم را روی یک سناریوی واقعی از <code>lsblk</code> تا <code>pvcreate → vgcreate → lvcreate → mkfs → mount → lvextend</code> مرحله‌به‌مرحله اجرا کنیم.</p>
+
+<p>در جلسه بعد، همین ساختار را روی یک Lab واقعی اجرا می‌کنیم و از <code>lsblk</code> شروع می‌کنیم و قدم‌به‌قدم به:</p>
+
+<div class="code-container"><span class="code-label">مراحل عملی</span><div class="code-block no-prompt">pvcreate
+→ vgcreate
+→ lvcreate
+→ mkfs
+→ mount
+→ lvextend
+→ Filesystem Resize</div></div>
+
+<p>می‌رسیم.</p>
 </div></div>
-` , 
+`
+, 
 "ch3-lvm-practice": `
 <div class="section-header">
     <div class="section-badge">۳</div>
