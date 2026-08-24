@@ -16568,97 +16568,649 @@ lvextend  → افزایش LV</div></div>
 <div class="section-header">
     <div class="section-badge">۳</div>
     <div>
-        <h1>RAID — مفاهیم و Levelها</h1>
+        <h1>RAID — مفاهیم و RAID Levelها</h1>
         <div class="meta">سخت‌افزار، دیسک و سیستم فایل · بخش ۸ از ۱۰</div>
     </div>
 </div>
 
-<p>در جلسه قبل، <strong>LVM</strong> را یاد گرفتیم. حالا وارد بخش <strong>RAID</strong> می‌شویم.</p>
+<p>در این جلسه با مفاهیم پایه‌ای RAID، انواع Levelها و نحوه‌ی انتخاب RAID مناسب آشنا می‌شویم.</p>
 
-<p>RAID یکی از مباحث مهم Storage در LPIC-1 است، چون باید بتوانی تفاوت بین <strong>افزایش سرعت، افزایش تحمل خرابی و استفاده از فضای دیسک</strong> را تشخیص بدهی.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>اهداف جلسه</strong><br>
+در پایان این جلسه باید بتوانید:
+<ul>
+    <li>مفهوم RAID را توضیح دهید.</li>
+    <li>تفاوت RAID با Backup را بدانید.</li>
+    <li>تفاوت Hardware RAID و Software RAID را بشناسید.</li>
+    <li>مفاهیم <strong>Striping، Mirroring و Parity</strong> را درک کنید.</li>
+    <li>RAID 0، RAID 1، RAID 4، RAID 5، RAID 6 و RAID 10 را مقایسه کنید.</li>
+    <li>حداقل تعداد Disk، میزان فضای قابل استفاده و Fault Tolerance هر Level را تشخیص دهید.</li>
+    <li>بر اساس یک سناریو، RAID مناسب را انتخاب کنید.</li>
+    <li>نقش <code>mdadm</code> و ابزارهای بررسی Software RAID در Linux را بشناسید.</li>
+</ul>
+</div></div>
 
-<p>در این جلسه تمرکز اصلی روی <strong>مفهوم RAID و Levelهای مهم</strong> است. پیاده‌سازی و مدیریت عملی RAID را در جلسه بعد انجام می‌دهیم.</p>
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>در این جلسه تمرکز ما روی مفاهیم است. پیاده‌سازی و مدیریت عملی RAID را در جلسه بعد انجام خواهیم داد.</div></div>
 
 <h2>RAID چیست؟</h2>
 
-<p>RAID مخفف:</p>
+<p>RAID مخفف عبارت زیر است:</p>
 
-<blockquote><strong>Redundant Array of Independent Disks</strong></blockquote>
-
-<p>است.</p>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Redundant Array of Independent Disks</div></div>
 
 <p>به زبان ساده:</p>
 
-<blockquote>RAID یعنی چند Disk را به شکلی مشخص کنار هم قرار دهیم تا یک Storage منطقی ایجاد کنیم.</blockquote>
+<blockquote>RAID یعنی چند Disk را با یک روش مشخص ترکیب کنیم تا از دید سیستم یک Storage منطقی ایجاد شود.</blockquote>
 
-<p>هدف RAID می‌تواند یکی از این موارد باشد:</p>
+<p>هدف از استفاده از RAID می‌تواند یکی یا ترکیبی از موارد زیر باشد:</p>
+
 <ul>
-    <li>افزایش سرعت</li>
-    <li>افزایش تحمل خرابی</li>
-    <li>ترکیبی از سرعت و تحمل خرابی</li>
-    <li>استفاده بهتر از چند Disk</li>
+    <li>افزایش Performance</li>
+    <li>افزایش Fault Tolerance</li>
+    <li>افزایش Availability</li>
+    <li>ترکیب ظرفیت چند Disk</li>
+    <li>ایجاد تعادل بین Performance، Redundancy و ظرفیت قابل استفاده</li>
 </ul>
 
-<div class="box important"><i class="fas fa-exclamation-triangle"></i><div><strong>نکته بسیار مهم</strong><br>
-<strong>RAID جای Backup را نمی‌گیرد.</strong><br>
-RAID می‌تواند در برابر خرابی Disk کمک کند، اما اگر فایل را اشتباهی حذف کنیم یا اطلاعات خراب شوند، RAID لزوماً نمی‌تواند آنها را برگرداند.</div></div>
+<p>اما باید از ابتدا یک نکته بسیار مهم را بدانیم:</p>
 
-<h2>RAID چگونه به وجود آمد؟</h2>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>RAID جایگزین Backup نیست.</strong><br>
+RAID ممکن است در برابر خرابی یک یا چند Disk از اطلاعات محافظت کند، اما لزوماً از شما در برابر موارد زیر محافظت نمی‌کند:
+<ul>
+    <li>حذف اشتباهی فایل</li>
+    <li>خراب شدن داده</li>
+    <li>حذف شدن فایل توسط کاربر</li>
+    <li>خرابی File System</li>
+    <li>حملات یا مشکلات نرم‌افزاری</li>
+</ul>
+پس: <strong>RAID ≠ Backup</strong></div></div>
 
-<p>فرض کنیم یک Disk داریم:</p>
+<h2>RAID چگونه کار می‌کند؟</h2>
+
+<p>فرض کنید فقط یک Disk داریم:</p>
 
 <div class="code-container"><span class="code-label">یک دیسک</span><div class="code-block no-prompt">Disk 1
-   ↓
-100GB</div></div>
+  ↓
+100 GB</div></div>
 
-<p>اگر این Disk خراب شود، Storage ما از دسترس خارج می‌شود.</p>
+<p>اگر این Disk خراب شود، ممکن است تمام Storage از دسترس خارج شود.</p>
 
-<p>حالا چند Disk داریم:</p>
+<p>حالا فرض کنید چند Disk داریم:</p>
 
 <div class="code-container"><span class="code-label">چند دیسک</span><div class="code-block no-prompt">Disk 1
 Disk 2
 Disk 3
 Disk 4</div></div>
 
-<p>می‌توانیم از آنها به روش‌های مختلف استفاده کنیم.</p>
+<p>می‌توانیم این Diskها را به روش‌های مختلف با هم ترکیب کنیم.</p>
+
+<p>این روش ترکیب را:</p>
+
+<div class="code-container"><span class="code-label">RAID Level</span><div class="code-block no-prompt">RAID Level</div></div>
+
+<p>می‌نامیم.</p>
+
+<p>هر RAID Level مشخص می‌کند:</p>
+
+<ul>
+    <li>داده چگونه بین Diskها توزیع شود.</li>
+    <li>آیا داده کپی شود یا نه.</li>
+    <li>آیا اطلاعات Parity وجود داشته باشد یا نه.</li>
+    <li>چند Disk می‌توانند خراب شوند.</li>
+    <li>چه مقدار از ظرفیت خام قابل استفاده باشد.</li>
+</ul>
+
+<h2>سه مفهوم اصلی قبل از یادگیری RAID Levelها</h2>
+
+<p>قبل از بررسی RAID 0، RAID 1 و سایر Levelها، ابتدا باید سه مفهوم اصلی را یاد بگیریم.</p>
+
+<h3>Striping</h3>
+
+<p>در Striping، داده بین چند Disk تقسیم می‌شود.</p>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">Disk 1 + Disk 2
-       ↓
-    RAID 1</div></div>
+<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">Data:
+
+A B C D E F G H</div></div>
+
+<p>بین دو Disk:</p>
+
+<div class="code-container"><span class="code-label">Striping</span><div class="code-block no-prompt">Disk 1        Disk 2
+
+A             B
+C             D
+E             F
+G             H</div></div>
+
+<p>نتیجه:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">چند Disk
+    ↓
+مشارکت همزمان در I/O
+    ↓
+Performance بهتر</div></div>
+
+<p>اما Striping به‌تنهایی هیچ محافظتی در برابر خرابی Disk ایجاد نمی‌کند.</p>
+
+<h3>Mirroring</h3>
+
+<p>در Mirroring، یک نسخه یکسان از داده روی Disk دیگر نگهداری می‌شود.</p>
+
+<div class="code-container"><span class="code-label">Mirroring</span><div class="code-block no-prompt">Disk 1        Disk 2
+
+A             A
+B             B
+C             C
+D             D</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Data
+ ↓
+Copy
+ ↓
+Redundancy</div></div>
+
+<p>اگر یکی از Diskها خراب شود، نسخه دیگر همچنان وجود دارد.</p>
+
+<h3>Parity</h3>
+
+<p>Parity اطلاعات اضافی‌ای است که برای کمک به بازسازی داده در صورت خرابی Disk استفاده می‌شود.</p>
+
+<p>به صورت مفهومی:</p>
+
+<div class="code-container"><span class="code-label">Parity</span><div class="code-block no-prompt">Data
++
+Parity
+↓
+Recovery Capability</div></div>
+
+<p>در RAIDهای مختلف، Parity می‌تواند:</p>
+
+<ul>
+    <li>روی یک Disk اختصاصی قرار بگیرد.</li>
+    <li>بین Diskها توزیع شود.</li>
+    <li>به صورت یک یا دو مجموعه Parity وجود داشته باشد.</li>
+</ul>
+
+<h2>RAID Level چیست؟</h2>
+
+<p>RAID Level مشخص می‌کند که Diskها چگونه با هم کار کنند.</p>
+
+<p>Levelهای مهم این جلسه:</p>
+
+<div class="code-container"><span class="code-label">Levelها</span><div class="code-block no-prompt">RAID 0
+RAID 1
+RAID 4
+RAID 5
+RAID 6
+RAID 10</div></div>
+
+<p>برای یادگیری بهتر، آن‌ها را در سه گروه بررسی می‌کنیم:</p>
+
+<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">RAID
+│
+├── Performance
+│   └── RAID 0
+│
+├── Mirroring
+│   └── RAID 1
+│
+├── Parity-based RAID
+│   ├── RAID 4
+│   ├── RAID 5
+│   └── RAID 6
+│
+└── Combined RAID
+    └── RAID 10</div></div>
+
+<h2>RAID 0 — Striping برای Performance</h2>
+
+<h3>مفهوم اصلی</h3>
+
+<p>RAID 0 فقط از:</p>
+
+<div class="code-container"><span class="code-label">Striping</span><div class="code-block no-prompt">Striping</div></div>
+
+<p>استفاده می‌کند.</p>
+
+<p>داده بین چند Disk تقسیم می‌شود:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Disk 1        Disk 2
+
+A             B
+C             D
+E             F
+G             H</div></div>
+
+<h3>مزایا</h3>
+
+<p>مهم‌ترین مزیت RAID 0:</p>
+
+<div class="code-container"><span class="code-label">مزیت</span><div class="code-block no-prompt">Performance ↑</div></div>
+
+<p>چون چند Disk می‌توانند هم‌زمان در عملیات I/O شرکت کنند.</p>
+
+<p>همچنین تقریباً تمام ظرفیت Diskها قابل استفاده است.</p>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">2 × 1 TB</div></div>
+
+<p>تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">Usable = 2 TB</div></div>
+
+<h3>مشکل RAID 0</h3>
+
+<p>RAID 0 هیچ Redundancy ندارد.</p>
+
+<p>اگر یکی از Diskها خراب شود:</p>
+
+<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">1 Disk Failed
+    ↓
+Array Data Unavailable</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">خلاصه RAID 0</span><div class="code-block no-prompt">RAID 0
+↓
+Striping
+↓
+Speed
+↓
+No Fault Tolerance</div></div>
+
+<h3>حداقل تعداد Disk</h3>
+
+<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">2 Disk</div></div>
+
+<h2>RAID 1 — Mirroring برای Redundancy</h2>
+
+<h3>مفهوم اصلی</h3>
+
+<p>RAID 1 از:</p>
+
+<div class="code-container"><span class="code-label">Mirroring</span><div class="code-block no-prompt">Mirroring</div></div>
+
+<p>استفاده می‌کند.</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Disk 1        Disk 2
+
+A             A
+B             B
+C             C
+D             D</div></div>
+
+<p>هر دو Disk نسخه‌ای از داده را نگهداری می‌کنند.</p>
+
+<h3>مزیت اصلی</h3>
+
+<p>اگر یکی از Diskها خراب شود:</p>
+
+<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Disk 1 → FAILED
+Disk 2 → OK</div></div>
+
+<p>داده همچنان روی Disk دیگر وجود دارد.</p>
+
+<p>در یک Mirror دو دیسکی:</p>
+
+<div class="code-container"><span class="code-label">تحمل خرابی</span><div class="code-block no-prompt">1 Disk Failure Tolerance</div></div>
+
+<h3>هزینه RAID 1</h3>
+
+<p>فرض کنید:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">2 × 1 TB</div></div>
+
+<p>داریم.</p>
+
+<p>فضای قابل استفاده تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">1 TB</div></div>
+
+<p>است.</p>
+
+<p>چون داده روی هر دو Disk کپی می‌شود.</p>
+
+<h3>Read و Write</h3>
+
+<p>در RAID 1:</p>
+
+<ul>
+    <li>هنگام Write داده باید روی Mirrorها نوشته شود.</li>
+    <li>در Read می‌توان از Diskهای مختلف استفاده کرد.</li>
+</ul>
+
+<p>اما مهم‌ترین ویژگی RAID 1 همچنان:</p>
+
+<div class="code-container"><span class="code-label">ویژگی</span><div class="code-block no-prompt">Redundancy</div></div>
+
+<p>است.</p>
+
+<h3>حداقل تعداد Disk</h3>
+
+<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">2 Disk</div></div>
+
+<h3>خلاصه</h3>
+
+<div class="code-container"><span class="code-label">خلاصه RAID 1</span><div class="code-block no-prompt">RAID 1
+↓
+Mirroring
+↓
+Redundancy
+↓
+≈ 50% Usable Capacity</div></div>
+
+<h2>RAIDهای مبتنی بر Parity</h2>
+
+<p>اکنون وارد خانواده‌ای می‌شویم که ترکیبی از:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">Striping
++
+Parity</div></div>
+
+<p>هستند.</p>
+
+<p>مهم‌ترین تفاوت RAID 4، RAID 5 و RAID 6 در نحوه استفاده از Parity و میزان Fault Tolerance است.</p>
+
+<h2>RAID 4 — Dedicated Parity</h2>
+
+<p>RAID 4 از:</p>
+
+<div class="code-container"><span class="code-label">RAID 4</span><div class="code-block no-prompt">Striping + Parity</div></div>
+
+<p>استفاده می‌کند.</p>
+
+<p>اما Parity روی یک Disk اختصاصی قرار می‌گیرد:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk 1 → Data
+Disk 2 → Data
+Disk 3 → Data
+Disk 4 → Parity</div></div>
+
+<p>مشکل اصلی:</p>
+
+<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">Dedicated Parity Disk
+        ↓
+Possible Bottleneck</div></div>
+
+<p>به همین دلیل RAID 4 نسبت به RAID 5 کاربرد بسیار کمتری دارد.</p>
+
+<p>مهم‌ترین نکته‌ای که باید به خاطر بسپارید:</p>
+
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">RAID 4
+↓
+Parity روی یک Disk مشخص</div></div>
+
+<h2>RAID 5 — Distributed Parity</h2>
+
+<p>RAID 5 از:</p>
+
+<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">Striping
++
+Distributed Parity</div></div>
+
+<p>استفاده می‌کند.</p>
+
+<p>برخلاف RAID 4، اطلاعات Parity روی یک Disk ثابت قرار ندارد.</p>
+
+<p>Parity بین Diskها توزیع می‌شود.</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk 1 → Data + Parity
+Disk 2 → Data + Parity
+Disk 3 → Data + Parity</div></div>
+
+<p>به این ساختار:</p>
+
+<div class="code-container"><span class="code-label">Distributed Parity</span><div class="code-block no-prompt">Distributed Parity</div></div>
+
+<p>می‌گوییم.</p>
+
+<h3>Fault Tolerance</h3>
+
+<p>اگر یک Disk خراب شود:</p>
+
+<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">1 Disk Failed</div></div>
+
+<p>RAID 5 می‌تواند با استفاده از:</p>
+
+<div class="code-container"><span class="code-label">بازسازی</span><div class="code-block no-prompt">Remaining Data
++
+Parity</div></div>
+
+<p>داده‌های موردنیاز را بازسازی کند.</p>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">RAID 5
+↓
+1 Disk Failure Tolerance</div></div>
+
+<h3>حداقل تعداد Disk</h3>
+
+<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">3 Disk</div></div>
+
+<h3>فضای قابل استفاده</h3>
+
+<p>فرمول:</p>
+
+<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">Usable ≈ (N - 1) × Size</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">3 × 1 TB</div></div>
+
+<p>تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2 TB Usable</div></div>
 
 <p>یا:</p>
 
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">Disk 1 + Disk 2 + Disk 3
-       ↓
-    RAID 5</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">4 × 1 TB</div></div>
 
-<p>نوع چیدمان Diskها را <strong>RAID Level</strong> مشخص می‌کند.</p>
+<p>تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">3 TB Usable</div></div>
+
+<h3>خلاصه</h3>
+
+<div class="code-container"><span class="code-label">خلاصه RAID 5</span><div class="code-block no-prompt">RAID 5
+↓
+Striping + Distributed Parity
+↓
+Minimum 3 Disks
+↓
+1 Disk Failure
+↓
+Usable = (N - 1) × Size</div></div>
+
+<h2>RAID 6 — Double Parity</h2>
+
+<p>RAID 6 از نظر کلی شبیه RAID 5 است، اما:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">RAID 5 → Single Parity
+RAID 6 → Double Parity</div></div>
+
+<p>نتیجه:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">RAID 6
+↓
+2 Disk Failure Tolerance</div></div>
+
+<p>یعنی اگر دو Disk خراب شوند، Array همچنان می‌تواند داده را حفظ کند.</p>
+
+<h3>حداقل تعداد Disk</h3>
+
+<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">4 Disk</div></div>
+
+<h3>فضای قابل استفاده</h3>
+
+<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">Usable ≈ (N - 2) × Size</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">4 × 1 TB</div></div>
+
+<p>تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2 TB Usable</div></div>
+
+<h3>خلاصه</h3>
+
+<div class="code-container"><span class="code-label">خلاصه RAID 6</span><div class="code-block no-prompt">RAID 6
+↓
+Striping + Double Parity
+↓
+Minimum 4 Disks
+↓
+2 Disk Failures
+↓
+Usable = (N - 2) × Size</div></div>
+
+<h2>RAID 10 — Performance + Redundancy</h2>
+
+<p>RAID 10 ترکیبی از:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">RAID 1
++
+RAID 0</div></div>
+
+<p>است.</p>
+
+<p>ابتدا Mirrorها ایجاد می‌شوند و سپس بین آن‌ها Striping انجام می‌شود.</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">        RAID 0
+       /      \\
+    RAID 1   RAID 1
+     /  \\     /  \\
+    D1  D2   D3  D4</div></div>
+
+<h3>نتیجه</h3>
+
+<p>از RAID 1:</p>
+
+<div class="code-container"><span class="code-label">Redundancy</span><div class="code-block no-prompt">Redundancy</div></div>
+
+<p>و از RAID 0:</p>
+
+<div class="code-container"><span class="code-label">Performance</span><div class="code-block no-prompt">Performance</div></div>
+
+<p>می‌گیریم.</p>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">RAID 10
+↓
+Performance + Redundancy</div></div>
+
+<h3>حداقل تعداد Disk</h3>
+
+<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">4 Disk</div></div>
+
+<h3>فضای قابل استفاده</h3>
+
+<p>در حالت معمول:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">≈ 50% Raw Capacity</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">4 × 1 TB</div></div>
+
+<p>تقریباً:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2 TB Usable</div></div>
+
+<h3>نکته مهم درباره خرابی Disk</h3>
+
+<p>نباید بگوییم:</p>
+
+<blockquote>RAID 10 همیشه دو Disk را تحمل می‌کند.</blockquote>
+
+<p>زیرا نتیجه به محل خرابی Diskها بستگی دارد.</p>
+
+<p>اگر دو Disk از یک Mirror خراب شوند:</p>
+
+<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Mirror
+
+Disk 1 → FAILED
+Disk 2 → FAILED</div></div>
+
+<p>آن Mirror از بین می‌رود.</p>
+
+<p>پس:</p>
+
+<blockquote>میزان Fault Tolerance در RAID 10 به این بستگی دارد که کدام Diskها خراب شوند.</blockquote>
+
+<h3>خلاصه</h3>
+
+<div class="code-container"><span class="code-label">خلاصه RAID 10</span><div class="code-block no-prompt">RAID 10
+↓
+RAID 1 + RAID 0
+↓
+Performance + Redundancy
+↓
+Minimum 4 Disks
+↓
+≈ 50% Usable Capacity</div></div>
+
+<h2>مقایسه سریع RAID Levelها</h2>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>RAID</th><th>تکنیک اصلی</th><th>حداقل Disk</th><th>تحمل خرابی</th><th>ظرفیت قابل استفاده</th></tr></thead>
+<tbody>
+<tr><td>RAID 0</td><td>Striping</td><td>2</td><td>0</td><td>تقریباً 100٪</td></tr>
+<tr><td>RAID 1</td><td>Mirroring</td><td>2</td><td>1 Disk در Mirror دو دیسکی</td><td>تقریباً 50٪</td></tr>
+<tr><td>RAID 4</td><td>Striping + Dedicated Parity</td><td>—</td><td>وابسته به Parity</td><td>یک Disk ظرفیت برای Parity</td></tr>
+<tr><td>RAID 5</td><td>Striping + Distributed Parity</td><td>3</td><td>1 Disk</td><td><code>(N - 1) × Size</code></td></tr>
+<tr><td>RAID 6</td><td>Striping + Double Parity</td><td>4</td><td>2 Disk</td><td><code>(N - 2) × Size</code></td></tr>
+<tr><td>RAID 10</td><td>Mirroring + Striping</td><td>4</td><td>وابسته به محل خرابی</td><td>تقریباً 50٪</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>چگونه RAID مناسب را انتخاب کنیم؟</h2>
+
+<p>برای سوالات LPIC-1 می‌توانید از این مسیر ذهنی استفاده کنید.</p>
+
+<h3>اگر فقط Performance مهم باشد:</h3>
+<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">RAID 0</div></div>
+
+<h3>اگر Mirroring و Redundancy بخواهیم:</h3>
+<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">RAID 1</div></div>
+
+<h3>اگر Parity و تحمل خرابی یک Disk بخواهیم:</h3>
+<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">RAID 5</div></div>
+
+<h3>اگر تحمل خرابی دو Disk بخواهیم:</h3>
+<div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">RAID 6</div></div>
+
+<h3>اگر Performance و Redundancy را با هم بخواهیم:</h3>
+<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">RAID 10</div></div>
 
 <h2>Hardware RAID و Software RAID</h2>
 
-<p>RAID را می‌توان به دو شکل کلی پیاده‌سازی کرد.</p>
+<p>RAID به دو شکل کلی پیاده‌سازی می‌شود.</p>
 
 <h3>Hardware RAID</h3>
 
-<p>در Hardware RAID، یک کنترلر سخت‌افزاری مسئول مدیریت RAID است.</p>
-
-<p>به صورت ساده:</p>
+<p>در Hardware RAID یک RAID Controller مدیریت RAID را انجام می‌دهد.</p>
 
 <div class="code-container"><span class="code-label">Hardware RAID</span><div class="code-block no-prompt">Disk 1 ─┐
 Disk 2 ─┼──→ RAID Controller ──→ OS
 Disk 3 ─┘</div></div>
 
-<p>سیستم‌عامل بیشتر اوقات یک Storage منطقی را می‌بیند و جزئیات RAID توسط Controller مدیریت می‌شود.</p>
+<p>سیستم‌عامل معمولاً Storage منطقی ارائه‌شده توسط Controller را مشاهده می‌کند.</p>
 
 <h3>Software RAID</h3>
 
-<p>در Software RAID، خود سیستم‌عامل و Kernel مدیریت RAID را انجام می‌دهند.</p>
+<p>در Software RAID، سیستم‌عامل و Kernel مسئول مدیریت RAID هستند.</p>
 
-<p>در لینوکس ابزار مهمی که برای این کار استفاده می‌شود:</p>
+<p>در Linux، ابزار مهم:</p>
 
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block no-prompt">mdadm</div></div>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">mdadm</div></div>
 
 <p>است.</p>
 
@@ -16674,850 +17226,140 @@ Disk 3 ─┘</div></div>
 
 <p>است.</p>
 
-<h2>RAID Level چیست؟</h2>
+<h2>ابزارهای مهم Software RAID در Linux</h2>
 
-<p>RAID Level مشخص می‌کند داده‌ها چگونه بین Diskها توزیع شوند.</p>
+<p>در Linux، Software RAID مبتنی بر:</p>
 
-<p>مهم‌ترین Levelهایی که باید برای LPIC-1 بشناسی:</p>
+<div class="code-container"><span class="code-label">md</span><div class="code-block no-prompt">md</div></div>
 
-<div class="code-container"><span class="code-label">Levelها</span><div class="code-block no-prompt">RAID 0
-RAID 1
-RAID 5
-RAID 6
-RAID 10</div></div>
+<p>است و ابزار مهم مدیریت آن:</p>
 
-<p>همچنین RAID 4 را نیز برای شناخت کلی معماری RAID می‌شناسیم.</p>
+<div class="code-container"><span class="code-label">mdadm</span><div class="code-block">mdadm</div></div>
 
-<h2>RAID 0 — Striping</h2>
+<p>می‌باشد.</p>
 
-<p>اولین Level:</p>
+<p>در جلسه بعد وارد پیاده‌سازی عملی خواهیم شد.</p>
 
-<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">RAID 0</div></div>
+<h3>مشاهده وضعیت RAID</h3>
 
-<p>است.</p>
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">cat /proc/mdstat</div></div>
+<p>برای مشاهده وضعیت RAIDهای <code>md</code>.</p>
 
-<p>RAID 0 از تکنیکی به نام:</p>
+<h3>بررسی اطلاعات RAID روی Device</h3>
 
-<blockquote><strong>Striping</strong></blockquote>
-
-<p>استفاده می‌کند.</p>
-
-<p>یعنی داده‌ها بین چند Disk تقسیم می‌شوند.</p>
-
-<p>فرض کنیم یک فایل داریم:</p>
-
-<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">A B C D E F G H</div></div>
-
-<p>در RAID 0 می‌توانیم آن را بین دو Disk تقسیم کنیم:</p>
-
-<div class="code-container"><span class="code-label">Striping</span><div class="code-block no-prompt">Disk 1        Disk 2
-
-A             B
-C             D
-E             F
-G             H</div></div>
-
-<p>در نتیجه چند Disk می‌توانند همزمان در عملیات I/O مشارکت کنند.</p>
-
-<h3>مزیت RAID 0</h3>
-
-<p>مهم‌ترین مزیت:</p>
-
-<blockquote><strong>افزایش Performance</strong></blockquote>
-
-<p>است.</p>
-
-<p>چون عملیات روی چند Disk تقسیم می‌شود.</p>
-
-<p>همچنین فضای Diskها با هم ترکیب می‌شود.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Disk 1 = 1TB
-Disk 2 = 1TB</div></div>
-
-<p>در RAID 0 تقریباً:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">Usable = 2TB</div></div>
-
-<p>داریم.</p>
-
-<h3>مشکل بسیار مهم RAID 0</h3>
-
-<p>RAID 0 هیچ تحمل خرابی ندارد.</p>
-
-<p>فرض کنیم:</p>
-
-<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Disk 1       Disk 2
-  ↓            ↓
- A C E G      B D F H</div></div>
-
-<p>اگر Disk 1 خراب شود:</p>
-
-<div class="code-container"><span class="code-label">از دست رفتن</span><div class="code-block no-prompt">A C E G</div></div>
-
-<p>از بین می‌روند.</p>
-
-<p>چون اطلاعات فایل بین Diskها تقسیم شده بود، کل Array عملاً قابل استفاده نخواهد بود.</p>
-
-<p>بنابراین:</p>
-
-<blockquote><strong>RAID 0 = Speed، نه Safety</strong></blockquote>
-
-<h3>RAID 0 را این‌طور حفظ کن</h3>
-
-<div class="code-container"><span class="code-label">خلاصه RAID 0</span><div class="code-block no-prompt">RAID 0
-   ↓
-Striping
-   ↓
-Speed ↑
-   ↓
-Fault Tolerance = 0</div></div>
-
-<p>یعنی:</p>
-
-<p><strong>RAID 0 سریع است، ولی هیچ محافظتی در برابر خرابی Disk ندارد.</strong></p>
-
-<h2>RAID 1 — Mirroring</h2>
-
-<p>حالا به:</p>
-
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">RAID 1</div></div>
-
-<p>می‌رسیم.</p>
-
-<p>RAID 1 از تکنیکی به نام:</p>
-
-<blockquote><strong>Mirroring</strong></blockquote>
-
-<p>استفاده می‌کند.</p>
-
-<p>یعنی داده‌ها روی Diskها به صورت Mirror یا کپی یکسان نگهداری می‌شوند.</p>
-
-<p>فرض کنیم داریم:</p>
-
-<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">A B C D</div></div>
-
-<p>در RAID 1:</p>
-
-<div class="code-container"><span class="code-label">Mirror</span><div class="code-block no-prompt">Disk 1        Disk 2
-
-A             A
-B             B
-C             C
-D             D</div></div>
-
-<p>یعنی هر دو Disk یک نسخه از داده را دارند.</p>
-
-<h3>مزیت RAID 1</h3>
-
-<p>اگر یک Disk خراب شود:</p>
-
-<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Disk 1 → FAILED
-
-Disk 2 → سالم</div></div>
-
-<p>اطلاعات همچنان در Disk دوم وجود دارد.</p>
-
-<p>پس:</p>
-
-<blockquote>RAID 1 تحمل خرابی یک Disk را دارد.</blockquote>
-
-<p>البته این موضوع در یک Array دو دیسکی مطرح است.</p>
-
-<h3>هزینه RAID 1</h3>
-
-<p>در RAID 1 بخشی از فضای فیزیکی قابل استفاده نیست.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Disk 1 = 1TB
-Disk 2 = 1TB</div></div>
-
-<p>داریم.</p>
-
-<p>اما:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">Usable ≈ 1TB</div></div>
-
-<p>نه 2TB.</p>
-
-<p>چرا؟</p>
-
-<p>چون اطلاعات روی هر دو Disk کپی شده‌اند.</p>
-
-<p>بنابراین تقریباً:</p>
-
-<div class="code-container"><span class="code-label">هزینه</span><div class="code-block no-prompt">50% فضای خام</div></div>
-
-<p>برای یک Mirror دو دیسکی قابل استفاده است.</p>
-
-<h3>RAID 1 و Read / Write</h3>
-
-<p>در RAID 1، هنگام Write داده باید روی Mirrorها نوشته شود.</p>
-
-<p>اما در Read می‌توان از Diskهای مختلف برای خواندن استفاده کرد.</p>
-
-<p>در نتیجه:</p>
-
-<blockquote>RAID 1 می‌تواند در خواندن عملکرد خوبی داشته باشد، ولی مزیت اصلی آن <strong>Redundancy و تحمل خرابی</strong> است.</blockquote>
-
-<p>پس در تست‌ها RAID 1 را با این مفهوم به یاد بیاور:</p>
-
-<div class="code-container"><span class="code-label">خلاصه RAID 1</span><div class="code-block no-prompt">RAID 1
-   ↓
-Mirroring
-   ↓
-Redundancy ↑
-   ↓
-Usable Space ↓</div></div>
-
-<h3>RAID 1 حداقل چند Disk می‌خواهد؟</h3>
-
-<p>برای RAID 1 حداقل:</p>
-
-<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">2 Disk</div></div>
-
-<p>لازم است.</p>
-
-<p>چون باید حداقل دو نسخه از داده داشته باشیم.</p>
-
-<h2>مقایسه RAID 0 و RAID 1</h2>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>ویژگی</th><th>RAID 0</th><th>RAID 1</th></tr></thead>
-<tbody>
-<tr><td>روش</td><td>Striping</td><td>Mirroring</td></tr>
-<tr><td>هدف اصلی</td><td>Speed</td><td>Redundancy</td></tr>
-<tr><td>تحمل خرابی</td><td>❌ ندارد</td><td>✅ یک Disk</td></tr>
-<tr><td>حداقل Disk</td><td>2</td><td>2</td></tr>
-<tr><td>فضای قابل استفاده</td><td>تقریباً 100٪</td><td>تقریباً 50٪ در دو دیسک هم‌اندازه</td></tr>
-<tr><td>کپی داده</td><td>تقسیم می‌شود</td><td>کپی می‌شود</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>یک راه حفظ کردن:</p>
-
-<div class="code-container"><span class="code-label">یادآوری</span><div class="code-block no-prompt">0 → Striping → Speed
-1 → Mirroring → Safety</div></div>
-
-<h2>RAID 5 — Striping + Parity</h2>
-
-<p>حالا می‌رسیم به یکی از مهم‌ترین Levelها:</p>
-
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">RAID 5</div></div>
-
-<p>RAID 5 ترکیبی از:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">Striping
-+
-Parity</div></div>
-
-<p>است.</p>
-
-<p>یعنی هم داده بین Diskها توزیع می‌شود و هم اطلاعات اضافی برای Recovery ذخیره می‌شود.</p>
-
-<h3>Parity چیست؟</h3>
-
-<p>Parity یکی از مفاهیم بسیار مهم RAID است.</p>
-
-<p>به زبان ساده:</p>
-
-<blockquote><strong>Parity اطلاعات اضافی‌ای است که به RAID کمک می‌کند در صورت خرابی یک Disk، اطلاعات از دست‌رفته را بازسازی کند.</strong></blockquote>
-
-<p>فرض کنیم چند Disk داریم:</p>
-
-<div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">Disk 1
-Disk 2
-Disk 3</div></div>
-
-<p>داده‌ها بین آنها توزیع می‌شوند و اطلاعات Parity نیز روی Diskها قرار می‌گیرد.</p>
-
-<p>نکته مهم:</p>
-
-<blockquote>در RAID 5، Parity روی یک Disk ثابت نمی‌ماند؛ بین Diskها <strong>توزیع</strong> می‌شود.</blockquote>
-
-<p>به همین دلیل به آن:</p>
-
-<blockquote><strong>Distributed Parity</strong></blockquote>
-
-<p>می‌گوییم.</p>
-
-<h3>اگر یک Disk در RAID 5 خراب شود چه می‌شود؟</h3>
-
-<p>فرض کنیم:</p>
-
-<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Disk 1 → سالم
-Disk 2 → سالم
-Disk 3 → خراب</div></div>
-
-<p>RAID 5 می‌تواند با استفاده از:</p>
-
-<div class="code-container"><span class="code-label">بازسازی</span><div class="code-block no-prompt">Data
-+
-Parity</div></div>
-
-<p>اطلاعات Disk خراب‌شده را بازسازی کند.</p>
-
-<p>بنابراین:</p>
-
-<blockquote><strong>RAID 5 تحمل خرابی یک Disk را دارد.</strong></blockquote>
-
-<h3>RAID 5 حداقل چند Disk می‌خواهد؟</h3>
-
-<p>برای RAID 5 حداقل:</p>
-
-<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">3 Disk</div></div>
-
-<p>لازم است.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">حداقل‌ها</span><div class="code-block no-prompt">RAID 0 → حداقل 2
-RAID 1 → حداقل 2
-RAID 5 → حداقل 3</div></div>
-
-<p>این اعداد برای تست‌ها مهم هستند.</p>
-
-<h3>فضای قابل استفاده در RAID 5</h3>
-
-<p>در RAID 5 تقریباً ظرفیت یک Disk برای Parity در نظر گرفته می‌شود.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">3 × 1TB</div></div>
-
-<p>داریم.</p>
-
-<p>فضای قابل استفاده تقریباً:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2TB</div></div>
-
-<p>است.</p>
-
-<p>برای چهار Disk یک ترابایتی:</p>
-
-<div class="code-container"><span class="code-label">چهار دیسک</span><div class="code-block no-prompt">4 × 1TB</div></div>
-
-<p>فضای قابل استفاده تقریباً:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">3TB</div></div>
-
-<p>است.</p>
-
-<p>فرمول ساده:</p>
-
-<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">Usable ≈ (N - 1) × Size</div></div>
-
-<p>که در آن:</p>
-<ul>
-    <li><code>N</code> = تعداد Diskها</li>
-    <li><code>Size</code> = ظرفیت کوچک‌ترین Disk</li>
-</ul>
-
-<h3>RAID 5 را چگونه حفظ کنیم؟</h3>
-
-<div class="code-container"><span class="code-label">خلاصه RAID 5</span><div class="code-block no-prompt">RAID 5
-   ↓
-Striping + Distributed Parity
-   ↓
-Speed + Fault Tolerance
-   ↓
-1 Disk Failure</div></div>
-
-<p>یعنی:</p>
-
-<blockquote><strong>RAID 5 می‌تواند خرابی یک Disk را تحمل کند.</strong></blockquote>
-
-<h2>RAID 6 — دو Parity</h2>
-
-<p>RAID 6 شبیه RAID 5 است، اما یک تفاوت بسیار مهم دارد:</p>
-
-<blockquote><strong>دو اطلاعات Parity دارد.</strong></blockquote>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">RAID 5 → یک Parity
-RAID 6 → دو Parity</div></div>
-
-<h3>مزیت RAID 6</h3>
-
-<p>اگر دو Disk همزمان خراب شوند:</p>
-
-<div class="code-container"><span class="code-label">خرابی دو دیسک</span><div class="code-block no-prompt">Disk 1 → سالم
-Disk 2 → FAILED
-Disk 3 → سالم
-Disk 4 → FAILED
-Disk 5 → سالم</div></div>
-
-<p>RAID 6 می‌تواند همچنان Array را حفظ کند و اطلاعات را بازسازی کند.</p>
-
-<p>بنابراین:</p>
-
-<blockquote><strong>RAID 6 تحمل خرابی همزمان دو Disk را دارد.</strong></blockquote>
-
-<h3>RAID 6 حداقل چند Disk می‌خواهد؟</h3>
-
-<p>برای RAID 6 معمولاً حداقل:</p>
-
-<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">4 Disk</div></div>
-
-<p>لازم است.</p>
-
-<p>چون دو Disk-equivalent ظرفیت برای Parity مصرف می‌شود.</p>
-
-<h3>فضای RAID 6</h3>
-
-<p>فرمول ساده:</p>
-
-<div class="code-container"><span class="code-label">فرمول</span><div class="code-block no-prompt">Usable ≈ (N - 2) × Size</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">4 × 1TB</div></div>
-
-<p>تقریباً:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2TB usable</div></div>
-
-<p>داریم.</p>
-
-<p>چون ظرفیت معادل دو Disk برای Parity استفاده می‌شود.</p>
-
-<h2>RAID 5 در مقابل RAID 6</h2>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>ویژگی</th><th>RAID 5</th><th>RAID 6</th></tr></thead>
-<tbody>
-<tr><td>Striping</td><td>✅</td><td>✅</td></tr>
-<tr><td>Parity</td><td>1</td><td>2</td></tr>
-<tr><td>تحمل خرابی</td><td>1 Disk</td><td>2 Disk</td></tr>
-<tr><td>حداقل Disk</td><td>3</td><td>4</td></tr>
-<tr><td>فضای قابل استفاده</td><td>N-1</td><td>N-2</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 5 → یک خرابی
-RAID 6 → دو خرابی</div></div>
-
-<h2>RAID 10 — ترکیب RAID 1 و RAID 0</h2>
-
-<p>حالا یکی از مهم‌ترین ترکیب‌ها:</p>
-
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">RAID 10</div></div>
-
-<p>است.</p>
-
-<p>RAID 10 ترکیبی از:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">RAID 1
-+
-RAID 0</div></div>
-
-<p>است.</p>
-
-<p>یعنی ابتدا Mirror ایجاد می‌کنیم و سپس روی Mirrorها Striping انجام می‌دهیم.</p>
-
-<h3>ساختار مفهومی RAID 10</h3>
-
-<p>فرض کنیم چهار Disk داریم:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk 1 ──┐
-         ├── Mirror
-Disk 2 ──┘
-
-Disk 3 ──┐
-         ├── Mirror
-Disk 4 ──┘</div></div>
-
-<p>سپس بین Mirrorها Striping انجام می‌شود.</p>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">ساختار ساده</span><div class="code-block no-prompt">       RAID 0
-      /      \\
-   RAID 1   RAID 1
-    /  \\     /  \\
-   D1  D2   D3  D4</div></div>
-
-<h3>مزیت RAID 10</h3>
-
-<p>RAID 10 می‌خواهد دو ویژگی را با هم داشته باشد:</p>
-
-<div class="code-container"><span class="code-label">ویژگی‌ها</span><div class="code-block no-prompt">RAID 1 → Redundancy
-RAID 0 → Performance</div></div>
-
-<p>پس:</p>
-
-<blockquote>RAID 10 هم Performance خوبی دارد و هم تحمل خرابی.</blockquote>
-
-<h3>حداقل Disk برای RAID 10</h3>
-
-<p>RAID 10 حداقل:</p>
-
-<div class="code-container"><span class="code-label">حداقل</span><div class="code-block no-prompt">4 Disk</div></div>
-
-<p>می‌خواهد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">4 × 1TB</div></div>
-
-<p>تقریباً:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">2TB usable</div></div>
-
-<p>داریم.</p>
-
-<p>چون Mirror باعث می‌شود حدود نصف ظرفیت خام قابل استفاده باشد.</p>
-
-<h3>آیا RAID 10 همیشه با خرابی دو Disk سالم می‌ماند؟</h3>
-
-<p>اینجا یک نکته مهم و تستی داریم.</p>
-
-<p>نگوییم:</p>
-
-<blockquote>RAID 10 همیشه می‌تواند دو Disk را تحمل کند.</blockquote>
-
-<p>این عبارت دقیق نیست.</p>
-
-<p>اگر دو Disk خراب شوند، نتیجه به <strong>محل خرابی‌ها</strong> بستگی دارد.</p>
-
-<p>مثلاً اگر هر دو Disk مربوط به یک Mirror خراب شوند:</p>
-
-<div class="code-container"><span class="code-label">خرابی</span><div class="code-block no-prompt">Mirror 1
-Disk 1 → FAILED
-Disk 2 → FAILED</div></div>
-
-<p>آن Mirror کامل از بین رفته و Array ممکن است از کار بیفتد.</p>
-
-<p>پس:</p>
-
-<blockquote>RAID 10 بسته به اینکه کدام Diskها خراب شوند، می‌تواند خرابی یک یا چند Disk را تحمل کند، اما تضمین ثابت «دو Disk» ندارد.</blockquote>
-
-<p>این نکته برای درک مفهومی RAID 10 مهم است.</p>
-
-<h2>RAID 4 — چرا کمتر استفاده می‌شود؟</h2>
-
-<p>RAID 4 نیز از:</p>
-
-<div class="code-container"><span class="code-label">RAID 4</span><div class="code-block no-prompt">Striping + Parity</div></div>
-
-<p>استفاده می‌کند.</p>
-
-<p>اما یک تفاوت مهم با RAID 5 دارد.</p>
-
-<p>در RAID 4، Parity روی یک Disk اختصاصی قرار می‌گیرد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk 1 → Data
-Disk 2 → Data
-Disk 3 → Data
-Disk 4 → Parity</div></div>
-
-<p>مشکل چیست؟</p>
-
-<p>Disk مربوط به Parity می‌تواند به:</p>
-
-<blockquote><strong>Bottleneck</strong></blockquote>
-
-<p>تبدیل شود.</p>
-
-<p>به همین دلیل RAID 4 نسبت به RAID 5 کاربرد بسیار کمتری دارد و در مقایسه با RAID 5/6 کمتر مورد استفاده قرار می‌گیرد.</p>
-
-<h2>مقایسه کلی RAID Levelها</h2>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>RAID</th><th>تکنیک</th><th>حداقل Disk</th><th>تحمل خرابی</th><th>فضای قابل استفاده</th></tr></thead>
-<tbody>
-<tr><td>RAID 0</td><td>Striping</td><td>2</td><td>0</td><td>تقریباً 100٪</td></tr>
-<tr><td>RAID 1</td><td>Mirroring</td><td>2</td><td>1</td><td>تقریباً 50٪</td></tr>
-<tr><td>RAID 5</td><td>Striping + Distributed Parity</td><td>3</td><td>1</td><td>N-1</td></tr>
-<tr><td>RAID 6</td><td>Striping + Double Parity</td><td>4</td><td>2</td><td>N-2</td></tr>
-<tr><td>RAID 10</td><td>RAID 1 + RAID 0</td><td>4</td><td>وابسته به محل خرابی</td><td>تقریباً 50٪</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>یک روش بسیار ساده برای انتخاب RAID</h2>
-
-<p>اگر سؤال بپرسد:</p>
-
-<h3>«بیشترین سرعت، بدون اهمیت دادن به تحمل خرابی؟»</h3>
-<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">RAID 0</div></div>
-
-<h3>«امنیت و Mirror؟»</h3>
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">RAID 1</div></div>
-
-<h3>«یک Disk خرابی + Parity؟»</h3>
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">RAID 5</div></div>
-
-<h3>«دو Disk خرابی + Parity؟»</h3>
-<div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">RAID 6</div></div>
-
-<h3>«سرعت + Mirror؟»</h3>
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">RAID 10</div></div>
-
-<h2>RAID و فضای Storage</h2>
-
-<p>این بخش را هم خوب یاد بگیر.</p>
-
-<p>فرض کنیم 4 Disk یک ترابایتی داریم.</p>
-
-<h3>RAID 0</h3>
-<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">4 × 1TB ≈ 4TB</div></div>
-
-<h3>RAID 1</h3>
-<p>در ساختار ساده Mirror:</p>
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">≈ 1TB</div></div>
-
-<h3>RAID 5</h3>
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">(4 - 1) × 1TB
-≈ 3TB</div></div>
-
-<h3>RAID 6</h3>
-<div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">(4 - 2) × 1TB
-≈ 2TB</div></div>
-
-<h3>RAID 10</h3>
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">≈ 2TB</div></div>
-
-<p>البته ظرفیت واقعی ممکن است به عوامل مختلف و ظرفیت دقیق Diskها وابسته باشد.</p>
-
-<h2>RAID چگونه در Linux پیاده می‌شود؟</h2>
-
-<p>در Linux برای Software RAID ابزار مهم:</p>
-
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">mdadm</div></div>
-
-<p>است.</p>
-
-<p><code>mdadm</code> برای مدیریت RAIDهای نرم‌افزاری مبتنی بر <code>md</code> در Linux استفاده می‌شود.</p>
-
-<p>در جلسه بعد با همین ابزار وارد Lab عملی می‌شویم.</p>
-
-<h2>نصب <code>mdadm</code></h2>
-
-<p>طبق محتوای آموزشی شما، در سیستم‌های مبتنی بر RPM مانند AlmaLinux/RHEL می‌توان از:</p>
-
-<div class="code-container"><span class="code-label">نصب</span><div class="code-block">sudo dnf install mdadm -y</div></div>
-
-<p>استفاده کرد.</p>
-
-<p>نکته مهم:</p>
-
-<blockquote>در این جلسه هنوز RAID را ایجاد نمی‌کنیم؛ فقط ابزار موردنیاز را معرفی می‌کنیم.</blockquote>
-
-<h2>آماده‌سازی Disk برای RAID</h2>
-
-<p>در سناریوی عملی معمولاً ابتدا Diskها را شناسایی می‌کنیم:</p>
-
-<div class="code-container"><span class="code-label">شناسایی</span><div class="code-block">lsblk</div></div>
-
-<p>سپس با ابزارهایی مثل:</p>
-
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">fdisk</div></div>
-
-<p>پارتیشن ایجاد می‌کنیم.</p>
-
-<p>در محتوای اسلاید شما، نوع پارتیشن RAID با کد:</p>
-
-<div class="code-container"><span class="code-label">کد</span><div class="code-block no-prompt">fd</div></div>
-
-<p>معرفی شده است.</p>
-
-<p>در اینجا صرفاً آن را به عنوان نکته آموزشی اسلاید نگه می‌داریم؛ جزئیات عملی Partition Type و تفاوت روش‌های جدیدتر را در جلسه پیاده‌سازی بررسی خواهیم کرد.</p>
-
-<h2>ابزارهای بررسی RAID</h2>
-
-<p>بعد از ساخت RAID، سه دستور بسیار مهم داریم.</p>
-
-<h3><code>/proc/mdstat</code></h3>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">cat /proc/mdstat</div></div>
-<p>برای مشاهده وضعیت RAIDهای <code>md</code> در Kernel.</p>
-
-<h3><code>mdadm -E</code></h3>
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">mdadm -E /dev/sdb1</div></div>
-<p>برای بررسی اطلاعات RAID روی Device و Superblock.</p>
+<p>برای مشاهده اطلاعات RAID و Superblock روی Device.</p>
 
-<h3><code>mdadm --detail</code></h3>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">mdadm --detail /dev/md0</div></div>
-<p>برای دیدن جزئیات Array.</p>
+<h3>مشاهده جزئیات Array</h3>
 
-<p>پس:</p>
+<div class="code-container"><span class="code-label">جزئیات</span><div class="code-block">mdadm --detail /dev/md0</div></div>
+<p>برای مشاهده جزئیات Array.</p>
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/proc/mdstat
-    ↓
-وضعیت کلی RAID
+<h2>RAID Superblock چیست؟</h2>
 
-mdadm -E
-    ↓
-اطلاعات RAID روی Device
+<p>در Software RAID، اطلاعات مربوط به RAID روی Memberها به شکل Metadata نگهداری می‌شود.</p>
 
-mdadm --detail
-    ↓
-جزئیات Array</div></div>
+<p>به این Metadata:</p>
 
-<h2>Superblock چیست؟</h2>
-
-<p>در RAID نرم‌افزاری، اطلاعات مربوط به RAID روی Memberها نگهداری می‌شود.</p>
-
-<p>این اطلاعات به شکل کلی شامل Metadata مربوط به Array است.</p>
-
-<p>به این ناحیه:</p>
-
-<blockquote><strong>RAID Superblock</strong></blockquote>
+<div class="code-container"><span class="code-label">RAID Superblock</span><div class="code-block no-prompt">RAID Superblock</div></div>
 
 <p>گفته می‌شود.</p>
 
-<p>به همین دلیل:</p>
+<p>به همین دلیل دستور زیر می‌تواند اطلاعات مربوط به RAID Metadata را نمایش دهد:</p>
 
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">mdadm -E /dev/sdb1</div></div>
-
-<p>می‌تواند اطلاعات مربوط به RAID Metadata را نشان دهد.</p>
-
-<h2>یک سناریوی ذهنی کامل</h2>
-
-<p>فرض کنیم چهار Disk داریم:</p>
-
-<div class="code-container"><span class="code-label">دیسک‌ها</span><div class="code-block no-prompt">/dev/sdb
-/dev/sdc
-/dev/sdd
-/dev/sde</div></div>
-
-<p>حالا می‌توانیم بر اساس هدفمان انتخاب کنیم.</p>
-
-<h3>اگر Speed بخواهیم:</h3>
-<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">/dev/sdb ─┐
-/dev/sdc ─┼──→ RAID 0</div></div>
-
-<h3>اگر Mirror بخواهیم:</h3>
-<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">/dev/sdb ─┐
-          ├──→ RAID 1
-/dev/sdc ─┘</div></div>
-
-<h3>اگر یک Disk تحمل خرابی بخواهیم:</h3>
-<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">/dev/sdb
-/dev/sdc
-/dev/sdd
-     ↓
-   RAID 5</div></div>
-
-<h3>اگر دو Disk تحمل خرابی بخواهیم:</h3>
-<div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">/dev/sdb
-/dev/sdc
-/dev/sdd
-/dev/sde
-     ↓
-   RAID 6</div></div>
-
-<h3>اگر Speed + Mirror بخواهیم:</h3>
-<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">/dev/sdb ─┐
-/dev/sdc ─┘
-     ↓
-  Mirror
-
-/dev/sdd ─┐
-/dev/sde ─┘
-     ↓
-  Mirror
-
-     ↓
-
-   RAID 10</div></div>
 
 <div class="summary-box">
     <h3>🧠 نقشه ذهنی RAID</h3>
     <div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                         RAID
                            │
-          ┌────────────────┴────────────────┐
-          │                                 │
-      Performance                       Redundancy
-          │                                 │
-       RAID 0                         RAID 1 / 5 / 6
-          │                                 │
-      Striping                       ┌──────┴──────┐
-                                     │             │
-                                  Mirror        Parity
-                                     │             │
-                                  RAID 1        RAID 5/6
-                                                   │
-                                          ┌────────┴────────┐
-                                          │                 │
-                                       RAID 5            RAID 6
-                                      1 Failure         2 Failures
+          ┌────────────────┼────────────────┐
+          │                │                │
+      Striping         Mirroring          Parity
+          │                │                │
+       RAID 0          RAID 1      ┌────────┼────────┐
+                                   │        │        │
+                                RAID 4    RAID 5   RAID 6
+                                   │        │        │
+                               Dedicated Distributed Double
+                                Parity     Parity   Parity
 
-                           RAID 10
-                              ↓
-                        RAID 1 + RAID 0</div></div>
+                         RAID 10
+                            │
+                     RAID 1 + RAID 0
+                            │
+                 Redundancy + Performance</div></div>
 </div>
 
 <div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکات طلایی LPIC-1</strong><br>
-<p>این موارد را حتماً حفظ کن:</p>
 
 <h4>RAID 0</h4>
 <div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">Striping
 Speed
 No Fault Tolerance
-Minimum 2 disks</div></div>
+Minimum 2 Disks</div></div>
 
 <h4>RAID 1</h4>
 <div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">Mirroring
 Redundancy
-Minimum 2 disks
-≈ 50% usable capacity</div></div>
+Minimum 2 Disks
+≈ 50% Usable Capacity</div></div>
 
 <h4>RAID 5</h4>
 <div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">Striping
 Distributed Parity
-Minimum 3 disks
+Minimum 3 Disks
 1 Disk Failure</div></div>
 
 <h4>RAID 6</h4>
 <div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">Striping
 Double Parity
-Minimum 4 disks
+Minimum 4 Disks
 2 Disk Failures</div></div>
 
 <h4>RAID 10</h4>
 <div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">RAID 1 + RAID 0
-Minimum 4 disks
 Performance + Redundancy
-≈ 50% usable capacity</div></div>
+Minimum 4 Disks
+≈ 50% Usable Capacity</div></div>
 </div></div>
+
+<h2>🧠 فرمول‌های مهم ظرفیت</h2>
+
+<p>فرض کنید:</p>
+
+<div class="code-container"><span class="code-label">متغیرها</span><div class="code-block no-prompt">N = تعداد Diskها
+Size = ظرفیت کوچک‌ترین Disk</div></div>
+
+<h3>RAID 0</h3>
+<div class="code-container"><span class="code-label">RAID 0</span><div class="code-block no-prompt">Usable ≈ N × Size</div></div>
+
+<h3>RAID 1</h3>
+<p>در حالت Mirror ساده:</p>
+<div class="code-container"><span class="code-label">RAID 1</span><div class="code-block no-prompt">Usable ≈ 50%</div></div>
+
+<h3>RAID 5</h3>
+<div class="code-container"><span class="code-label">RAID 5</span><div class="code-block no-prompt">Usable ≈ (N - 1) × Size</div></div>
+
+<h3>RAID 6</h3>
+<div class="code-container"><span class="code-label">RAID 6</span><div class="code-block no-prompt">Usable ≈ (N - 2) × Size</div></div>
+
+<h3>RAID 10</h3>
+<div class="code-container"><span class="code-label">RAID 10</span><div class="code-block no-prompt">Usable ≈ 50%</div></div>
 
 <h2>خودآزمایی</h2>
 
-<div class="quiz-card"><p>❓ تست ۱: کدام RAID از <strong>Striping بدون Parity یا Mirroring</strong> استفاده می‌کند؟</p>
+<div class="quiz-card"><p>❓ تست ۱: کدام RAID فقط از Striping استفاده می‌کند و هیچ Fault Tolerance ندارد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) RAID 0</button>
     <button onclick="selectOption(this)">ب) RAID 1</button>
     <button onclick="selectOption(this)">ج) RAID 5</button>
     <button onclick="selectOption(this)">د) RAID 6</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — RAID 0</strong><br>RAID 0 فقط از Striping استفاده می‌کند و هیچ Parity یا Mirroring ندارد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — RAID 0</strong><br>RAID 0 فقط از Striping استفاده می‌کند و هیچ Fault Tolerance ندارد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۲: حداقل تعداد Disk برای RAID 5 چند عدد است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) 1</button>
-    <button onclick="selectOption(this)">ب) 2</button>
-    <button onclick="selectOption(this)">ج) 3</button>
-    <button onclick="selectOption(this)">د) 4</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>RAID 5 حداقل به 3 Disk نیاز دارد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۳: کدام RAID از Mirroring استفاده می‌کند؟</p>
+<div class="quiz-card"><p>❓ تست ۲: کدام RAID از Mirroring استفاده می‌کند؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) RAID 0</button>
     <button onclick="selectOption(this)">ب) RAID 1</button>
@@ -17527,7 +17369,17 @@ Performance + Redundancy
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — RAID 1</strong><br>RAID 1 از Mirroring استفاده می‌کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۴: کدام RAID می‌تواند خرابی همزمان دو Disk را تحمل کند؟</p>
+<div class="quiz-card"><p>❓ تست ۳: حداقل تعداد Disk برای RAID 5 چند عدد است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) 2</button>
+    <button onclick="selectOption(this)">ب) 3</button>
+    <button onclick="selectOption(this)">ج) 4</button>
+    <button onclick="selectOption(this)">د) 5</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — 3 Disk</strong><br>RAID 5 حداقل به 3 Disk نیاز دارد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۴: کدام RAID می‌تواند خرابی هم‌زمان دو Disk را تحمل کند؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) RAID 0</button>
     <button onclick="selectOption(this)">ب) RAID 1</button>
@@ -17537,119 +17389,85 @@ Performance + Redundancy
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: د — RAID 6</strong><br>RAID 6 با Double Parity می‌تواند خرابی دو Disk را تحمل کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۵: کدام RAID ترکیبی از RAID 1 و RAID 0 است؟</p>
+<div class="quiz-card"><p>❓ تست ۵: در RAID 5، Parity چگونه ذخیره می‌شود؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 4</button>
-    <button onclick="selectOption(this)">ب) RAID 5</button>
-    <button onclick="selectOption(this)">ج) RAID 6</button>
-    <button onclick="selectOption(this)">د) RAID 10</button>
+    <button onclick="selectOption(this)">الف) روی اولین Disk</button>
+    <button onclick="selectOption(this)">ب) روی آخرین Disk</button>
+    <button onclick="selectOption(this)">ج) به صورت Distributed بین Diskها</button>
+    <button onclick="selectOption(this)">د) بدون Parity</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: د — RAID 10</strong><br>RAID 10 ترکیبی از RAID 1 و RAID 0 است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — Distributed Parity</strong><br>در RAID 5، Parity به صورت توزیع‌شده بین Diskها قرار می‌گیرد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۶: در RAID 5، Parity چگونه ذخیره می‌شود؟</p>
+<div class="quiz-card"><p>❓ تست ۶: چهار Disk یک ترابایتی داریم. ظرفیت قابل استفاده تقریبی RAID 5 چقدر است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) فقط روی اولین Disk</button>
-    <button onclick="selectOption(this)">ب) فقط روی آخرین Disk</button>
-    <button onclick="selectOption(this)">ج) به صورت توزیع‌شده بین Diskها</button>
-    <button onclick="selectOption(this)">د) اصلاً وجود ندارد</button>
+    <button onclick="selectOption(this)">الف) 1 TB</button>
+    <button onclick="selectOption(this)">ب) 2 TB</button>
+    <button onclick="selectOption(this)">ج) 3 TB</button>
+    <button onclick="selectOption(this)">د) 4 TB</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>در RAID 5، Parity به صورت توزیع‌شده بین Diskها قرار می‌گیرد (Distributed Parity).</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — 3 TB</strong><br>فرمول: (N - 1) × Size = (4 - 1) × 1 TB = 3 TB</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۷: کدام RAID هیچ تحمل خرابی ندارد؟</p>
+<div class="quiz-card"><p>❓ تست ۷: چهار Disk یک ترابایتی داریم. ظرفیت قابل استفاده تقریبی RAID 6 چقدر است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 0</button>
-    <button onclick="selectOption(this)">ب) RAID 1</button>
-    <button onclick="selectOption(this)">ج) RAID 5</button>
-    <button onclick="selectOption(this)">د) RAID 6</button>
+    <button onclick="selectOption(this)">الف) 1 TB</button>
+    <button onclick="selectOption(this)">ب) 2 TB</button>
+    <button onclick="selectOption(this)">ج) 3 TB</button>
+    <button onclick="selectOption(this)">د) 4 TB</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — RAID 0</strong><br>RAID 0 هیچ تحمل خرابی ندارد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — 2 TB</strong><br>فرمول: (N - 2) × Size = (4 - 2) × 1 TB = 2 TB</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: چهار Disk یک ترابایتی داریم. ظرفیت قابل استفاده تقریبی RAID 5 چقدر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) 1TB</button>
-    <button onclick="selectOption(this)">ب) 2TB</button>
-    <button onclick="selectOption(this)">ج) 3TB</button>
-    <button onclick="selectOption(this)">د) 4TB</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>فرمول: (N-1) × Size = (4-1) × 1TB = 3TB</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۹: چهار Disk یک ترابایتی داریم. ظرفیت قابل استفاده تقریبی RAID 6 چقدر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) 1TB</button>
-    <button onclick="selectOption(this)">ب) 2TB</button>
-    <button onclick="selectOption(this)">ج) 3TB</button>
-    <button onclick="selectOption(this)">د) 4TB</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>فرمول: (N-2) × Size = (4-2) × 1TB = 2TB</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۰: برای مدیریت Software RAID در Linux کدام ابزار مهم است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>lvm</code></button>
-    <button onclick="selectOption(this)">ب) <code>mdadm</code></button>
-    <button onclick="selectOption(this)">ج) <code>fdisk</code></button>
-    <button onclick="selectOption(this)">د) <code>mkfs</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>mdadm</code></strong><br><code>mdadm</code> ابزار اصلی مدیریت Software RAID مبتنی بر <code>md</code> در Linux است.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۱ — مفهومی: اگر هدف اصلی افزایش سرعت باشد و تحمل خرابی اهمیتی نداشته باشد، کدام RAID مناسب‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) RAID 0</button>
-    <button onclick="selectOption(this)">ب) RAID 1</button>
-    <button onclick="selectOption(this)">ج) RAID 5</button>
-    <button onclick="selectOption(this)">د) RAID 6</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — RAID 0</strong><br>RAID 0 با Striping بهترین Performance را ارائه می‌دهد اما تحمل خرابی ندارد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۱۲ — سناریویی: یک Administrator می‌خواهد با چهار Disk، هم Performance خوبی داشته باشد و هم از Mirroring استفاده کند. کدام RAID مناسب‌تر است؟</p>
+<div class="quiz-card"><p>❓ تست ۸: یک Administrator می‌خواهد هم Performance خوبی داشته باشد و هم Redundancy داشته باشد. کدام RAID مناسب‌تر است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) RAID 0</button>
     <button onclick="selectOption(this)">ب) RAID 1</button>
     <button onclick="selectOption(this)">ج) RAID 5</button>
     <button onclick="selectOption(this)">د) RAID 10</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: د — RAID 10</strong><br>RAID 10 = RAID 1 + RAID 0، هم Mirroring دارد و هم Striping.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: د — RAID 10</strong><br>RAID 10 هم Performance (از Striping) و هم Redundancy (از Mirroring) را دارد.</div>
 </div>
 
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🎯 جمع‌بندی جلسه</strong><br>
-<p>مهم‌ترین چیزی که باید از این جلسه در ذهن داشته باشی:</p>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🎯 جمع‌بندی نهایی جلسه</strong><br>
+<p>اگر فقط بخواهید کل جلسه را در یک نقشه ذهنی حفظ کنید:</p>
 
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 0
 → Striping
 → Speed
-→ No protection</div></div>
+→ No Protection
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 1
+RAID 1
 → Mirroring
 → Redundancy
-→ 1 Disk failure</div></div>
+→ 1 Disk Failure در Mirror دو دیسکی
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 5
+RAID 5
 → Striping + Distributed Parity
-→ 1 Disk failure</div></div>
+→ Minimum 3 Disks
+→ 1 Disk Failure
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 6
+RAID 6
 → Striping + Double Parity
-→ 2 Disk failures</div></div>
+→ Minimum 4 Disks
+→ 2 Disk Failures
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">RAID 10
+RAID 10
 → RAID 1 + RAID 0
-→ Performance + Redundancy</div></div>
+→ Performance + Redundancy
+→ Minimum 4 Disks</div></div>
 
 <p>و در Linux:</p>
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block no-prompt">mdadm
-   ↓
-Software RAID</div></div>
+<div class="code-container"><span class="code-label">Software RAID</span><div class="code-block no-prompt">Software RAID
+      ↓
+    md
+      ↓
+   mdadm</div></div>
 
-<p>در <strong>جلسه بعد — RAID: پیاده‌سازی و مدیریت</strong> می‌رویم سراغ Lab واقعی: آماده‌سازی Diskها، ساخت Array با <code>mdadm</code>، ساخت RAID 0 و RAID 1، <code>mkfs</code> و <code>mount</code>، بررسی <code>/proc/mdstat</code> و <code>mdadm --detail</code>، و بعد سناریوی <strong>خرابی و خارج کردن یک Disk از RAID</strong>.</p>
+<p>در <strong>جلسه ۹ — RAID: پیاده‌سازی و مدیریت</strong> می‌توانیم دقیقاً بر اساس همین ساختار مفهومی وارد بخش عملی شویم: آماده‌سازی Diskها، ساخت RAID Array، بررسی <code>/proc/mdstat</code>، استفاده از <code>mdadm --detail</code>، ساخت File System، Mount کردن و در نهایت سناریوی خرابی Disk.</p>
 </div></div>
-` , 
+`
+, 
 "ch3-raid-practice": `
 <div class="section-header">
     <div class="section-badge">۳</div>
@@ -18788,50 +18606,55 @@ Healthy RAID</div></div>
     </div>
 </div>
 
-<p>در جلسات قبلی با <strong>Disk، Partition، Filesystem، Mount، LVM و RAID</strong> آشنا شدیم.</p>
+<p>در جلسات قبلی با مفاهیمی مانند:</p>
 
-<p>حالا باید یاد بگیریم وقتی یک سیستم لینوکسی در حال استفاده است، <strong>چطور بفهمیم فضای دیسک چقدر است، چقدر مصرف شده و دقیقاً چه چیزی باعث پر شدن دیسک شده است.</strong></p>
+<ul>
+    <li>Disk</li>
+    <li>Partition</li>
+    <li>Filesystem</li>
+    <li>Mount</li>
+    <li>LVM</li>
+    <li>RAID</li>
+</ul>
 
-<p>دو فرمان اصلی این جلسه:</p>
+<p>آشنا شدیم.</p>
 
-<div class="code-container"><span class="code-label">df</span><div class="code-block">df</div></div>
+<p>در این جلسه قرار است یاد بگیریم <strong>فضای ذخیره‌سازی در Linux را بررسی و عیب‌یابی کنیم</strong>.</p>
 
-<p>و:</p>
+<p>در پایان جلسه باید بتوانی:</p>
 
-<div class="code-container"><span class="code-label">du</span><div class="code-block">du</div></div>
+<ul>
+    <li>میزان فضای آزاد و مصرف‌شده یک Filesystem را بررسی کنی.</li>
+    <li>بفهمی کدام Directory بیشترین فضا را مصرف کرده است.</li>
+    <li>تفاوت <code>df</code> و <code>du</code> را تشخیص بدهی.</li>
+    <li>ارتباط Disk، Partition، Filesystem و Mount را در خروجی ابزارها درک کنی.</li>
+    <li>در سناریوی <code>Disk Full</code> مرحله‌به‌مرحله مشکل را پیدا کنی.</li>
+    <li>تفاوت مشکل <strong>Capacity</strong> و مشکل <strong>I/O Performance</strong> را بفهمی.</li>
+</ul>
 
-<p>اما قبل از این دو، باید یک مفهوم خیلی مهم را کاملاً متوجه شویم:</p>
+<h2>مدل ذخیره‌سازی در Linux</h2>
 
-<blockquote><strong>لینوکس همه Storageها را در یک درخت فایل واحد قرار می‌دهد.</strong></blockquote>
+<h3>Linux یک درخت فایل واحد دارد</h3>
 
-<h2>ساختار Virtual Directory در Linux</h2>
-
-<p>اگر قبلاً با Windows کار کرده باشی، احتمالاً این ساختار برایت آشناست:</p>
+<p>در Linux برخلاف Windows که با Drive Letterهایی مثل:</p>
 
 <div class="code-container"><span class="code-label">ویندوز</span><div class="code-block no-prompt">C:\\
 D:\\
 E:\\</div></div>
 
-<p>هر Drive می‌تواند یک ساختار جداگانه داشته باشد.</p>
+<p>کار می‌کند، تمام فایل‌ها در یک درخت واحد قرار دارند.</p>
 
-<p>اما Linux چنین مدلی ندارد.</p>
-
-<p>در Linux یک درخت فایل واحد داریم که ریشه آن:</p>
+<p>ریشه این درخت:</p>
 
 <div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
 
 <p>است.</p>
 
-<p>به این <code>/</code> می‌گوییم:</p>
+<p>به آن <strong>Root Directory</strong> می‌گوییم.</p>
 
-<blockquote><strong>Root Directory</strong></blockquote>
-
-<h2>ساختار درختی Linux</h2>
-
-<p>مثلاً:</p>
+<p>ساختار ساده:</p>
 
 <div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">/
-├── bin
 ├── boot
 ├── dev
 ├── etc
@@ -18840,492 +18663,188 @@ E:\\</div></div>
 │   └── sara
 ├── mnt
 ├── opt
-├── tmp
 ├── usr
 └── var</div></div>
 
-<p>همه این مسیرها بخشی از <strong>یک درخت واحد</strong> هستند.</p>
+<p>تمام این مسیرها بخشی از یک Filesystem Tree واحد هستند.</p>
 
-<p>یعنی:</p>
+<h3>Disk چگونه وارد این درخت می‌شود؟</h3>
 
-<div class="code-container"><span class="code-label">یک ریشه</span><div class="code-block no-prompt">/
-│
-├── etc
-├── home
-├── usr
-└── var</div></div>
+<p>یک Partition مانند:</p>
 
-<p>همگی زیر یک Root قرار دارند.</p>
+<div class="code-container"><span class="code-label">Partition</span><div class="code-block no-prompt">/dev/sdb1</div></div>
 
-<h2>Disk کجای این ساختار قرار می‌گیرد؟</h2>
+<p>به‌صورت مستقیم یک Drive Letter ایجاد نمی‌کند.</p>
 
-<p>اینجا مفهوم <strong>Mount</strong> اهمیت پیدا می‌کند.</p>
-
-<p>فرض کن یک Disk داریم:</p>
-
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb1</div></div>
-
-<p>این Disk به خودی خود تبدیل به یک مسیر مثل:</p>
-
-<div class="code-container"><span class="code-label">ویندوز</span><div class="code-block no-prompt">D:\\</div></div>
-
-<p>نمی‌شود.</p>
-
-<p>بلکه آن را به یک Directory متصل می‌کنیم.</p>
+<p>ابتدا روی آن Filesystem قرار می‌گیرد و سپس Filesystem در یک Directory به نام <strong>Mount Point</strong> متصل می‌شود.</p>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">Mount</span><div class="code-block">sudo mount /dev/sdb1 /mnt</div></div>
 
-<p>حالا:</p>
+<p>مفهوم کلی:</p>
 
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb1
-     ↓
-   Mount
-     ↓
-    /mnt</div></div>
-
-<p>یعنی محتوای <code>/dev/sdb1</code> از طریق <code>/mnt</code> قابل دسترسی است.</p>
-
-<h2>Mount Point چیست؟</h2>
-
-<p>دایرکتوری‌ای که Disk یا Filesystem به آن متصل می‌شود:</p>
-
-<blockquote><strong>Mount Point</strong></blockquote>
-
-<p>نام دارد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/mnt</div></div>
-
-<p>می‌تواند Mount Point باشد.</p>
-
-<p>یا:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home</div></div>
-
-<p>یا حتی:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/ali</div></div>
-
-<h2>مثال مهم با <code>/home</code></h2>
-
-<p>فرض کنیم Disk اصلی سیستم شامل این ساختار است:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/
-├── bin
-├── etc
-├── home
-├── usr
-└── var</div></div>
-
-<p>و روی <code>/home</code> اطلاعات کاربران قرار دارد:</p>
-
-<div class="code-container"><span class="code-label">کاربران</span><div class="code-block no-prompt">/home
-├── ali
-├── sara
-└── reza</div></div>
-
-<p>حالا یک Disk دوم داریم:</p>
-
-<div class="code-container"><span class="code-label">دیسک دوم</span><div class="code-block no-prompt">/dev/sdb1</div></div>
-
-<p>می‌توانیم آن را روی:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home</div></div>
-
-<p>Mount کنیم.</p>
-
-<p>در این حالت:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb1
-      ↓
-    /home</div></div>
-
-<p>و اطلاعات کاربران روی Disk دوم قرار می‌گیرند.</p>
-
-<p>از دید کاربر، همچنان فقط مسیر:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/ali</div></div>
-
-<p>را می‌بینیم.</p>
-
-<h2>Mount کردن داخل یک Subdirectory</h2>
-
-<p>حتی می‌توانیم دقیق‌تر عمل کنیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Mount دقیق</span><div class="code-block">sudo mount /dev/sdb1 /home/ali</div></div>
-
-<p>در این حالت:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/
-└── home
-    ├── ali
-    └── sara</div></div>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">اتصال</span><div class="code-block no-prompt">/dev/sdb1
-     ↓
- /home/ali</div></div>
-
-<p>قرار می‌گیرد.</p>
-
-<p>بنابراین Linux می‌تواند چند Storage مختلف را در نقاط مختلف یک درخت واحد قرار دهد.</p>
-
-<h2>یک نکته بسیار مهم درباره Mount</h2>
-
-<p>فرض کن:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home</div></div>
-
-<p>قبلاً فایل‌هایی داشته باشد و بعد یک Filesystem جدید را روی <code>/home</code> Mount کنیم.</p>
-
-<p>تا زمانی که آن Filesystem Mount است، محتوای قبلی <code>/home</code> از مسیر عادی قابل مشاهده نیست؛ چون Mount شده است و Filesystem جدید روی آن نقطه قرار گرفته است.</p>
-
-<p>این نکته در Troubleshooting بسیار مهم است.</p>
-
-<h2>Filesystem چیست؟</h2>
-
-<p>تا اینجا گفتیم Disk و Partition داریم.</p>
-
-<p>اما یک Partition خام هنوز ساختار لازم برای نگهداری فایل‌ها را ندارد.</p>
-
-<p>باید روی آن یک:</p>
-
-<blockquote><strong>Filesystem</strong></blockquote>
-
-<p>بسازیم.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkfs.ext4 /dev/sdb1</div></div>
-
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
+    │
+    ▼
 Filesystem
- ↓
+    │
+    ▼
 Mount
- ↓
-Directory Tree</div></div>
-
-<p>این ترتیب را به خاطر بسپار.</p>
-
-<h2>Filesystemهای مهم</h2>
-
-<p>Linux می‌تواند با Filesystemهای مختلف کار کند.</p>
-
-<p>در مباحث LPIC-1 با نمونه‌های مختلفی روبه‌رو می‌شویم.</p>
-
-<h3>Filesystemهای بومی Linux</h3>
-<p>مثل:</p>
-<div class="code-container"><span class="code-label">بومی</span><div class="code-block no-prompt">ext4
-btrfs
-swap</div></div>
-
-<h3>Filesystemهای دیگر</h3>
-<p>مثل:</p>
-<div class="code-container"><span class="code-label">دیگر</span><div class="code-block no-prompt">ntfs
-vfat
-hfs+
-nfs
-zfs
-udf</div></div>
-
-<p>هر کدام ویژگی و کاربرد خاص خودشان را دارند.</p>
-
-<h2>ext4</h2>
-
-<p>یکی از Filesystemهای بسیار رایج در Linux:</p>
-
-<div class="code-container"><span class="code-label">ext4</span><div class="code-block no-prompt">ext4</div></div>
-
-<p>است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">sudo mkfs.ext4 /dev/sdb1</div></div>
-
-<p>یعنی روی <code>/dev/sdb1</code> یک Filesystem از نوع <code>ext4</code> ایجاد کن.</p>
-
-<h2>swap</h2>
-
-<p><code>swap</code> با Filesystem معمولی که برای ذخیره فایل استفاده می‌کنیم متفاوت است.</p>
-
-<p>Swap برای استفاده به عنوان فضای مبادله حافظه سیستم استفاده می‌شود.</p>
+    │
+    ▼
+/mnt</div></div>
 
 <p>بنابراین:</p>
 
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">ext4
-برای ذخیره فایل‌هاست، اما:
+<blockquote><strong>Mount Point مسیری است که Filesystem از طریق آن وارد Directory Tree لینوکس می‌شود.</strong></blockquote>
 
-swap
-برای Memory Management سیستم استفاده می‌شود.</div></div>
+<h3>زنجیره‌ای که باید به خاطر بسپاری</h3>
 
-<h2>btrfs</h2>
+<p>برای درک ابزارهای این جلسه، این زنجیره مهم است:</p>
 
-<p>یکی دیگر از Filesystemهای Linux:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Disk
+  ↓
+Partition
+  ↓
+Filesystem
+  ↓
+Mount
+  ↓
+Directory Tree
+  ↓
+Files</div></div>
 
-<div class="code-container"><span class="code-label">btrfs</span><div class="code-block no-prompt">btrfs</div></div>
+<p>ابزارهای این جلسه هر کدام در قسمت متفاوتی از این زنجیره نگاه می‌کنند.</p>
 
-<p>است.</p>
+<h2><code>df</code></h2>
 
-<p>یکی از ویژگی‌های شناخته‌شده آن:</p>
+<h3><code>df</code> چیست؟</h3>
 
-<blockquote><strong>Copy-on-Write (CoW)</strong></blockquote>
+<p><code>df</code> مخفف:</p>
 
-<p>است.</p>
-
-<p>در سطح LPIC-1 کافی است بدانیم btrfs یک Filesystem پیشرفته Linux است و قابلیت‌هایی فراتر از Filesystemهای سنتی ارائه می‌دهد.</p>
-
-<h2>Linux و Filesystemهای غیر-Linux</h2>
-
-<p>Linux محدود به Filesystemهای خودش نیست.</p>
-
-<p>برای مثال می‌تواند با:</p>
-
-<div class="code-container"><span class="code-label">غیرلینوکس</span><div class="code-block no-prompt">NTFS
-VFAT
-HFS+
-NFS</div></div>
-
-<p>و انواع دیگر Filesystemها کار کند.</p>
-
-<p>این قابلیت زمانی مهم است که Linux بخواهد به Storageهایی که توسط سیستم‌های دیگر ایجاد شده‌اند دسترسی پیدا کند.</p>
-
-<h2>Mount موقتی</h2>
-
-<p>یک روش برای Mount کردن:</p>
-
-<div class="code-container"><span class="code-label">mount</span><div class="code-block">mount</div></div>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Disk Free</div></div>
 
 <p>است.</p>
 
-<p>مثلاً:</p>
+<p>وظیفه اصلی آن بررسی <strong>فضای Filesystemها</strong> است.</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo mount /dev/sdb1 /mnt</div></div>
+<p>به زبان ساده:</p>
 
-<p>بعد از اجرای آن:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb1
-    ↓
-   /mnt</div></div>
-
-<p>متصل می‌شود.</p>
-
-<h2>چرا می‌گوییم Mount موقتی؟</h2>
-
-<p>اگر فقط با:</p>
-
-<div class="code-container"><span class="code-label">mount</span><div class="code-block">mount</div></div>
-
-<p>یک Filesystem را Mount کنیم، این تنظیم الزاماً بعد از Reboot باقی نمی‌ماند.</p>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">موقتی</span><div class="code-block no-prompt">System Running
-     ↓
-mount
-     ↓
-Filesystem available
-     ↓
-Reboot
-     ↓
-ممکن است Mount از بین برود</div></div>
-
-<p>برای Mount دائمی از:</p>
-
-<div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
-
-<p>استفاده می‌کنیم.</p>
-
-<h2><code>/etc/fstab</code></h2>
-
-<p>فایل:</p>
-
-<div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
-
-<p>یکی از فایل‌های بسیار مهم در Linux است.</p>
-
-<p>اطلاعات Filesystemهایی که باید هنگام Boot به صورت خودکار Mount شوند، در این فایل تعریف می‌شود.</p>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">mount
-برای Mount دستی/موقتی
-
-و:
-
-/etc/fstab
-برای تعریف Mountهای دائمی و خودکار.</div></div>
-
-<h2>ارتباط Boot و fstab</h2>
-
-<p>در هنگام Boot، سیستم اطلاعات مربوط به Mountهای تعریف‌شده در:</p>
-
-<div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
-
-<p>را بررسی می‌کند.</p>
-
-<p>بنابراین اگر یک Partition باید بعد از هر Boot به صورت خودکار Mount شود، معمولاً باید Configuration آن در <code>fstab</code> قرار گیرد.</p>
-
-<h2>حالا برسیم به <code>df</code></h2>
-
-<p>فرمان:</p>
-
-<div class="code-container"><span class="code-label">df</span><div class="code-block">df</div></div>
-
-<p>مخفف:</p>
-
-<blockquote><strong>Disk Free</strong></blockquote>
-
-<p>است.</p>
-
-<p>وظیفه اصلی آن نمایش میزان فضای:</p>
-<ul>
-    <li>کل</li>
-    <li>استفاده‌شده</li>
-    <li>آزاد</li>
-</ul>
-<p>Filesystemهاست.</p>
+<blockquote><code>df</code> به تو می‌گوید یک Filesystem چقدر فضا دارد و چه مقدار از آن استفاده شده است.</blockquote>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">اجرا</span><div class="code-block">df</div></div>
 
-<p>ممکن است چیزی شبیه این نشان دهد:</p>
+<p>ممکن است خروجی‌ای شبیه این داشته باشد:</p>
 
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem     1024-blocks     Used Available Capacity Mounted on
 /dev/sda2        20000000  9000000  11000000      45% /</div></div>
 
-<h2><code>df</code> چه چیزی را نشان می‌دهد؟</h2>
+<h3><code>df</code> چه اطلاعاتی می‌دهد؟</h3>
 
-<p>به زبان ساده:</p>
+<p>مهم‌ترین ستون‌ها:</p>
 
-<blockquote><code>df</code> می‌گوید هر Filesystem چقدر فضا دارد و چقدر از آن استفاده شده است.</blockquote>
-
-<p>پس اگر سؤال این باشد:</p>
-
-<blockquote>«چقدر فضای Disk من باقی مانده؟»</blockquote>
-
-<p>یکی از اولین دستورهایی که باید به ذهن تو بیاید:</p>
-
-<div class="code-container"><span class="code-label">df</span><div class="code-block">df</div></div>
-
-<p>است.</p>
-
-<h2><code>df -h</code></h2>
-
-<p>خروجی معمول <code>df</code> ممکن است با Blockهای عددی نمایش داده شود.</p>
-
-<p>برای نمایش قابل فهم‌تر:</p>
-
-<div class="code-container"><span class="code-label">خوانا</span><div class="code-block">df -h</div></div>
-
-<p>گزینه:</p>
-
-<div class="code-container"><span class="code-label">-h</span><div class="code-block no-prompt">-h</div></div>
-
-<p>یعنی:</p>
-
-<blockquote><strong>Human-readable</strong></blockquote>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ستون</th><th>مفهوم</th></tr></thead>
+<tbody>
+<tr><td><code>Filesystem</code></td><td>نام Filesystem</td></tr>
+<tr><td><code>Size</code></td><td>ظرفیت کل</td></tr>
+<tr><td><code>Used</code></td><td>فضای استفاده‌شده</td></tr>
+<tr><td><code>Avail</code></td><td>فضای قابل استفاده</td></tr>
+<tr><td><code>Use%</code></td><td>درصد استفاده</td></tr>
+<tr><td><code>Mounted on</code></td><td>محل Mount</td></tr>
+</tbody>
+</table>
+</div>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem      Size  Used Avail Use% Mounted on
 /dev/sda2        20G   12G    8G  60% /</div></div>
 
-<p>خیلی خواناتر است.</p>
+<p>یعنی:</p>
 
-<h2>تفسیر <code>df -h</code></h2>
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">کل فضا       = 20G
+مصرف‌شده     = 12G
+قابل استفاده = 8G
+درصد مصرف    = 60%
+Mount Point  = /</div></div>
+
+<h2><code>df -h</code></h2>
+
+<h3>چرا <code>-h</code>؟</h3>
+
+<p>خروجی معمول <code>df</code> ممکن است بر اساس Block نمایش داده شود.</p>
+
+<p>برای خروجی قابل فهم‌تر:</p>
+
+<div class="code-container"><span class="code-label">خوانا</span><div class="code-block">df -h</div></div>
+
+<p>استفاده می‌کنیم.</p>
+
+<p><code>-h</code> یعنی:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Human-readable</div></div>
 
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda2        20G   12G    8G   60% /</div></div>
+/dev/sda2        20G   12G    8G  60% /</div></div>
 
-<p>ستون‌ها:</p>
+<p>این خروجی برای بررسی روزمره بسیار خواناتر است.</p>
 
-<h3><code>Filesystem</code></h3>
-<p>Filesystem موردنظر:</p>
-<div class="code-container"><span class="code-label">Filesystem</span><div class="code-block no-prompt">/dev/sda2</div></div>
+<h3>سؤال کلیدی <code>df</code></h3>
 
-<h3><code>Size</code></h3>
-<p>کل فضای قابل استفاده:</p>
-<div class="code-container"><span class="code-label">Size</span><div class="code-block no-prompt">20G</div></div>
+<p>اگر سؤال این باشد:</p>
 
-<h3><code>Used</code></h3>
-<p>فضای مصرف‌شده:</p>
-<div class="code-container"><span class="code-label">Used</span><div class="code-block no-prompt">12G</div></div>
+<blockquote>«Filesystem من چقدر فضای آزاد دارد؟»</blockquote>
 
-<h3><code>Avail</code></h3>
-<p>فضای قابل استفاده باقی‌مانده:</p>
-<div class="code-container"><span class="code-label">Avail</span><div class="code-block no-prompt">8G</div></div>
+<p>اولین دستوری که باید به ذهن برسد:</p>
 
-<h3><code>Use%</code></h3>
-<p>درصد استفاده:</p>
-<div class="code-container"><span class="code-label">Use%</span><div class="code-block no-prompt">60%</div></div>
-
-<h3><code>Mounted on</code></h3>
-<p>محل Mount:</p>
-<div class="code-container"><span class="code-label">Mounted on</span><div class="code-block no-prompt">/</div></div>
-
-<h2>سؤال مهم: <code>df</code> یا <code>du</code>؟</h2>
-
-<p>این دو فرمان را نباید با هم اشتباه بگیری.</p>
-
-<h3><code>df</code></h3>
-<p>نگاه می‌کند به:</p>
-<blockquote><strong>Filesystem</strong></blockquote>
-
-<h3><code>du</code></h3>
-<p>نگاه می‌کند به:</p>
-<blockquote><strong>Files و Directories</strong></blockquote>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">df</span><div class="code-block no-prompt">df
-↓
-Filesystem Level</div></div>
-
-<p>ولی:</p>
-
-<div class="code-container"><span class="code-label">du</span><div class="code-block no-prompt">du
-↓
-Directory/File Level</div></div>
-
-<p>این مهم‌ترین تفاوت این جلسه است.</p>
-
-<h2><code>du</code> چیست؟</h2>
-
-<p><code>du</code> مخفف:</p>
-
-<blockquote><strong>Disk Usage</strong></blockquote>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block">df -h</div></div>
 
 <p>است.</p>
 
-<p>کارش این است که نشان دهد:</p>
+<h2><code>du</code></h2>
 
-<blockquote>چه مقدار فضا توسط فایل‌ها و Directoryها مصرف شده است.</blockquote>
+<h3><code>du</code> چیست؟</h3>
+
+<p><code>du</code> مخفف:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Disk Usage</div></div>
+
+<p>است.</p>
+
+<p>برخلاف <code>df</code> که از دید <strong>Filesystem</strong> نگاه می‌کند، <code>du</code> از دید <strong>Files و Directories</strong> به مصرف فضا نگاه می‌کند.</p>
+
+<p>به زبان ساده:</p>
+
+<blockquote><code>du</code> کمک می‌کند بفهمیم چه فایل‌ها و Directoryهایی فضای دیسک را مصرف کرده‌اند.</blockquote>
+
+<h3><code>du</code> ساده</h3>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">du /home</div></div>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">du /home</div></div>
 
 <p>می‌تواند میزان مصرف زیرشاخه‌های <code>/home</code> را نشان دهد.</p>
 
-<h2><code>du -h</code></h2>
+<p>اما خروجی ممکن است برای انسان چندان خوانا نباشد.</p>
 
-<p>مثل <code>df</code>، برای خروجی خواناتر:</p>
+<p>برای همین معمولاً از:</p>
 
 <div class="code-container"><span class="code-label">خوانا</span><div class="code-block">du -h</div></div>
+
+<p>استفاده می‌کنیم.</p>
+
+<h3><code>du -h</code></h3>
+
+<p>گزینه <code>-h</code> یعنی:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Human-readable</div></div>
 
 <p>مثلاً:</p>
 
@@ -19334,33 +18853,22 @@ Directory/File Level</div></div>
 500M    ./Videos
 705M    .</div></div>
 
-<p>حالا می‌توانی ببینی کدام Directory فضای بیشتری مصرف کرده است.</p>
+<p>اکنون می‌توانیم راحت‌تر بفهمیم کدام Directory فضای بیشتری مصرف کرده است.</p>
 
-<h2><code>du -sh</code></h2>
+<h2>مهم‌ترین ترکیب <code>du</code></h2>
 
-<p>یکی از کاربردی‌ترین شکل‌های <code>du</code>:</p>
+<h3><code>du -sh</code></h3>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">du -sh /home</div></div>
+<p>یکی از مهم‌ترین دستورهای این جلسه:</p>
 
-<p>است.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">du -sh /home</div></div>
 
 <p>گزینه‌ها:</p>
 
-<div class="code-container"><span class="code-label">-s</span><div class="code-block no-prompt">-s</div></div>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-s → Summary
+-h → Human-readable</div></div>
 
-<p>یعنی:</p>
-
-<blockquote>فقط Summary را نشان بده.</blockquote>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">-h</span><div class="code-block no-prompt">-h</div></div>
-
-<p>یعنی:</p>
-
-<blockquote>Human-readable</blockquote>
-
-<p>پس:</p>
+<p>بنابراین:</p>
 
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">du -sh /home</div></div>
 
@@ -19372,482 +18880,486 @@ Directory/File Level</div></div>
 
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">12G    /home</div></div>
 
-<h2>پیدا کردن Directory بزرگ</h2>
+<h2>تفاوت <code>df</code> و <code>du</code></h2>
 
-<p>فرض کن سیستم کند شده یا Disk تقریباً پر شده.</p>
+<h3>تفاوت اصلی</h3>
 
-<p>ابتدا:</p>
+<p>این مهم‌ترین مفهوم جلسه است.</p>
 
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">df -h</div></div>
+<h4><code>df</code></h4>
 
-<p>را اجرا می‌کنی و متوجه می‌شوی:</p>
+<p>از دید:</p>
 
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/dev/sda2    20G    19G    1G    95%    /</div></div>
+<div class="code-container"><span class="code-label">df</span><div class="code-block no-prompt">Filesystem</div></div>
 
-<p>حالا سؤال:</p>
+<p>نگاه می‌کند.</p>
 
-<blockquote>«چه چیزی این 19GB را مصرف کرده؟»</blockquote>
+<p>یعنی:</p>
 
-<p>اینجاست که <code>du</code> وارد می‌شود.</p>
+<blockquote>«Filesystem چقدر فضا دارد و چقدر از آن مصرف شده؟»</blockquote>
+
+<h4><code>du</code></h4>
+
+<p>از دید:</p>
+
+<div class="code-container"><span class="code-label">du</span><div class="code-block no-prompt">Files
+Directories</div></div>
+
+<p>نگاه می‌کند.</p>
+
+<p>یعنی:</p>
+
+<blockquote>«چه فایل‌ها و Directoryهایی این فضا را مصرف کرده‌اند؟»</blockquote>
+
+<h3>روش ساده برای حفظ کردن</h3>
+
+<div class="code-container"><span class="code-label">df</span><div class="code-block no-prompt">df
+ ↓
+Filesystem
+ ↓
+چقدر فضا دارم؟</div></div>
+
+<p>در مقابل:</p>
+
+<div class="code-container"><span class="code-label">du</span><div class="code-block no-prompt">du
+ ↓
+Files / Directories
+ ↓
+چه چیزی فضا را مصرف کرده؟</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>جمله طلایی LPIC-1</strong><br>
+<strong><code>df</code> فضای Filesystem را بررسی می‌کند؛ <code>du</code> مصرف فضا توسط Files و Directories را بررسی می‌کند.</strong></div></div>
+
+<h2>سناریوی اصلی Troubleshooting</h2>
+
+<h3>وقتی Disk پر شده است چه کنیم؟</h3>
+
+<p>فرض کن سیستم خطای زیر می‌دهد:</p>
+
+<div class="code-container"><span class="code-label">خطا</span><div class="code-block no-prompt">No space left on device</div></div>
+
+<p>اولین کار:</p>
+
+<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">df -h</div></div>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo du -sh /*</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        20G   20G     0  100% /</div></div>
 
-<p>این دستور مصرف Directoryهای اصلی زیر <code>/</code> را بررسی می‌کند.</p>
+<p>نتیجه:</p>
 
-<p>ممکن است ببینی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/ → 100% full</div></div>
+
+<p>اما هنوز نمی‌دانیم <strong>چه چیزی</strong> این فضا را مصرف کرده است.</p>
+
+<p>اینجا <code>du</code> وارد می‌شود.</p>
+
+<h3>مرحله دوم: پیدا کردن Directory حجیم</h3>
+
+<p>برای بررسی Directoryهای اصلی:</p>
+
+<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">sudo du -sh /*</div></div>
+
+<p>ممکن است چیزی شبیه این ببینیم:</p>
 
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">500M    /boot
 2.0G    /home
 8.5G    /var
 4.0G    /usr</div></div>
 
-<p>حالا مشخص می‌شود:</p>
+<p>مشخص است که:</p>
 
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/var</div></div>
 
-<p>فضای زیادی مصرف کرده است.</p>
+<p>مشکوک است.</p>
 
-<h2>بررسی مرحله‌به‌مرحله با <code>du</code></h2>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo du -sh /var/*</div></div>
-
-<p>حالا می‌توانیم داخل <code>/var</code> را بررسی کنیم.</p>
-
-<p>فرض کنیم:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">6G     /var/log
-1G     /var/cache
-500M   /var/tmp</div></div>
-
-<p>پس مشکل اصلی:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/var/log</div></div>
-
-<p>است.</p>
+<h3>مرحله سوم: ورود به Directory مشکوک</h3>
 
 <p>حالا:</p>
 
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo du -sh /var/log/*</div></div>
-
-<p>و همین‌طور ادامه می‌دهیم تا به علت اصلی برسیم.</p>
-
-<h2><code>df</code> و <code>du</code> مثل نقشه و جزئیات هستند</h2>
-
-<p>یک روش ساده برای به خاطر سپردن:</p>
-
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">df
-│
-└── «Filesystem چقدر پر شده؟»
-
-du
-│
-└── «چه چیزی این فضا را مصرف کرده؟»</div></div>
+<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">sudo du -sh /var/*</div></div>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">df -h
-   ↓
-/ = 95% full
-   ↓
-du
-   ↓
-/var = 8.5G
-   ↓
-du
-   ↓
-/var/log = 6G</div></div>
-
-<h2>یک نکته مهم: ممکن است <code>df</code> و <code>du</code> دقیقاً یک عدد نشان ندهند</h2>
-
-<p>این موضوع در Troubleshooting مهم است.</p>
-
-<p>ممکن است:</p>
-
-<div class="code-container"><span class="code-label">df</span><div class="code-block">df -h</div></div>
-
-<p>بگوید:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Used = 10G</div></div>
-
-<p>ولی:</p>
-
-<div class="code-container"><span class="code-label">du</span><div class="code-block">du -sh /</div></div>
-
-<p>عدد متفاوتی نشان دهد.</p>
-
-<p>یکی از دلایل معروف این اختلاف:</p>
-
-<blockquote>فایل حذف شده ولی هنوز توسط یک Process باز نگه داشته شده است.</blockquote>
-
-<p>در این حالت:</p>
-
-<div class="code-container"><span class="code-label">دلیل</span><div class="code-block no-prompt">Directory entry حذف شده
-        ↓
-File هنوز توسط Process باز است
-        ↓
-فضا هنوز توسط Filesystem مصرف می‌شود</div></div>
-
-<p>بنابراین <code>du</code> ممکن است آن فایل را دیگر در مسیرها نبیند، ولی <code>df</code> همچنان فضای مصرف‌شده را نشان دهد.</p>
-
-<p>این نکته برای عیب‌یابی Disk Full بسیار مهم است.</p>
-
-<h2><code>lsblk</code></h2>
-
-<p>فرمان بسیار مهم دیگر:</p>
-
-<div class="code-container"><span class="code-label">lsblk</span><div class="code-block">lsblk</div></div>
-
-<p>است.</p>
-
-<p>مخفف:</p>
-
-<blockquote><strong>List Block Devices</strong></blockquote>
-
-<p>است.</p>
-
-<p>برای مشاهده ساختار Diskها و Partitionها فوق‌العاده کاربردی است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
-sda      8:0    0   20G  0 disk
-├─sda1   8:1    0    1G  0 part /boot
-└─sda2   8:2    0   19G  0 part /
-sdb      8:16   0   10G  0 disk
-└─sdb1   8:17   0   10G  0 part /mnt/data</div></div>
-
-<h2><code>lsblk</code> چه اطلاعاتی می‌دهد؟</h2>
-
-<p>به صورت ساده:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
- ↓
-Partition
- ↓
-Mount Point</div></div>
-
-<p>را در یک ساختار درختی نشان می‌دهد.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">sda
-├── sda1 → /boot
-└── sda2 → /</div></div>
-
-<p>پس <code>lsblk</code> برای پاسخ دادن به سؤال:</p>
-
-<blockquote>«چه Diskهایی دارم و هر کدام کجا Mount شده‌اند؟»</blockquote>
-
-<p>بسیار مفید است.</p>
-
-<h2>مقایسه <code>lsblk</code> و <code>df</code></h2>
-
-<p>این دو هم تفاوت مهمی دارند.</p>
-
-<h3><code>lsblk</code></h3>
-<p>تمرکز روی:</p>
-<div class="code-container"><span class="code-label">lsblk</span><div class="code-block no-prompt">Block Devices
-Disk
-Partition
-LVM
-Mount</div></div>
-
-<h3><code>df</code></h3>
-<p>تمرکز روی:</p>
-<div class="code-container"><span class="code-label">df</span><div class="code-block no-prompt">Filesystem
-Used
-Available
-Capacity</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">6G      /var/log
+1G      /var/cache
+500M    /var/tmp</div></div>
 
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">lsblk → ساختار Storage
-df    → فضای Filesystem</div></div>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/var/log</div></div>
 
-<h2><code>iostat</code></h2>
+<p>بخش عمده فضا را مصرف کرده است.</p>
 
-<p>فرمان مهم دیگری:</p>
+<p>می‌توانیم یک مرحله دیگر جلو برویم:</p>
 
-<div class="code-container"><span class="code-label">iostat</span><div class="code-block">iostat</div></div>
+<div class="code-container"><span class="code-label">ادامه</span><div class="code-block">sudo du -sh /var/log/*</div></div>
+
+<p>به این ترتیب مرحله‌به‌مرحله به منبع مصرف فضا نزدیک می‌شویم.</p>
+
+<h2>یک Workflow مهم برای امتحان و کار واقعی</h2>
+
+<h3>الگوریتم بررسی Disk Full</h3>
+
+<p>این روند را حفظ کن:</p>
+
+<div class="code-container"><span class="code-label">الگوریتم</span><div class="code-block no-prompt">Disk Full?
+    │
+    ▼
+ df -h
+    │
+    ▼
+کدام Filesystem پر است؟
+    │
+    ▼
+ du -sh /*
+    │
+    ▼
+کدام Directory بزرگ است؟
+    │
+    ▼
+ du -sh /directory/*
+    │
+    ▼
+تکرار بررسی
+    │
+    ▼
+پیدا کردن عامل اصلی</div></div>
+
+<p>مثال:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">df -h
+  ↓
+/ = 95%
+  ↓
+du -sh /*
+  ↓
+/var = 8.5G
+  ↓
+du -sh /var/*
+  ↓
+/var/log = 6G</div></div>
+
+<p>این یکی از مهم‌ترین سناریوهای عملی این جلسه است.</p>
+
+<h2>چرا <code>df</code> و <code>du</code> ممکن است متفاوت باشند؟</h2>
+
+<h3>اختلاف بین <code>df</code> و <code>du</code></h3>
+
+<p>گاهی ممکن است:</p>
+
+<div class="code-container"><span class="code-label">df</span><div class="code-block">df -h</div></div>
+
+<p>فضای مصرف‌شده بیشتری نسبت به:</p>
+
+<div class="code-container"><span class="code-label">du</span><div class="code-block">du -sh /</div></div>
+
+<p>نشان دهد.</p>
+
+<p>یکی از دلایل معروف:</p>
+
+<blockquote><strong>فایلی حذف شده، اما هنوز توسط یک Process باز نگه داشته شده است.</strong></blockquote>
+
+<p>در این حالت:</p>
+
+<div class="code-container"><span class="code-label">دلیل</span><div class="code-block no-prompt">File
+ ↓
+Delete
+ ↓
+نام فایل از Directory حذف می‌شود
+ ↓
+Process هنوز File را باز نگه داشته
+ ↓
+فضا همچنان توسط Filesystem مصرف می‌شود</div></div>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">du
+↓
+ممکن است فایل را نبیند
+
+df
+↓
+فضای اشغال‌شده را همچنان نشان می‌دهد</div></div>
+
+<p>این موضوع در Troubleshooting بسیار مهم است.</p>
+
+<h2><code>lsblk</code></h2>
+
+<h3><code>lsblk</code> چیست؟</h3>
+
+<p><code>lsblk</code> مخفف:</p>
+
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">List Block Devices</div></div>
 
 <p>است.</p>
 
-<p>این فرمان برای بررسی عملکرد I/O سیستم استفاده می‌شود.</p>
+<p>برای مشاهده ساختار Block Deviceها، Diskها و Partitionها بسیار مفید است.</p>
 
-<p>یعنی فقط نمی‌پرسد:</p>
+<p>مثلاً:</p>
 
-<blockquote>«چقدر فضا داریم؟»</blockquote>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">lsblk</div></div>
 
-<p>بلکه می‌توانیم درباره عملکرد ورودی/خروجی Storage اطلاعات بیشتری به دست آوریم.</p>
+<p>ممکن است:</p>
 
-<p>برای مثال:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME   SIZE TYPE MOUNTPOINTS
+sda     20G disk
+├─sda1   1G part /boot
+└─sda2  19G part /
+sdb     10G disk
+└─sdb1  10G part /mnt/data</div></div>
+
+<p>را نشان دهد.</p>
+
+<h3><code>lsblk</code> چه سؤالی را جواب می‌دهد؟</h3>
+
+<p>اگر سؤال این باشد:</p>
+
+<blockquote>«چه Disk و Partitionهایی دارم و کجا Mount شده‌اند؟»</blockquote>
+
+<p>دستور مناسب:</p>
+
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block">lsblk</div></div>
+
+<p>است.</p>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">lsblk → ساختار Storage
+df    → فضای Filesystem
+du    → مصرف Files و Directories</div></div>
+
+<h2><code>df</code> در مقابل <code>lsblk</code></h2>
+
+<p>این دو را هم اشتباه نکن.</p>
+
+<h3><code>lsblk</code></h3>
+
+<p>تمرکز روی:</p>
+
+<div class="code-container"><span class="code-label">lsblk</span><div class="code-block no-prompt">Disk
+Partition
+Block Device
+Mount Point</div></div>
+
+<h3><code>df</code></h3>
+
+<p>تمرکز روی:</p>
+
+<div class="code-container"><span class="code-label">df</span><div class="code-block no-prompt">Filesystem
+Used
+Available
+Use%</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lsblk
+  ↓
+ساختار Storage
+
+df
+  ↓
+وضعیت فضای Filesystem</div></div>
+
+<h2><code>iostat</code></h2>
+
+<h3>Capacity با Performance فرق دارد</h3>
+
+<p>ممکن است یک Disk:</p>
+
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">20 GB total
+5 GB free</div></div>
+
+<p>فضای آزاد داشته باشد، اما بسیار کند باشد.</p>
+
+<p>در این حالت مشکل لزوماً کمبود فضا نیست.</p>
+
+<p>ممکن است مشکل:</p>
+
+<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">I/O Performance</div></div>
+
+<p>باشد.</p>
+
+<p>برای بررسی عملکرد I/O می‌توان از:</p>
+
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">iostat</div></div>
+
+<p>استفاده کرد.</p>
+
+<h3><code>iostat</code></h3>
+
+<p><code>iostat</code> برای بررسی فعالیت و عملکرد I/O سیستم استفاده می‌شود.</p>
+
+<p>مثلاً اطلاعات مرتبط با:</p>
 
 <div class="code-container"><span class="code-label">معیارها</span><div class="code-block no-prompt">Read
 Write
 I/O</div></div>
 
-<p>و شاخص‌های مرتبط با فعالیت Disk را می‌توان بررسی کرد.</p>
+<p>را بررسی می‌کند.</p>
 
-<h2>نصب <code>iostat</code></h2>
+<p>در این جلسه کافی است تفاوت زیر را کاملاً بفهمی:</p>
 
-<p>در سیستم‌های جدید، <code>iostat</code> معمولاً همراه بسته:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">df / du
+   ↓
+Storage Capacity
 
-<div class="code-container"><span class="code-label">بسته</span><div class="code-block no-prompt">sysstat</div></div>
+iostat
+   ↓
+Storage I/O Performance</div></div>
 
-<p>ارائه می‌شود.</p>
+<h3><code>iostat -x</code></h3>
 
-<p>مثلاً در سیستم‌های مبتنی بر RHEL:</p>
-
-<div class="code-container"><span class="code-label">نصب</span><div class="code-block">sudo dnf install sysstat -y</div></div>
-
-<p>سپس:</p>
-
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">iostat</div></div>
-
-<h2><code>iostat -x</code></h2>
-
-<p>یکی از حالت‌های کاربردی:</p>
+<p>برای اطلاعات گسترده‌تر:</p>
 
 <div class="code-container"><span class="code-label">جزئیات</span><div class="code-block">iostat -x</div></div>
 
-<p>است که اطلاعات گسترده‌تری درباره عملکرد Deviceهای Storage ارائه می‌دهد.</p>
+<p>استفاده می‌شود.</p>
 
-<p>برای Troubleshooting مشکلات I/O مفید است.</p>
+<p>این دستور برای Troubleshooting مشکلات I/O مفید است.</p>
 
-<h2>تفاوت فضای Disk و عملکرد Disk</h2>
+<p>در سیستم‌هایی که <code>iostat</code> در دسترس نیست، معمولاً این فرمان همراه بسته <code>sysstat</code> ارائه می‌شود.</p>
 
-<p>این دو را از هم جدا کن.</p>
+<h2>ابزارهای جلسه در یک نگاه</h2>
 
-<p>ممکن است Disk:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">20GB total
-5GB free</div></div>
-
-<p>داشته باشد، اما بسیار کند باشد.</p>
-
-<p>در اینجا مشکل:</p>
-
-<div class="code-container"><span class="code-label">ظرفیت</span><div class="code-block no-prompt">Capacity</div></div>
-
-<p>نیست.</p>
-
-<p>ممکن است مشکل:</p>
-
-<div class="code-container"><span class="code-label">عملکرد</span><div class="code-block no-prompt">I/O Performance</div></div>
-
-<p>باشد.</p>
-
-<p>برای بررسی فضای ذخیره‌سازی:</p>
-
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block">df
-du</div></div>
-
-<p>مهم‌اند.</p>
-
-<p>برای بررسی عملکرد I/O:</p>
-
-<div class="code-container"><span class="code-label">عملکرد</span><div class="code-block">iostat</div></div>
-
-<p>مفید است.</p>
-
-<h2>یک سناریوی واقعی Troubleshooting</h2>
-
-<p>فرض کن کاربر می‌گوید:</p>
-
-<blockquote>«Linux من خطای No space left on device می‌دهد.»</blockquote>
-
-<h3>مرحله اول</h3>
-<p>بررسی Filesystem:</p>
-<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">df -h</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/dev/sda2   20G   20G   0G   100%   /</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Filesystem Full</div></div>
-
-<h3>مرحله دوم</h3>
-<p>پیدا کردن Directory بزرگ:</p>
-<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">sudo du -sh /*</div></div>
-<p>فرض کنیم:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/var    12G
-/home    2G
-/usr     4G</div></div>
-<p>پس <code>/var</code> مشکوک است.</p>
-
-<h3>مرحله سوم</h3>
-<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">sudo du -sh /var/*</div></div>
-<p>فرض کنیم:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/var/log     10G
-/var/cache    1G</div></div>
-<p>حالا مشخص شده:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/var/log</div></div>
-<p>فضای زیادی مصرف کرده است.</p>
-
-<p>این دقیقاً کاربرد واقعی <code>df</code> و <code>du</code> است.</p>
-
-<h2>سناریوی دوم: پیدا کردن Mount</h2>
-
-<p>فرض کن می‌خواهی بفهمی:</p>
-
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb1</div></div>
-
-<p>کجا Mount شده است.</p>
-
-<p>یکی از روش‌های ساده:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">sdb
-└─sdb1    10G    /home</div></div>
-
-<p>پس:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sdb1 → /home</div></div>
-
-<h2>سناریوی سوم: بررسی Mountهای فعال</h2>
-
-<p>می‌توانی از:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">df -h</div></div>
-
-<p>هم استفاده کنی.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda2        20G   10G   10G  50% /
-/dev/sdb1        50G   20G   30G  40% /home</div></div>
-
-<p>اینجا مشخص است:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/dev/sda2 → /
-/dev/sdb1 → /home</div></div>
-
-<h2>ارتباط همه مفاهیم فصل تا اینجا</h2>
-
-<p>حالا می‌توانیم کل فصل سوم را به هم وصل کنیم:</p>
-
-<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">Physical Disk
-      ↓
-Partition
-      ↓
- ┌────┴─────┐
- │          │
-LVM       RAID
- │          │
- └────┬─────┘
-      ↓
-Filesystem
-      ↓
-Mount Point
-      ↓
-Linux Directory Tree
-      ↓
-     Files</div></div>
-
-<p>و ابزارهای بررسی:</p>
-
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lsblk
-  ↓
-ساختار Disk / Partition / Mount
-
-df
-  ↓
-فضای Filesystem
-
-du
-  ↓
-فضای مصرف‌شده توسط Files/Directories
-
-iostat
-  ↓
-عملکرد I/O</div></div>
-
-<div class="summary-box">
-    <h3>جدول طلایی دستورات فصل</h3>
-    <div class="table-wrap">
-    <table>
-    <thead><tr><th>فرمان</th><th>سؤال اصلی که جواب می‌دهد</th></tr></thead>
-    <tbody>
-    <tr><td><code>lsblk</code></td><td>چه Disk و Partitionهایی دارم؟</td></tr>
-    <tr><td><code>mount</code></td><td>چه چیزی Mount شده / چگونه Mount کنم؟</td></tr>
-    <tr><td><code>df</code></td><td>Filesystem چقدر فضا دارد؟</td></tr>
-    <tr><td><code>df -h</code></td><td>فضای Filesystem را خوانا ببینم؟</td></tr>
-    <tr><td><code>du</code></td><td>فایل‌ها و Directoryها چقدر فضا مصرف کرده‌اند؟</td></tr>
-    <tr><td><code>du -sh</code></td><td>مجموع مصرف یک Directory چقدر است؟</td></tr>
-    <tr><td><code>iostat</code></td><td>عملکرد I/O دیسک چگونه است؟</td></tr>
-    <tr><td><code>iostat -x</code></td><td>جزئیات بیشتری از I/O بده</td></tr>
-    </tbody>
-    </table>
-    </div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>فرمان</th><th>سؤال اصلی</th></tr></thead>
+<tbody>
+<tr><td><code>lsblk</code></td><td>چه Disk و Partitionهایی دارم؟</td></tr>
+<tr><td><code>mount</code></td><td>چه چیزی Mount شده یا چگونه Mount کنم؟</td></tr>
+<tr><td><code>df</code></td><td>Filesystem چقدر فضا دارد؟</td></tr>
+<tr><td><code>df -h</code></td><td>فضای Filesystem را خوانا ببینم؟</td></tr>
+<tr><td><code>du</code></td><td>Files و Directoryها چقدر فضا مصرف کرده‌اند؟</td></tr>
+<tr><td><code>du -h</code></td><td>مصرف را خوانا ببینم؟</td></tr>
+<tr><td><code>du -sh</code></td><td>مجموع مصرف یک Directory چقدر است؟</td></tr>
+<tr><td><code>iostat</code></td><td>وضعیت I/O چگونه است؟</td></tr>
+<tr><td><code>iostat -x</code></td><td>جزئیات بیشتری از I/O چیست؟</td></tr>
+</tbody>
+</table>
 </div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکات طلایی LPIC-1</strong><br>
+<h2>ارتباط جلسه با جلسات قبلی</h2>
 
-<h4>نکته ۱</h4>
-<p>ریشه فایل‌سیستم Linux:</p>
-<div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
+<p>در جلسات قبلی ساختار Storage را یاد گرفتیم:</p>
 
-<h4>نکته ۲</h4>
-<p>Linux برخلاف مدل Drive Letter ویندوز، یک درخت فایل واحد دارد.</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
+ ↓
+Partition
+ ↓
+LVM / RAID
+ ↓
+Filesystem
+ ↓
+Mount
+ ↓
+Directory Tree
+ ↓
+Files</div></div>
 
-<h4>نکته ۳</h4>
-<p>Disk برای قابل استفاده شدن در درخت فایل معمولاً باید:</p>
-<div class="code-container"><span class="code-label">نیاز</span><div class="code-block no-prompt">Filesystem
-+
-Mount</div></div>
-<p>داشته باشد.</p>
+<p>حالا در این جلسه یاد می‌گیریم این ساختار را <strong>بررسی و Troubleshoot</strong> کنیم:</p>
 
-<h4>نکته ۴</h4>
-<p>Mount Point می‌تواند چیزی مثل:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/mnt
-/home
-/home/user</div></div>
-<p>باشد.</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block no-prompt">lsblk
+ ↓
+Disk / Partition / Mount</div></div>
 
-<h4>نکته ۵</h4>
-<p>Mount موقتی:</p>
-<div class="code-container"><span class="code-label">موقتی</span><div class="code-block">mount /dev/sdb1 /mnt</div></div>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block no-prompt">df -h
+ ↓
+Filesystem Usage</div></div>
 
-<h4>نکته ۶</h4>
-<p>Mount دائمی:</p>
-<div class="code-container"><span class="code-label">دائمی</span><div class="code-block no-prompt">/etc/fstab</div></div>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block no-prompt">du -sh
+ ↓
+File / Directory Usage</div></div>
 
-<h4>نکته ۷</h4>
-<p>برای فضای Filesystem:</p>
-<div class="code-container"><span class="code-label">فضا</span><div class="code-block">df -h</div></div>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block no-prompt">iostat
+ ↓
+I/O Performance</div></div>
 
-<h4>نکته ۸</h4>
-<p>برای پیدا کردن Directoryهای حجیم:</p>
-<div class="code-container"><span class="code-label">پیدا کردن</span><div class="code-block">du -sh</div></div>
+<div class="summary-box">
+    <h3>⭐ نکات طلایی LPIC-1</h3>
 
-<h4>نکته ۹</h4>
-<p>برای ساختار Disk و Partition:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">lsblk</div></div>
+    <h4>نکته ۱</h4>
+    <p>ریشه Directory Tree لینوکس:</p>
+    <div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
 
-<h4>نکته ۱۰</h4>
-<p>برای بررسی عملکرد I/O:</p>
-<div class="code-container"><span class="code-label">عملکرد</span><div class="code-block">iostat</div></div>
-</div></div>
+    <h4>نکته ۲</h4>
+    <p>Linux از یک درخت فایل واحد استفاده می‌کند، نه Drive Letterهایی مانند <code>C:</code> و <code>D:</code>.</p>
+
+    <h4>نکته ۳</h4>
+    <p><code>df</code> برای بررسی <strong>Filesystem Space</strong> است.</p>
+    <div class="code-container"><span class="code-label">df</span><div class="code-block">df -h</div></div>
+
+    <h4>نکته ۴</h4>
+    <p><code>du</code> برای بررسی <strong>File/Directory Usage</strong> است.</p>
+    <div class="code-container"><span class="code-label">du</span><div class="code-block">du -sh /home</div></div>
+
+    <h4>نکته ۵</h4>
+    <p><code>-h</code> یعنی:</p>
+    <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Human-readable</div></div>
+
+    <h4>نکته ۶</h4>
+    <p><code>-s</code> در <code>du</code> یعنی:</p>
+    <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">Summary</div></div>
+
+    <h4>نکته ۷</h4>
+    <p>برای پیدا کردن عامل پر شدن Root:</p>
+    <div class="code-container"><span class="code-label">پیدا کردن</span><div class="code-block">sudo du -sh /*</div></div>
+
+    <h4>نکته ۸</h4>
+    <p>برای بررسی ساختار Disk و Partition:</p>
+    <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
+
+    <h4>نکته ۹</h4>
+    <p>Mountهای دائمی معمولاً در:</p>
+    <div class="code-container"><span class="code-label">fstab</span><div class="code-block no-prompt">/etc/fstab</div></div>
+    <p>تعریف می‌شوند.</p>
+
+    <h4>نکته ۱۰</h4>
+    <p><code>iostat</code> بیشتر برای بررسی <strong>I/O Performance</strong> است، نه مقدار فضای آزاد.</p>
+</div>
+
+<h2>چیت‌شیت جلسه</h2>
+
+<div class="code-container"><span class="code-label">چیت‌شیت</span><div class="code-block no-prompt">┌──────────────────────────────────────┐
+│         Disk Space Troubleshooting   │
+└──────────────────────────────────────┘
+
+df -h
+  ↓
+Filesystem چقدر پر است؟
+  ↓
+du -sh /*
+  ↓
+کدام Directory بزرگ است؟
+  ↓
+du -sh /var/*
+  ↓
+کدام Subdirectory بزرگ است؟
+  ↓
+رسیدن به عامل اصلی</div></div>
+
+<p>و برای تشخیص نوع مشکل:</p>
+
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lsblk
+ ↓
+Storage Structure
+
+df
+ ↓
+Filesystem Capacity
+
+du
+ ↓
+File / Directory Usage
+
+iostat
+ ↓
+I/O Performance</div></div>
 
 <h2>خودآزمایی</h2>
 
-<div class="quiz-card"><p>❓ تست ۱: ریشه ساختار فایل در Linux کدام است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>C:\</code></button>
-    <button onclick="selectOption(this)">ب) <code>/root</code></button>
-    <button onclick="selectOption(this)">ج) <code>/</code></button>
-    <button onclick="selectOption(this)">د) <code>/home</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>/</code></strong><br>ریشه ساختار فایل در Linux <code>/</code> است.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۲: کدام فرمان میزان فضای آزاد و مصرف‌شده Filesystemها را نمایش می‌دهد؟</p>
+<div class="quiz-card"><p>❓ تست ۱: کدام دستور میزان فضای استفاده‌شده و آزاد Filesystemها را نمایش می‌دهد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>du</code></button>
     <button onclick="selectOption(this)">ب) <code>df</code></button>
@@ -19857,37 +19369,29 @@ Mount</div></div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>df</code></strong><br><code>df</code> فضای Filesystem را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۳: برای نمایش خواناتر خروجی <code>df</code> کدام گزینه مناسب است؟</p>
+<div class="quiz-card"><p>❓ تست ۲: برای نمایش خواناتر خروجی <code>df</code> کدام گزینه استفاده می‌شود؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>df -r</code></button>
+    <button onclick="selectOption(this)">الف) <code>df -s</code></button>
     <button onclick="selectOption(this)">ب) <code>df -h</code></button>
-    <button onclick="selectOption(this)">ج) <code>df -l</code></button>
-    <button onclick="selectOption(this)">د) <code>df -x</code></button>
+    <button onclick="selectOption(this)">ج) <code>df -x</code></button>
+    <button onclick="selectOption(this)">د) <code>df -r</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>df -h</code></strong><br><code>-h</code> مخفف human-readable است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>df -h</code></strong><br><code>-h</code> مخفف Human-readable است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۴: کدام فرمان برای پیدا کردن مقدار فضای مصرف‌شده توسط یک Directory مناسب‌تر است؟</p>
+<div class="quiz-card"><p>❓ تست ۳: کدام دستور برای بررسی میزان فضای مصرف‌شده توسط <code>/home</code> مناسب است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>du</code></button>
-    <button onclick="selectOption(this)">ب) <code>df</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsmod</code></button>
-    <button onclick="selectOption(this)">د) <code>fdisk</code></button>
+    <button onclick="selectOption(this)">الف) <code>du -sh /home</code></button>
+    <button onclick="selectOption(this)">ب) <code>df /home</code></button>
+    <button onclick="selectOption(this)">ج) <code>lsblk /home</code></button>
+    <button onclick="selectOption(this)">د) <code>iostat /home</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du</code></strong><br><code>du</code> فضای مصرف‌شده توسط فایل‌ها و Directoryها را نشان می‌دهد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۵: خروجی کدام دستور برای پیدا کردن اینکه <code>/var</code> چقدر فضا مصرف کرده مفید است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>du -sh /var</code></button>
-    <button onclick="selectOption(this)">ب) <code>lsmod /var</code></button>
-    <button onclick="selectOption(this)">ج) <code>fdisk /var</code></button>
-    <button onclick="selectOption(this)">د) <code>mdadm /var</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du -sh /var</code></strong><br><code>du -sh</code> مجموع مصرف یک Directory را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du -sh /home</code></strong><br><code>du -sh</code> مجموع مصرف یک Directory را نشان می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۶: گزینه <code>-s</code> در <code>du -sh</code> چه مفهومی دارد؟</p>
+<div class="quiz-card"><p>❓ تست ۴: گزینه <code>-s</code> در:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">du -sh /home</div></div>
+<p>چه مفهومی دارد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) Sort</button>
     <button onclick="selectOption(this)">ب) Summary</button>
@@ -19897,7 +19401,41 @@ Mount</div></div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — Summary</strong><br><code>-s</code> یعنی فقط خلاصه (Summary) را نمایش بده.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۷: کدام فایل برای تعریف Mountهای دائمی استفاده می‌شود؟</p>
+<div class="quiz-card"><p>❓ تست ۵: کاربر با خطای:</p>
+<div class="code-container"><span class="code-label">خطا</span><div class="code-block no-prompt">No space left on device</div></div>
+<p>مواجه شده است. اولین دستور مناسب برای بررسی وضعیت Filesystem چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>du -sh /*</code></button>
+    <button onclick="selectOption(this)">ب) <code>df -h</code></button>
+    <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">د) <code>iostat</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>df -h</code></strong><br>اولین قدم در Troubleshooting Disk Full، بررسی فضای Filesystem با <code>df -h</code> است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۶: بعد از اجرای:</p>
+<div class="code-container"><span class="code-label">df -h</span><div class="code-block">df -h</div></div>
+<p>مشخص شده <code>/</code> برابر 95٪ پر است. برای پیدا کردن Directoryهای حجیم چه دستوری مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>du -sh /*</code></button>
+    <button onclick="selectOption(this)">ب) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">ج) <code>iostat</code></button>
+    <button onclick="selectOption(this)">د) <code>mount</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du -sh /*</code></strong><br><code>du -sh /*</code> مصرف Directoryهای اصلی زیر <code>/</code> را نشان می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۷: کدام دستور ساختار Diskها و Partitionها را به‌صورت درختی نمایش می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>df</code></button>
+    <button onclick="selectOption(this)">ب) <code>du</code></button>
+    <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">د) <code>iostat</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>lsblk</code></strong><br><code>lsblk</code> ساختار درختی Block Deviceها را نشان می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۸: کدام فایل برای تعریف Mountهای دائمی استفاده می‌شود؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>/etc/hosts</code></button>
     <button onclick="selectOption(this)">ب) <code>/etc/passwd</code></button>
@@ -19907,86 +19445,77 @@ Mount</div></div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>/etc/fstab</code></strong><br><code>/etc/fstab</code> برای تعریف Mountهای دائمی استفاده می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۸: کدام دستور نمای درختی از Block Deviceها و Partitionها ارائه می‌دهد؟</p>
+<div class="quiz-card"><p>❓ تست ۹: کدام ابزار بیشتر برای بررسی Performance مربوط به Disk I/O استفاده می‌شود؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>du</code></button>
-    <button onclick="selectOption(this)">ب) <code>df</code></button>
-    <button onclick="selectOption(this)">ج) <code>lsblk</code></button>
-    <button onclick="selectOption(this)">د) <code>iostat</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>lsblk</code></strong><br><code>lsblk</code> ساختار درختی Block Deviceها را نشان می‌دهد.</div>
-</div>
-
-<div class="quiz-card"><p>❓ تست ۹: کدام ابزار بیشتر برای بررسی عملکرد I/O دیسک استفاده می‌شود؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>iostat</code></button>
+    <button onclick="selectOption(this)">الف) <code>df</code></button>
     <button onclick="selectOption(this)">ب) <code>du</code></button>
-    <button onclick="selectOption(this)">ج) <code>df</code></button>
-    <button onclick="selectOption(this)">د) <code>mount</code></button>
+    <button onclick="selectOption(this)">ج) <code>iostat</code></button>
+    <button onclick="selectOption(this)">د) <code>lsblk</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>iostat</code></strong><br><code>iostat</code> برای بررسی عملکرد I/O دیسک استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>iostat</code></strong><br><code>iostat</code> برای بررسی عملکرد I/O دیسک استفاده می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ تست ۱۰ — سناریویی: دستور زیر نشان می‌دهد:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/dev/sda2   20G   20G   0G   100%   /</div></div>
-<p>کاربر می‌گوید: «می‌خواهم بفهمم کدام Directory باعث پر شدن Disk شده است.» کدام دستور انتخاب مناسب‌تری برای مرحله بعد است؟</p>
+<div class="quiz-card"><p>❓ تست ۱۰ — سناریویی: خروجی زیر را داریم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        20G   20G     0  100% /</div></div>
+<p>مدیر سیستم می‌خواهد بفهمد کدام Directory باعث پر شدن Filesystem شده است. کدام دستور انتخاب مناسب‌تری برای مرحله بعد است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>du -sh /*</code></button>
-    <button onclick="selectOption(this)">ب) <code>lsmod</code></button>
-    <button onclick="selectOption(this)">ج) <code>fdisk -l</code></button>
-    <button onclick="selectOption(this)">د) <code>mdadm --detail /dev/md0</code></button>
+    <button onclick="selectOption(this)">ب) <code>lsblk</code></button>
+    <button onclick="selectOption(this)">ج) <code>iostat</code></button>
+    <button onclick="selectOption(this)">د) <code>mount</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du -sh /*</code></strong><br><code>du -sh /*</code> مصرف Directoryهای اصلی زیر <code>/</code> را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: الف — <code>du -sh /*</code></strong><br>بعد از تشخیص Filesystem پر، باید Directory حجیم را با <code>du -sh /*</code> پیدا کرد.</div>
 </div>
 
-<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🎯 جمع‌بندی نهایی فصل سوم</strong><br>
-<p>در پایان فصل سوم باید بتوانی این زنجیره را کاملاً درک کنی:</p>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>جمع‌بندی نهایی</strong><br>
+<p>اگر بخواهیم کل جلسه ۱۰ را در چند خط خلاصه کنیم:</p>
 
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">             Storage
-                │
-       ┌────────┴────────┐
-       │                 │
-   Partition           RAID
-       │                 │
-       └────────┬────────┘
-                │
-               LVM
-                │
-           Filesystem
-                │
-             Mount
-                │
-       Linux Directory Tree
-                │
-              Files</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Filesystem Full?
+       │
+       ▼
+    df -h
+       │
+       ▼
+کدام Filesystem؟
+       │
+       ▼
+   du -sh /*
+       │
+       ▼
+کدام Directory؟
+       │
+       ▼
+ du -sh /directory/*
+       │
+       ▼
+پیدا کردن عامل مصرف فضا</div></div>
 
-<p>و برای مدیریت و عیب‌یابی:</p>
+<p>و تفاوت اصلی ابزارها:</p>
 
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">lsblk
- ↓
-ساختار Diskها
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">┌──────────┬──────────────────────────────┐
+│ lsblk    │ ساختار Disk و Partition      │
+├──────────┼──────────────────────────────┤
+│ df       │ فضای Filesystem              │
+├──────────┼──────────────────────────────┤
+│ du       │ مصرف Files و Directories     │
+├──────────┼──────────────────────────────┤
+│ iostat   │ عملکرد I/O                   │
+└──────────┴──────────────────────────────┘</div></div>
 
-df -h
- ↓
-Filesystem چقدر پر است؟
+<h3>سه دستور مهمی که باید از این جلسه کاملاً مسلط باشی:</h3>
 
-du -sh
- ↓
-چه چیزی فضا را مصرف کرده؟
+<div class="code-container"><span class="code-label">دستور ۱</span><div class="code-block">df -h</div></div>
+<p><strong>Filesystem چقدر فضا دارد؟</strong></p>
 
-iostat
- ↓
-آیا مشکل Performance / I/O داریم؟</div></div>
+<div class="code-container"><span class="code-label">دستور ۲</span><div class="code-block">du -sh /path</div></div>
+<p><strong>این Directory چقدر فضا مصرف کرده؟</strong></p>
 
-<p><strong>مهم‌ترین تفاوت امتحانی این جلسه:</strong></p>
+<div class="code-container"><span class="code-label">دستور ۳</span><div class="code-block">sudo du -sh /*</div></div>
+<p><strong>کدام Directory اصلی باعث مصرف فضا شده؟</strong></p>
 
-<blockquote><code>df</code> از دید <strong>Filesystem</strong> به فضا نگاه می‌کند، اما <code>du</code> از دید <strong>Files و Directories</strong>.</blockquote>
-
-<p>و مهم‌ترین مسیر مفهومی:</p>
-
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Disk → Partition → Filesystem → Mount → Directory Tree</div></div>
-
-<p>با این جلسه، <strong>۱۰ جلسه فصل سوم</strong> تمام شد و بخش‌های اصلی Hardware، Disk، Partition، Kernel Module، LVM، RAID و Disk Space را پوشش دادیم.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>مهم‌ترین نکته امتحانی جلسه</strong><br>
+<code>df</code> از دید <strong>Filesystem</strong> به فضای دیسک نگاه می‌کند، در حالی که <code>du</code> از دید <strong>Files و Directories</strong> به مصرف فضا نگاه می‌کند.</div></div>
 </div></div>
 `
 
