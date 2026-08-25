@@ -20122,1191 +20122,1860 @@ I/O Performance</div></div>
 <code>df</code> از دید <strong>Filesystem</strong> به فضای دیسک نگاه می‌کند، در حالی که <code>du</code> از دید <strong>Files و Directories</strong> به مصرف فضا نگاه می‌کند.</div></div>
 </div></div>
 `, 
+
 "ch4-1": `
 <div class="section-header">
     <div class="section-badge">۴</div>
     <div>
-        <h1>مدیریت فایل و دایرکتوری در لینوکس</h1>
+        <h1>Intro + File & Directory Management</h1>
         <div class="meta">فایل‌ها، مجوزها و آرشیو · بخش ۱ از ۷</div>
     </div>
 </div>
 
-<h2>۱. اهداف یادگیری</h2>
-<p>در پایان این جلسه باید بتوانی:</p>
-<ul>
-    <li>ساختار فایل و دایرکتوری و مفهوم <strong>inode</strong> را توضیح بدهی.</li>
-    <li>تفاوت مسیرهای <strong>Absolute</strong> و <strong>Relative</strong> را تشخیص بدهی.</li>
-    <li>با <code>pwd</code> و <code>ls</code> اطلاعات مسیر و فایل‌ها را بررسی کنی.</li>
-    <li>با <code>touch</code>، <code>mkdir</code>، <code>cp</code>، <code>mv</code>، <code>rm</code> و <code>rmdir</code> فایل‌ها و دایرکتوری‌ها را مدیریت کنی.</li>
-    <li>از <strong>Wildcard</strong>ها برای انتخاب چند فایل استفاده کنی.</li>
-</ul>
+<h2>ساختار کلی جلسه</h2>
+<p>قبل از اینکه سراغ دستورهایی مثل <code>cp</code> و <code>mv</code> و <code>rm</code> برویم، باید یک تصویر کلی از نحوه‌ی کار با فایل‌ها در لینوکس داشته باشیم.</p>
 
-<h2>۲. مسئله و تصویر کلی</h2>
-<h3>۲.۱ چرا این مبحث مهم است؟</h3>
-<p>فرض کن وارد یک سرور لینوکسی شده‌ای و این وظیفه را داری:</p>
-<blockquote>یک فایل تنظیمات را پیدا کن، از آن کپی بگیر، نام کپی را تغییر بده، چند فایل قدیمی را حذف کن و یک پوشه برای Backup بساز.</blockquote>
-<p>برای انجام این کار باید بتوانی:</p>
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">پیدا کردن موقعیت فعلی
-        ↓
-شناخت مسیر فایل
-        ↓
-مشاهده فایل‌ها
-        ↓
-ساخت فایل/دایرکتوری
-        ↓
-کپی یا جابه‌جایی
-        ↓
-حذف</div></div>
-<p>پس قبل از حفظ کردن دستورها، باید بدانیم <strong>فایل و دایرکتوری در لینوکس چگونه سازمان‌دهی شده‌اند.</strong></p>
+<h3>تصویر واحدی که باید در پایان جلسه در ذهن داشته باشی</h3>
+<p>در لینوکس تقریباً همه‌چیز از طریق <strong>File System</strong> و درختی از فایل‌ها و دایرکتوری‌ها مدیریت می‌شود:</p>
+<div class="code-container"><span class="code-label">ساختار درختی</span><div class="code-block no-prompt">/
+                         │
+              ┌──────────┼──────────┐
+              │          │          │
+             etc        home       var
+                         │
+                         ├── amir
+                         │    ├── file1.txt
+                         │    └── notes
+                         │
+                         └── ali</div></div>
+<p>برای کار با این درخت باید بتوانیم:</p>
+<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">1. بفهمیم فایل و Directory چیست
+             ↓
+2. مسیر فایل را پیدا کنیم
+             ↓
+3. نوع فایل و اطلاعات آن را ببینیم
+             ↓
+4. فایل و Directory بسازیم
+             ↓
+5. آن‌ها را کپی یا جابه‌جا کنیم
+             ↓
+6. حذفشان کنیم
+             ↓
+7. با Wildcard چند فایل را همزمان انتخاب کنیم</div></div>
+<p>پس مسیر اصلی جلسه این است:</p>
+<div class="code-container"><span class="code-label">نقشه جلسه</span><div class="code-block no-prompt">File System
+     │
+     ├── File
+     ├── Directory
+     ├── Path
+     └── inode
+          ↓
+     انواع فایل
+          ↓
+     Absolute / Relative Path
+          ↓
+     pwd / ls
+          ↓
+     touch / mkdir
+          ↓
+     cp / mv
+          ↓
+     rm / rmdir
+          ↓
+     Wildcards</div></div>
 
-<h3>۲.۲ تصویر کلی</h3>
-<p>مدل ذهنی این جلسه:</p>
-<div class="code-container"><span class="code-label">Big Picture</span><div class="code-block no-prompt">                    Linux Filesystem
-                           │
-             ┌─────────────┴─────────────┐
-             ↓                           ↓
-         Directory                     File
-             │                           │
-       ┌─────┼─────┐                     │
-       ↓     ↓     ↓                     ↓
-     File  Dir   Dir                  Data
-       │
-       ↓
-     inode
-       │
-       ↓
-Metadata + Information about the file</div></div>
-<p>و عملیات اصلی ما:</p>
-<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">          File / Directory
-                 │
-      ┌──────────┼──────────┐
-      ↓          ↓          ↓
-    Create     Inspect    Modify
-      │          │          │
- touch/mkdir   ls/pwd    cp/mv/rm</div></div>
-<p>در این جلسه قرار نیست فقط دستورها را حفظ کنیم؛ می‌خواهیم بفهمیم <strong>هر دستور روی چه چیزی و برای چه کاری استفاده می‌شود.</strong></p>
-
-<h3>۲.۳ نقشه مسیر جلسه</h3>
-<p>ترتیب یادگیری ما:</p>
-<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">File & Directory
-       ↓
-   inode + Types
-       ↓
-  Path & Location
-       ↓
-   pwd / ls
-       ↓
-touch / mkdir
-       ↓
-   cp / mv
-       ↓
-   rm / rmdir
-       ↓
-   Wildcards
-       ↓
-   سناریوی واقعی</div></div>
-
-<h2>۳. درسنامه اصلی</h2>
-<h3>۳.۱ File چیست؟</h3>
-<p>در لینوکس، <strong>File</strong> محلی برای نگهداری اطلاعات است.</p>
+<h2>بخش اول — فایل و دایرکتوری در لینوکس</h2>
+<h3>1. File چیست؟</h3>
+<p>در ساده‌ترین تعریف:</p>
+<blockquote><strong>File یک واحد برای نگهداری یا نمایش اطلاعات در سیستم فایل است.</strong></blockquote>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">notes.txt
-config.conf
 photo.jpg
+config.conf
 script.sh</div></div>
-<p>اما یک نکته مهم وجود دارد:</p>
-<blockquote>لینوکس فقط فایل‌های معمولی ندارد.</blockquote>
-<p>چیزهایی که ما به‌عنوان «فایل» می‌بینیم، می‌توانند انواع مختلفی داشته باشند.</p>
+<p>این‌ها همگی File هستند.</p>
+<p>اما در لینوکس مفهوم File کمی گسترده‌تر است.</p>
+<p>در لینوکس بسیاری از منابع سیستم از طریق یک interface شبیه File در اختیار کاربر قرار می‌گیرند.</p>
+<p>برای همین ممکن است در لینوکس با چیزهایی مثل این هم روبه‌رو شویم:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">/dev/sda
+/dev/null
+/dev/tty</div></div>
+<p>بنابراین وقتی در لینوکس می‌گوییم <strong>File</strong>، منظورمان فقط یک فایل متنی یا عکس نیست.</p>
 
-<h3>۳.۲ Directory چیست؟</h3>
-<p><strong>Directory</strong> را ساده‌ترین شکل می‌توانیم یک محفظه برای نگهداری و سازمان‌دهی فایل‌ها و دایرکتوری‌های دیگر بدانیم.</p>
+<h3>2. Directory چیست؟</h3>
+<p>Directory را می‌توانیم در سطح مقدماتی مثل یک <strong>پوشه</strong> در نظر بگیریم.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/navid/
-│
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>یک Directory است.</p>
+<p>داخل آن می‌توانیم فایل و Directoryهای دیگری داشته باشیم:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir
 ├── notes.txt
-├── script.sh
-│
-└── projects/
-    ├── project1/
-    └── project2/</div></div>
-<p>اینجا:</p>
-<ul>
-    <li><code>notes.txt</code> → فایل</li>
-    <li><code>script.sh</code> → فایل</li>
-    <li><code>projects</code> → دایرکتوری</li>
-    <li><code>project1</code> → دایرکتوری</li>
-</ul>
-<h4>یک نکته مهم</h4>
-<p>Directory خودش اطلاعات فایل‌ها را مثل یک فایل متنی نگهداری نمی‌کند؛ بلکه ساختار فایل‌سیستم اطلاعاتی مانند نام‌ها و ارتباط آن‌ها با inodeها را مدیریت می‌کند.</p>
-<p>فعلاً همین تصویر برای LPIC-1 کافی است.</p>
+├── photo.jpg
+├── documents/
+│   ├── report.pdf
+│   └── book.pdf
+└── scripts/
+    └── backup.sh</div></div>
+<p>پس Directory برای <strong>سازمان‌دهی و نگهداری entryهای مربوط به فایل‌ها و Directoryهای دیگر</strong> استفاده می‌شود.</p>
 
-<h3>۳.۳ inode چیست؟</h3>
-<p>این یکی از مهم‌ترین مفاهیم این جلسه است.</p>
-<p>می‌توانی inode را مثل <strong>شناسنامه فنی یک فایل</strong> تصور کنی.</p>
-<p>inode اطلاعاتی درباره فایل نگه می‌دارد، مانند:</p>
-<ul>
-    <li>نوع فایل</li>
-    <li>Permission</li>
-    <li>مالک</li>
-    <li>گروه</li>
-    <li>اندازه</li>
-    <li>زمان‌های مختلف فایل</li>
-    <li>تعداد Linkها</li>
-    <li>محل داده‌های فایل</li>
-</ul>
-<p>اما:</p>
-<blockquote><strong>نام فایل داخل inode ذخیره نمی‌شود.</strong></blockquote>
+<h3>3. تفاوت File و Directory</h3>
+<p>یک اشتباه رایج این است که فکر کنیم Directory خودش یک نوع فایل کاملاً جدا از File است.</p>
+<p>برای سطح LPIC-1 بهتر است این تصویر را داشته باشی:</p>
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">File System
+     │
+     ├── Regular File
+     ├── Directory
+     ├── Symbolic Link
+     ├── Device File
+     ├── FIFO
+     └── Socket</div></div>
+<p>یعنی Directory هم یکی از انواع objectهایی است که سیستم فایل مدیریت می‌کند.</p>
+
+<h3>4. inode چیست؟</h3>
+<p>یکی از مفاهیم بسیار مهم این جلسه <strong>inode</strong> است.</p>
+<p>ممکن است یک فایل داشته باشیم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">notes.txt</div></div>
+<p>و تصور کنیم سیستم فقط چیزی شبیه این دارد:</p>
+<div class="code-container"><span class="code-label">تصور</span><div class="code-block no-prompt">notes.txt → محتوای فایل</div></div>
+<p>اما در واقع ساختار پیچیده‌تر است.</p>
 <p>به‌صورت ساده:</p>
-<div class="code-container"><span class="code-label">inode</span><div class="code-block no-prompt">Directory
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Directory
    │
-   │  filename
+   │ نام فایل
+   ↓
+notes.txt
+   │
+   │ اشاره به inode
    ↓
  inode
    │
-   ├── permissions
-   ├── owner
-   ├── group
-   ├── size
-   ├── timestamps
-   └── data locations</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">notes.txt ───────→ inode 12543</div></div>
-<p>در واقع Directory می‌گوید:</p>
-<blockquote>نام <code>notes.txt</code> به inode شماره <code>12543</code> اشاره می‌کند.</blockquote>
+   ├── نوع فایل
+   ├── Permission
+   ├── Owner
+   ├── Group
+   ├── Size
+   ├── Timestamps
+   └── محل Data</div></div>
+<h4>inode چیست؟</h4>
+<p><strong>inode یک ساختار داده‌ای است که اطلاعات مدیریتی مربوط به یک فایل را نگهداری می‌کند.</strong></p>
+<p>مثلاً اطلاعاتی مانند:</p>
+<ul>
+    <li>نوع فایل</li>
+    <li>Permissionها</li>
+    <li>Owner</li>
+    <li>Group</li>
+    <li>اندازه</li>
+    <li>زمان‌های مختلف فایل</li>
+    <li>تعداد Linkها</li>
+    <li>اشاره به بلوک‌های داده</li>
+</ul>
+<p>در inode نگهداری می‌شوند.</p>
+<p>اما یک نکته‌ی مهم:</p>
+<blockquote><strong>نام فایل معمولاً داخل inode ذخیره نمی‌شود.</strong></blockquote>
+<p>این نکته برای LPIC-1 مهم است.</p>
+<p>Directory در واقع ارتباط بین <strong>نام</strong> و <strong>inode</strong> را مدیریت می‌کند.</p>
+<p>می‌توانیم به شکل ساده تصور کنیم:</p>
+<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Directory
 
-<h4>دیدن inode</h4>
-<p>با <code>ls -i</code>:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -i</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">12543 notes.txt
-12544 script.sh
-12545 projects</div></div>
-<p>عدد سمت چپ inode number است.</p>
+"notes.txt" ─────────→ inode 12345
+"photo.jpg" ─────────→ inode 12346
+"script.sh" ─────────→ inode 12347</div></div>
+<p>و inode به اطلاعات مربوط به داده‌های فایل مرتبط است.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>ممکن است دو نام مختلف به <strong>یک inode</strong> اشاره کنند. این موضوع پایه مفهوم <strong>Hard Link</strong> است که در جلسه ۴ به‌صورت کامل یاد می‌گیریم.</div></div>
-
-<h3>۳.۴ انواع فایل‌ها در لینوکس</h3>
-<p>برای دیدن نوع فایل‌ها، <code>ls -l</code> بسیار مهم است.</p>
+<h4>یک نتیجه مهم درباره inode</h4>
+<p>ممکن است دو نام مختلف به یک inode اشاره کنند.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r--  1 navid users  1200 notes.txt
-drwxr-xr-x  2 navid users  4096 projects
-lrwxrwxrwx  1 navid users    12 latest -> notes.txt</div></div>
-<p>اولین کاراکتر نوع فایل را مشخص می‌کند:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">file1
+file2
+   │
+   └──────→ inode 500</div></div>
+<p>این موضوع بعداً در مبحث <strong>Hard Link</strong> بسیار مهم خواهد شد.</p>
+<p>پس از همین الان این رابطه را در ذهن داشته باش:</p>
+<div class="code-container"><span class="code-label">رابطه</span><div class="code-block no-prompt">Filename
+   ↓
+Directory Entry
+   ↓
+inode
+   ↓
+File Data</div></div>
+
+<h2>بخش دوم — انواع فایل‌ها در لینوکس</h2>
+<p>برای مدیریت فایل‌ها باید بتوانیم نوع آن‌ها را هم بشناسیم.</p>
+<p>مهم‌ترین انواعی که در LPIC-1 باید بشناسی:</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th>علامت</th><th>نوع</th></tr></thead>
+<thead><tr><th>نوع</th><th>مفهوم</th></tr></thead>
 <tbody>
-<tr><td><code>-</code></td><td>Regular File</td></tr>
-<tr><td><code>d</code></td><td>Directory</td></tr>
-<tr><td><code>l</code></td><td>Symbolic Link</td></tr>
-<tr><td><code>c</code></td><td>Character Device</td></tr>
-<tr><td><code>b</code></td><td>Block Device</td></tr>
-<tr><td><code>p</code></td><td>Named Pipe</td></tr>
-<tr><td><code>s</code></td><td>Socket</td></tr>
+<tr><td>Regular File</td><td>فایل معمولی</td></tr>
+<tr><td>Directory</td><td>دایرکتوری</td></tr>
+<tr><td>Symbolic Link</td><td>لینک نمادین</td></tr>
+<tr><td>Block Device</td><td>دستگاه بلوکی</td></tr>
+<tr><td>Character Device</td><td>دستگاه کاراکتری</td></tr>
+<tr><td>FIFO / Named Pipe</td><td>کانال ارتباطی</td></tr>
+<tr><td>Socket</td><td>ارتباط بین Processها</td></tr>
 </tbody>
 </table>
 </div>
-<p>فعلاً مهم‌ترین موارد:</p>
-<div class="code-container"><span class="code-label">مهم</span><div class="code-block no-prompt">- → فایل معمولی
-d → دایرکتوری
-l → Symbolic Link</div></div>
-<p>انواع دیگر را در مباحث مربوط به سخت‌افزار و سیستم فایل در حد لازم بیشتر می‌بینیم.</p>
+<p>حالا یکی‌یکی ببینیم.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر خروجی این باشد:</div></div>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">drwxr-xr-x</div></div>
-<p>حرف اول <code>d</code> است؛ بنابراین این مورد <strong>Directory</strong> است، نه فایل معمولی.</p>
+<h4>1. Regular File</h4>
+<p>همان چیزی است که معمولاً از کلمه‌ی File انتظار داریم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">notes.txt
+image.jpg
+script.sh
+program</div></div>
+<p>می‌تواند شامل متن، تصویر، برنامه، داده و غیره باشد.</p>
+<p>در خروجی <code>ls -l</code> نوع آن با <code>-</code> نمایش داده می‌شود:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 amir amir 1200 Aug 26 notes.txt
+^
+└── Regular File</div></div>
 
-<h3>۳.۵ Path — مسیر فایل</h3>
-<p>سیستم فایل لینوکس ساختاری درختی دارد:</p>
-<div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">/
-├── home
-│   └── navid
-│       ├── notes.txt
-│       └── projects
-│
+<h4>2. Directory</h4>
+<p>برای سازمان‌دهی فایل‌ها و Directoryهای دیگر استفاده می‌شود.</p>
+<p>در <code>ls -l</code> با <code>d</code> مشخص می‌شود:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">drwxr-xr-x
+^
+└── Directory</div></div>
+
+<h4>3. Symbolic Link</h4>
+<p>یک <strong>لینک نمادین</strong> است که به مسیر یک فایل یا Directory دیگر اشاره می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">latest → /home/amir/report.pdf</div></div>
+<p>در <code>ls -l</code> با <code>l</code> مشخص می‌شود:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">lrwxrwxrwx 1 amir amir 18 Aug 26 latest -> report.pdf
+^
+└── Symbolic Link</div></div>
+<p>این موضوع را در جلسه‌ی Hard Link و Symbolic Link به‌صورت کامل بررسی خواهیم کرد.</p>
+
+<h4>4. Block Device</h4>
+<p>دستگاه‌هایی که داده را به شکل Block مدیریت می‌کنند.</p>
+<p>مثلاً دیسک:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda</div></div>
+<p>یا Partition:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1</div></div>
+<p>در <code>ls -l</code> معمولاً با <code>b</code> دیده می‌شود.</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">brw-rw---- ...
+^
+└── Block Device</div></div>
+
+<h4>5. Character Device</h4>
+<p>دستگاه‌هایی که داده را به صورت جریان کاراکتری مدیریت می‌کنند.</p>
+<p>مثلاً برخی Terminalها و Deviceهای خاص.</p>
+<p>در <code>ls -l</code> با <code>c</code> نمایش داده می‌شوند.</p>
+
+<h4>6. FIFO / Named Pipe</h4>
+<p>FIFO مخفف:</p>
+<p><strong>First In, First Out</strong></p>
+<p>است.</p>
+<p>یک روش برای ارتباط بین Processها است.</p>
+<p>در خروجی <code>ls -l</code> با <code>p</code> نمایش داده می‌شود.</p>
+
+<h4>7. Socket</h4>
+<p>Socket برای ارتباط بین Processها استفاده می‌شود.</p>
+<p>در <code>ls -l</code> با <code>s</code> نمایش داده می‌شود.</p>
+
+<h3>خلاصه‌ی نوع فایل‌ها</h3>
+<p>یکی از چیزهایی که ارزش حفظ کردن دارد:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">-  Regular File
+d  Directory
+l  Symbolic Link
+b  Block Device
+c  Character Device
+p  FIFO
+s  Socket</div></div>
+<p>این حروف را وقتی خروجی <code>ls -l</code> را بخوانی مرتب خواهی دید.</p>
+
+<h2>بخش سوم — File System و ساختار درختی</h2>
+<p>لینوکس یک ساختار فایل <strong>درختی</strong> دارد.</p>
+<p>ریشه‌ی این درخت:</p>
+<div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
+<p>است.</p>
+<p>به آن <strong>Root Directory</strong> می‌گوییم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/
+├── bin
+├── boot
+├── dev
 ├── etc
-├── var
-└── tmp</div></div>
-<p>در بالاترین سطح، <code>/</code> قرار دارد.</p>
-<p>به <code>/</code> می‌گوییم:</p>
-<blockquote><strong>Root Directory</strong></blockquote>
-<p>این را با کاربر <code>root</code> اشتباه نگیر.</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/       → Root Directory
-root    → نام کاربر قدرتمند سیستم</div></div>
-
-<h3>۳.۶ Absolute Path</h3>
-<p>مسیر Absolute از <code>/</code> شروع می‌شود و <strong>مکان کامل فایل</strong> را مشخص می‌کند.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
-<p>مهم نیست الان در کدام دایرکتوری هستی.</p>
-<p>اگر بگویی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat /home/navid/notes.txt</div></div>
-<p>مسیر کامل را مشخص کرده‌ای.</p>
-<h4>مدل ذهنی</h4>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/
+├── home
+├── tmp
+├── usr
+└── var</div></div>
+<p>و مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/
 └── home
-    └── navid
-        └── notes.txt</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
-<p>یک Absolute Path است.</p>
+    └── amir</div></div>
 
-<h3>۳.۷ Relative Path</h3>
-<p>Relative Path نسبت به <strong>دایرکتوری فعلی</strong> معنا پیدا می‌کند.</p>
-<p>فرض کن الان اینجا هستیم:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/</div></div>
-<p>و فایل داریم:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
-<p>می‌توانیم بگوییم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat notes.txt</div></div>
-<p>چون <code>notes.txt</code> نسبت به محل فعلی مشخص است.</p>
-<p>اگر وارد <code>projects</code> شویم:</p>
-<div class="code-container"><span class="code-label">ورود</span><div class="code-block">cd projects</div></div>
-<p>حالا موقعیت ما:</p>
-<div class="code-container"><span class="code-label">محل جدید</span><div class="code-block no-prompt">/home/navid/projects/</div></div>
-<p>اگر فایل زیر وجود داشته باشد:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/projects/test.txt</div></div>
-<p>می‌توانیم بنویسیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat test.txt</div></div>
-<h4>تفاوت اصلی</h4>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Absolute:
-از / شروع می‌شود و مستقل از محل فعلی است.
-
-Relative:
-نسبت به محل فعلی محاسبه می‌شود.</div></div>
-
-<h3>۳.۸ <code>.</code> و <code>..</code></h3>
-<p>دو مفهوم بسیار مهم در مسیرها:</p>
-<h4><code>.</code></h4>
-<p>یعنی:</p>
-<blockquote>دایرکتوری فعلی</blockquote>
+<h2>بخش چهارم — Path چیست؟</h2>
+<p>برای دسترسی به یک فایل یا Directory باید بدانیم کجای درخت قرار دارد.</p>
+<p>این آدرس را <strong>Path</strong> می‌نامیم.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">./script.sh</div></div>
-<p>یعنی اجرای <code>script.sh</code> از دایرکتوری فعلی.</p>
-
-<h4><code>..</code></h4>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir/notes.txt</div></div>
 <p>یعنی:</p>
-<blockquote>دایرکتوری والد (Parent)</blockquote>
-<p>مثلاً اگر اینجا باشیم:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/projects/</div></div>
-<p>با:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cd ..</div></div>
-<p>می‌رویم به:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/</div></div>
-<p>دیاگرام:</p>
-<div class="code-container"><span class="code-label">دیاگرام</span><div class="code-block no-prompt">/home/navid/
-      │
-      └── projects/
-             ↑
-             │
-            ..</div></div>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/
+└── home
+    └── amir
+        └── notes.txt</div></div>
+<p>Path در لینوکس از <code>/</code> برای جدا کردن اجزای مسیر استفاده می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir/documents/report.pdf</div></div>
+<p>اجزای مسیر:</p>
+<div class="code-container"><span class="code-label">اجزا</span><div class="code-block no-prompt">/
+home
+amir
+documents
+report.pdf</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر مسیر فعلی این باشد:</div></div>
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/navid/projects/web</div></div>
-<p>آنگاه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">.   → /home/navid/projects/web
-..  → /home/navid/projects</div></div>
+<h2>بخش پنجم — Absolute Path</h2>
+<h3>Absolute Path چیست؟</h3>
+<p>مسیر Absolute از ریشه‌ی سیستم فایل یعنی <code>/</code> شروع می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir/notes.txt</div></div>
+<p>این یک Absolute Path است.</p>
+<p>چون از:</p>
+<div class="code-container"><span class="code-label">ریشه</span><div class="code-block no-prompt">/</div></div>
+<p>شروع شده است.</p>
+<p>مثال‌های دیگر:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">/etc/hosts
+/var/log/syslog
+/home/amir/Documents/report.pdf</div></div>
+<h4>ویژگی مهم</h4>
+<p>Absolute Path به این بستگی ندارد که <strong>الان در کدام Directory قرار داری</strong>.</p>
+<p>مثلاً اگر داخل این باشی:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>و این دستور را بزنی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat /etc/hosts</div></div>
+<p>مسیر همچنان مشخص است.</p>
 
-<h3>۳.۹ <code>pwd</code> — من کجا هستم؟</h3>
-<p>وقتی با چندین دایرکتوری کار می‌کنی، اولین سؤال مهم این است:</p>
-<blockquote>الان کجا هستم؟</blockquote>
-<p>دستور:</p>
+<h2>بخش ششم — Relative Path</h2>
+<p>Relative Path از موقعیت فعلی ما شروع می‌شود.</p>
+<p>فرض کن الان اینجا هستیم:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>و این فایل وجود دارد:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/amir/notes.txt</div></div>
+<p>می‌توانیم بگوییم:</p>
+<div class="code-container"><span class="code-label">نسبی</span><div class="code-block no-prompt">notes.txt</div></div>
+<p>این یک Relative Path است.</p>
+<p>چرا؟</p>
+<p>چون مسیر را از <strong>Current Directory</strong> محاسبه می‌کنیم.</p>
+
+<h3><code>.</code> و <code>..</code></h3>
+<p>دو مفهوم بسیار مهم:</p>
+<div class="code-container"><span class="code-label">نقطه</span><div class="code-block no-prompt">.</div></div>
+<p>یعنی:</p>
+<blockquote>Current Directory</blockquote>
+<p>و:</p>
+<div class="code-container"><span class="code-label">دو نقطه</span><div class="code-block no-prompt">..</div></div>
+<p>یعنی:</p>
+<blockquote>Parent Directory</blockquote>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/amir/documents</div></div>
+<p>Current Directory ما است.</p>
+<p>در این حالت:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">.
+↓
+/home/amir/documents</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">..
+↓
+/home/amir</div></div>
+
+<h4>مثال</h4>
+<p>اگر داخل:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>باشیم و فایل زیر وجود داشته باشد:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/amir/documents/report.pdf</div></div>
+<p>می‌توانیم آن را به شکل Relative بنویسیم:</p>
+<div class="code-container"><span class="code-label">نسبی</span><div class="code-block no-prompt">documents/report.pdf</div></div>
+<p>یا به شکل Absolute:</p>
+<div class="code-container"><span class="code-label">مطلق</span><div class="code-block no-prompt">/home/amir/documents/report.pdf</div></div>
+<p>هر دو به یک فایل اشاره می‌کنند.</p>
+
+<h2>بخش هفتم — Current Directory</h2>
+<p>یکی از مفاهیم پایه در Shell این است که همیشه یک <strong>Current Working Directory</strong> داریم.</p>
+<p>یعنی Shell می‌داند:</p>
+<blockquote>«الان کاربر در کدام Directory قرار دارد؟»</blockquote>
+<p>برای فهمیدن آن از:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">pwd</div></div>
-<p>مخفف:</p>
-<blockquote><strong>Print Working Directory</strong></blockquote>
+<p>استفاده می‌کنیم.</p>
+
+<h3>دستور <code>pwd</code></h3>
+<p><code>pwd</code> مخفف:</p>
+<p><strong>Print Working Directory</strong></p>
+<p>است.</p>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">اجرا</span><div class="code-block no-prompt">$ pwd
-/home/navid/projects</div></div>
-<p>یعنی Shell در حال حاضر در این دایرکتوری قرار دارد.</p>
-<h4>چرا مهم است؟</h4>
-<p>فرض کن می‌خواهی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm *.log</div></div>
-<p>قبل از اجرای آن بهتر است بدانی در کدام دایرکتوری هستی:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
-<p>چون Relative Path به موقعیت فعلی وابسته است.</p>
+/home/amir</div></div>
+<p>یعنی Current Directory ما:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>است.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br><code>pwd</code> فایل یا دایرکتوری را پیدا نمی‌کند؛ فقط <strong>مسیر دایرکتوری کاری فعلی</strong> را نمایش می‌دهد.</div></div>
+<h4>چرا <code>pwd</code> مهم است؟</h4>
+<p>چون بسیاری از دستورها با Relative Path کار می‌کنند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">$ pwd
+/home/amir
 
-<h3>۳.۱۰ <code>ls</code> — چه چیزی اینجاست؟</h3>
-<p>بعد از اینکه فهمیدیم کجا هستیم، می‌خواهیم بدانیم چه چیزهایی در آنجا وجود دارد.</p>
+$ ls
+notes.txt
+documents</div></div>
+<p>وقتی می‌گویی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat notes.txt</div></div>
+<p>Shell فایل را در:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/amir/notes.txt</div></div>
+<p>جست‌وجو می‌کند.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">pwd
+ ↓
+Current Directory
+ ↓
+Relative Path</div></div>
+<p>این سه مفهوم به هم مرتبط‌اند.</p>
+
+<h2>بخش هشتم — مشاهده فایل‌ها با <code>ls</code></h2>
+<p>یکی از پرکاربردترین دستورات لینوکس:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls</div></div>
+<p>است.</p>
+<p><code>ls</code> برای نمایش محتویات Directory استفاده می‌شود.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">notes.txt
-projects
-script.sh</div></div>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block no-prompt">$ ls
+documents  notes.txt  script.sh</div></div>
 
-<h4>گزینه‌های مهم <code>ls</code></h4>
-<h5>نمایش جزئیات</h5>
-<div class="code-container"><span class="code-label">جزئیات</span><div class="code-block">ls -l</div></div>
+<h3><code>ls -l</code></h3>
+<p>گزینه‌ی بسیار مهم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
+<p>حالت <strong>Long Listing</strong> را نمایش می‌دهد.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 navid users 1200 Aug 25 15:00 notes.txt</div></div>
-<p>فعلاً مهم‌ترین قسمت برای ما:</p>
-<div class="code-container"><span class="code-label">قسمت اول</span><div class="code-block no-prompt">-rw-r--r--</div></div>
-<p>نوع فایل و Permission را نشان می‌دهد.</p>
-<p>جزئیات Permission را در <strong>جلسه ۵</strong> به‌صورت کامل یاد می‌گیریم.</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 amir amir 1200 Aug 26 10:20 notes.txt
+drwxr-xr-x 2 amir amir 4096 Aug 26 10:21 documents</div></div>
+<p>در این خروجی اطلاعات بیشتری می‌بینیم.</p>
+<p>فعلاً مهم‌ترین بخش‌ها:</p>
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">-rw-r--r--  1  amir  amir  1200  Aug 26  notes.txt
+│           │   │      │     │       │
+│           │   │      │     │       └── Name
+│           │   │      │     └────────── Size
+│           │   │      └──────────────── Group
+│           │   └─────────────────────── Owner
+│           └─────────────────────────── Link Count
+└─────────────────────────────────────── File Type + Permissions</div></div>
+<p>بخش Permission و Ownership را در جلسه‌های بعدی به‌صورت کامل بررسی می‌کنیم.</p>
 
-<h5>نمایش فایل‌های مخفی</h5>
-<div class="code-container"><span class="code-label">مخفی</span><div class="code-block">ls -a</div></div>
-<p>در لینوکس فایل‌هایی که نامشان با <code>.</code> شروع می‌شود معمولاً Hidden هستند:</p>
+<h3><code>ls -a</code></h3>
+<p>به‌صورت پیش‌فرض <code>ls</code> فایل‌هایی که نامشان با <code>.</code> شروع می‌شود را نشان نمی‌دهد.</p>
+<p>این‌ها معمولاً <strong>Hidden Files</strong> نامیده می‌شوند.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">.bashrc
 .profile</div></div>
-<p>با:</p>
+<p>برای دیدن آن‌ها:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -a</div></div>
-<p>نمایش داده می‌شوند.</p>
-
-<h5>ترکیب گزینه‌ها</h5>
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">ls -la</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">-l → جزئیات
--a → فایل‌های مخفی</div></div>
-
-<h5>مشاهده یک دایرکتوری بدون ورود به آن</h5>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls /etc</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls -l /etc</div></div>
-<p>لازم نیست حتماً با <code>cd</code> وارد دایرکتوری شوی.</p>
-
-<h3>۳.۱۱ ساخت فایل با <code>touch</code></h3>
-<p>حالا که می‌دانیم فایل چیست، می‌توانیم آن را ایجاد کنیم.</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch notes.txt</div></div>
-<p>اگر فایل وجود نداشته باشد:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt</div></div>
-<p>ساخته می‌شود.</p>
-<p>اگر فایل از قبل وجود داشته باشد، <code>touch</code> معمولاً محتوای آن را پاک نمی‌کند؛ بلکه زمان‌های مربوط به فایل را به‌روزرسانی می‌کند.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">touch report.txt</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">.  ..  .bashrc  .profile  notes.txt</div></div>
+<p>دو مورد:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">.
+..</div></div>
+<p>همان Current Directory و Parent Directory هستند.</p>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>فکر نکن <code>touch</code> یعنی «ویرایش فایل».</div></div>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch file.txt</div></div>
-<p>محتوای فایل را تولید نمی‌کند؛ فقط فایل خالی ایجاد می‌کند، یا timestamp فایل موجود را تغییر می‌دهد.</p>
+<h3><code>ls -la</code></h3>
+<p>برای دیدن فایل‌های مخفی همراه با اطلاعات کامل:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -la</div></div>
+<p>این دستور ترکیبی از:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-l
+-a</div></div>
+<p>است.</p>
 
-<h3>۳.۱۲ ساخت Directory با <code>mkdir</code></h3>
-<p>برای ساخت دایرکتوری:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir projects</div></div>
-<p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">projects/</div></div>
+<h2>بخش نهم — ایجاد فایل با <code>touch</code></h2>
+<p>برای ایجاد یک فایل خالی می‌توانیم از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch</div></div>
+<p>استفاده کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">touch notes.txt</div></div>
+<p>اگر <code>notes.txt</code> وجود نداشته باشد، یک فایل ایجاد می‌شود.</p>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+<p>می‌بینیم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">notes.txt</div></div>
 
-<h4>ساخت چند Directory</h4>
+<h4>نکته مهم درباره <code>touch</code></h4>
+<p><code>touch</code> الزاماً فقط برای ایجاد فایل نیست.</p>
+<p>اگر فایل <strong>از قبل وجود داشته باشد</strong>، <code>touch</code> معمولاً timestampهای آن را به‌روزرسانی می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">touch notes.txt</div></div>
+<p>اگر فایل وجود داشته باشد، فایل جدیدی ساخته نمی‌شود.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">حالت اول</span><div class="code-block no-prompt">File doesn't exist
+        ↓
+      touch
+        ↓
+   File created</div></div>
+<p>ولی:</p>
+<div class="code-container"><span class="code-label">حالت دوم</span><div class="code-block no-prompt">File exists
+     ↓
+   touch
+     ↓
+timestamps updated</div></div>
+
+<h4>ایجاد چند فایل</h4>
+<p>می‌توانیم چند فایل را همزمان ایجاد کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch file1.txt file2.txt file3.txt</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+<p>خواهیم داشت:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">file1.txt
+file2.txt
+file3.txt</div></div>
+
+<h2>بخش دهم — ایجاد Directory با <code>mkdir</code></h2>
+<p>برای ایجاد Directory از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir documents</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">documents/</div></div>
+<p>ساخته شده است.</p>
+
+<h4>ایجاد چند Directory</h4>
 <div class="code-container"><span class="code-label">چند</span><div class="code-block">mkdir dir1 dir2 dir3</div></div>
 
-<h4>ساخت ساختار تو در تو با <code>-p</code></h4>
-<p>فرض کن می‌خواهیم این ساختار را ایجاد کنیم:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-└── backend/
-    └── logs/</div></div>
-<p>می‌توانیم بنویسیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir -p project/backend/logs</div></div>
-<p>گزینه <code>-p</code> باعث می‌شود دایرکتوری‌های والد موردنیاز نیز ایجاد شوند.</p>
+<h4><code>mkdir -p</code></h4>
+<p>یکی از گزینه‌های مهم:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">mkdir -p</div></div>
+<p>گزینه‌ی <code>-p</code> باعث می‌شود Directoryهای والد موردنیاز هم ایجاد شوند.</p>
+<p>فرض کن چنین مسیری وجود ندارد:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/amir/projects/linux/lpic</div></div>
+<p>می‌توانیم بزنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir -p /home/amir/projects/linux/lpic</div></div>
+<p>در این صورت Directoryهای لازم ساخته می‌شوند.</p>
+<p>یعنی اگر:</p>
+<div class="code-container"><span class="code-label">پروژه</span><div class="code-block no-prompt">projects</div></div>
+<p>وجود نداشته باشد، ساخته می‌شود.</p>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">لینوکس</span><div class="code-block no-prompt">linux</div></div>
+<p>ساخته می‌شود.</p>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">lpic</span><div class="code-block no-prompt">lpic</div></div>
+<p>ساخته می‌شود.</p>
+<p>تصویر:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir
+      │
+      └── projects
+            │
+            └── linux
+                  │
+                  └── lpic</div></div>
+<p>بدون <code>-p</code> اگر Parentها وجود نداشته باشند، ایجاد مسیر تو در تو با یک دستور معمولی ممکن است خطا بدهد.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر:</div></div>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir project/backend/logs</div></div>
-<p>و <code>project</code> یا <code>backend</code> وجود نداشته باشند، دستور شکست می‌خورد.</p>
-<p>اما:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir -p project/backend/logs</div></div>
-<p>آن‌ها را در صورت نیاز ایجاد می‌کند.</p>
+<h2>بخش یازدهم — کپی کردن با <code>cp</code></h2>
+<p>برای کپی کردن:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>ساختار کلی:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">cp source destination</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Source
+   ↓
+ cp
+   ↓
+Destination</div></div>
 
-<h3>۳.۱۳ کپی کردن با <code>cp</code></h3>
-<p>حالا فرض کن فایل زیر را داریم:</p>
+<h4>مثال</h4>
+<p>فرض کن:</p>
 <div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">notes.txt</div></div>
-<p>می‌خواهیم یک نسخه از آن بسازیم:</p>
-<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp notes.txt backup.txt</div></div>
-<p>ساختار:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">notes.txt
-     │
-     │ cp
-     ↓
+<p>داریم.</p>
+<p>می‌خواهیم یک کپی به نام:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block no-prompt">backup.txt</div></div>
+<p>بسازیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp notes.txt backup.txt</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt
 backup.txt</div></div>
-<p>محتوای <code>backup.txt</code> با <code>notes.txt</code> یکسان خواهد بود.</p>
+<p>هر دو وجود دارند.</p>
 
 <h4>کپی فایل به Directory</h4>
-<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp notes.txt backup/</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">backup/
-└── notes.txt</div></div>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">notes.txt
+documents/</div></div>
+<p>داریم.</p>
+<p>می‌توانیم بزنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp notes.txt documents/</div></div>
+<p>حالا فایل در:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">documents/notes.txt</div></div>
+<p>قرار می‌گیرد.</p>
 
 <h4>کپی Directory</h4>
-<p>برای کپی یک دایرکتوری معمولاً از <code>-r</code> استفاده می‌کنیم:</p>
-<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp -r project backup/</div></div>
-<p>یعنی کل ساختار <code>project</code> را کپی کن.</p>
+<p>اگر بخواهیم یک Directory را کپی کنیم، معمولاً باید از گزینه‌ی recursive استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp -r source destination</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cp -r documents backup</div></div>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">documents/
+   ├── file1
+   └── file2</div></div>
+<p>تبدیل می‌شود به:</p>
+<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">documents/
+   ├── file1
+   └── file2
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>برای کپی کردن یک directory به همراه محتویات آن:</div></div>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp -r</div></div>
+backup/
+   ├── file1
+   └── file2</div></div>
+<p><code>-r</code> یعنی:</p>
+<p><strong>recursive</strong></p>
+<p>یعنی محتویات Directory و زیرشاخه‌های آن نیز پردازش شوند.</p>
 
-<h3>۳.۱۴ جابه‌جایی و تغییر نام با <code>mv</code></h3>
-<p>دستور <code>mv</code> دو کاربرد بسیار مهم دارد:</p>
-<ol>
-    <li>جابه‌جایی</li>
-    <li>تغییر نام</li>
-</ol>
+<h2>بخش دوازدهم — جابه‌جایی و تغییر نام با <code>mv</code></h2>
+<p>دستور:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv</div></div>
+<p>برای <strong>Move</strong> کردن استفاده می‌شود.</p>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">mv source destination</div></div>
 
-<h4>جابه‌جایی</h4>
-<div class="code-container"><span class="code-label">جابه‌جایی</span><div class="code-block">mv notes.txt backup/</div></div>
-<p>فایل از محل قبلی به <code>backup/</code> منتقل می‌شود.</p>
-<div class="code-container"><span class="code-label">قبل و بعد</span><div class="code-block no-prompt">قبل:
+<h4>جابه‌جایی فایل</h4>
+<div class="code-container"><span class="code-label">جابه‌جایی</span><div class="code-block">mv notes.txt documents/</div></div>
+<p>فایل:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">notes.txt</div></div>
+<p>از محل قبلی برداشته شده و به:</p>
+<div class="code-container"><span class="code-label">محل جدید</span><div class="code-block no-prompt">documents/notes.txt</div></div>
+<p>منتقل می‌شود.</p>
 
-.
-├── notes.txt
-└── backup/
+<h4><code>mv</code> برای Rename</h4>
+<p>یک نکته مهم:</p>
+<p><code>mv</code> فقط برای جابه‌جایی نیست.</p>
+<p>برای تغییر نام هم استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv old.txt new.txt</div></div>
+<p>در این حالت فایل به Directory دیگری نرفته است.</p>
+<p>فقط نامش تغییر کرده:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">old.txt
+   ↓
+new.txt</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">mv = Move + Rename</div></div>
+<p>این یکی از نکات مهم LPIC-1 است.</p>
 
-
-بعد:
-
-.
-└── backup
-    └── notes.txt</div></div>
-
-<h4>تغییر نام</h4>
-<div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv notes.txt report.txt</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt → report.txt</div></div>
-<p>در واقع <code>mv</code> می‌تواند بدون جابه‌جایی فیزیکی، نام فایل را تغییر دهد.</p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>بعضی افراد تصور می‌کنند برای تغییر نام دستور جداگانه‌ای مثل <code>rename</code> همیشه لازم است.</div></div>
-<p>در کارهای معمول:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv old.txt new.txt</div></div>
-<p>کافی است.</p>
-
-<h3>۳.۱۵ حذف فایل با <code>rm</code></h3>
-<p>برای حذف فایل:</p>
-<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm notes.txt</div></div>
-<p>پس از اجرای دستور، فایل حذف می‌شود.</p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته بسیار مهم</strong><br>در لینوکس معمولاً <code>rm</code> مانند Recycle Bin ویندوز عمل نمی‌کند.</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm important.txt</div></div>
-<p>را نباید مثل انتقال به سطل زباله در نظر بگیری.</p>
-<p>پس قبل از اجرای آن مطمئن شو.</p>
+<h2>بخش سیزدهم — حذف فایل با <code>rm</code></h2>
+<p>برای حذف فایل معمولاً از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm notes.txt</div></div>
+<p>فایل حذف می‌شود.</p>
 
 <h4>حذف چند فایل</h4>
 <div class="code-container"><span class="code-label">چند</span><div class="code-block">rm file1.txt file2.txt file3.txt</div></div>
 
-<h4>حذف Directory و محتویات آن</h4>
-<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm -r project</div></div>
-<p>گزینه <code>-r</code> یعنی به‌صورت recursive.</p>
-<p>یعنی وارد زیرشاخه‌ها شو و محتویات را نیز حذف کن.</p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>🚨 هشدار</strong><br>دستور زیر بسیار قدرتمند و خطرناک است:</div></div>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -rf directory</div></div>
-<p>در محیط واقعی باید قبل از اجرای آن مسیر را دقیق بررسی کنی.</p>
-
-<h3>۳.۱۶ <code>rmdir</code></h3>
-<p>برای حذف یک دایرکتوری خالی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rmdir emptydir</div></div>
-<p>اگر دایرکتوری محتویاتی داشته باشد، معمولاً حذف نمی‌شود.</p>
+<h4><code>rm -i</code></h4>
+<p>گزینه‌ی <code>-i</code> برای Interactive است.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خالی</span><div class="code-block no-prompt">emptydir/</div></div>
-<p>→ قابل حذف با <code>rmdir</code></p>
-<p>اما:</p>
-<div class="code-container"><span class="code-label">غیرخالی</span><div class="code-block no-prompt">project/
-├── a.txt
-└── b.txt</div></div>
-<p>→ <code>rmdir project</code> شکست می‌خورد.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm -i notes.txt</div></div>
+<p>Shell ممکن است قبل از حذف از شما تأیید بخواهد:</p>
+<div class="code-container"><span class="code-label">پیام</span><div class="code-block no-prompt">remove 'notes.txt'?</div></div>
+<p>این گزینه برای جلوگیری از حذف اشتباهی مفید است.</p>
+
+<h4>حذف Directory با <code>rm -r</code></h4>
+<p>اگر Directory شامل محتوا باشد، <code>rm</code> معمولی کافی نیست.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm documents</div></div>
+<p>ممکن است با خطا مواجه شود.</p>
+<p>برای حذف بازگشتی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -r documents</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Directory
+   ↓
+rm -r
+   ↓
+Directory + contents</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ <code>rm -r</code> را جدی بگیر</strong><br><code>rm</code> عملیات حذف انجام می‌دهد و استفاده از <code>rm -r</code> می‌تواند تعداد زیادی فایل و Directory را حذف کند. پس قبل از اجرای آن حتماً مسیر را بررسی کن.</div></div>
+<p>مثلاً قبل از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -r backup</div></div>
+<p>بهتر است بدانیم دقیقاً در کجا هستیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>و محتویات را بررسی کنیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+
+<h4><code>rm -f</code></h4>
+<p>گزینه‌ی:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-f</div></div>
+<p>یعنی Force.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm -f file.txt</div></div>
+<p>در بسیاری از شرایط بدون درخواست تأیید فایل را حذف می‌کند و بعضی خطاهای مربوط به نبود فایل را نادیده می‌گیرد.</p>
+
+<h4>ترکیب <code>rm -rf</code></h4>
+<p>ممکن است این دستور را زیاد ببینی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -rf directory</div></div>
+<p>یعنی تقریباً:</p>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">-r → recursive
+-f → force</div></div>
+<p>این دستور بسیار قدرتمند و خطرناک است.</p>
+<p>برای یادگیری LPIC-1 باید معنی آن را بدانی، اما در استفاده واقعی باید با احتیاط بسیار زیاد اجرا شود.</p>
+
+<h2>بخش چهاردهم — حذف Directory خالی با <code>rmdir</code></h2>
+<p>دستور:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rmdir</div></div>
+<p>برای حذف Directory استفاده می‌شود، اما یک شرط مهم دارد:</p>
+<blockquote><strong>Directory باید خالی باشد.</strong></blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir test
+rmdir test</div></div>
+<p>موفق است.</p>
+<p>اما اگر:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">test/
+└── file.txt</div></div>
+<p>وجود داشته باشد:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rmdir test</div></div>
+<p>موفق نمی‌شود، چون Directory خالی نیست.</p>
 
 <h4>تفاوت <code>rmdir</code> و <code>rm -r</code></h4>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">rmdir directory
-       ↓
-فقط Directory خالی
+<p>این تفاوت را خوب یاد بگیر:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
+<tbody>
+<tr><td><code>rmdir dir</code></td><td>حذف Directory خالی</td></tr>
+<tr><td><code>rm -r dir</code></td><td>حذف Directory و محتویات آن</td></tr>
+</tbody>
+</table>
+</div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">rmdir</span><div class="code-block no-prompt">rmdir
+  ↓
+فقط Directory خالی</div></div>
+<p>ولی:</p>
+<div class="code-container"><span class="code-label">rm -r</span><div class="code-block no-prompt">rm -r
+  ↓
+Directory + contents</div></div>
 
-rm -r directory
-       ↓
-Directory + محتویات</div></div>
-
-<h3>۳.۱۷ Wildcards — انتخاب الگوها</h3>
-<p>اینجا یکی از کاربردی‌ترین بخش‌های جلسه شروع می‌شود.</p>
-<p>فرض کن این فایل‌ها را داریم:</p>
-<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">report.txt
-report.pdf
-report.jpg
-notes.txt
-image.jpg</div></div>
-<p>اگر بخواهیم چند فایل را با یک الگو انتخاب کنیم، از <strong>Wildcard</strong> استفاده می‌کنیم.</p>
+<h2>بخش پانزدهم — Wildcards</h2>
+<p>حالا به یکی از قسمت‌های بسیار مهم Shell می‌رسیم:</p>
+<p><strong>Wildcards</strong></p>
+<p>Wildcardها اجازه می‌دهند به جای نوشتن نام دقیق فایل، یک <strong>الگوی نام</strong> تعریف کنیم.</p>
 <p>سه مورد مهم:</p>
-<div class="code-container"><span class="code-label">Wildcardها</span><div class="code-block no-prompt">*     → هر تعداد کاراکتر
-?     → دقیقاً یک کاراکتر
-[]    → یکی از کاراکترهای مشخص‌شده</div></div>
+<div class="code-container"><span class="code-label">Wildcardها</span><div class="code-block no-prompt">*
+?
+[]</div></div>
 
-<h4><code>*</code></h4>
+<h4>1. ستاره <code>*</code></h4>
+<p>علامت:</p>
+<div class="code-container"><span class="code-label">ستاره</span><div class="code-block no-prompt">*</div></div>
+<p>می‌تواند با <strong>صفر یا چند کاراکتر</strong> تطبیق پیدا کند.</p>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.txt</div></div>
 <p>یعنی:</p>
-<blockquote>تمام نام‌هایی که با <code>.txt</code> تمام می‌شوند.</blockquote>
-<p>خروجی:</p>
+<blockquote>همه فایل‌هایی که نامشان با هر چیزی شروع شود و به <code>.txt</code> ختم شود.</blockquote>
+<p>اگر داشته باشیم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">notes.txt
+report.txt
+test.txt
+image.jpg
+script.sh</div></div>
+<p>نتیجه:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">notes.txt
-report.txt</div></div>
-<p>مثال دیگر:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm *.log</div></div>
-<p>تمام فایل‌های <code>.log</code> در دایرکتوری فعلی را هدف قرار می‌دهد.</p>
+report.txt
+test.txt</div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>🚨 نکته مهم</strong><br><code>*</code> به معنی «هر فایل در کل سیستم» نیست.</div></div>
-<p>این:</p>
-<div class="code-container"><span class="code-label">الگو</span><div class="code-block">*.txt</div></div>
-<p>فقط با فایل‌های مطابق الگو در <strong>محل موردنظر Shell</strong> تطبیق داده می‌شود.</p>
-
-<h4><code>?</code></h4>
-<p>علامت <code>?</code> دقیقاً یک کاراکتر را جایگزین می‌کند.</p>
-<p>فرض:</p>
-<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1
+<h4>مثال دیگر</h4>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file*</div></div>
+<p>می‌تواند با مواردی مثل این match شود:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">file
+file1
 file2
-file10</div></div>
+file.txt
+filename</div></div>
+<p>چون <code>*</code> می‌تواند حتی <strong>صفر کاراکتر</strong> را هم match کند.</p>
+
+<h4>2. علامت <code>?</code></h4>
+<p>علامت:</p>
+<div class="code-container"><span class="code-label">سوال</span><div class="code-block no-prompt">?</div></div>
+<p>معمولاً دقیقاً با <strong>یک کاراکتر</strong> match می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file?.txt</div></div>
+<p>می‌تواند match کند:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">file1.txt
+file2.txt
+fileA.txt</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">file10.txt</div></div>
+<p>با این الگو match نمی‌شود، چون بعد از <code>file</code> دو کاراکتر داریم:</p>
+<div class="code-container"><span class="code-label">علت</span><div class="code-block no-prompt">10</div></div>
+<p>در حالی که <code>?</code> فقط یک کاراکتر را می‌پذیرد.</p>
+
+<h4>3. براکت <code>[]</code></h4>
+<p>با:</p>
+<div class="code-container"><span class="code-label">براکت</span><div class="code-block no-prompt">[]</div></div>
+<p>می‌توانیم مجموعه‌ای از کاراکترهای مجاز را مشخص کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[123].txt</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1.txt
+file2.txt
+file3.txt</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file4.txt</div></div>
+<p>مطابق این الگو نیست.</p>
+
+<h4>مثال حروف</h4>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[a-c].txt</div></div>
+<p>می‌تواند match کند:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">filea.txt
+fileb.txt
+filec.txt</div></div>
+
+<h4>Wildcardها را با هم ترکیب کنیم</h4>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">ls file[0-9].*</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">file
++
+یک رقم از 0 تا 9
++
+.
++
+هر پسوندی</div></div>
+<p>بنابراین مواردی مثل:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">file1.txt
+file2.log
+file7.conf</div></div>
+<p>می‌توانند match شوند.</p>
+
+<h4>نکته بسیار مهم: Wildcard توسط Shell گسترش پیدا می‌کند</h4>
+<p>وقتی می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls *.txt</div></div>
+<p>خود <code>ls</code> لزوماً مسئول پیدا کردن <code>*.txt</code> نیست.</p>
+<p>Shell ابتدا الگو را بررسی و در صورت وجود match آن را گسترش می‌دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls *.txt</div></div>
+<p>ممکن است قبل از اجرای <code>ls</code> به چیزی شبیه این تبدیل شود:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">ls notes.txt report.txt test.txt</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">User
+ ↓
+Shell
+ ↓
+Wildcard Expansion
+ ↓
+Command</div></div>
+<p>این مفهوم بعداً در بحث Shell و Quoting هم خیلی مهم خواهد بود.</p>
+
+<h4>Wildcard با <code>rm</code></h4>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm *.tmp</div></div>
+<p>می‌تواند تمام فایل‌های <code>.tmp</code> موجود در Directory فعلی را هدف قرار دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">a.tmp
+b.tmp
+backup.tmp
+test.tmp</div></div>
+<p>پس قبل از اجرای دستورهای حذف با wildcard حتماً بررسی کن که چه فایل‌هایی match می‌شوند.</p>
+<p>برای مثال:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls *.tmp</div></div>
+<p>بعد اگر مطمئن بودی:</p>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm *.tmp</div></div>
+<p>این یک عادت بسیار خوب در کار واقعی لینوکس است.</p>
+
+<h4>فایل‌های مخفی و Wildcard</h4>
+<p>یک نکته مهم:</p>
+<p>الگوی ساده:</p>
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">*</div></div>
+<p>معمولاً با فایل‌هایی که نامشان با <code>.</code> شروع می‌شود match نمی‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file.txt
+test.txt
+.bashrc
+.profile</div></div>
 <p>اگر بزنیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls file?</div></div>
-<p>مطابق می‌شوند:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls *</div></div>
+<p>فایل‌های عادی match می‌شوند، اما فایل‌های hidden که با <code>.</code> شروع می‌شوند معمولاً نه.</p>
+<p>برای دیدن فایل‌های hidden از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -a</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>این رفتار را برای آزمون LPIC-1 به خاطر بسپار.</p>
+
+<h2>بخش شانزدهم — یک سناریوی کامل</h2>
+<p>حالا تمام مفاهیم را در یک سناریو کنار هم قرار دهیم.</p>
+<p>فرض کنیم می‌خواهیم یک پروژه‌ی ساده ایجاد کنیم.</p>
+<p>ابتدا ببینیم کجا هستیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>یک Directory بسازیم:</p>
+<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir project</div></div>
+<p>و وارد آن شویم:</p>
+<div class="code-container"><span class="code-label">ورود</span><div class="code-block">cd project</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/amir/project</div></div>
+<p>چند فایل بسازیم:</p>
+<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">touch main.c README.md test.txt log.txt</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+<p>می‌بینیم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">README.md
+log.txt
+main.c
+test.txt</div></div>
+<p>یک Directory دیگر بسازیم:</p>
+<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir backup</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
+├── README.md
+├── log.txt
+├── main.c
+├── test.txt
+└── backup/</div></div>
+<p>فایل‌های متنی را بررسی کنیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls *.txt</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">log.txt
+test.txt</div></div>
+<p>حالا <code>main.c</code> را کپی کنیم:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp main.c backup/</div></div>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
+├── README.md
+├── log.txt
+├── main.c
+├── test.txt
+└── backup/
+    └── main.c</div></div>
+<p>نام <code>test.txt</code> را تغییر دهیم:</p>
+<div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv test.txt test-old.txt</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">test-old.txt</div></div>
+<p>داریم.</p>
+<p>در نهایت اگر بخواهیم <code>backup</code> را حذف کنیم:</p>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm -r backup</div></div>
+<p>و اگر Directory دیگری خالی باشد:</p>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rmdir emptydir</div></div>
+<p>این سناریو تقریباً تمام زنجیره‌ی اصلی جلسه را به هم متصل می‌کند.</p>
+
+<h2>بخش هفدهم — یک نکته مهم درباره نام فایل‌ها</h2>
+<p>در لینوکس نام فایل‌ها می‌تواند شامل بسیاری از کاراکترها باشد، اما بهتر است برای نام فایل‌های معمولی از نام‌های ساده استفاده کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">myfile.txt
+backup-2026.txt
+server_config.conf</div></div>
+<p>بهتر از نام‌هایی با فاصله و کاراکترهای عجیب هستند.</p>
+<p>مثلاً اگر فایلی داشته باشیم:</p>
+<div class="code-container"><span class="code-label">فایل با فاصله</span><div class="code-block no-prompt">my file.txt</div></div>
+<p>کار با آن نیازمند توجه به فاصله و Quoting است:</p>
+<div class="code-container"><span class="code-label">روش درست</span><div class="code-block">ls "my file.txt"</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">روش دیگر</span><div class="code-block">ls my\ file.txt</div></div>
+<p>مباحث کامل Quoting و نحوه برخورد Shell با کاراکترهای خاص در بخش‌های مربوط به Shell بهتر بررسی می‌شوند؛ فعلاً فقط بدان که <strong>فاصله بخشی از نام فایل است و Shell آن را به‌صورت جداکننده‌ی آرگومان‌ها هم تفسیر می‌کند.</strong></p>
+
+<h2>بخش هجدهم — نکات مهم کار با فایل و Directory</h2>
+<h4>نکته ۱ — همیشه Current Directory را بدان</h4>
+<p>قبل از عملیات حساس:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>مثلاً قبل از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -r *</div></div>
+<p>نداشتن تصویر درست از Current Directory می‌تواند فاجعه‌بار باشد.</p>
+
+<h4>نکته ۲ — قبل از حذف با Wildcard بررسی کن</h4>
+<p>به‌جای اینکه مستقیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm *.log</div></div>
+<p>بزنی، اول:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls *.log</div></div>
+<p>را بررسی کن.</p>
+
+<h4>نکته ۳ — <code>mv</code> فقط Move نیست</h4>
+<p>این دستور هم:</p>
+<div class="code-container"><span class="code-label">Move</span><div class="code-block no-prompt">Move</div></div>
+<p>و هم:</p>
+<div class="code-container"><span class="code-label">Rename</span><div class="code-block no-prompt">Rename</div></div>
+<p>را انجام می‌دهد.</p>
+
+<h4>نکته ۴ — <code>cp</code> فایل اصلی را حذف نمی‌کند</h4>
+<p>اگر بزنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp file1 file2</div></div>
+<p>هر دو باقی می‌مانند:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1
 file2</div></div>
-<p>ولی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file10</div></div>
-<p>مطابق نیست، چون دو کاراکتر بعد از <code>file</code> دارد.</p>
-
-<h4><code>[]</code></h4>
-<p>برای انتخاب یک کاراکتر از مجموعه مشخص:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[123]</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1
-file2
-file3</div></div>
 <p>اما:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file4</div></div>
-<p>مطابق نیست.</p>
-<p>می‌توانیم Range هم داشته باشیم:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[1-5]</div></div>
-<p>یعنی یکی از:</p>
-<div class="code-container"><span class="code-label">اعداد</span><div class="code-block no-prompt">1 2 3 4 5</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv file1 file2</div></div>
+<p>دیگر یک عملیات جابه‌جایی/تغییر نام است و منبع در محل قبلی باقی نمی‌ماند.</p>
 
-<h4>یک مثال ترکیبی</h4>
-<p>فرض کنیم:</p>
-<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">app1.log
-app2.log
-app3.log
-app10.log
-db1.log</div></div>
-<p>دستور:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls app?.log</div></div>
-<p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">app1.log
-app2.log
-app3.log</div></div>
-<p>ولی <code>app10.log</code> نه؛ چون <code>?</code> فقط یک کاراکتر را پوشش می‌دهد.</p>
+<h4>نکته ۵ — <code>rmdir</code> فقط Directory خالی را حذف می‌کند</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rmdir test</div></div>
+<p>اگر <code>test</code> محتوا داشته باشد، حذف نمی‌شود.</p>
 
-<h3>۳.۱۸ یک سناریوی کوچک واقعی</h3>
-<p>فرض کن می‌خواهیم برای یک پروژه چنین ساختاری بسازیم:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-├── docs/
-├── backup/
-└── src/</div></div>
-<p>ابتدا:</p>
-<div class="code-container"><span class="code-label">روش ساده</span><div class="code-block">mkdir -p project/docs
-mkdir -p project/backup
-mkdir -p project/src</div></div>
-<p>سپس:</p>
-<div class="code-container"><span class="code-label">ساخت فایل</span><div class="code-block">touch project/src/main.py
-touch project/docs/readme.txt</div></div>
-<p>کپی:</p>
-<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp project/src/main.py project/backup/</div></div>
-<p>تغییر نام:</p>
-<div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv project/docs/readme.txt project/docs/README.txt</div></div>
-<p>مشاهده:</p>
-<div class="code-container"><span class="code-label">مشاهده</span><div class="code-block">ls -R project</div></div>
-<p>در نتیجه با چند دستور ساده توانستیم یک ساختار واقعی پروژه بسازیم.</p>
+<h4>نکته ۶ — <code>rm -r</code> بازگشتی است</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -r directory</div></div>
+<p>یعنی Directory و محتویات زیر آن را حذف کن.</p>
 
-<h2>۴. خطاهای واقعی</h2>
+<h4>نکته ۷ — <code>*</code> با یک یا چند کاراکتر محدود نیست</h4>
+<p><code>*</code> می‌تواند:</p>
+<div class="code-container"><span class="code-label">صفر یا چند</span><div class="code-block no-prompt">صفر یا چند کاراکتر</div></div>
+<p>را match کند.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">علامت سوال</span><div class="code-block no-prompt">?</div></div>
+<p>فقط:</p>
+<div class="code-container"><span class="code-label">یک کاراکتر</span><div class="code-block no-prompt">یک کاراکتر</div></div>
+<p>را match می‌کند.</p>
+
+<h4>نکته ۸ — <code>[]</code> مجموعه‌ای از کاراکترهاست</h4>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">file[123].txt</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1.txt
+file2.txt
+file3.txt</div></div>
+
+<h3>نقشه‌ی دستورات این جلسه</h3>
+<p>در پایان بهتر است این جدول را به‌عنوان نقشه‌ی سریع جلسه داشته باشی:</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th>خطا</th><th>علت</th><th>راه‌حل</th></tr></thead>
+<thead><tr><th>دستور</th><th>کاربرد اصلی</th></tr></thead>
 <tbody>
-<tr><td><code>mkdir: cannot create directory ...</code></td><td>والد موردنیاز وجود ندارد</td><td>استفاده از <code>mkdir -p</code></td></tr>
-<tr><td><code>cp: -r not specified; omitting directory</code></td><td>تلاش برای کپی Directory بدون recursive</td><td>استفاده از <code>cp -r</code></td></tr>
-<tr><td><code>rmdir: Directory not empty</code></td><td>دایرکتوری خالی نیست</td><td>ابتدا محتویات را مدیریت کن یا در صورت اطمینان <code>rm -r</code></td></tr>
-<tr><td><code>rm: cannot remove ...</code></td><td>فایل وجود ندارد یا Permission کافی نداری</td><td>مسیر و دسترسی را بررسی کن</td></tr>
-<tr><td>Wildcard نتیجه مورد انتظار را نمی‌دهد</td><td>الگو با نام فایل‌ها تطابق ندارد</td><td>الگو و محل فعلی را با <code>pwd</code> و <code>ls</code> بررسی کن</td></tr>
+<tr><td><code>pwd</code></td><td>نمایش Current Directory</td></tr>
+<tr><td><code>ls</code></td><td>نمایش محتویات Directory</td></tr>
+<tr><td><code>ls -l</code></td><td>نمایش اطلاعات کامل‌تر</td></tr>
+<tr><td><code>ls -a</code></td><td>نمایش Hidden Files</td></tr>
+<tr><td><code>touch</code></td><td>ایجاد فایل / تغییر timestamp</td></tr>
+<tr><td><code>mkdir</code></td><td>ایجاد Directory</td></tr>
+<tr><td><code>mkdir -p</code></td><td>ایجاد مسیرهای تو در تو</td></tr>
+<tr><td><code>cp</code></td><td>کپی</td></tr>
+<tr><td><code>cp -r</code></td><td>کپی بازگشتی Directory</td></tr>
+<tr><td><code>mv</code></td><td>جابه‌جایی / تغییر نام</td></tr>
+<tr><td><code>rm</code></td><td>حذف فایل</td></tr>
+<tr><td><code>rm -r</code></td><td>حذف بازگشتی Directory</td></tr>
+<tr><td><code>rm -i</code></td><td>حذف با تأیید</td></tr>
+<tr><td><code>rm -f</code></td><td>حذف اجباری</td></tr>
+<tr><td><code>rmdir</code></td><td>حذف Directory خالی</td></tr>
 </tbody>
 </table>
 </div>
 
-<h2>۵. سناریوی ترکیبی عیب‌یابی</h2>
-<h3>مسئله</h3>
-<p>روی یک سرور وارد محیط کاری شده‌ای:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">$ pwd
-/home/navid/project</div></div>
-<p>محتویات:</p>
-<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">app.py
-app1.log
-app2.log
-README.txt
-backup/</div></div>
-<p>وظیفه مدیر سیستم این است:</p>
+<h3>نکات مهم جلسه</h3>
 <ol>
-    <li>یک پوشه به نام <code>old_logs</code> بسازی.</li>
-    <li>فایل‌های <code>app1.log</code> و <code>app2.log</code> را به آن منتقل کنی.</li>
-    <li>از <code>app.py</code> یک کپی داخل <code>backup/</code> ایجاد کنی.</li>
-    <li>نام کپی را <code>app_backup.py</code> بگذاری.</li>
-    <li>مطمئن شوی ساختار نهایی درست است.</li>
+    <li><strong>Directory بخشی از ساختار File System است</strong> و برای سازمان‌دهی فایل‌ها و Directoryهای دیگر استفاده می‌شود.</li>
+    <li><strong>inode اطلاعات مدیریتی فایل را نگهداری می‌کند</strong>؛ نام فایل به‌صورت مستقیم مفهوم اصلی inode نیست.</li>
+    <li>رابطه‌ی مهم را به خاطر بسپار:</li>
+</ol>
+<div class="code-container"><span class="code-label">رابطه</span><div class="code-block no-prompt">Filename
+   ↓
+Directory Entry
+   ↓
+inode
+   ↓
+File Data</div></div>
+<ol start="4">
+    <li>مهم‌ترین انواع File:</li>
+</ol>
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">-  Regular File
+d  Directory
+l  Symbolic Link
+b  Block Device
+c  Character Device
+p  FIFO
+s  Socket</div></div>
+<ol start="5">
+    <li>مسیر Absolute از <code>/</code> شروع می‌شود:</li>
+</ol>
+<div class="code-container"><span class="code-label">مطلق</span><div class="code-block no-prompt">/home/amir/file.txt</div></div>
+<ol start="6">
+    <li>مسیر Relative به Current Directory وابسته است:</li>
+</ol>
+<div class="code-container"><span class="code-label">نسبی</span><div class="code-block no-prompt">documents/file.txt</div></div>
+<ol start="7">
+    <li><code>pwd</code> می‌گوید <strong>الان کجا هستیم</strong>.</li>
+    <li><code>ls</code> می‌گوید <strong>در این Directory چه چیزهایی وجود دارد</strong>.</li>
+    <li><code>touch</code> برای ایجاد فایل و همچنین به‌روزرسانی timestampها استفاده می‌شود.</li>
+    <li><code>mkdir</code> برای ساخت Directory و <code>mkdir -p</code> برای ساخت مسیرهای تو در تو مناسب است.</li>
+    <li><code>cp</code> کپی می‌کند؛ <code>mv</code> جابه‌جا یا Rename می‌کند.</li>
+    <li><code>rmdir</code> فقط Directory خالی را حذف می‌کند.</li>
+    <li><code>rm -r</code> می‌تواند Directory و تمام محتویاتش را حذف کند.</li>
+    <li>Wildcardهای مهم:</li>
+</ol>
+<div class="code-container"><span class="code-label">Wildcardها</span><div class="code-block no-prompt">*   → صفر یا چند کاراکتر
+?   → دقیقاً یک کاراکتر
+[]  → یکی از کاراکترهای مشخص‌شده</div></div>
+<ol start="15">
+    <li>Wildcardها معمولاً توسط <strong>Shell</strong> قبل از اجرای Command گسترش پیدا می‌کنند.</li>
 </ol>
 
-<h3>پاسخ</h3>
-<h4>مشاهده → تحلیل</h4>
-<p>اول مطمئن می‌شویم در محل درست هستیم:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
-<p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/project</div></div>
-<p>سپس:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
-<p>تا فایل‌ها را ببینیم.</p>
-
-<h4>تشخیص → انتخاب راه‌حل</h4>
-<p>برای ساخت دایرکتوری:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir old_logs</div></div>
-<p>برای انتخاب دو فایل log می‌توانیم از Wildcard استفاده کنیم:</p>
-<div class="code-container"><span class="code-label">الگو</span><div class="code-block">app?.log</div></div>
-<p>چون:</p>
-<div class="code-container"><span class="code-label">تطابق</span><div class="code-block no-prompt">app1.log
-app2.log</div></div>
-<p>هر دو دقیقاً یک کاراکتر بعد از <code>app</code> دارند.</p>
-
-<h4>اجرا</h4>
-<div class="code-container"><span class="code-label">انتقال</span><div class="code-block">mv app?.log old_logs/</div></div>
-<p>حالا کپی:</p>
-<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp app.py backup/</div></div>
-<p>و سپس تغییر نام:</p>
-<div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv backup/app.py backup/app_backup.py</div></div>
-
-<h4>بررسی نتیجه</h4>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls backup</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls old_logs</div></div>
-<p>باید تقریباً چنین ساختاری داشته باشیم:</p>
-<div class="code-container"><span class="code-label">ساختار نهایی</span><div class="code-block no-prompt">project/
-├── README.txt
-├── app.py
-├── backup/
-│   └── app_backup.py
-└── old_logs/
-    ├── app1.log
-    └── app2.log</div></div>
-
-<h4>نتیجه</h4>
-<p>اینجا حداقل سه مفهوم را همزمان استفاده کردیم:</p>
-<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">Path
-  +
-File/Directory Management
-  +
-Wildcard</div></div>
-<p>این دقیقاً همان چیزی است که در کار واقعی لینوکس اتفاق می‌افتد: <strong>دستورها جدا از هم نیستند؛ برای حل مسئله با هم ترکیب می‌شوند.</strong></p>
-
-<h2>۶. جمع‌بندی به سبک فاینمن</h2>
-<p>اگر بخواهیم کل جلسه را خیلی ساده توضیح دهیم:</p>
-<p>لینوکس اطلاعات را در یک ساختار درختی نگهداری می‌کند. در این ساختار، <strong>Directoryها</strong> برای سازمان‌دهی و <strong>Fileها</strong> برای نگهداری داده استفاده می‌شوند.</p>
-<p>برای اینکه بتوانیم با یک فایل کار کنیم، باید بدانیم <strong>کجاست</strong>. اینجا مفهوم Path وارد می‌شود:</p>
-<div class="code-container"><span class="code-label">Path</span><div class="code-block no-prompt">Absolute → از / شروع می‌شود
-Relative → نسبت به محل فعلی</div></div>
-<p>برای فهمیدن محل فعلی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">pwd</div></div>
-<p>و برای دیدن محتویات:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls</div></div>
-<p>بعد می‌توانیم فایل و دایرکتوری بسازیم:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">touch
-mkdir</div></div>
-<p>آن‌ها را کپی یا جابه‌جا کنیم:</p>
-<div class="code-container"><span class="code-label">کپی/جابه‌جایی</span><div class="code-block">cp
-mv</div></div>
-<p>و در صورت نیاز حذف کنیم:</p>
-<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm
-rmdir</div></div>
-<p>اما وقتی تعداد فایل‌ها زیاد می‌شود، نمی‌خواهیم تک‌تک نام‌ها را بنویسیم. اینجا <strong>Wildcard</strong> وارد می‌شود:</p>
-<div class="code-container"><span class="code-label">Wildcard</span><div class="code-block no-prompt">*  → هر تعداد کاراکتر
-?  → یک کاراکتر
-[] → یکی از مجموعه مشخص</div></div>
-<p>و در پشت صحنه، هر فایل اطلاعاتی مانند مالک، Permission، اندازه و زمان‌ها دارد که با <strong>inode</strong> مرتبط است.</p>
-<p>پس تصویر اصلی جلسه این است:</p>
-<div class="code-container"><span class="code-label">تصویر اصلی</span><div class="code-block no-prompt">Filesystem
-    ↓
+<h2>جمع‌بندی — به سبک فاینمن</h2>
+<p>اگر بخواهیم کل جلسه را خیلی ساده برای یک نفر که تازه لینوکس را شروع کرده توضیح بدهیم، داستان این است:</p>
+<p>لینوکس فایل‌هایش را داخل یک <strong>درخت بزرگ</strong> نگهداری می‌کند. بالاترین نقطه‌ی این درخت <code>/</code> است. داخل این درخت Directoryهایی قرار دارند و داخل آن‌ها فایل‌ها و Directoryهای دیگر.</p>
+<p>برای اینکه بتوانیم با یک فایل کار کنیم، اول باید بدانیم <strong>کجاست</strong>. اینجاست که مفهوم <strong>Path</strong> وارد می‌شود. اگر مسیر را از <code>/</code> شروع کنیم، Absolute Path داریم. اگر از جایی که الان هستیم شروع کنیم، Relative Path داریم.</p>
+<p>اما خود فایل فقط «یک اسم» نیست. در پشت صحنه، سیستم اطلاعات مدیریتی فایل را در <strong>inode</strong> نگهداری می‌کند. Directory هم کمک می‌کند نام‌هایی که کاربر می‌بیند به inodeهای مربوطه وصل شوند.</p>
+<p>حالا که فهمیدیم فایل‌ها کجا هستند، باید بتوانیم با آن‌ها کار کنیم. <code>pwd</code> می‌گوید الان کجا هستیم و <code>ls</code> می‌گوید آنجا چه چیزهایی وجود دارد. بعد با <code>touch</code> و <code>mkdir</code> چیزهای جدید می‌سازیم.</p>
+<p>اگر بخواهیم یک فایل را <strong>تکثیر</strong> کنیم، <code>cp</code> به کار می‌آید؛ اگر بخواهیم آن را <strong>جابه‌جا یا Rename</strong> کنیم، <code>mv</code> استفاده می‌شود. برای حذف هم <code>rm</code> داریم و برای Directory خالی <code>rmdir</code>.</p>
+<p>در نهایت وقتی تعداد فایل‌ها زیاد شود، نمی‌خواهیم نام تک‌تک آن‌ها را بنویسیم. اینجا <strong>Wildcard</strong> به کمکمان می‌آید. مثلاً <code>*.txt</code> یعنی «فایل‌هایی که نامشان با هر چیزی شروع می‌شود و با <code>.txt</code> تمام می‌شود».</p>
+<p>پس کل جلسه در واقع یک زنجیره‌ی منطقی است:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">File System
+     ↓
 File / Directory
-    ↓
-Path → پیدا کردن محل
-    ↓
-ls / pwd → شناخت محیط
-    ↓
-touch / mkdir → ایجاد
-    ↓
-cp / mv → کپی و جابه‌جایی
-    ↓
-rm / rmdir → حذف
-    ↓
-Wildcards → کار با چند فایل</div></div>
+     ↓
+Path
+     ↓
+Current Directory
+     ↓
+pwd / ls
+     ↓
+Create
+     ↓
+Copy / Move
+     ↓
+Delete
+     ↓
+Wildcard</div></div>
+<p>وقتی این تصویر را داشته باشی، دیگر <code>pwd</code>، <code>ls</code>، <code>cp</code>، <code>mv</code> و <code>rm</code> دستورهای جدا از هم نیستند؛ همه ابزارهایی هستند برای <strong>حرکت و مدیریت درخت فایل‌های لینوکس</strong>.</p>
 
-<h2>۷. Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">Cheat Sheet</span><div class="code-block no-prompt">pwd                  → نمایش مسیر فعلی
-ls / ls -l / ls -a   → مشاهده محتویات
-touch file            → ایجاد فایل خالی
-mkdir dir             → ایجاد Directory
-mkdir -p a/b/c        → ایجاد مسیر تو در تو
-cp file dest          → کپی
-cp -r dir dest        → کپی Directory
-mv old new             → جابه‌جایی / تغییر نام
-rm file                → حذف فایل
-rm -r dir              → حذف Directory و محتویات
-rmdir dir              → حذف Directory خالی
-* → هر تعداد کاراکتر | ? → یک کاراکتر | [] → یک کاراکتر از مجموعه</div></div>
+<h3>تصویر نهایی جلسه</h3>
+<p>اگر بخواهی فقط <strong>یک نقشه</strong> از این جلسه در ذهنت بماند، این را نگه دار:</p>
+<div class="code-container"><span class="code-label">نقشه نهایی</span><div class="code-block no-prompt">                    Linux File System
+                           │
+                           ▼
+                    Directory Tree
+                           │
+                    ┌──────┴──────┐
+                    │             │
+                  Files       Directories
+                    │
+                    ▼
+                  inode
+                    │
+                    ▼
+              File Information
+                    │
+                    ▼
+                 Path
+              ┌─────┴─────┐
+              │           │
+         Absolute      Relative
+              │           │
+              └─────┬─────┘
+                    ▼
+             Current Directory
+                    │
+              ┌─────┴──────┐
+              │            │
+             pwd           ls
+                           │
+                           ▼
+                    Create / Manage
+                           │
+        ┌──────────┬───────┼────────┬──────────┐
+        ▼          ▼       ▼        ▼          ▼
+      touch      mkdir     cp       mv        rm
+                                             │
+                                          rmdir
+                           │
+                           ▼
+                       Wildcards
+                    ┌────┬────┬────┐
+                    *    ?    []</div></div>
+<p>این جلسه پایه‌ی تقریباً تمام مباحث بعدی فصل است؛ مخصوصاً وقتی به <strong>Permissions، Hard Link، Symbolic Link، ACL و File Search</strong> برسیم، همین مفاهیم دوباره به شکل عمیق‌تر به هم متصل خواهند شد.</p>
+<p><strong>گام بعدی منطقی:</strong> جلسه ۲ را با همین مدل ذهنی روی <strong>Compression & Archive</strong> ادامه می‌دهیم؛ آنجا تفاوت <code>gzip</code>، <code>bzip2</code>، <code>xz</code>، <code>tar</code> و مفهوم «Archive در برابر Compression» را از پایه به هم وصل می‌کنیم.</p>
 
-<h2>۸. تست پایانی</h2>
+<h2>۶ سؤال چهارگزینه‌ای — سطح LPIC-1</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>خروجی زیر را داریم:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/projects</div></div>
-<p>و فایل زیر وجود دارد:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/projects/app.py</div></div>
-<p>کدام دستور به شکل <strong>Relative Path</strong> به این فایل اشاره می‌کند؟</p>
+<p>کدام گزینه درباره inode صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/home/navid/projects/app.py</code></button>
-    <button onclick="selectOption(this)">ب) <code>./app.py</code></button>
-    <button onclick="selectOption(this)">ج) <code>/app.py</code></button>
-    <button onclick="selectOption(this)">د) <code>../app.py</code></button>
+    <button onclick="selectOption(this)">الف) نام فایل همیشه مستقیماً داخل inode ذخیره می‌شود.</button>
+    <button onclick="selectOption(this)">ب) inode شامل اطلاعاتی مانند Permission، Owner و اطلاعات مربوط به داده‌های فایل است.</button>
+    <button onclick="selectOption(this)">ج) inode فقط برای Directoryها استفاده می‌شود.</button>
+    <button onclick="selectOption(this)">د) هر Filename الزاماً باید یک inode کاملاً متفاوت داشته باشد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>./app.py</code></strong><br>چون دایرکتوری فعلی <code>/home/navid/projects</code> است و <code>./app.py</code> یعنی فایل <code>app.py</code> در دایرکتوری فعلی.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br>inode اطلاعات مدیریتی فایل مانند Permission، Owner، Group، اندازه، Timestampها و اطلاعات مربوط به محل داده‌ها را نگهداری می‌کند. گزینه A نادرست است، چون در مدل مفهومی سیستم فایل، Filename و inode دو مفهوم جدا هستند. گزینه C غلط است؛ inode برای فایل‌ها استفاده می‌شود و Directoryها نیز inode دارند. گزینه D هم غلط است، چون در مبحث Hard Link می‌بینیم چند نام می‌توانند به یک inode اشاره کنند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>می‌خواهیم این ساختار را ایجاد کنیم:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-└── src/
-    └── python/</div></div>
-<p>در حالی که هیچ‌کدام از این دایرکتوری‌ها وجود ندارند. کدام دستور مناسب‌تر است؟</p>
+<p>اگر کاربر در مسیر زیر باشد:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/amir</div></div>
+<p>کدام گزینه یک Relative Path است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>mkdir project/src/python</code></button>
-    <button onclick="selectOption(this)">ب) <code>mkdir -p project/src/python</code></button>
-    <button onclick="selectOption(this)">ج) <code>touch project/src/python</code></button>
-    <button onclick="selectOption(this)">د) <code>cp -r project/src/python</code></button>
+    <button onclick="selectOption(this)">الف) <code>/etc/hosts</code></button>
+    <button onclick="selectOption(this)">ب) <code>/home/amir/file.txt</code></button>
+    <button onclick="selectOption(this)">ج) <code>documents/report.txt</code></button>
+    <button onclick="selectOption(this)">د) <code>/var/log/syslog</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>mkdir -p project/src/python</code></strong><br>گزینه <code>-p</code> باعث می‌شود دایرکتوری‌های والد موردنیاز نیز ساخته شوند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>documents/report.txt</code></strong><br>چون Relative Path از <code>/</code> شروع نمی‌شود و مسیر آن نسبت به Current Directory تفسیر می‌شود. اگر Current Directory <code>/home/amir</code> باشد، آنگاه <code>documents/report.txt</code> به <code>/home/amir/documents/report.txt</code> اشاره می‌کند.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۳ — سناریومحور</p>
-<p>دایرکتوری فعلی شامل این فایل‌هاست:</p>
-<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">log1.txt
-log2.txt
-log10.txt
-data1.txt</div></div>
-<p>کدام دستور فقط <code>log1.txt</code> و <code>log2.txt</code> را انتخاب می‌کند؟</p>
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>فرض کنید فایل‌های زیر وجود دارند:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1.txt
+file2.txt
+file10.txt
+fileA.txt</div></div>
+<p>کدام الگو فقط می‌تواند <code>file1.txt</code>، <code>file2.txt</code> و <code>fileA.txt</code> را match کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>ls log*.txt</code></button>
-    <button onclick="selectOption(this)">ب) <code>ls log?.txt</code></button>
-    <button onclick="selectOption(this)">ج) <code>ls log[10].txt</code></button>
-    <button onclick="selectOption(this)">د) <code>ls log[1-10].txt</code></button>
+    <button onclick="selectOption(this)">الف) <code>file*.txt</code></button>
+    <button onclick="selectOption(this)">ب) <code>file?.txt</code></button>
+    <button onclick="selectOption(this)">ج) <code>file[12].txt</code></button>
+    <button onclick="selectOption(this)">د) <code>file[0-9].txt</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>ls log?.txt</code></strong><br><code>?</code> دقیقاً یک کاراکتر را جایگزین می‌کند:<br><code>log1.txt</code> ✓<br><code>log2.txt</code> ✓<br><code>log10.txt</code> ✗</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>file?.txt</code></strong><br><code>?</code> دقیقاً یک کاراکتر را match می‌کند. پس <code>file1.txt</code>، <code>file2.txt</code> و <code>fileA.txt</code> مطابق هستند. اما <code>file10.txt</code> مطابق نیست، چون بعد از <code>file</code> دو کاراکتر دارد. گزینه C فقط <code>file1.txt</code> و <code>file2.txt</code> را match می‌کند، نه <code>fileA.txt</code>.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۴ — سناریومحور</p>
-<p>مدیر سیستم می‌خواهد یک Directory به نام <code>backup</code> را به همراه تمام محتویاتش به <code>backup2</code> کپی کند.</p>
-<p>کدام دستور مناسب است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام دستور یک Directory و تمام محتویات آن را به‌صورت recursive کپی می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>cp backup backup2</code></button>
-    <button onclick="selectOption(this)">ب) <code>cp -r backup backup2</code></button>
-    <button onclick="selectOption(this)">ج) <code>mv backup backup2</code></button>
-    <button onclick="selectOption(this)">د) <code>rm -r backup backup2</code></button>
+    <button onclick="selectOption(this)">الف) <code>cp directory backup</code></button>
+    <button onclick="selectOption(this)">ب) <code>cp -r directory backup</code></button>
+    <button onclick="selectOption(this)">ج) <code>mv -r directory backup</code></button>
+    <button onclick="selectOption(this)">د) <code>mkdir -r directory backup</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>cp -r backup backup2</code></strong><br>برای کپی Recursive یک Directory و محتویات آن از <code>cp -r</code> استفاده می‌کنیم. <code>mv</code> جابه‌جا می‌کند، نه کپی.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>cp -r directory backup</code></strong><br>برای کپی بازگشتی Directory از <code>cp -r</code> استفاده می‌کنیم. <code>-r</code> مخفف <strong>recursive</strong> است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>کدام عبارت درباره inode صحیح است؟</p>
+<p>فرض کنید:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/amir/test</div></div>
+<p>شامل فایل <code>file.txt</code> است. اجرای کدام دستور به‌صورت مستقیم نمی‌تواند این Directory را حذف کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) نام فایل مستقیماً داخل inode ذخیره می‌شود.</button>
-    <button onclick="selectOption(this)">ب) inode فقط برای Directoryها استفاده می‌شود.</button>
-    <button onclick="selectOption(this)">ج) inode اطلاعاتی مانند مالک، Permission، اندازه و اطلاعات مرتبط با داده فایل را نگهداری می‌کند.</button>
-    <button onclick="selectOption(this)">د) هر دو فایل با نام متفاوت حتماً inode متفاوت دارند.</button>
+    <button onclick="selectOption(this)">الف) <code>rm -r /home/amir/test</code></button>
+    <button onclick="selectOption(this)">ب) <code>rmdir /home/amir/test</code></button>
+    <button onclick="selectOption(this)">ج) <code>rm -rf /home/amir/test</code></button>
+    <button onclick="selectOption(this)">د) ابتدا حذف فایل و سپس <code>rmdir /home/amir/test</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>inode اطلاعات اصلی فایل را نگهداری می‌کند، اما <strong>نام فایل در Directory قرار دارد</strong> و Directory نام را به inode مرتبط می‌کند. این موضوع پایه درک <strong>Hard Link</strong> در جلسه ۴ است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>rmdir /home/amir/test</code></strong><br><code>rmdir</code> فقط Directory <strong>خالی</strong> را حذف می‌کند. چون <code>test/</code> شامل <code>file.txt</code> است، دستور <code>rmdir</code> موفق نمی‌شود. در گزینه D ابتدا فایل حذف می‌شود و بعد Directory خالی خواهد شد، بنابراین <code>rmdir</code> می‌تواند آن را حذف کند.</div>
 </div>
 
-<h2>🔗 ارتباط با جلسه بعد</h2>
-<p>حالا می‌دانیم فایل چیست، چگونه مسیر آن را پیدا کنیم و چگونه آن را ایجاد، کپی، جابه‌جا و حذف کنیم.</p>
-<p>اما یک مشکل باقی مانده:</p>
-<blockquote>اگر بخواهیم حجم یک فایل را کم کنیم، یا چندین فایل را در یک بسته قرار دهیم تا راحت‌تر منتقل یا نگهداری شوند، چه کنیم؟</blockquote>
-<p>اینجا وارد جلسه ۲ می‌شویم:</p>
-<p><strong>Compression & Archive → <code>gzip</code>، <code>bzip2</code>، <code>xz</code>، <code>zip</code> و <code>tar</code>.</strong></p>
-`,
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کاربر می‌خواهد نام فایل <code>old.txt</code> را به <code>new.txt</code> تغییر دهد. کدام دستور مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>cp old.txt new.txt</code></button>
+    <button onclick="selectOption(this)">ب) <code>touch old.txt new.txt</code></button>
+    <button onclick="selectOption(this)">ج) <code>mv old.txt new.txt</code></button>
+    <button onclick="selectOption(this)">د) <code>rmdir old.txt new.txt</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>mv old.txt new.txt</code></strong><br><code>mv</code> علاوه بر جابه‌جایی، برای <strong>Rename</strong> نیز استفاده می‌شود. <code>cp</code> یک کپی ایجاد می‌کند و فایل اصلی را نگه می‌دارد، بنابراین برای Rename مناسب نیست.</div>
+</div>
+`
+,
 "ch4-2": `
 <div class="section-header">
     <div class="section-badge">۴</div>
     <div>
-        <h1>فشرده‌سازی و آرشیو در لینوکس</h1>
+        <h1>Compression & Archive</h1>
         <div class="meta">فایل‌ها، مجوزها و آرشیو · بخش ۲ از ۷</div>
     </div>
 </div>
 
-<h2>۱. اهداف یادگیری</h2>
+<h2>۱. اهداف کلی درس</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>تفاوت <strong>Compression</strong> و <strong>Archive</strong> را دقیق و مفهومی توضیح بدهی.</li>
+    <li>با ابزارهای <code>gzip</code>، <code>bzip2</code> و <code>xz</code> فایل‌ها را فشرده و از حالت فشرده خارج کنی.</li>
+    <li>مفهوم <strong>Archive</strong> و نقش <code>tar</code> را در جمع‌آوری چند فایل و دایرکتوری بفهمی.</li>
+    <li>فایل‌های <code>tar.gz</code>، <code>tar.bz2</code> و <code>tar.xz</code> را ایجاد، استخراج و بررسی کنی.</li>
+    <li>گزینه‌های مهم <code>tar</code>، <code>gzip</code>، <code>bzip2</code> و <code>xz</code> را در سطح LPIC-1 تشخیص بدهی.</li>
+    <li>تفاوت بین <strong>Archive کردن، Compress کردن و Archive + Compress</strong> را در سناریوهای واقعی تشخیص بدهی.</li>
+</ol>
+
+<h2>۲. ساختار کلی جلسه</h2>
+<p>قبل از اینکه سراغ دستورها برویم، باید یک تصویر واحد در ذهن داشته باشیم.</p>
+
+<h3>تصویر ذهنی این جلسه</h3>
+<p>فرض کن یک پوشه داریم:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
+├── file1.txt
+├── file2.txt
+├── image.jpg
+└── docs/
+    ├── doc1.txt
+    └── doc2.txt</div></div>
+<p>ما دو مشکل متفاوت داریم:</p>
+
+<h4>مشکل اول: چند فایل داریم</h4>
+<p>می‌خواهیم همه را در قالب <strong>یک فایل واحد</strong> جمع کنیم.</p>
+<div class="code-container"><span class="code-label">Archive</span><div class="code-block no-prompt">file1.txt ─┐
+file2.txt ─┤
+image.jpg ─┼──→ project.tar
+docs/ ─────┘</div></div>
+<p>این کار اسمش:</p>
+<blockquote><strong>Archive</strong></blockquote>
+<p>است.</p>
+
+<h4>مشکل دوم: حجم داده زیاد است</h4>
+<p>حالا می‌خواهیم حجم فایل کمتر شود:</p>
+<div class="code-container"><span class="code-label">Compression</span><div class="code-block no-prompt">project.tar
+     ↓
+Compression
+     ↓
+project.tar.gz</div></div>
+<p>این کار:</p>
+<blockquote><strong>Compression</strong></blockquote>
+<p>است.</p>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Archive
+چند فایل → یک فایل
+
+Compression
+یک فایل → حجم کمتر</div></div>
+<p>و می‌توانیم این دو را پشت سر هم انجام دهیم:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Files & Directories
+        ↓
+      tar
+        ↓
+     Archive
+        ↓
+   Compression
+        ↓
+  tar.gz / tar.bz2 / tar.xz</div></div>
+<p>این دقیقاً همان چیزی است که در فایل‌هایی مثل این می‌بینی:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">backup.tar.gz
+backup.tar.bz2
+backup.tar.xz</div></div>
+<p>نکته بسیار مهم:</p>
+<blockquote><code>tar</code> خودش ابزار اصلی Compression نیست؛ <code>tar</code> برای Archive کردن است.</blockquote>
+<p>و:</p>
+<blockquote><code>gzip</code>، <code>bzip2</code> و <code>xz</code> ابزارهای Compression هستند.</blockquote>
+
+<h2>بخش اول — Compression چیست؟</h2>
+<h3>۳. مفهوم Compression</h3>
+<p>Compression یعنی:</p>
+<blockquote>کاهش حجم داده با استفاده از روش‌هایی برای نمایش فشرده‌تر همان اطلاعات.</blockquote>
+<p>مثلاً فرض کن یک فایل متنی داریم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Linux Linux Linux Linux Linux Linux</div></div>
+<p>در داده واقعی ممکن است بتوان اطلاعات تکراری را به شکل بهینه‌تری نمایش داد.</p>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Original
+100 MB
+   ↓
+Compression
+   ↓
+60 MB</div></div>
+<p>هدف اصلی:</p>
 <ul>
-    <li>تفاوت <strong>Compression</strong> و <strong>Archive</strong> را دقیق توضیح بدهی.</li>
-    <li>با <code>gzip</code>، <code>bzip2</code>، <code>xz</code> و <code>zip</code> فایل‌ها را فشرده و از حالت فشرده خارج کنی.</li>
-    <li>با ابزارهای <code>zcat</code>، <code>bzcat</code> و <code>xzcat</code> محتوای فایل‌های فشرده را مشاهده کنی.</li>
-    <li>با <code>tar</code> آرشیو بسازی، محتویات آن را ببینی و استخراج کنی.</li>
-    <li>تفاوت <code>.tar</code>، <code>.tar.gz</code>، <code>.tar.bz2</code> و <code>.tar.xz</code> را تشخیص بدهی.</li>
-    <li>مفهوم کلی <code>cpio</code> را در سطح موردنیاز LPIC-1 بشناسی.</li>
+    <li>کاهش فضای موردنیاز</li>
+    <li>کاهش حجم فایل هنگام انتقال</li>
+    <li>کاهش فضای Backup</li>
+    <li>سریع‌تر شدن انتقال فایل‌های حجیم</li>
 </ul>
 
-<h2>۲. مسئله و انگیزه + تصویر کلی</h2>
-<h3>۲.۱ کاربرد درس — The Why</h3>
-<p>فرض کن روی یک سرور این ساختار را داری:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-├── config/
-├── logs/
-├── src/
-├── README.md
-└── database.sql</div></div>
-<p>حالا می‌خواهی کل پروژه را برای سرور دیگری ارسال کنی.</p>
-<p>یک مشکل داریم:</p>
-<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">چندین فایل و Directory
-        ↓
-چطور همه را یکجا منتقل کنیم؟
-        ↓
-چطور حجمشان را کمتر کنیم؟</div></div>
-<p>اینجا دو مفهوم وارد می‌شوند:</p>
-<p><strong>Archive</strong> و <strong>Compression</strong></p>
-<p>و نکته بسیار مهم این است که این دو <strong>یکی نیستند</strong>.</p>
+<h4>۴. دو نوع مهم Compression</h4>
+<p>به‌صورت مفهومی دو نوع اصلی داریم:</p>
 
-<h3>۲.۲ تصویر کلی</h3>
-<p>مدل ذهنی مرکزی این جلسه:</p>
-<div class="code-container"><span class="code-label">Big Picture</span><div class="code-block no-prompt">             چند فایل / Directory
-                     │
-          ┌──────────┴──────────┐
-          ↓                     ↓
-       Archive               Compress
-          │                     │
-          ↓                     ↓
-   چند فایل → یک بسته       کاهش حجم
-          │                     │
-          └──────────┬──────────┘
-                     ↓
-               tar + gzip
-                     ↓
-              project.tar.gz</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Archive  → جمع کردن چند فایل در یک بسته
-Compression → کم کردن حجم</div></div>
-<p>و این دو می‌توانند با هم استفاده شوند.</p>
-
-<h3>۲.۳ Roadmap</h3>
-<p>مسیر جلسه:</p>
-<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Archive vs Compression
-        ↓
-gzip / gunzip
-        ↓
-bzip2 / bunzip2
-        ↓
-xz / unxz
-        ↓
-zip / unzip
-        ↓
-tar
-        ↓
-tar + gzip/bzip2/xz
-        ↓
-zcat / bzcat / xzcat
-        ↓
-cpio
-        ↓
-سناریوی ترکیبی</div></div>
-
-<h2>۳. درسنامه اصلی</h2>
-<h3>۳.۱ Archive چیست؟</h3>
-<p><strong>Archive</strong> یعنی چند فایل و Directory را در یک بسته قرار دهیم.</p>
+<h5>Lossless Compression</h5>
+<p>در این روش:</p>
+<blockquote>بعد از استخراج، اطلاعات دقیقاً به حالت اولیه برمی‌گردد.</blockquote>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">project/
+<div class="code-container"><span class="code-label">Lossless</span><div class="code-block no-prompt">original.txt
+     ↓
+compression
+     ↓
+compressed
+     ↓
+decompression
+     ↓
+original.txt</div></div>
+<p>برای فایل‌های سیستم، برنامه‌ها، اسناد و Backup معمولاً به <strong>Lossless Compression</strong> نیاز داریم.</p>
+<p>ابزارهایی که در این جلسه می‌خوانیم:</p>
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">gzip
+bzip2
+xz</div></div>
+<p>همگی برای این نوع Compression هستند.</p>
+
+<h5>Lossy Compression</h5>
+<p>در این روش بخشی از اطلاعات حذف می‌شود تا حجم بسیار کمتری ایجاد شود.</p>
+<p>مثلاً در بعضی فرمت‌های:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">JPEG
+MP3
+MP4</div></div>
+<p>ممکن است بخشی از اطلاعات حذف شود.</p>
+<p>اما برای فایل‌های سیستمی و Backup مناسب نیست؛ چون نمی‌خواهیم فایل بعد از استخراج تغییر کند.</p>
+<p>در LPIC-1 تمرکز ما روی ابزارهای <strong>Lossless</strong> است.</p>
+
+<h2>بخش دوم — Archive چیست؟</h2>
+<h3>۵. مفهوم Archive</h3>
+<p>Archive یعنی:</p>
+<blockquote>چند فایل و دایرکتوری را در یک فایل واحد قرار دهیم.</blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir/project/
 ├── a.txt
 ├── b.txt
 ├── c.txt
-└── images/</div></div>
-<p>بعد از Archive:</p>
-<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">project.tar</div></div>
-<p>یعنی چندین فایل و Directory در یک فایل آرشیوی قرار گرفته‌اند.</p>
-<h4>نکته مهم</h4>
-<p>Archive لزوماً باعث کاهش حجم نمی‌شود.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">10 files
-   ↓
-tar
-   ↓
-1 archive</div></div>
-<p>ولی حجم ممکن است تقریباً همان مقدار قبلی باقی بماند.</p>
+└── docs/</div></div>
+<p>می‌توانیم آنها را تبدیل کنیم به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project.tar</div></div>
+<p>داخل <code>project.tar</code> همچنان فایل‌های مختلف وجود دارند.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">محتوای tar</span><div class="code-block no-prompt">project.tar
+│
+├── a.txt
+├── b.txt
+├── c.txt
+└── docs/</div></div>
+<p>بنابراین Archive الزاماً به معنی کاهش حجم نیست.</p>
 
-<h3>۳.۲ Compression چیست؟</h3>
-<p>Compression یعنی:</p>
-<blockquote>تلاش برای کاهش حجم داده‌ها با استفاده از الگوریتم فشرده‌سازی.</blockquote>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">large.log
-   ↓ gzip
-large.log.gz</div></div>
-<p>در حالت ایده‌آل:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">100 MB → 20 MB</div></div>
-<p>البته میزان فشرده‌سازی به نوع داده بستگی دارد.</p>
-<p>مثلاً فایل‌های متنی معمولاً قابلیت فشرده‌سازی خوبی دارند، اما یک فایل JPEG که از قبل فشرده شده، معمولاً خیلی کمتر فشرده می‌شود.</p>
+<h3>۶. <code>tar</code> چیست؟</h3>
+<p><code>tar</code> مخفف:</p>
+<blockquote>Tape Archive</blockquote>
+<p>است.</p>
+<p>امروزه اسم آن از گذشته باقی مانده، اما کاربرد آن بسیار گسترده‌تر از Tape است.</p>
+<p><code>tar</code> معمولاً برای:</p>
+<ul>
+    <li>جمع کردن چند فایل</li>
+    <li>Archive کردن دایرکتوری</li>
+    <li>Backup</li>
+    <li>انتقال مجموعه‌ای از فایل‌ها</li>
+    <li>استخراج Archive</li>
+</ul>
+<p>استفاده می‌شود.</p>
 
-<h4>تفاوت اصلی</h4>
-<div class="table-wrap">
-<table>
-<thead><tr><th>مفهوم</th><th>کار</th></tr></thead>
-<tbody>
-<tr><td>Archive</td><td>چند فایل را در یک بسته قرار می‌دهد</td></tr>
-<tr><td>Compression</td><td>حجم داده را کاهش می‌دهد</td></tr>
-</tbody>
-</table>
-</div>
-<p>بنابراین:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar
-↓
-Archive</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">gzip / bzip2 / xz
-↓
-Compression</div></div>
-<p>اما می‌توانیم آن‌ها را ترکیب کنیم:</p>
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">tar
- +
+<h3>۷. یک اشتباه بسیار رایج</h3>
+<p>این دو را با هم اشتباه نکن:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Archive ≠ Compression</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf project.tar project/</div></div>
+<p>اینجا فقط Archive ساخته‌ایم.</p>
+<p>حجم فایل لزوماً کمتر نشده است.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip project.tar</div></div>
+<p>حالا فایل Archive را Compress کرده‌ایم:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project.tar
+     ↓
 gzip
- ↓
-.tar.gz</div></div>
+     ↓
+project.tar.gz</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">tar  → Archive
+gzip → Compression</div></div>
 
-<h3>۳.۳ <code>gzip</code></h3>
-<p>یکی از رایج‌ترین ابزارهای فشرده‌سازی در لینوکس:</p>
+<h2>بخش سوم — <code>gzip</code></h2>
+<h3>۸. معرفی <code>gzip</code></h3>
+<p><code>gzip</code> یکی از رایج‌ترین ابزارهای Compression در Linux است.</p>
+<p>معمولاً روی فایل‌های منفرد استفاده می‌شود.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip file.txt</div></div>
 <p>فایل:</p>
 <div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">file.txt</div></div>
-<p>به:</p>
+<p>تبدیل می‌شود به:</p>
 <div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">file.txt.gz</div></div>
-<p>تبدیل می‌شود.</p>
-<h4>نکته مهم</h4>
-<p>به‌طور معمول <code>gzip</code> فایل اصلی را نگه نمی‌دارد و نسخه فشرده‌شده جای آن را می‌گیرد.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">قبل:
-file.txt
-
-gzip file.txt
-
-بعد:
+<p>به‌طور معمول فایل اصلی بعد از Compression باقی نمی‌ماند.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file.txt
+   ↓
+gzip
+   ↓
 file.txt.gz</div></div>
 
-<h4>خارج کردن از حالت فشرده</h4>
+<h3>۹. استخراج فایل <code>gzip</code></h3>
+<p>برای خارج کردن فایل از حالت فشرده می‌توانیم از:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">gunzip file.txt.gz</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip -d file.txt.gz</div></div>
-<p>هر دو برای Decompress کردن gzip استفاده می‌شوند.</p>
+<p>استفاده کنیم.</p>
 <p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file.txt</div></div>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file.txt.gz
+     ↓
+gunzip
+     ↓
+file.txt</div></div>
+<p>در واقع:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">gzip   → compress
+gunzip → decompress</div></div>
 
-<h4>مثال عملی</h4>
-<div class="code-container"><span class="code-label">تمرین</span><div class="code-block">echo "Linux is powerful" > message.txt
-gzip message.txt</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
-<p>می‌بینیم:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">message.txt.gz</div></div>
-<p>برای بازگرداندن:</p>
-<div class="code-container"><span class="code-label">بازگرداندن</span><div class="code-block">gunzip message.txt.gz</div></div>
+<h3>۱۰. استفاده از <code>gzip -d</code></h3>
+<p>روش دیگر برای Decompress کردن:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip -d file.txt.gz</div></div>
+<p>است.</p>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">gunzip file.txt.gz</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">gzip -d file.txt.gz</div></div>
+<p>عملاً برای خارج کردن فایل از حالت gzip استفاده می‌شوند.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br><code>gzip file</code> → <code>file.gz</code><br><code>gunzip file.gz</code> → <code>file</code><br>و:<br><code>gzip -d file.gz</code> معادل <code>gunzip</code> است.</div></div>
+<h3>۱۱. حفظ فایل اصلی با <code>gzip -k</code></h3>
+<p>اگر بخواهی فایل اصلی را نگه داری:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip -k file.txt</div></div>
+<p>در این حالت:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file.txt
+file.txt.gz</div></div>
+<p>هر دو وجود خواهند داشت.</p>
+<p>گزینه مهم:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">-k = keep</div></div>
+<p>یعنی فایل اصلی را نگه دار.</p>
 
-<h3>۳.۴ مشاهده محتوای gzip بدون استخراج — <code>zcat</code></h3>
-<p>گاهی نمی‌خواهیم فایل را از حالت فشرده خارج کنیم؛ فقط می‌خواهیم محتوایش را ببینیم.</p>
+<h3>۱۲. مشاهده محتوای gzip بدون استخراج</h3>
+<p>یکی از ابزارهای مفید:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">zcat file.txt.gz</div></div>
+<p>است.</p>
+<p>این دستور محتوای فایل فشرده را روی خروجی نمایش می‌دهد.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">zcat message.txt.gz</div></div>
-<p>محتوای فایل را نمایش می‌دهد.</p>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">message.txt.gz
-      │
-      ↓
-    zcat
-      │
-      ↓
-نمایش محتوا</div></div>
-<p>بدون اینکه فایل را ابتدا با <code>gunzip</code> استخراج کنیم.</p>
-<h4>کاربرد واقعی</h4>
-<p>برای بررسی سریع یک Log فشرده:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">zcat access.log.gz</div></div>
+<p>یعنی لازم نیست ابتدا آن را Extract کنیم.</p>
+<p>این قابلیت مخصوصاً برای Logها مفید است.</p>
 
-<h3>۳.۵ <code>bzip2</code></h3>
-<p>ابزار دیگری برای Compression:</p>
+<h3>۱۳. سطح Compression در gzip</h3>
+<p><code>gzip</code> امکان تعیین سطح فشرده‌سازی را هم دارد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">سطح ۱</span><div class="code-block">gzip -1 file.txt</div></div>
+<p>فشرده‌سازی سریع‌تر و معمولاً با Compression کمتر.</p>
+<p>و:</p>
+<div class="code-container"><span class="code-label">سطح ۹</span><div class="code-block">gzip -9 file.txt</div></div>
+<p>فشرده‌سازی بیشتر و معمولاً زمان CPU بیشتر.</p>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">-1
+↓
+سریع‌تر
+
+-9
+↓
+فشرده‌سازی بیشتر</div></div>
+<p>مقدار پیش‌فرض معمولاً:</p>
+<div class="code-container"><span class="code-label">پیش‌فرض</span><div class="code-block no-prompt">-6</div></div>
+<p>است.</p>
+<p>برای LPIC-1 مهم است مفهوم این گزینه‌ها را بشناسی، نه اینکه حفظ کنی در چه سناریویی دقیقاً کدام عدد بهترین است.</p>
+
+<h2>بخش چهارم — <code>bzip2</code></h2>
+<h3>۱۴. معرفی <code>bzip2</code></h3>
+<p>ابزار مهم بعدی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">bzip2</div></div>
+<p>است.</p>
+<p>کار آن مشابه <code>gzip</code> است.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">bzip2 file.txt</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">file.txt.bz2</div></div>
-<p>برای Decompress:</p>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file.txt.bz2</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file.txt
+   ↓
+bzip2
+   ↓
+file.txt.bz2</div></div>
+
+<h3>۱۵. استخراج <code>bzip2</code></h3>
+<p>برای استخراج:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">bunzip2 file.txt.bz2</div></div>
 <p>یا:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">bzip2 -d file.txt.bz2</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">bzip2  → compress
+bunzip2 → decompress</div></div>
 
-<h4>مشاهده محتوا با <code>bzcat</code></h4>
+<h3>۱۶. حفظ فایل اصلی در bzip2</h3>
+<p>مانند <code>gzip</code>، گزینه <code>-k</code> وجود دارد:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">bzip2 -k file.txt</div></div>
+<p>در نتیجه فایل اصلی حفظ می‌شود.</p>
+
+<h3>۱۷. مشاهده فایل bzip2</h3>
+<p>برای مشاهده محتوای فایل فشرده بدون Extract کردن:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">bzcat file.txt.bz2</div></div>
-<p>یعنی:</p>
-<blockquote>محتوای فایل bzip2 را بدون استخراج کامل نمایش بده.</blockquote>
 
-<h3>۳.۶ <code>xz</code></h3>
+<h3>۱۸. سطح Compression در bzip2</h3>
+<p>مانند <code>gzip</code>، <code>bzip2</code> هم سطح Compression دارد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">سطح ۱</span><div class="code-block">bzip2 -1 file.txt</div></div>
+<p>تا:</p>
+<div class="code-container"><span class="code-label">سطح ۹</span><div class="code-block">bzip2 -9 file.txt</div></div>
+<p>در حالت کلی:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">عدد کمتر → سریع‌تر
+عدد بیشتر → Compression بیشتر</div></div>
+
+<h2>بخش پنجم — <code>xz</code></h2>
+<h3>۱۹. معرفی <code>xz</code></h3>
 <p>ابزار مهم دیگر:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">xz</div></div>
+<p>است.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">xz file.txt</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">file.txt.xz</div></div>
-<p>برای خارج کردن:</p>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file.txt.xz</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file.txt
+   ↓
+xz
+   ↓
+file.txt.xz</div></div>
+
+<h3>۲۰. استخراج فایل xz</h3>
+<p>برای Extract کردن:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">unxz file.txt.xz</div></div>
 <p>یا:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">xz -d file.txt.xz</div></div>
-<p>و برای مشاهده محتوا:</p>
+<p>استفاده می‌کنیم.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">xz   → compress
+unxz → decompress</div></div>
+
+<h3>۲۱. حفظ فایل اصلی با <code>xz -k</code></h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">xz -k file.txt</div></div>
+<p>فایل اصلی را نگه می‌دارد.</p>
+
+<h3>۲۲. مشاهده محتوای xz</h3>
+<p>برای مشاهده محتوای فایل بدون Extract:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">xzcat file.txt.xz</div></div>
 
-<h4>مقایسه سه ابزار</h4>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">gzip
- ↓
-.gz
- ↓
-gunzip / gzip -d
- ↓
-zcat
+<h3>۲۳. سطح Compression در xz</h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">سطح ۱</span><div class="code-block">xz -1 file.txt</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">سطح ۹</span><div class="code-block">xz -9 file.txt</div></div>
+<p>در حالت کلی:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">سطح پایین
+↓
+سرعت بیشتر
 
-bzip2
- ↓
-.bz2
- ↓
-bunzip2 / bzip2 -d
- ↓
-bzcat
+سطح بالا
+↓
+Compression بیشتر</div></div>
 
-xz
- ↓
-.xz
- ↓
-unxz / xz -d
- ↓
-xzcat</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>پسوند فایل معمولاً ابزار استفاده‌شده را مشخص می‌کند:<br><code>.gz</code> → gzip<br><code>.bz2</code> → bzip2<br><code>.xz</code> → xz</div></div>
-
-<h3>۳.۷ مقایسه gzip، bzip2 و xz</h3>
-<p>در سطح LPIC-1 لازم نیست وارد جزئیات الگوریتم‌های داخلی این ابزارها شوی.</p>
-<p>یک مدل ساده کافی است:</p>
+<h3>۲۴. مقایسه سه ابزار</h3>
+<p>حالا سه ابزار اصلی را کنار هم بگذاریم:</p>
 <div class="table-wrap">
 <table>
-<thead><tr><th>ابزار</th><th>معمولاً</th><th>پسوند</th></tr></thead>
+<thead><tr><th>ابزار</th><th>پسوند معمول</th><th>Compress</th><th>Decompress</th></tr></thead>
 <tbody>
-<tr><td><code>gzip</code></td><td>سریع و رایج</td><td><code>.gz</code></td></tr>
-<tr><td><code>bzip2</code></td><td>فشرده‌سازی بهتر از gzip در بسیاری موارد، ولی کندتر</td><td><code>.bz2</code></td></tr>
-<tr><td><code>xz</code></td><td>معمولاً Compression قوی‌تر، ولی پرهزینه‌تر</td><td><code>.xz</code></td></tr>
+<tr><td><code>gzip</code></td><td><code>.gz</code></td><td><code>gzip</code></td><td><code>gunzip</code></td></tr>
+<tr><td><code>bzip2</code></td><td><code>.bz2</code></td><td><code>bzip2</code></td><td><code>bunzip2</code></td></tr>
+<tr><td><code>xz</code></td><td><code>.xz</code></td><td><code>xz</code></td><td><code>unxz</code></td></tr>
 </tbody>
 </table>
 </div>
-<p>نکته مهم:</p>
-<blockquote>«فشرده‌سازی بهتر» همیشه به معنی «بهتر برای همه شرایط» نیست. گاهی سرعت مهم‌تر از حجم نهایی است.</blockquote>
+<p>و برای مشاهده مستقیم:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ابزار</th><th>نمایش محتوا</th></tr></thead>
+<tbody>
+<tr><td>gzip</td><td><code>zcat</code></td></tr>
+<tr><td>bzip2</td><td><code>bzcat</code></td></tr>
+<tr><td>xz</td><td><code>xzcat</code></td></tr>
+</tbody>
+</table>
+</div>
 
-<h3>۳.۸ <code>zip</code></h3>
-<p><code>zip</code> کمی با ابزارهای قبلی متفاوت است.</p>
-<p>می‌توانیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">zip archive.zip file1.txt file2.txt</div></div>
-<p>و یک فایل ZIP بسازیم.</p>
+<h2>بخش ششم — چرا <code>tar</code> لازم است؟</h2>
+<p>اینجا یک سؤال مهم داریم.</p>
+<p>فرض کن این‌ها را داریم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1.txt
+file2.txt
+file3.txt
+file4.txt</div></div>
+<p>اگر بخواهیم هرکدام را جداگانه <code>gzip</code> کنیم:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1.txt.gz
+file2.txt.gz
+file3.txt.gz
+file4.txt.gz</div></div>
+<p>چه مشکلی داریم؟</p>
+<p>هنوز <strong>چهار فایل</strong> داریم.</p>
+<p>اما ممکن است بخواهیم همه را در یک فایل قرار دهیم:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">files.tar</div></div>
+<p>پس اول Archive می‌کنیم.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf files.tar file1.txt file2.txt file3.txt file4.txt</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file1.txt ─┐
+file2.txt ─┤
+file3.txt ─┼──→ files.tar
+file4.txt ─┘</div></div>
+<p>بعد می‌توانیم Archive را Compress کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip files.tar</div></div>
+<p>و نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">files.tar.gz</div></div>
+
+<h2>بخش هفتم — ساخت Archive با <code>tar</code></h2>
+<h3>۲۵. ساخت یک Archive</h3>
+<p>ساختار ساده:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">tar -cf archive.tar files</div></div>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">zip documents.zip report.txt notes.txt</div></div>
-<p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">documents.zip</div></div>
-<p>برای استخراج:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">unzip documents.zip</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -cf backup.tar /home/amir/Documents</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">tar
+│
+├── -c → create
+├── -f → file
+│
+└── backup.tar → نام Archive</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">-c = Create
+-f = File</div></div>
 
-<h4>ZIP و Directory</h4>
-<p>برای افزودن یک Directory به ZIP:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">zip -r project.zip project/</div></div>
-<p>گزینه <code>-r</code> یعنی محتویات Directory نیز به‌صورت Recursive وارد آرشیو شوند.</p>
-<p>استخراج:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">unzip project.zip</div></div>
+<h3>۲۶. یک نکته مهم درباره <code>-f</code></h3>
+<p>در:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf backup.tar data/</div></div>
+<p>گزینه <code>-f</code> می‌گوید:</p>
+<blockquote>فایل Archive که می‌خواهی روی آن کار کنی کدام است؟</blockquote>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">backup.tar</div></div>
+<p>نام فایل خروجی است.</p>
 
-<h4>تفاوت مهم ZIP با gzip</h4>
-<p><code>gzip</code> معمولاً روی <strong>یک فایل</strong> کار می‌کند:</p>
-<div class="code-container"><span class="code-label">gzip</span><div class="code-block no-prompt">file.txt
- ↓
-file.txt.gz</div></div>
-<p>اما ZIP خودش می‌تواند چند فایل و Directory را در یک فایل ZIP قرار دهد.</p>
-<div class="code-container"><span class="code-label">ZIP</span><div class="code-block no-prompt">file1
-file2
-dir1
- ↓
-archive.zip</div></div>
-<p>پس ZIP هم <strong>Archive</strong> و هم <strong>Compression</strong> انجام می‌دهد.</p>
+<h3>۲۷. مشاهده محتویات Archive</h3>
+<p>برای دیدن فایل‌های داخل Archive:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tf backup.tar</div></div>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-t = list</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -tf backup.tar</div></div>
+<p>ممکن است چیزی شبیه این نشان دهد:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">home/amir/Documents/
+home/amir/Documents/file1.txt
+home/amir/Documents/file2.txt
+home/amir/Documents/report.txt</div></div>
+<p>نکته:</p>
+<blockquote><code>tar -t</code> فقط محتویات Archive را نمایش می‌دهد؛ آن را Extract نمی‌کند.</blockquote>
 
-<h3>۳.۹ <code>tar</code> — ابزار مهم جلسه</h3>
-<p>حالا می‌رسیم به یکی از مهم‌ترین ابزارهای LPIC-1:</p>
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">tar</div></div>
-<p>نام آن از:</p>
-<blockquote><strong>Tape Archive</strong></blockquote>
-<p>آمده است.</p>
-<p>کار اصلی <code>tar</code>:</p>
-<blockquote>ایجاد و مدیریت Archive</blockquote>
+<h3>۲۸. استخراج Archive</h3>
+<p>برای Extract کردن:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xf backup.tar</div></div>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-x = extract</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">-c → create
+-x → extract
+-t → list
+-f → file</div></div>
+<p>این چهار گزینه از مهم‌ترین گزینه‌های <code>tar</code> در سطح LPIC-1 هستند.</p>
+
+<h3>۲۹. استخراج در یک مسیر مشخص</h3>
+<p>فرض کن Archive داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.tar</div></div>
+<p>و می‌خواهیم محتویات آن در:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/tmp/restore</div></div>
+<p>Extract شود.</p>
+<p>می‌توانیم بگوییم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xf backup.tar -C /tmp/restore</div></div>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-C</div></div>
+<p>مسیر مقصد را مشخص می‌کند.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">tar -xf backup.tar -C /tmp/restore</div></div>
 <p>یعنی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">چند فایل
+<blockquote>Archive را Extract کن و نتیجه را در <code>/tmp/restore</code> قرار بده.</blockquote>
+
+<h2>بخش هشتم — ترکیب <code>tar</code> و Compression</h2>
+<p>اینجا مهم‌ترین بخش جلسه است.</p>
+<p>به جای اینکه دو مرحله جدا انجام دهیم:</p>
+<div class="code-container"><span class="code-label">دو مرحله</span><div class="code-block">tar -cf backup.tar project/
+gzip backup.tar</div></div>
+<p>می‌توانیم <code>tar</code> را مستقیماً با Compression استفاده کنیم.</p>
+
+<h3>۳۰. ساخت <code>tar.gz</code></h3>
+<p>برای gzip:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup.tar.gz project/</div></div>
+<p>گزینه‌ها:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create
+-z → gzip
+-f → file</div></div>
+<p>یعنی:</p>
+<blockquote>یک Archive بساز، آن را با gzip فشرده کن و اسمش را <code>backup.tar.gz</code> بگذار.</blockquote>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">project/
    ↓
 tar
    ↓
-یک فایل Archive</div></div>
+Archive
+   ↓
+gzip
+   ↓
+backup.tar.gz</div></div>
 
-<h3>۳.۱۰ ساخت Archive با <code>tar -c</code></h3>
-<p>فرض:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-├── a.txt
-├── b.txt
-└── c.txt</div></div>
-<p>می‌خواهیم Archive بسازیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf project.tar project/</div></div>
-<p>گزینه‌ها:</p>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → Create
--f → File</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar -cf project.tar project/</div></div>
-<p>یعنی:</p>
-<blockquote>یک Archive جدید به نام <code>project.tar</code> ایجاد کن و <code>project/</code> را داخل آن قرار بده.</blockquote>
-
-<h3>۳.۱۱ مشاهده محتویات Archive با <code>tar -t</code></h3>
-<p>قبل از استخراج می‌توانیم ببینیم چه چیزی داخل Archive است:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tf project.tar</div></div>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-t → Table of contents
--f → Archive file</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">project/
-project/a.txt
-project/b.txt
-project/c.txt</div></div>
-<p>این کار بسیار مفید است.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>برای <strong>دیدن محتویات tar بدون استخراج</strong>:<br><code>tar -tf archive.tar</code></div></div>
-
-<h3>۳.۱۲ استخراج Archive با <code>tar -x</code></h3>
-<p>برای Extract:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xf project.tar</div></div>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-x → Extract
--f → File</div></div>
-<p>پس مدل اصلی <code>tar</code> را به خاطر بسپار:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">-c → Create
--t → List
--x → Extract</div></div>
-<p>و <code>-f</code> مشخص می‌کند با کدام Archive کار داریم.</p>
-
-<h3>۳.۱۳ یک نکته بسیار مهم درباره <code>tar</code></h3>
-<p>دستور:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf project.tar project/</div></div>
-<p>فقط <strong>Archive</strong> می‌سازد.</p>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project/
-   ↓ tar
-project.tar</div></div>
-<p>اما حجم فایل‌ها را الزاماً کاهش نمی‌دهد.</p>
-<p>برای Compression باید یک ابزار Compression هم اضافه کنیم.</p>
-
-<h3>۳.۱۴ <code>tar + gzip</code></h3>
-<p>برای ساخت Archive و فشرده‌سازی با gzip:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project.tar.gz project/</div></div>
+<h3>۳۱. استخراج <code>tar.gz</code></h3>
+<p>برای استخراج:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
 <p>اینجا:</p>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → Create
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-x → extract
 -z → gzip
--f → File</div></div>
+-f → file</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
 <p>یعنی:</p>
+<blockquote>فایل tar.gz را با gzip باز کن و Archive را Extract کن.</blockquote>
+
+<h3>۳۲. مشاهده محتویات <code>tar.gz</code></h3>
+<p>بدون Extract:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-t → list
+-z → gzip
+-f → file</div></div>
+
+<h2>بخش نهم — <code>tar.bz2</code></h2>
+<p>برای bzip2 از:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-j</div></div>
+<p>استفاده می‌کنیم.</p>
+
+<h4>ساخت</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cjf backup.tar.bz2 project/</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create
+-j → bzip2
+-f → file</div></div>
+
+<h4>استخراج</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xjf backup.tar.bz2</div></div>
+
+<h4>مشاهده محتویات</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tjf backup.tar.bz2</div></div>
+
+<h2>بخش دهم — <code>tar.xz</code></h2>
+<p>برای xz از:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-J</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>دقت کن:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">-J</div></div>
+<p>حرف <strong>J بزرگ</strong> است.</p>
+
+<h4>ساخت</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cJf backup.tar.xz project/</div></div>
+
+<h4>استخراج</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xJf backup.tar.xz</div></div>
+
+<h4>مشاهده محتویات</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tJf backup.tar.xz</div></div>
+
+<h3>۳۳. جدول طلایی <code>tar</code></h3>
+<p>این جدول را برای LPIC-1 خوب یاد بگیر:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>کار</th><th>gzip</th><th>bzip2</th><th>xz</th></tr></thead>
+<tbody>
+<tr><td>ساخت Archive فشرده</td><td><code>tar -czf</code></td><td><code>tar -cjf</code></td><td><code>tar -cJf</code></td></tr>
+<tr><td>استخراج</td><td><code>tar -xzf</code></td><td><code>tar -xjf</code></td><td><code>tar -xJf</code></td></tr>
+<tr><td>مشاهده محتویات</td><td><code>tar -tzf</code></td><td><code>tar -tjf</code></td><td><code>tar -tJf</code></td></tr>
+</tbody>
+</table>
+</div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">-z → gzip
+-j → bzip2
+-J → xz</div></div>
+
+<h2>بخش یازدهم — پسوند فایل‌ها را چطور بخوانیم؟</h2>
+<p>وقتی می‌بینی:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">backup.tar.gz</div></div>
+<p>از راست به چپ نگاه کن:</p>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.gz</div></div>
+<p>یعنی:</p>
+<blockquote>gzip</blockquote>
+<p>و:</p>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.tar</div></div>
+<p>یعنی:</p>
+<blockquote>Archive ساخته‌شده با tar</blockquote>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">backup.tar.gz
+      ↑    ↑
+     tar  gzip</div></div>
+<p>همین‌طور:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">backup.tar.bz2</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar + bzip2</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">backup.tar.xz</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar + xz</div></div>
+
+<h2>بخش دوازدهم — <code>tar</code> خودش Compression نیست</h2>
+<p>این نکته ارزش امتحانی زیادی دارد.</p>
+<p>وقتی اجرا می‌کنی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf backup.tar project/</div></div>
+<p>فقط Archive ساخته‌ای.</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project/
+   ↓
+backup.tar</div></div>
+<p>اما وقتی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup.tar.gz project/</div></div>
+<p>اجرا می‌کنی:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">project/
    ↓
 tar
@@ -21315,334 +21984,424 @@ Archive
    ↓
 gzip
    ↓
-project.tar.gz</div></div>
-
-<h4>استخراج <code>.tar.gz</code></h4>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xzf project.tar.gz</div></div>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-x → Extract
--z → gzip
--f → File</div></div>
-
-<h3>۳.۱۵ <code>tar + bzip2</code></h3>
-<p>ساخت:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">tar -cjf project.tar.bz2 project/</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-j → bzip2</div></div>
-<p>استخراج:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xjf project.tar.bz2</div></div>
-
-<h3>۳.۱۶ <code>tar + xz</code></h3>
-<p>ساخت:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">tar -cJf project.tar.xz project/</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-J → xz</div></div>
-<p>استخراج:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xJf project.tar.xz</div></div>
-
-<h3>۳.۱۷ مهم‌ترین جدول <code>tar</code></h3>
-<div class="table-wrap">
-<table>
-<thead><tr><th>کار</th><th>دستور</th></tr></thead>
-<tbody>
-<tr><td>ساخت tar</td><td><code>tar -cf archive.tar dir/</code></td></tr>
-<tr><td>مشاهده</td><td><code>tar -tf archive.tar</code></td></tr>
-<tr><td>استخراج</td><td><code>tar -xf archive.tar</code></td></tr>
-<tr><td>ساخت tar.gz</td><td><code>tar -czf archive.tar.gz dir/</code></td></tr>
-<tr><td>استخراج tar.gz</td><td><code>tar -xzf archive.tar.gz</code></td></tr>
-<tr><td>ساخت tar.bz2</td><td><code>tar -cjf archive.tar.bz2 dir/</code></td></tr>
-<tr><td>استخراج tar.bz2</td><td><code>tar -xjf archive.tar.bz2</code></td></tr>
-<tr><td>ساخت tar.xz</td><td><code>tar -cJf archive.tar.xz dir/</code></td></tr>
-<tr><td>استخراج tar.xz</td><td><code>tar -xJf archive.tar.xz</code></td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی بسیار مهم</strong><br>این سه گزینه را دقیق حفظ کن:<br><code>-z → gzip</code><br><code>-j → bzip2</code><br><code>-J → xz</code><br>تفاوت <code>j</code> و <code>J</code> مهم است.</div></div>
-
-<h3>۳.۱۸ چرا <code>.tar.gz</code> دو پسوند دارد؟</h3>
-<p>به این نام نگاه کن:</p>
-<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">backup.tar.gz</div></div>
-<p>از سمت مفهومی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Files
- ↓
-tar
- ↓
-backup.tar
- ↓
-gzip
- ↓
 backup.tar.gz</div></div>
-<p>بنابراین:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">.tar → Archive
-.gz  → Compression با gzip</div></div>
-<p>همین منطق برای:</p>
-<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">.tar.bz2
-.tar.xz</div></div>
-<p>وجود دارد.</p>
-
-<h3>۳.۱۹ آیا tar خودش Compression است؟</h3>
-<p>خیر.</p>
-<p>به‌صورت مفهومی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar  → Archive
-gzip → Compression</div></div>
-<p>اما <code>tar</code> می‌تواند هنگام کار، Compression را نیز فعال کند:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -czf ...</div></div>
-<p>یعنی <code>tar</code> و gzip در یک عملیات ترکیب شده‌اند.</p>
-
-<h3>۳.۲۰ مشاهده Archive فشرده بدون استخراج</h3>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
-<p>محتویات را می‌بینیم.</p>
-<p>برای xz:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -tJf backup.tar.xz</div></div>
-<p>برای bzip2:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -tjf backup.tar.bz2</div></div>
-<p>این موضوع در کار واقعی بسیار مفید است.</p>
-<p>مثلاً قبل از استخراج یک فایل دانلودشده:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf package.tar.gz</div></div>
-<p>بررسی می‌کنی داخل آن چیست.</p>
-
-<h3>۳.۲۱ <code>cpio</code></h3>
-<p><code>cpio</code> نیز ابزاری برای ایجاد و استخراج Archive است.</p>
-<p>در LPIC-1 باید مفهوم آن را بشناسی و کاربرد اصلی آن را درک کنی.</p>
-<p>یکی از تفاوت‌های مهم <code>cpio</code> با <code>tar</code> این است که <code>cpio</code> معمولاً با <strong>لیستی از فایل‌ها از طریق Standard Input</strong> کار می‌کند.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -type f | cpio -o > archive.cpio</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">find
- ↓
-لیست فایل‌ها
- ↓
-cpio
- ↓
-archive.cpio</div></div>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-o → copy-out</div></div>
-<p>برای استخراج، حالت <code>copy-in</code> استفاده می‌شود:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">cpio -id < archive.cpio</div></div>
-<p>در این مرحله لازم نیست وارد جزئیات پیچیده <code>cpio</code> شوی؛ برای LPIC-1 شناخت مفهوم و گزینه‌های پایه کافی است.</p>
-
-<h3>۳.۲۲ خطاهای واقعی</h3>
-<div class="table-wrap">
-<table>
-<thead><tr><th>خطا</th><th>علت</th><th>راه‌حل</th></tr></thead>
-<tbody>
-<tr><td><code>tar: Cannot open</code></td><td>نام یا مسیر Archive اشتباه است</td><td>نام فایل را با <code>ls</code> بررسی کن</td></tr>
-<tr><td><code>tar: This does not look like a tar archive</code></td><td>فایل Archive معتبر نیست یا فرمت اشتباه انتخاب شده</td><td>نوع Archive و گزینه <code>-z/-j/-J</code> را بررسی کن</td></tr>
-<tr><td><code>gzip: ... No such file</code></td><td>فایل gzip وجود ندارد</td><td>مسیر و نام <code>.gz</code> را بررسی کن</td></tr>
-<tr><td><code>tar -xf</code> روی <code>.tar.gz</code> خطا می‌دهد</td><td>Compression gzip هنوز باید هنگام استخراج مدیریت شود</td><td><code>tar -xzf</code> استفاده کن</td></tr>
-<tr><td><code>rmdir</code> یا عملیات Archive روی مسیر اشتباه</td><td>دایرکتوری/مسیر موردنظر وجود ندارد</td><td>ابتدا <code>pwd</code> و <code>ls</code> را بررسی کن</td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>۳.۲۳ سناریوی ترکیبی عیب‌یابی</h3>
-<h4>مسئله</h4>
-<p>مدیر سیستم از تو می‌خواهد Directory زیر را برای انتقال به سرور دیگری آماده کنی:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">website/
-├── config/
-│   └── app.conf
-├── logs/
-│   ├── access.log
-│   └── error.log
-├── html/
-│   └── index.html
-└── README.md</div></div>
-<p>قرار است:</p>
-<ol>
-    <li>کل Directory در یک Archive قرار گیرد.</li>
-    <li>حجم Archive کاهش پیدا کند.</li>
-    <li>قبل از انتقال بررسی کنی چه فایل‌هایی داخل آن هستند.</li>
-    <li>Archive را در یک محیط آزمایشی استخراج کنی.</li>
-</ol>
-
-<h4>پاسخ</h4>
-<h5>مشاهده</h5>
-<p>ابتدا ساختار را بررسی می‌کنیم:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -R website/</div></div>
-
-<h5>تحلیل</h5>
-<p>چون چندین فایل و Directory داریم:</p>
-<div class="code-container"><span class="code-label">نیاز</span><div class="code-block no-prompt">Archive → tar</div></div>
-<p>و چون می‌خواهیم حجم کاهش یابد:</p>
-<div class="code-container"><span class="code-label">نیاز</span><div class="code-block no-prompt">Compression → gzip</div></div>
 <p>پس:</p>
-<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block no-prompt">tar + gzip</div></div>
-<p>انتخاب مناسبی است.</p>
+<blockquote><code>tar</code> وظیفه جمع‌آوری و بسته‌بندی فایل‌ها را دارد، نه اینکه ذاتاً Compression انجام دهد.</blockquote>
 
-<h5>ایجاد Archive</h5>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">tar -czf website.tar.gz website/</div></div>
+<h2>بخش سیزدهم — <code>tar</code> و حفظ ساختار دایرکتوری</h2>
+<p>یکی از مزایای Archive این است که ساختار فایل‌ها حفظ می‌شود.</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
+├── src/
+│   ├── main.c
+│   └── test.c
+├── docs/
+│   └── readme.txt
+└── config/
+    └── app.conf</div></div>
+<p>اگر:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project.tar.gz project/</div></div>
+<p>بسازیم، هنگام Extract کردن ساختار کلی حفظ می‌شود.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project/
+├── src/
+├── docs/
+└── config/</div></div>
+<p>همراه فایل‌های داخل آنها برمی‌گردد.</p>
+<p>این موضوع یکی از دلایل مهم استفاده از <code>tar</code> برای Backup و انتقال مجموعه فایل‌هاست.</p>
+
+<h2>بخش چهاردهم — یک سناریوی واقعی</h2>
+<p>فرض کن مدیر سیستم هستی و می‌خواهی از:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/amir/project</div></div>
+<p>یک Archive فشرده بسازی.</p>
+
+<h4>مرحله ۱ — ساخت <code>tar.gz</code></h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project-backup.tar.gz /home/amir/project</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project-backup.tar.gz</div></div>
+<p>داریم.</p>
+
+<h4>مرحله ۲ — بررسی Archive</h4>
+<p>قبل از Extract می‌توانیم ببینیم چه چیزهایی داخل آن است:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf project-backup.tar.gz</div></div>
+
+<h4>مرحله ۳ — Extract</h4>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xzf project-backup.tar.gz</div></div>
+
+<h4>مرحله ۴ — Extract در محل مشخص</h4>
+<div class="code-container"><span class="code-label">استخراج در مسیر</span><div class="code-block">tar -xzf project-backup.tar.gz -C /tmp/restore</div></div>
+<p>این سناریو در عمل بسیار رایج است.</p>
+
+<h2>بخش پانزدهم — <code>tar</code> و Verbose</h2>
+<p>گاهی می‌خواهیم هنگام اجرای دستور ببینیم چه فایل‌هایی در حال پردازش هستند.</p>
+<p>از:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-v</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -cvf backup.tar project/</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -czvf backup.tar.gz project/</div></div>
+<p><code>v</code> یعنی:</p>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">verbose</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -czvf backup.tar.gz project/</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create
+-z → gzip
+-v → نمایش جزئیات
+-f → file</div></div>
+<p>ترکیب <code>-v</code> برای زمانی مفید است که می‌خواهی خروجی عملیات را ببینی؛ اما برای هر دستور الزامی نیست.</p>
+
+<h2>بخش شانزدهم — <code>gzip</code>، <code>bzip2</code> یا <code>xz</code>؟</h2>
+<p>در سطح مفهومی می‌توانیم این‌طور نگاه کنیم:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">gzip
+ ↓
+سریع و بسیار رایج
+
+bzip2
+ ↓
+Compression مناسب، قدیمی‌تر
+
+xz
+ ↓
+معمولاً Compression بهتر، اما CPU بیشتری می‌تواند مصرف کند</div></div>
+<p>نباید این را به شکل یک قانون مطلق مثل «xz همیشه بهترین است» حفظ کنی.</p>
+<p>انتخاب ابزار به شرایط بستگی دارد:</p>
+<ul>
+    <li>سرعت</li>
+    <li>میزان Compression</li>
+    <li>CPU</li>
+    <li>سازگاری</li>
+    <li>حجم داده</li>
+    <li>ابزارهایی که در محیط مقصد موجود هستند</li>
+</ul>
+<p>برای LPIC-1 مهم‌تر از مقایسه دقیق Benchmark این است که <strong>کاربرد و syntax هر سه را بشناسی.</strong></p>
+
+<h2>بخش هفدهم — نکته‌ای درباره فایل‌های متنی و Binary</h2>
+<p>Compression روی همه فایل‌ها به یک اندازه نتیجه نمی‌دهد.</p>
+<p>مثلاً فایل متنی ممکن است قابلیت Compression خوبی داشته باشد:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">large.log</div></div>
+<p>اما بعضی فایل‌ها قبلاً فشرده شده‌اند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">photo.jpg
+video.mp4
+archive.zip</div></div>
+<p>فشرده‌سازی مجدد آنها معمولاً سود زیادی ندارد.</p>
+<p>بنابراین:</p>
+<blockquote>Compression به نوع و ساختار داده هم وابسته است.</blockquote>
+
+<h2>بخش هجدهم — <code>zip</code> چه می‌شود؟</h2>
+<p>در Linux ابزارهایی مانند:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">zip
+unzip</div></div>
+<p>هم وجود دارند.</p>
+<p>اما از دید این جلسه باید یک تفاوت مفهومی را در ذهن داشته باشی:</p>
+<div class="code-container"><span class="code-label">خانواده</span><div class="code-block no-prompt">tar + gzip/bzip2/xz</div></div>
+<p>یک خانواده بسیار رایج در دنیای Linux/Unix است.</p>
+<p>در حالی که:</p>
+<div class="code-container"><span class="code-label">فرمت</span><div class="code-block no-prompt">zip</div></div>
+<p>یک فرمت Archive/Compression مستقل است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">zip archive.zip file1.txt file2.txt</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">unzip archive.zip</div></div>
+<p>در LPIC-1 دانستن وجود و کاربرد کلی <code>zip</code>/<code>unzip</code> مفید است، اما محور اصلی این جلسه روی:</p>
+<div class="code-container"><span class="code-label">محور</span><div class="code-block no-prompt">tar
+gzip
+bzip2
+xz</div></div>
+<p>است.</p>
+
+<h2>بخش نوزدهم — <code>cpio</code> در LPIC-1</h2>
+<p>یک ابزار دیگر که ممکن است در مباحث LPIC-1 ببینی:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">cpio</div></div>
+<p>است.</p>
+<p><code>cpio</code> نیز برای Archive کردن فایل‌ها استفاده می‌شود.</p>
+<p>اما syntax و مدل کاری آن با <code>tar</code> متفاوت است.</p>
+<p>در این جلسه لازم نیست آن را هم‌وزن <code>tar</code> یاد بگیری؛ چیزی که باید بدانی:</p>
+<blockquote><code>cpio</code> یک ابزار Archive در Linux است و در مباحث LPIC-1 ممکن است با آن مواجه شوی.</blockquote>
+<p>تمرکز اصلی سناریوهای این جلسه همچنان:</p>
+<div class="code-container"><span class="code-label">تمرکز</span><div class="code-block no-prompt">tar
++
+gzip / bzip2 / xz</div></div>
+<p>است.</p>
+
+<h2>بخش بیستم — نقشه دستورات جلسه</h2>
+<p>حالا تمام جلسه را در یک نقشه کوچک جمع کنیم:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                FILES
+                  │
+          ┌───────┴────────┐
+          │                │
+       Archive          Compression
+          │                │
+         tar       ┌───────┼────────┐
+          │        │       │        │
+          │      gzip    bzip2      xz
+          │        │       │        │
+          └────────┴───────┴────────┘
+                   │
+          Archive + Compression
+                   │
+       ┌───────────┼────────────┐
+       │           │            │
+    .tar.gz     .tar.bz2     .tar.xz</div></div>
+<p>و عملیات اصلی:</p>
+<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">CREATE
+tar -cf
+tar -czf
+tar -cjf
+tar -cJf
+
+LIST
+tar -tf
+tar -tzf
+tar -tjf
+tar -tJf
+
+EXTRACT
+tar -xf
+tar -xzf
+tar -xjf
+tar -xJf</div></div>
+
+<h2>بخش بیست‌ویکم — یک مثال کامل برای تمرین</h2>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir/data/
+├── file1.txt
+├── file2.txt
+└── docs/
+    ├── a.txt
+    └── b.txt</div></div>
+
+<h4>1. فقط Archive</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf data.tar /home/amir/data</div></div>
 <p>نتیجه:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">website/
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">data.tar</div></div>
+
+<h4>2. Archive + gzip</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf data.tar.gz /home/amir/data</div></div>
+
+<h4>3. Archive + bzip2</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cjf data.tar.bz2 /home/amir/data</div></div>
+
+<h4>4. Archive + xz</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cJf data.tar.xz /home/amir/data</div></div>
+
+<h4>5. مشاهده محتویات</h4>
+<p>برای gzip:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf data.tar.gz</div></div>
+<p>برای bzip2:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tjf data.tar.bz2</div></div>
+<p>برای xz:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tJf data.tar.xz</div></div>
+
+<h4>6. استخراج</h4>
+<p>gzip:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf data.tar.gz</div></div>
+<p>bzip2:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xjf data.tar.bz2</div></div>
+<p>xz:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xJf data.tar.xz</div></div>
+
+<h2>نکات مهم جلسه</h2>
+<h4>1. Archive با Compression فرق دارد</h4>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Archive
+→ چند فایل را در یک فایل جمع می‌کند.
+
+Compression
+→ حجم داده را کاهش می‌دهد.</div></div>
+
+<h4>2. <code>tar</code> به‌تنهایی الزاماً فشرده‌سازی نمی‌کند</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf backup.tar data/</div></div>
+<p>فقط Archive است.</p>
+
+<h4>3. سه ابزار اصلی Compression</h4>
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">gzip
+bzip2
+xz</div></div>
+
+<h4>4. پسوندها را بشناس</h4>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.gz   → gzip
+.bz2  → bzip2
+.xz   → xz
+.tar  → tar archive</div></div>
+
+<h4>5. گزینه‌های مهم <code>tar</code></h4>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create
+-x → extract
+-t → list
+-f → archive file
+-v → verbose
+-z → gzip
+-j → bzip2
+-J → xz
+-C → directory</div></div>
+
+<h4>6. ترکیب‌های بسیار مهم</h4>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">tar -czf backup.tar.gz data/
+tar -cjf backup.tar.bz2 data/
+tar -cJf backup.tar.xz data/</div></div>
+<p>و برای استخراج:</p>
+<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xzf backup.tar.gz
+tar -xjf backup.tar.bz2
+tar -xJf backup.tar.xz</div></div>
+
+<h2>جمع‌بندی به سبک فاینمن</h2>
+<p>فرض کن می‌خواهی برای یک دوست کاملاً مبتدی توضیح بدهی.</p>
+<p>تو یک کمد داری که داخلش تعداد زیادی وسیله پخش شده است.</p>
+<p>اول می‌خواهی همه وسایل را داخل <strong>یک جعبه</strong> بگذاری.</p>
+<p>این می‌شود:</p>
+<blockquote><strong>Archive</strong></blockquote>
+<p>در Linux، <code>tar</code> این کار را انجام می‌دهد.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">چند فایل
    ↓
 tar
    ↓
-website.tar
+یک فایل</div></div>
+<p>اما حالا جعبه بزرگ است.</p>
+<p>می‌خواهی خود جعبه را کوچک‌تر کنی.</p>
+<p>این می‌شود:</p>
+<blockquote><strong>Compression</strong></blockquote>
+<p>ابزارهایی مثل:</p>
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">gzip
+bzip2
+xz</div></div>
+<p>این کار را انجام می‌دهند.</p>
+<p>پس می‌توانی بگویی:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">فایل‌ها
    ↓
-gzip
+tar
    ↓
-website.tar.gz</div></div>
+یک Archive
+   ↓
+gzip / bzip2 / xz
+   ↓
+یک Archive فشرده</div></div>
+<p>و این همان چیزی است که در:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">backup.tar.gz</div></div>
+<p>می‌بینی.</p>
+<p>قسمت:</p>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.tar</div></div>
+<p>می‌گوید:</p>
+<blockquote>این داده‌ها در یک Archive قرار گرفته‌اند.</blockquote>
+<p>قسمت:</p>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.gz</div></div>
+<p>می‌گوید:</p>
+<blockquote>Archive با gzip فشرده شده است.</blockquote>
+<p>بنابراین وقتی در Linux با فایل:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">something.tar.xz</div></div>
+<p>مواجه شدی، دیگر نباید آن را یک «فرمت عجیب» ببینی.</p>
+<p>باید آن را این‌طور بخوانی:</p>
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">something
+   ↓
+tar Archive
+   ↓
+xz Compression</div></div>
+<p>و از همین مدل ذهنی می‌توانی دستور مناسب را بسازی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xJf something.tar.xz</div></div>
+<p>این اتصال بین <strong>Archive → Compression → tar → gzip/bzip2/xz</strong> مهم‌ترین چیزی است که باید از این جلسه در ذهن بماند.</p>
 
-<h5>بررسی محتویات</h5>
-<p>قبل از استخراج:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf website.tar.gz</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">website/
-website/config/
-website/config/app.conf
-website/logs/
-website/logs/access.log
-website/logs/error.log
-website/html/
-website/html/index.html
-website/README.md</div></div>
-<p>اگر چیزی اشتباه بود، هنوز چیزی استخراج نکرده‌ایم.</p>
+<h3>تصویر نهایی جلسه</h3>
+<p>اگر بخواهی فقط <strong>یک نقشه</strong> از کل این جلسه در ذهنت بماند، این باشد:</p>
+<div class="code-container"><span class="code-label">نقشه نهایی</span><div class="code-block no-prompt">             Files / Directories
+                     │
+                     ▼
+                   tar
+                     │
+                     ▼
+                  Archive
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+        gzip       bzip2        xz
+          │          │          │
+          ▼          ▼          ▼
+      .tar.gz    .tar.bz2    .tar.xz</div></div>
+<p>و هنگام کار با <code>tar</code> همیشه اول از خودت بپرس:</p>
+<div class="code-container"><span class="code-label">سوال</span><div class="code-block no-prompt">می‌خواهم بسازم؟      → -c
+می‌خواهم استخراج کنم؟ → -x
+می‌خواهم ببینم؟       → -t
 
-<h5>استخراج آزمایشی</h5>
-<p>یک Directory آزمایشی بساز:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir test_restore</div></div>
-<p>سپس:</p>
-<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xzf website.tar.gz -C test_restore</div></div>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-C → تغییر دایرکتوری مقصد برای عملیات tar</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -R test_restore</div></div>
-<p>و ساختار را بررسی می‌کنیم.</p>
+gzip؟  → -z
+bzip2؟ → -j
+xz؟    → -J</div></div>
+<p><strong>قدم منطقی بعدی</strong> بعد از این جلسه، انجام چند سناریوی عملی <code>tar + gzip/bzip2/xz</code> روی VM است؛ این کار باعث می‌شود تفاوت <code>-c</code>، <code>-x</code>، <code>-t</code> و سه نوع Compression کاملاً جا بیفتد.</p>
 
-<h5>جریان کامل</h5>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">مشاهده
-   ↓
-تشخیص: چند فایل → Archive
-   ↓
-تشخیص: کاهش حجم → gzip
-   ↓
-tar -czf
-   ↓
-tar -tzf → بررسی محتویات
-   ↓
-tar -xzf → استخراج
-   ↓
-بررسی نتیجه</div></div>
-<p>این دقیقاً الگوی کاری‌ای است که در مدیریت واقعی سرور استفاده می‌شود.</p>
-
-<h2>۴. جمع‌بندی به سبک فاینمن</h2>
-<p>فرض کن می‌خواهی چندین وسیله را برای جابه‌جایی داخل یک جعبه بگذاری.</p>
-<p><strong>Archive</strong> مثل این است که همه وسایل را داخل یک جعبه قرار بدهی:</p>
-<div class="code-container"><span class="code-label">Archive</span><div class="code-block no-prompt">10 فایل
-  ↓
-یک Archive</div></div>
-<p>ولی هنوز اندازه وسایل تغییر نکرده است.</p>
-<p><strong>Compression</strong> مثل این است که تلاش کنی وسایل را فشرده‌تر کنی تا فضای کمتری بگیرند.</p>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Archive = چند فایل → یک بسته
-Compression = کاهش حجم</div></div>
-<p>در لینوکس:</p>
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">tar → Archive
-gzip / bzip2 / xz → Compression</div></div>
-<p>به همین دلیل می‌توانیم داشته باشیم:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">project.tar</div></div>
-<p>فقط Archive است.</p>
-<p>ولی:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">project.tar.gz</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar  → Archive
-gzip → Compression</div></div>
-<p>و برای سه حالت اصلی <code>tar</code>:</p>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-z → gzip
--j → bzip2
--J → xz</div></div>
-<p>پس اگر فقط یک چیز از این جلسه در ذهنت بماند، این باشد:</p>
-<div class="code-container"><span class="code-label">نقشه اصلی</span><div class="code-block no-prompt">             tar
-              │
-        ┌─────┴─────┐
-        ↓           ↓
-     Archive     Compression
-                  │
-          ┌───────┼───────┐
-          ↓       ↓       ↓
-        gzip    bzip2     xz
-          ↓       ↓       ↓
-         .gz     .bz2     .xz</div></div>
-
-<h2>۵. Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">Cheat Sheet</span><div class="code-block no-prompt">Archive ≠ Compression
-tar → Archive
-gzip → .gz       | gunzip / gzip -d
-bzip2 → .bz2     | bunzip2 / bzip2 -d
-xz → .xz         | unxz / xz -d
-tar -cf           → Create
-tar -tf           → List
-tar -xf           → Extract
--z → gzip | -j → bzip2 | -J → xz
-tar -czf a.tar.gz dir/ → ساخت tar.gz
-tar -tzf a.tar.gz      → مشاهده بدون استخراج</div></div>
-
-<h2>۶. تست پایانی</h2>
+<h2>۶ سؤال چهارگزینه‌ای — سطح LPIC-1</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>کدام گزینه تفاوت <strong>Archive</strong> و <strong>Compression</strong> را درست بیان می‌کند؟</p>
+<p>کدام گزینه تفاوت <code>Archive</code> و <code>Compression</code> را درست بیان می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) هر دو دقیقاً یک کار انجام می‌دهند.</button>
-    <button onclick="selectOption(this)">ب) Archive حجم را کم می‌کند و Compression چند فایل را یکی می‌کند.</button>
-    <button onclick="selectOption(this)">ج) Archive چند فایل را در یک بسته قرار می‌دهد، Compression حجم داده را کاهش می‌دهد.</button>
-    <button onclick="selectOption(this)">د) <code>tar</code> همیشه فایل‌ها را فشرده می‌کند.</button>
+    <button onclick="selectOption(this)">الف) Archive حجم فایل را کاهش می‌دهد و Compression چند فایل را یکی می‌کند.</button>
+    <button onclick="selectOption(this)">ب) Archive چند فایل را در یک فایل جمع می‌کند و Compression حجم داده را کاهش می‌دهد.</button>
+    <button onclick="selectOption(this)">ج) Archive فقط برای فایل‌های متنی است و Compression فقط برای Binaryها.</button>
+    <button onclick="selectOption(this)">د) این دو مفهوم در Linux تفاوتی ندارند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>tar</code> به‌طور اصلی Archive می‌سازد؛ کاهش حجم وظیفه ابزارهایی مانند <code>gzip</code>، <code>bzip2</code> و <code>xz</code> است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>tar</code> معمولاً برای Archive کردن و ابزارهایی مثل <code>gzip</code>، <code>bzip2</code> و <code>xz</code> برای Compression استفاده می‌شوند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>کدام دستور یک Archive به نام <code>backup.tar.gz</code> از Directory به نام <code>data</code> می‌سازد؟</p>
+<p>کدام دستور یک Archive با gzip می‌سازد؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>tar -xzf backup.tar.gz data</code></button>
-    <button onclick="selectOption(this)">ب) <code>tar -czf backup.tar.gz data</code></button>
-    <button onclick="selectOption(this)">ج) <code>tar -cjf backup.tar.gz data</code></button>
-    <button onclick="selectOption(this)">د) <code>gzip -tar backup.tar.gz data</code></button>
+    <button onclick="selectOption(this)">الف) <code>tar -xzf backup.tar.gz data/</code></button>
+    <button onclick="selectOption(this)">ب) <code>tar -czf backup.tar.gz data/</code></button>
+    <button onclick="selectOption(this)">ج) <code>gzip -tar backup.tar data/</code></button>
+    <button onclick="selectOption(this)">د) <code>tar -tzf backup.tar.gz data/</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>tar -czf backup.tar.gz data</code> چون:<br><code>-c → Create</code><br><code>-z → gzip</code><br><code>-f → File</code></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>tar -czf backup.tar.gz data/</code></strong><br>زیرا: <code>-c → create</code>، <code>-z → gzip</code>، <code>-f → file</code>. گزینه A برای Extract است و D برای List کردن محتویات.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۳ — سناریومحور</p>
-<p>یک مدیر سیستم فایل <code>logs.tar.gz</code> را دریافت کرده و <strong>قبل از استخراج</strong> می‌خواهد ببیند چه فایل‌هایی داخل آن هستند.</p>
-<p>کدام دستور مناسب است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>فایل زیر را داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.tar.xz</div></div>
+<p>کدام دستور محتویات آن را بدون Extract کردن نمایش می‌دهد؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>tar -xzf logs.tar.gz</code></button>
-    <button onclick="selectOption(this)">ب) <code>tar -czf logs.tar.gz</code></button>
-    <button onclick="selectOption(this)">ج) <code>tar -tzf logs.tar.gz</code></button>
-    <button onclick="selectOption(this)">د) <code>gunzip logs.tar.gz</code></button>
+    <button onclick="selectOption(this)">الف) <code>tar -xJf backup.tar.xz</code></button>
+    <button onclick="selectOption(this)">ب) <code>tar -cJf backup.tar.xz</code></button>
+    <button onclick="selectOption(this)">ج) <code>tar -tJf backup.tar.xz</code></button>
+    <button onclick="selectOption(this)">د) <code>xz -tJ backup.tar.xz</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>tar -tzf logs.tar.gz</code></strong><br><code>-t</code> محتویات Archive را نمایش می‌دهد و هیچ استخراجی انجام نمی‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>tar -tJf backup.tar.xz</code></strong><br>چون: <code>-t → list</code>، <code>-J → xz</code>، <code>-f → file</code>. پس فقط محتویات Archive را نمایش می‌دهد.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۴ — سناریومحور</p>
-<p>فایلی به نام <code>database.sql.xz</code> داری و فقط می‌خواهی محتوای آن را در ترمینال ببینی، بدون اینکه آن را ابتدا Extract کنی.</p>
-<p>کدام دستور مناسب است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام گزینه فایل اصلی را هنگام Compression با <code>gzip</code> حفظ می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>cat database.sql.xz</code></button>
-    <button onclick="selectOption(this)">ب) <code>xzcat database.sql.xz</code></button>
-    <button onclick="selectOption(this)">ج) <code>unxz database.sql.xz</code></button>
-    <button onclick="selectOption(this)">د) <code>tar -xJf database.sql.xz</code></button>
+    <button onclick="selectOption(this)">الف) <code>gzip -d file.txt</code></button>
+    <button onclick="selectOption(this)">ب) <code>gzip -k file.txt</code></button>
+    <button onclick="selectOption(this)">ج) <code>gzip -x file.txt</code></button>
+    <button onclick="selectOption(this)">د) <code>gzip -t file.txt</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>xzcat database.sql.xz</code></strong><br><code>xzcat</code> محتوای فایل xz را مستقیماً نمایش می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>gzip -k file.txt</code></strong><br>گزینه <code>-k = keep</code> باعث می‌شود فایل اصلی حفظ شود.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>برای ساخت یک Archive فشرده‌شده با <strong>bzip2</strong> کدام دستور صحیح است؟</p>
+<p>کار گزینه <code>-j</code> در <code>tar</code> چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>tar -czf backup.tar.bz2 data/</code></button>
-    <button onclick="selectOption(this)">ب) <code>tar -cJf backup.tar.bz2 data/</code></button>
-    <button onclick="selectOption(this)">ج) <code>tar -cjf backup.tar.bz2 data/</code></button>
-    <button onclick="selectOption(this)">د) <code>tar -cxf backup.tar.bz2 data/</code></button>
+    <button onclick="selectOption(this)">الف) فعال کردن gzip</button>
+    <button onclick="selectOption(this)">ب) فعال کردن xz</button>
+    <button onclick="selectOption(this)">ج) فعال کردن bzip2</button>
+    <button onclick="selectOption(this)">د) استخراج فایل</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>tar -cjf backup.tar.bz2 data/</code></strong><br>گزینه:<br><code>-j → bzip2</code><br>درحالی‌که:<br><code>-z → gzip</code><br><code>-J → xz</code></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — فعال کردن bzip2</strong><br>سه گزینه مهم: <code>-z → gzip</code>، <code>-j → bzip2</code>، <code>-J → xz</code>. دقت کن <code>-j</code> و <code>-J</code> متفاوت‌اند.</div>
 </div>
 
-<h2>🔗 ارتباط با جلسه بعد</h2>
-<p>حالا می‌توانی فایل‌ها را <strong>Archive و Compress</strong> کنی؛ اما هنوز یک سؤال مهم باقی مانده:</p>
-<blockquote>اگر بخواهیم از اطلاعات سیستم Backup بگیریم و بعداً آن را Restore کنیم، مخصوصاً اگر فقط بخشی از فایل‌ها تغییر کرده باشند، چه روشی مناسب است؟</blockquote>
-<p>در جلسه بعد وارد:</p>
-<p><strong>Backup & <code>dd</code></strong></p>
-<p>می‌شویم و تفاوت <strong>Backup فایل‌محور، Incremental Backup و کپی سطح پایین دیسک/پارتیشن</strong> را یاد می‌گیریم.</p>
-` ,
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>فرض کن فایل زیر وجود دارد:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.tar.bz2</div></div>
+<p>کدام دستور آن را Extract می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>tar -xzf backup.tar.bz2</code></button>
+    <button onclick="selectOption(this)">ب) <code>tar -xjf backup.tar.bz2</code></button>
+    <button onclick="selectOption(this)">ج) <code>tar -xJf backup.tar.bz2</code></button>
+    <button onclick="selectOption(this)">د) <code>tar -tjf backup.tar.bz2</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>tar -xjf backup.tar.bz2</code></strong><br>چون فایل با <code>bzip2</code> فشرده شده است: <code>-j → bzip2</code> و <code>-x → extract</code> و <code>-f → file</code>. گزینه A برای gzip، گزینه C برای xz و گزینه D برای <strong>نمایش محتویات</strong> Archive است، نه Extract کردن.</div>
+</div>
+`
+ ,
 "ch4-3": `
 <div class="section-header">
     <div class="section-badge">۴</div>
@@ -21727,7 +22486,7 @@ Backup → هدف / کاربرد</div></div>
 <p>از <code>tar</code> برای ایجاد یک Backup استفاده کرده‌ایم.</p>
 <p>اما <code>tar</code> ذاتاً فقط «ابزار Backup» نیست؛ می‌تواند برای Archive کردن فایل‌ها نیز استفاده شود.</p>
 
-<h2>۳. درسنامه اصلی</h2>
+<h2>۳. درسنامه اصلی — Hands-on Core</h2>
 <h3>۳.۱ Full Backup با <code>tar</code></h3>
 <p>ساده‌ترین مدل Backup:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">کل اطلاعات
