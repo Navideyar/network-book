@@ -20134,123 +20134,166 @@ I/O Performance</div></div>
 <h2>۱. اهداف یادگیری</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ul>
-    <li>تفاوت <strong>File</strong> و <strong>Directory</strong> را توضیح بدهی.</li>
-    <li>مفهوم <strong>Path</strong> و تفاوت <strong>Absolute Path</strong> و <strong>Relative Path</strong> را درک و تشخیص بدهی.</li>
-    <li>مفهوم پایه‌ی <strong>inode</strong> را توضیح بدهی و آن را با نام فایل و Directory مرتبط کنی.</li>
-    <li>با <code>pwd</code> و <code>ls</code> محیط و فایل‌های موجود را بررسی کنی.</li>
-    <li>با <code>touch</code> و <code>mkdir</code> فایل و Directory ایجاد کنی.</li>
-    <li>با <code>cp</code> و <code>mv</code> فایل‌ها و Directoryها را کپی، جابه‌جا و Rename کنی.</li>
-    <li>با <code>rm</code> و <code>rmdir</code> فایل‌ها و Directoryها را حذف کنی.</li>
-    <li>با Wildcardهای <code>*</code>، <code>?</code> و <code>[]</code> چند فایل را با یک الگو انتخاب کنی.</li>
-    <li>چند دستور را برای حل یک مسئله‌ی واقعی مدیریت فایل با هم ترکیب کنی.</li>
+    <li>ساختار فایل و دایرکتوری و مفهوم <strong>inode</strong> را توضیح بدهی.</li>
+    <li>تفاوت مسیرهای <strong>Absolute</strong> و <strong>Relative</strong> را تشخیص بدهی.</li>
+    <li>با <code>pwd</code> و <code>ls</code> اطلاعات مسیر و فایل‌ها را بررسی کنی.</li>
+    <li>با <code>touch</code>، <code>mkdir</code>، <code>cp</code>، <code>mv</code>، <code>rm</code> و <code>rmdir</code> فایل‌ها و دایرکتوری‌ها را مدیریت کنی.</li>
+    <li>از <strong>Wildcard</strong>ها برای انتخاب چند فایل استفاده کنی.</li>
 </ul>
 
 <h2>۲. مسئله و تصویر کلی</h2>
-<h3>۲.۱ چرا مدیریت فایل مهم است؟</h3>
-<p>فرض کن وارد یک سرور لینوکسی شده‌ای و باید:</p>
-<ol>
-    <li>محل فعلی خودت را پیدا کنی؛</li>
-    <li>فایل‌های موجود را بررسی کنی؛</li>
-    <li>یک Directory برای Backup بسازی؛</li>
-    <li>چند فایل را کپی یا جابه‌جا کنی؛</li>
-    <li>فایل‌های قدیمی را حذف کنی.</li>
-</ol>
-<p>برای انجام این کار، باید اول یک مدل ذهنی ساده داشته باشی:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">فایل و Directory را می‌شناسیم
-          ↓
-می‌دانیم کجا هستیم
-          ↓
-مسیر فایل را مشخص می‌کنیم
-          ↓
-محتویات را بررسی می‌کنیم
-          ↓
-ایجاد / کپی / جابه‌جایی
-          ↓
-حذف
-          ↓
-کار با چند فایل با Wildcard</div></div>
-<p>بنابراین در این جلسه هدف فقط حفظ کردن چند دستور نیست؛ هدف این است که بفهمی:</p>
-<blockquote><strong>با چه نوع چیزی کار می‌کنم، کجاست، و برای انجام کار موردنظر کدام عملیات را باید روی آن انجام دهم؟</strong></blockquote>
+<h3>۲.۱ چرا این مبحث مهم است؟</h3>
+<p>فرض کن وارد یک سرور لینوکسی شده‌ای و این وظیفه را داری:</p>
+<blockquote>یک فایل تنظیمات را پیدا کن، از آن کپی بگیر، نام کپی را تغییر بده، چند فایل قدیمی را حذف کن و یک پوشه برای Backup بساز.</blockquote>
+<p>برای انجام این کار باید بتوانی:</p>
+<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">پیدا کردن موقعیت فعلی
+        ↓
+شناخت مسیر فایل
+        ↓
+مشاهده فایل‌ها
+        ↓
+ساخت فایل/دایرکتوری
+        ↓
+کپی یا جابه‌جایی
+        ↓
+حذف</div></div>
+<p>پس قبل از حفظ کردن دستورها، باید بدانیم <strong>فایل و دایرکتوری در لینوکس چگونه سازمان‌دهی شده‌اند.</strong></p>
 
-<h3>۲.۲ مدل ذهنی مرکزی جلسه</h3>
-<div class="code-container"><span class="code-label">Big Picture</span><div class="code-block no-prompt">                 Linux Filesystem
-                        │
-              ┌─────────┴─────────┐
-              ↓                   ↓
-           Directory            File
-              │                   │
-        سازمان‌دهی فایل‌ها       داده
-              │
-              └─────────┐
-                        ↓
-                      Path
-                        │
-                        ↓
-                پیدا کردن موقعیت
-                        │
-          ┌─────────────┼─────────────┐
-          ↓             ↓             ↓
-       Inspect        Create       Modify/Delete
-          │             │             │
-       pwd / ls     touch / mkdir   cp / mv / rm</div></div>
-<p>در پشت صحنه، هر فایل و Directory با یک <strong>inode</strong> مرتبط است. در این جلسه inode را فقط به اندازه‌ای یاد می‌گیریم که مدل فایل‌سیستم کامل شود؛ جزئیات کاربرد آن در Hard Link در جلسه ۴ بررسی می‌شود.</p>
+<h3>۲.۲ تصویر کلی</h3>
+<p>مدل ذهنی این جلسه:</p>
+<div class="code-container"><span class="code-label">Big Picture</span><div class="code-block no-prompt">                    Linux Filesystem
+                           │
+             ┌─────────────┴─────────────┐
+             ↓                           ↓
+         Directory                     File
+             │                           │
+       ┌─────┼─────┐                     │
+       ↓     ↓     ↓                     ↓
+     File  Dir   Dir                  Data
+       │
+       ↓
+     inode
+       │
+       ↓
+Metadata + Information about the file</div></div>
+<p>و عملیات اصلی ما:</p>
+<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">          File / Directory
+                 │
+      ┌──────────┼──────────┐
+      ↓          ↓          ↓
+    Create     Inspect    Modify
+      │          │          │
+ touch/mkdir   ls/pwd    cp/mv/rm</div></div>
+<p>در این جلسه قرار نیست فقط دستورها را حفظ کنیم؛ می‌خواهیم بفهمیم <strong>هر دستور روی چه چیزی و برای چه کاری استفاده می‌شود.</strong></p>
 
-<h3>۲.۳ مسیر یادگیری</h3>
+<h3>۲.۳ نقشه مسیر جلسه</h3>
+<p>ترتیب یادگیری ما:</p>
 <div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">File & Directory
        ↓
-Path و موقعیت فعلی
+   inode + Types
        ↓
-pwd / ls
+  Path & Location
        ↓
-Create
+   pwd / ls
        ↓
-Copy / Move / Rename
+touch / mkdir
        ↓
-Delete
+   cp / mv
        ↓
-Wildcards
+   rm / rmdir
        ↓
-Troubleshooting و سناریوی ترکیبی</div></div>
+   Wildcards
+       ↓
+   سناریوی واقعی</div></div>
 
-<h2>۳. فایل و دایرکتوری</h2>
+<h2>۳. درسنامه اصلی</h2>
 <h3>۳.۱ File چیست؟</h3>
-<p>در ساده‌ترین نگاه، <strong>File</strong> یک شیء در فایل‌سیستم است که داده را در خود نگهداری می‌کند.</p>
+<p>در لینوکس، <strong>File</strong> محلی برای نگهداری اطلاعات است.</p>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">notes.txt
 config.conf
 photo.jpg
 script.sh</div></div>
-<p>اما در لینوکس واژه‌ی File مفهوم گسترده‌تری دارد و فایل‌سیستم فقط شامل فایل‌های معمولی نیست. Directory، Symbolic Link و انواع دیگری از File System Objectها نیز وجود دارند.</p>
-<p>برای جلسه‌ی فعلی مهم‌ترین دو مورد:</p>
-<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">-  → Regular File
-d  → Directory</div></div>
+<p>اما یک نکته مهم وجود دارد:</p>
+<blockquote>لینوکس فقط فایل‌های معمولی ندارد.</blockquote>
+<p>چیزهایی که ما به‌عنوان «فایل» می‌بینیم، می‌توانند انواع مختلفی داشته باشند.</p>
 
 <h3>۳.۲ Directory چیست؟</h3>
-<p>Directory برای <strong>سازمان‌دهی فایل‌ها و Directoryهای دیگر</strong> استفاده می‌شود.</p>
+<p><strong>Directory</strong> را ساده‌ترین شکل می‌توانیم یک محفظه برای نگهداری و سازمان‌دهی فایل‌ها و دایرکتوری‌های دیگر بدانیم.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/student/
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/navid/
+│
 ├── notes.txt
 ├── script.sh
+│
 └── projects/
     ├── project1/
     └── project2/</div></div>
-<p>در این مثال:</p>
+<p>اینجا:</p>
 <ul>
-    <li><code>notes.txt</code> یک File است.</li>
-    <li><code>script.sh</code> یک File است.</li>
-    <li><code>projects</code> یک Directory است.</li>
-    <li><code>project1</code> و <code>project2</code> نیز Directory هستند.</li>
+    <li><code>notes.txt</code> → فایل</li>
+    <li><code>script.sh</code> → فایل</li>
+    <li><code>projects</code> → دایرکتوری</li>
+    <li><code>project1</code> → دایرکتوری</li>
 </ul>
-<p>پس Directory را بهتر است فقط «پوشه» تصور نکنیم؛ آن بخشی از ساختار فایل‌سیستم است که نام‌ها و ارتباط آن‌ها با اشیای فایل‌سیستم را سازمان‌دهی می‌کند.</p>
+<h4>یک نکته مهم</h4>
+<p>Directory خودش اطلاعات فایل‌ها را مثل یک فایل متنی نگهداری نمی‌کند؛ بلکه ساختار فایل‌سیستم اطلاعاتی مانند نام‌ها و ارتباط آن‌ها با inodeها را مدیریت می‌کند.</p>
+<p>فعلاً همین تصویر برای LPIC-1 کافی است.</p>
 
-<h3>۳.۳ انواع اصلی File System Objectها</h3>
-<p>با <code>ls -l</code> می‌توانیم اولین کاراکتر نوع File System Object را ببینیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
+<h3>۳.۳ inode چیست؟</h3>
+<p>این یکی از مهم‌ترین مفاهیم این جلسه است.</p>
+<p>می‌توانی inode را مثل <strong>شناسنامه فنی یک فایل</strong> تصور کنی.</p>
+<p>inode اطلاعاتی درباره فایل نگه می‌دارد، مانند:</p>
+<ul>
+    <li>نوع فایل</li>
+    <li>Permission</li>
+    <li>مالک</li>
+    <li>گروه</li>
+    <li>اندازه</li>
+    <li>زمان‌های مختلف فایل</li>
+    <li>تعداد Linkها</li>
+    <li>محل داده‌های فایل</li>
+</ul>
+<p>اما:</p>
+<blockquote><strong>نام فایل داخل inode ذخیره نمی‌شود.</strong></blockquote>
+<p>به‌صورت ساده:</p>
+<div class="code-container"><span class="code-label">inode</span><div class="code-block no-prompt">Directory
+   │
+   │  filename
+   ↓
+ inode
+   │
+   ├── permissions
+   ├── owner
+   ├── group
+   ├── size
+   ├── timestamps
+   └── data locations</div></div>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r--  1 student users 1200 Aug 25 15:00 notes.txt
-drwxr-xr-x  2 student users 4096 Aug 25 15:00 projects
-lrwxrwxrwx  1 student users   12 Aug 25 15:00 latest -> notes.txt</div></div>
-<p>اولین کاراکتر:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">notes.txt ───────→ inode 12543</div></div>
+<p>در واقع Directory می‌گوید:</p>
+<blockquote>نام <code>notes.txt</code> به inode شماره <code>12543</code> اشاره می‌کند.</blockquote>
+
+<h4>دیدن inode</h4>
+<p>با <code>ls -i</code>:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -i</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">12543 notes.txt
+12544 script.sh
+12545 projects</div></div>
+<p>عدد سمت چپ inode number است.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>ممکن است دو نام مختلف به <strong>یک inode</strong> اشاره کنند. این موضوع پایه مفهوم <strong>Hard Link</strong> است که در جلسه ۴ به‌صورت کامل یاد می‌گیریم.</div></div>
+
+<h3>۳.۴ انواع فایل‌ها در لینوکس</h3>
+<p>برای دیدن نوع فایل‌ها، <code>ls -l</code> بسیار مهم است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r--  1 navid users  1200 notes.txt
+drwxr-xr-x  2 navid users  4096 projects
+lrwxrwxrwx  1 navid users    12 latest -> notes.txt</div></div>
+<p>اولین کاراکتر نوع فایل را مشخص می‌کند:</p>
 <div class="table-wrap">
 <table>
 <thead><tr><th>علامت</th><th>نوع</th></tr></thead>
@@ -20265,469 +20308,477 @@ lrwxrwxrwx  1 student users   12 Aug 25 15:00 latest -> notes.txt</div></div>
 </tbody>
 </table>
 </div>
-<p>برای این جلسه بیشتر روی این سه مورد تمرکز کن:</p>
-<div class="code-container"><span class="code-label">مهم</span><div class="code-block no-prompt">-  → Regular File
-d  → Directory
-l  → Symbolic Link</div></div>
-<p>جزئیات Symbolic Link در جلسه ۴ بررسی می‌شود.</p>
+<p>فعلاً مهم‌ترین موارد:</p>
+<div class="code-container"><span class="code-label">مهم</span><div class="code-block no-prompt">- → فایل معمولی
+d → دایرکتوری
+l → Symbolic Link</div></div>
+<p>انواع دیگر را در مباحث مربوط به سخت‌افزار و سیستم فایل در حد لازم بیشتر می‌بینیم.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اولین کاراکتر خروجی <code>ls -l</code> نوع File System Object را مشخص می‌کند؛ بنابراین <code>d</code> به معنی Directory است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر خروجی این باشد:</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">drwxr-xr-x</div></div>
+<p>حرف اول <code>d</code> است؛ بنابراین این مورد <strong>Directory</strong> است، نه فایل معمولی.</p>
 
-<h2>۴. inode — شناسه‌ی داخلی فایل‌سیستم</h2>
-<h3>۴.۱ inode چیست؟</h3>
-<p>هر File System Object با یک <strong>inode</strong> مرتبط است.</p>
-<p>برای تصور ساده، inode را مثل «شناسنامه‌ی فنی» آن شیء در نظر بگیر.</p>
-<p>inode اطلاعاتی مانند موارد زیر را نگهداری می‌کند:</p>
-<ul>
-    <li>نوع فایل</li>
-    <li>Permissionها</li>
-    <li>مالک و گروه</li>
-    <li>اندازه</li>
-    <li>Timestampها</li>
-    <li>تعداد Linkها</li>
-    <li>اطلاعات مرتبط با محل داده‌های فایل</li>
-</ul>
-<p>اما یک نکته‌ی بسیار مهم:</p>
-<blockquote><strong>نام فایل مستقیماً داخل inode قرار ندارد.</strong></blockquote>
-<p>به‌صورت ساده:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Directory
-   │
-   │ filename
-   ↓
- inode
-   │
-   ├── type
-   ├── permissions
-   ├── owner / group
-   ├── size
-   ├── timestamps
-   └── references to file data</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">notes.txt ─────→ inode 12543</div></div>
-<p>یعنی Directory نام <code>notes.txt</code> را به inode شماره <code>12543</code> مرتبط می‌کند.</p>
-
-<h3>۴.۲ مشاهده inode</h3>
-<p>با <code>ls -i</code> می‌توانیم inode number را ببینیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -i</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">12543 notes.txt
-12544 script.sh
-12545 projects</div></div>
-<p>عدد سمت چپ، inode number است.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته مهم</strong><br>ممکن است چند نام مختلف به یک inode اشاره کنند. این مفهوم پایه‌ی درک Hard Link است که در جلسه ۴ به‌طور کامل بررسی می‌شود.</div></div>
-
-<h2>۵. مسیر و موقعیت فعلی</h2>
-<h3>۵.۱ ساختار درختی فایل‌سیستم</h3>
-<p>فایل‌سیستم لینوکس را می‌توان به شکل یک درخت تصور کرد:</p>
+<h3>۳.۵ Path — مسیر فایل</h3>
+<p>سیستم فایل لینوکس ساختاری درختی دارد:</p>
 <div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">/
 ├── home
-│   └── student
+│   └── navid
 │       ├── notes.txt
 │       └── projects
+│
 ├── etc
 ├── var
 └── tmp</div></div>
-<p>در بالاترین سطح، <code>/</code> قرار دارد که به آن <strong>Root Directory</strong> می‌گوییم.</p>
-<p>این را با کاربر <code>root</code> اشتباه نکن:</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/      → Root Directory
-root   → یک حساب کاربری</div></div>
+<p>در بالاترین سطح، <code>/</code> قرار دارد.</p>
+<p>به <code>/</code> می‌گوییم:</p>
+<blockquote><strong>Root Directory</strong></blockquote>
+<p>این را با کاربر <code>root</code> اشتباه نگیر.</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/       → Root Directory
+root    → نام کاربر قدرتمند سیستم</div></div>
 
-<h3>۵.۲ Current Working Directory</h3>
-<p>هر Shell یک <strong>Current Working Directory</strong> دارد؛ یعنی دایرکتوری‌ای که مسیرهای Relative نسبت به آن تفسیر می‌شوند.</p>
+<h3>۳.۶ Absolute Path</h3>
+<p>مسیر Absolute از <code>/</code> شروع می‌شود و <strong>مکان کامل فایل</strong> را مشخص می‌کند.</p>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/student/projects</div></div>
-<p>اگر این دایرکتوری Current Working Directory باشد:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt</div></div>
-<p>به این فایل اشاره می‌کند:</p>
-<div class="code-container"><span class="code-label">فایل کامل</span><div class="code-block no-prompt">/home/student/projects/notes.txt</div></div>
-<p>پس یکی از اولین سؤال‌ها هنگام کار با فایل‌ها این است:</p>
-<blockquote>الان در کدام Directory هستم؟</blockquote>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
+<p>مهم نیست الان در کدام دایرکتوری هستی.</p>
+<p>اگر بگویی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat /home/navid/notes.txt</div></div>
+<p>مسیر کامل را مشخص کرده‌ای.</p>
+<h4>مدل ذهنی</h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/
+└── home
+    └── navid
+        └── notes.txt</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
+<p>یک Absolute Path است.</p>
 
-<h3>۵.۳ Absolute Path</h3>
-<p><strong>Absolute Path</strong> مسیر کامل یک فایل یا Directory است و از <code>/</code> شروع می‌شود.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/student/projects/notes.txt</div></div>
-<p>این مسیر مستقل از Current Working Directory است.</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls /home/student/projects/notes.txt</div></div>
-
-<h3>۵.۴ Relative Path</h3>
-<p><strong>Relative Path</strong> نسبت به Current Working Directory معنا پیدا می‌کند.</p>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">محل فعلی</span><div class="code-block no-prompt">Current Working Directory:
-/home/student/projects</div></div>
-<p>و فایل:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/student/projects/notes.txt</div></div>
-<p>در این حالت:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls notes.txt</div></div>
-<p>یک Relative Path است.</p>
-<p>مقایسه:</p>
+<h3>۳.۷ Relative Path</h3>
+<p>Relative Path نسبت به <strong>دایرکتوری فعلی</strong> معنا پیدا می‌کند.</p>
+<p>فرض کن الان اینجا هستیم:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/</div></div>
+<p>و فایل داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/notes.txt</div></div>
+<p>می‌توانیم بگوییم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat notes.txt</div></div>
+<p>چون <code>notes.txt</code> نسبت به محل فعلی مشخص است.</p>
+<p>اگر وارد <code>projects</code> شویم:</p>
+<div class="code-container"><span class="code-label">ورود</span><div class="code-block">cd projects</div></div>
+<p>حالا موقعیت ما:</p>
+<div class="code-container"><span class="code-label">محل جدید</span><div class="code-block no-prompt">/home/navid/projects/</div></div>
+<p>اگر فایل زیر وجود داشته باشد:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/projects/test.txt</div></div>
+<p>می‌توانیم بنویسیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat test.txt</div></div>
+<h4>تفاوت اصلی</h4>
 <div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Absolute:
- /home/student/projects/notes.txt
+از / شروع می‌شود و مستقل از محل فعلی است.
 
 Relative:
- notes.txt</div></div>
-<h4>نکته کلیدی</h4>
-<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">Absolute Path
-→ مستقل از محل فعلی
+نسبت به محل فعلی محاسبه می‌شود.</div></div>
 
-Relative Path
-→ وابسته به محل فعلی</div></div>
-
-<h3>۵.۵ <code>.</code> و <code>..</code></h3>
-<p>دو نماد مهم در Relative Path:</p>
-<h4><code>.</code> — دایرکتوری فعلی</h4>
-<div class="code-container"><span class="code-label">نقطه</span><div class="code-block no-prompt">.</div></div>
-<p>یعنی Current Directory.</p>
+<h3>۳.۸ <code>.</code> و <code>..</code></h3>
+<p>دو مفهوم بسیار مهم در مسیرها:</p>
+<h4><code>.</code></h4>
+<p>یعنی:</p>
+<blockquote>دایرکتوری فعلی</blockquote>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">./script.sh</div></div>
-<p>یعنی <code>script.sh</code> در دایرکتوری فعلی.</p>
-<h4><code>..</code> — دایرکتوری والد</h4>
-<div class="code-container"><span class="code-label">دو نقطه</span><div class="code-block no-prompt">..</div></div>
-<p>یعنی Parent Directory.</p>
-<p>اگر اینجا باشیم:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/student/projects</div></div>
+<p>یعنی اجرای <code>script.sh</code> از دایرکتوری فعلی.</p>
+
+<h4><code>..</code></h4>
+<p>یعنی:</p>
+<blockquote>دایرکتوری والد (Parent)</blockquote>
+<p>مثلاً اگر اینجا باشیم:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/projects/</div></div>
 <p>با:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">cd ..</div></div>
-<p>به اینجا می‌رویم:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/student</div></div>
-<p>اگر مسیر فعلی:</p>
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/student/projects/web</div></div>
-<p>باشد:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">.   → /home/student/projects/web
-..  → /home/student/projects</div></div>
+<p>می‌رویم به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/</div></div>
+<p>دیاگرام:</p>
+<div class="code-container"><span class="code-label">دیاگرام</span><div class="code-block no-prompt">/home/navid/
+      │
+      └── projects/
+             ↑
+             │
+            ..</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br><code>.</code> به Current Directory و <code>..</code> به Parent Directory اشاره می‌کند.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر مسیر فعلی این باشد:</div></div>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/navid/projects/web</div></div>
+<p>آنگاه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">.   → /home/navid/projects/web
+..  → /home/navid/projects</div></div>
 
-<h2>۶. مشاهده و بررسی محیط</h2>
-<h3>۶.۱ <code>pwd</code> — مسیر فعلی</h3>
-<p>برای دیدن Current Working Directory:</p>
+<h3>۳.۹ <code>pwd</code> — من کجا هستم؟</h3>
+<p>وقتی با چندین دایرکتوری کار می‌کنی، اولین سؤال مهم این است:</p>
+<blockquote>الان کجا هستم؟</blockquote>
+<p>دستور:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">pwd</div></div>
 <p>مخفف:</p>
-<blockquote>Print Working Directory</blockquote>
+<blockquote><strong>Print Working Directory</strong></blockquote>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">اجرا</span><div class="code-block no-prompt">$ pwd
-/home/student/projects</div></div>
-<p>یعنی Shell در حال حاضر در:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/student/projects</div></div>
-<p>قرار دارد.</p>
-<p><code>pwd</code> فایل را جست‌وجو نمی‌کند؛ فقط مسیر Directory فعلی را نمایش می‌دهد.</p>
+/home/navid/projects</div></div>
+<p>یعنی Shell در حال حاضر در این دایرکتوری قرار دارد.</p>
+<h4>چرا مهم است؟</h4>
+<p>فرض کن می‌خواهی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm *.log</div></div>
+<p>قبل از اجرای آن بهتر است بدانی در کدام دایرکتوری هستی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>چون Relative Path به موقعیت فعلی وابسته است.</p>
 
-<h3>۶.۲ <code>ls</code> — مشاهده محتویات</h3>
-<p>بعد از اینکه فهمیدیم کجا هستیم، می‌خواهیم بدانیم چه چیزهایی در آنجا وجود دارد:</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br><code>pwd</code> فایل یا دایرکتوری را پیدا نمی‌کند؛ فقط <strong>مسیر دایرکتوری کاری فعلی</strong> را نمایش می‌دهد.</div></div>
+
+<h3>۳.۱۰ <code>ls</code> — چه چیزی اینجاست؟</h3>
+<p>بعد از اینکه فهمیدیم کجا هستیم، می‌خواهیم بدانیم چه چیزهایی در آنجا وجود دارد.</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls</div></div>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">notes.txt
 projects
 script.sh</div></div>
 
-<h4><code>ls -l</code> — نمایش جزئیات</h4>
+<h4>گزینه‌های مهم <code>ls</code></h4>
+<h5>نمایش جزئیات</h5>
 <div class="code-container"><span class="code-label">جزئیات</span><div class="code-block">ls -l</div></div>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 student users 1200 Aug 25 15:00 notes.txt</div></div>
-<p>فعلاً مهم‌ترین بخش برای ما:</p>
-<div class="code-container"><span class="code-label">نوع</span><div class="code-block no-prompt">-rw-r--r--</div></div>
-<p>است که نوع Object و Permissionها را نشان می‌دهد.</p>
-<p>جزئیات Permission در جلسه ۵ آموزش داده می‌شود.</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 navid users 1200 Aug 25 15:00 notes.txt</div></div>
+<p>فعلاً مهم‌ترین قسمت برای ما:</p>
+<div class="code-container"><span class="code-label">قسمت اول</span><div class="code-block no-prompt">-rw-r--r--</div></div>
+<p>نوع فایل و Permission را نشان می‌دهد.</p>
+<p>جزئیات Permission را در <strong>جلسه ۵</strong> به‌صورت کامل یاد می‌گیریم.</p>
 
-<h4><code>ls -a</code> — نمایش موارد مخفی</h4>
+<h5>نمایش فایل‌های مخفی</h5>
 <div class="code-container"><span class="code-label">مخفی</span><div class="code-block">ls -a</div></div>
-<p>نام‌هایی که با <code>.</code> شروع می‌شوند معمولاً Hidden هستند:</p>
+<p>در لینوکس فایل‌هایی که نامشان با <code>.</code> شروع می‌شود معمولاً Hidden هستند:</p>
 <div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">.bashrc
 .profile</div></div>
-<p>همچنین <code>.</code> و <code>..</code> را نیز در خروجی مشاهده می‌کنی.</p>
+<p>با:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -a</div></div>
+<p>نمایش داده می‌شوند.</p>
 
-<h4>ترکیب گزینه‌ها</h4>
+<h5>ترکیب گزینه‌ها</h5>
 <div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">ls -la</div></div>
 <p>یعنی:</p>
 <div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">-l → جزئیات
--a → موارد مخفی</div></div>
+-a → فایل‌های مخفی</div></div>
 
-<h4>چند گزینه کاربردی دیگر</h4>
-<div class="code-container"><span class="code-label">خواناتر</span><div class="code-block">ls -h</div></div>
-<p>نمایش اندازه‌ها به شکل خواناتر، معمولاً همراه با <code>-l</code>:</p>
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">ls -lh</div></div>
-<p>برای مشاهده‌ی زیرDirectoryها به‌صورت بازگشتی:</p>
-<div class="code-container"><span class="code-label">بازگشتی</span><div class="code-block">ls -R</div></div>
-<p>برای مشاهده inode:</p>
-<div class="code-container"><span class="code-label">inode</span><div class="code-block">ls -i</div></div>
-<p>برای دیدن خود Directory به‌جای محتویات آن:</p>
-<div class="code-container"><span class="code-label">خود دایرکتوری</span><div class="code-block">ls -d projects</div></div>
+<h5>مشاهده یک دایرکتوری بدون ورود به آن</h5>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls /etc</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls -l /etc</div></div>
+<p>لازم نیست حتماً با <code>cd</code> وارد دایرکتوری شوی.</p>
 
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong>فعلاً لازم نیست همه‌ی گزینه‌های <code>ls</code> را حفظ کنی؛ روی گزینه‌هایی تمرکز کن که در این جلسه و LPIC-1 کاربرد بیشتری دارند.</div></div>
-
-<h2>۷. ایجاد فایل و Directory</h2>
-<h3>۷.۱ <code>touch</code> — ایجاد فایل</h3>
-<p>اگر فایل وجود نداشته باشد:</p>
+<h3>۳.۱۱ ساخت فایل با <code>touch</code></h3>
+<p>حالا که می‌دانیم فایل چیست، می‌توانیم آن را ایجاد کنیم.</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch notes.txt</div></div>
-<p>یک فایل خالی ایجاد می‌شود.</p>
-<p>اگر فایل از قبل وجود داشته باشد، <code>touch</code> محتوای آن را پاک نمی‌کند؛ Timestampهای مربوط به فایل را به‌روزرسانی می‌کند.</p>
-<h4>اشتباه رایج</h4>
-<p><code>touch</code> ابزار ویرایش محتوا نیست:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch file.txt</div></div>
-<p>به معنی «باز کردن فایل برای نوشتن» نیست؛ در صورت نبود فایل، آن را ایجاد می‌کند.</p>
+<p>اگر فایل وجود نداشته باشد:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt</div></div>
+<p>ساخته می‌شود.</p>
+<p>اگر فایل از قبل وجود داشته باشد، <code>touch</code> معمولاً محتوای آن را پاک نمی‌کند؛ بلکه زمان‌های مربوط به فایل را به‌روزرسانی می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">touch report.txt</div></div>
 
-<h3>۷.۲ <code>mkdir</code> — ایجاد Directory</h3>
-<p>برای ساخت Directory:</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>فکر نکن <code>touch</code> یعنی «ویرایش فایل».</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch file.txt</div></div>
+<p>محتوای فایل را تولید نمی‌کند؛ فقط فایل خالی ایجاد می‌کند، یا timestamp فایل موجود را تغییر می‌دهد.</p>
+
+<h3>۳.۱۲ ساخت Directory با <code>mkdir</code></h3>
+<p>برای ساخت دایرکتوری:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir projects</div></div>
-<p>برای ساخت چند Directory:</p>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">projects/</div></div>
+
+<h4>ساخت چند Directory</h4>
 <div class="code-container"><span class="code-label">چند</span><div class="code-block">mkdir dir1 dir2 dir3</div></div>
 
-<h4><code>mkdir -p</code> — ایجاد ساختار تو‌در‌تو</h4>
-<p>اگر این ساختار را می‌خواهیم:</p>
+<h4>ساخت ساختار تو در تو با <code>-p</code></h4>
+<p>فرض کن می‌خواهیم این ساختار را ایجاد کنیم:</p>
 <div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
 └── backend/
     └── logs/</div></div>
 <p>می‌توانیم بنویسیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir -p project/backend/logs</div></div>
-<p>گزینه <code>-p</code> باعث می‌شود Directoryهای والد موردنیاز نیز در صورت نبودن ایجاد شوند.</p>
-<p>بدون <code>-p</code>:</p>
+<p>گزینه <code>-p</code> باعث می‌شود دایرکتوری‌های والد موردنیاز نیز ایجاد شوند.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر:</div></div>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir project/backend/logs</div></div>
-<p>اگر <code>project</code> یا <code>backend</code> وجود نداشته باشد، دستور شکست می‌خورد.</p>
+<p>و <code>project</code> یا <code>backend</code> وجود نداشته باشند، دستور شکست می‌خورد.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir -p project/backend/logs</div></div>
+<p>آن‌ها را در صورت نیاز ایجاد می‌کند.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br><code>mkdir -p</code> برای ایجاد یک مسیر تو‌در‌تو، بدون نیاز به ایجاد دستی والدها، بسیار مهم است.</div></div>
-
-<h2>۸. کپی، جابه‌جایی و تغییر نام</h2>
-<h3>۸.۱ <code>cp</code> — کپی</h3>
-<p>برای کپی یک فایل:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp notes.txt backup.txt</div></div>
-<p>نتیجه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt
+<h3>۳.۱۳ کپی کردن با <code>cp</code></h3>
+<p>حالا فرض کن فایل زیر را داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">notes.txt</div></div>
+<p>می‌خواهیم یک نسخه از آن بسازیم:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp notes.txt backup.txt</div></div>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">notes.txt
+     │
+     │ cp
+     ↓
 backup.txt</div></div>
-<p>محتوای <code>backup.txt</code> از <code>notes.txt</code> کپی شده است.</p>
+<p>محتوای <code>backup.txt</code> با <code>notes.txt</code> یکسان خواهد بود.</p>
 
 <h4>کپی فایل به Directory</h4>
-<div class="code-container"><span class="code-label">کپی به دایرکتوری</span><div class="code-block">cp notes.txt backup/</div></div>
-<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp notes.txt backup/</div></div>
+<p>یعنی:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">backup/
 └── notes.txt</div></div>
 
 <h4>کپی Directory</h4>
-<p>برای کپی یک Directory همراه با محتویات:</p>
-<div class="code-container"><span class="code-label">کپی دایرکتوری</span><div class="code-block">cp -r project backup/</div></div>
-<p>گزینه <code>-r</code> یعنی Recursive.</p>
+<p>برای کپی یک دایرکتوری معمولاً از <code>-r</code> استفاده می‌کنیم:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp -r project backup/</div></div>
+<p>یعنی کل ساختار <code>project</code> را کپی کن.</p>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>کپی Directory و محتویات آن معمولاً به <code>cp -r</code> نیاز دارد.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>برای کپی کردن یک directory به همراه محتویات آن:</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp -r</div></div>
 
-<h4><code>cp -i</code></h4>
-<p>برای درخواست تأیید هنگام احتمال overwrite:</p>
-<div class="code-container"><span class="code-label">تأیید</span><div class="code-block">cp -i notes.txt backup.txt</div></div>
-<p>این گزینه در کارهای حساس می‌تواند از overwrite ناخواسته جلوگیری کند.</p>
+<h3>۳.۱۴ جابه‌جایی و تغییر نام با <code>mv</code></h3>
+<p>دستور <code>mv</code> دو کاربرد بسیار مهم دارد:</p>
+<ol>
+    <li>جابه‌جایی</li>
+    <li>تغییر نام</li>
+</ol>
 
-<h3>۸.۲ <code>mv</code> — جابه‌جایی</h3>
-<p>برای جابه‌جایی:</p>
+<h4>جابه‌جایی</h4>
 <div class="code-container"><span class="code-label">جابه‌جایی</span><div class="code-block">mv notes.txt backup/</div></div>
 <p>فایل از محل قبلی به <code>backup/</code> منتقل می‌شود.</p>
+<div class="code-container"><span class="code-label">قبل و بعد</span><div class="code-block no-prompt">قبل:
 
-<h4><code>mv</code> برای تغییر نام</h4>
+.
+├── notes.txt
+└── backup/
+
+
+بعد:
+
+.
+└── backup
+    └── notes.txt</div></div>
+
+<h4>تغییر نام</h4>
 <div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv notes.txt report.txt</div></div>
 <p>یعنی:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">notes.txt → report.txt</div></div>
-<p>بنابراین <code>mv</code> هم برای <strong>Move</strong> و هم برای <strong>Rename</strong> استفاده می‌شود.</p>
+<p>در واقع <code>mv</code> می‌تواند بدون جابه‌جایی فیزیکی، نام فایل را تغییر دهد.</p>
 
-<h4><code>mv -i</code></h4>
-<div class="code-container"><span class="code-label">تأیید</span><div class="code-block">mv -i old.txt new.txt</div></div>
-<p>در صورت احتمال overwrite، از کاربر تأیید می‌گیرد.</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>بعضی افراد تصور می‌کنند برای تغییر نام دستور جداگانه‌ای مثل <code>rename</code> همیشه لازم است.</div></div>
+<p>در کارهای معمول:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv old.txt new.txt</div></div>
+<p>کافی است.</p>
 
-<h2>۹. حذف فایل و Directory</h2>
-<h3>۹.۱ <code>rm</code> — حذف فایل</h3>
-<p>برای حذف یک فایل:</p>
+<h3>۳.۱۵ حذف فایل با <code>rm</code></h3>
+<p>برای حذف فایل:</p>
 <div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm notes.txt</div></div>
-<p>حذف با <code>rm</code> را با انتقال به Recycle Bin اشتباه نکن؛ معمولاً فایل مستقیماً از نام‌گذاری عادی فایل‌سیستم حذف می‌شود و نباید روی امکان بازیابی ساده حساب کنی.</p>
+<p>پس از اجرای دستور، فایل حذف می‌شود.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته بسیار مهم</strong><br>در لینوکس معمولاً <code>rm</code> مانند Recycle Bin ویندوز عمل نمی‌کند.</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm important.txt</div></div>
+<p>را نباید مثل انتقال به سطل زباله در نظر بگیری.</p>
+<p>پس قبل از اجرای آن مطمئن شو.</p>
 
 <h4>حذف چند فایل</h4>
 <div class="code-container"><span class="code-label">چند</span><div class="code-block">rm file1.txt file2.txt file3.txt</div></div>
 
-<h4><code>rm -i</code></h4>
-<p>برای دریافت تأیید:</p>
-<div class="code-container"><span class="code-label">تأیید</span><div class="code-block">rm -i important.txt</div></div>
-<p>این گزینه برای جلوگیری از حذف ناخواسته مفید است.</p>
+<h4>حذف Directory و محتویات آن</h4>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm -r project</div></div>
+<p>گزینه <code>-r</code> یعنی به‌صورت recursive.</p>
+<p>یعنی وارد زیرشاخه‌ها شو و محتویات را نیز حذف کن.</p>
 
-<h3>۹.۲ حذف Directory با <code>rm -r</code></h3>
-<p>برای حذف یک Directory همراه با محتویات:</p>
-<div class="code-container"><span class="code-label">حذف دایرکتوری</span><div class="code-block">rm -r project</div></div>
-<p>گزینه <code>-r</code> یعنی حذف Recursive.</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>🚨 هشدار</strong><br>دستور زیر بسیار قدرتمند و خطرناک است:</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -rf directory</div></div>
+<p>در محیط واقعی باید قبل از اجرای آن مسیر را دقیق بررسی کنی.</p>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ هشدار</strong><br>دستورهایی مثل <code>rm -rf directory</code> بسیار قدرتمند هستند. قبل از اجرای چنین دستوری باید مسیر و هدف را دقیق بررسی کنی.</div></div>
+<h3>۳.۱۶ <code>rmdir</code></h3>
+<p>برای حذف یک دایرکتوری خالی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">rmdir emptydir</div></div>
+<p>اگر دایرکتوری محتویاتی داشته باشد، معمولاً حذف نمی‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خالی</span><div class="code-block no-prompt">emptydir/</div></div>
+<p>→ قابل حذف با <code>rmdir</code></p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">غیرخالی</span><div class="code-block no-prompt">project/
+├── a.txt
+└── b.txt</div></div>
+<p>→ <code>rmdir project</code> شکست می‌خورد.</p>
 
-<h3>۹.۳ <code>rmdir</code> — حذف Directory خالی</h3>
-<p>برای حذف یک Directory خالی:</p>
-<div class="code-container"><span class="code-label">حذف خالی</span><div class="code-block">rmdir emptydir</div></div>
-<p>اگر Directory محتویات داشته باشد، <code>rmdir</code> آن را حذف نمی‌کند.</p>
-<p>مقایسه:</p>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">rmdir dir
-   ↓
+<h4>تفاوت <code>rmdir</code> و <code>rm -r</code></h4>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">rmdir directory
+       ↓
 فقط Directory خالی
 
-rm -r dir
-   ↓
+rm -r directory
+       ↓
 Directory + محتویات</div></div>
 
-<h2>۱۰. Wildcardها — انتخاب فایل با الگو</h2>
+<h3>۳.۱۷ Wildcards — انتخاب الگوها</h3>
+<p>اینجا یکی از کاربردی‌ترین بخش‌های جلسه شروع می‌شود.</p>
 <p>فرض کن این فایل‌ها را داریم:</p>
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">report.txt
 report.pdf
 report.jpg
 notes.txt
 image.jpg</div></div>
-<p>اگر بخواهیم چند فایل را با یک الگو انتخاب کنیم، می‌توانیم از Wildcardها استفاده کنیم.</p>
-<p>سه Wildcard مهم این جلسه:</p>
-<div class="code-container"><span class="code-label">Wildcardها</span><div class="code-block no-prompt">*   → هر تعداد کاراکتر
-?   → دقیقاً یک کاراکتر
-[]  → یک کاراکتر از مجموعه مشخص</div></div>
+<p>اگر بخواهیم چند فایل را با یک الگو انتخاب کنیم، از <strong>Wildcard</strong> استفاده می‌کنیم.</p>
+<p>سه مورد مهم:</p>
+<div class="code-container"><span class="code-label">Wildcardها</span><div class="code-block no-prompt">*     → هر تعداد کاراکتر
+?     → دقیقاً یک کاراکتر
+[]    → یکی از کاراکترهای مشخص‌شده</div></div>
 
-<h3>۱۰.۱ <code>*</code></h3>
+<h4><code>*</code></h4>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls *.txt</div></div>
-<p>فایل‌هایی که نامشان با <code>.txt</code> تمام می‌شود را مطابق الگو انتخاب می‌کند:</p>
+<p>یعنی:</p>
+<blockquote>تمام نام‌هایی که با <code>.txt</code> تمام می‌شوند.</blockquote>
+<p>خروجی:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">notes.txt
 report.txt</div></div>
 <p>مثال دیگر:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">rm *.log</div></div>
-<p>فایل‌های <code>.log</code> مطابق الگو در محل موردنظر را هدف قرار می‌دهد.</p>
-<h4>نکته مهم</h4>
-<p><code>*</code> به معنی «هر فایل در کل سیستم» نیست.</p>
-<p>الگوی:</p>
-<div class="code-container"><span class="code-label">الگو</span><div class="code-block">*.txt</div></div>
-<p>توسط Shell در مسیر مربوط به الگو بررسی می‌شود.</p>
-<p>همچنین در حالت معمول <code>*</code> فایل‌های Hidden را که با <code>.</code> شروع می‌شوند شامل نمی‌شود.</p>
+<p>تمام فایل‌های <code>.log</code> در دایرکتوری فعلی را هدف قرار می‌دهد.</p>
 
-<h3>۱۰.۲ <code>?</code></h3>
-<p><code>?</code> دقیقاً یک کاراکتر را جایگزین می‌کند.</p>
-<p>اگر داشته باشیم:</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>🚨 نکته مهم</strong><br><code>*</code> به معنی «هر فایل در کل سیستم» نیست.</div></div>
+<p>این:</p>
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">*.txt</div></div>
+<p>فقط با فایل‌های مطابق الگو در <strong>محل موردنظر Shell</strong> تطبیق داده می‌شود.</p>
+
+<h4><code>?</code></h4>
+<p>علامت <code>?</code> دقیقاً یک کاراکتر را جایگزین می‌کند.</p>
+<p>فرض:</p>
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1
 file2
 file10</div></div>
-<p>دستور:</p>
+<p>اگر بزنیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls file?</div></div>
-<p>این‌ها را مطابق می‌کند:</p>
+<p>مطابق می‌شوند:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1
 file2</div></div>
-<p>اما:</p>
+<p>ولی:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file10</div></div>
-<p>مطابق نیست؛ چون دو کاراکتر بعد از <code>file</code> دارد.</p>
+<p>مطابق نیست، چون دو کاراکتر بعد از <code>file</code> دارد.</p>
 
-<h3>۱۰.۳ <code>[]</code></h3>
+<h4><code>[]</code></h4>
 <p>برای انتخاب یک کاراکتر از مجموعه مشخص:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[123]</div></div>
-<p>مطابق:</p>
+<p>یعنی:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file1
 file2
 file3</div></div>
-<p>و نه:</p>
+<p>اما:</p>
 <div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">file4</div></div>
-<p>می‌توان Range نیز داشت:</p>
+<p>مطابق نیست.</p>
+<p>می‌توانیم Range هم داشته باشیم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls file[1-5]</div></div>
-<p>یعنی یک کاراکتر از محدوده‌ی:</p>
+<p>یعنی یکی از:</p>
 <div class="code-container"><span class="code-label">اعداد</span><div class="code-block no-prompt">1 2 3 4 5</div></div>
 
-<h3>۱۰.۴ مقایسه سه Wildcard</h3>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">*       → صفر یا چند کاراکتر
-?       → دقیقاً یک کاراکتر
-[abc]   → دقیقاً یک کاراکتر از a یا b یا c</div></div>
-<p>مثلاً:</p>
+<h4>یک مثال ترکیبی</h4>
+<p>فرض کنیم:</p>
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">app1.log
 app2.log
 app3.log
-app10.log</div></div>
-<p>با:</p>
+app10.log
+db1.log</div></div>
+<p>دستور:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls app?.log</div></div>
-<p>سه فایل اول مطابق هستند، اما <code>app10.log</code> نیست.</p>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">app1.log
+app2.log
+app3.log</div></div>
+<p>ولی <code>app10.log</code> نه؛ چون <code>?</code> فقط یک کاراکتر را پوشش می‌دهد.</p>
 
-<h2>۱۱. سناریوی عملی</h2>
-<p>فرض کنیم می‌خواهیم چنین ساختاری بسازیم:</p>
+<h3>۳.۱۸ یک سناریوی کوچک واقعی</h3>
+<p>فرض کن می‌خواهیم برای یک پروژه چنین ساختاری بسازیم:</p>
 <div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
 ├── docs/
 ├── backup/
 └── src/</div></div>
 <p>ابتدا:</p>
-<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir -p project/docs
+<div class="code-container"><span class="code-label">روش ساده</span><div class="code-block">mkdir -p project/docs
 mkdir -p project/backup
 mkdir -p project/src</div></div>
-<p>ایجاد فایل‌ها:</p>
-<div class="code-container"><span class="code-label">ایجاد</span><div class="code-block">touch project/src/main.py
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">ساخت فایل</span><div class="code-block">touch project/src/main.py
 touch project/docs/readme.txt</div></div>
 <p>کپی:</p>
 <div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp project/src/main.py project/backup/</div></div>
 <p>تغییر نام:</p>
 <div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv project/docs/readme.txt project/docs/README.txt</div></div>
-<p>بررسی ساختار:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -R project</div></div>
-<p>در این سناریو چند مفهوم را کنار هم استفاده کردیم:</p>
-<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">mkdir
-  ↓
-touch
-  ↓
-cp
-  ↓
-mv
-  ↓
-ls</div></div>
-<p>هدف این جلسه همین است: دستورها را به‌صورت جداگانه حفظ نکنیم؛ بلکه بدانیم هرکدام در چه مرحله‌ای از حل مسئله استفاده می‌شوند.</p>
+<p>مشاهده:</p>
+<div class="code-container"><span class="code-label">مشاهده</span><div class="code-block">ls -R project</div></div>
+<p>در نتیجه با چند دستور ساده توانستیم یک ساختار واقعی پروژه بسازیم.</p>
 
-<h2>۱۲. خطاهای واقعی و روش حل آن‌ها</h2>
+<h2>۴. خطاهای واقعی</h2>
 <div class="table-wrap">
 <table>
-<thead><tr><th>خطا / وضعیت</th><th>علت محتمل</th><th>بررسی / راه‌حل</th></tr></thead>
+<thead><tr><th>خطا</th><th>علت</th><th>راه‌حل</th></tr></thead>
 <tbody>
-<tr><td><code>mkdir: cannot create directory ...</code></td><td>والد موردنیاز وجود ندارد</td><td>مسیر را بررسی کن و در صورت نیاز <code>mkdir -p</code> استفاده کن</td></tr>
-<tr><td><code>cp: ... omitting directory</code></td><td>تلاش برای کپی Directory بدون Recursive</td><td>از <code>cp -r</code> استفاده کن</td></tr>
-<tr><td><code>rmdir: Directory not empty</code></td><td>Directory خالی نیست</td><td>محتویات را بررسی کن؛ در صورت نیاز و با اطمینان <code>rm -r</code></td></tr>
-<tr><td><code>rm: cannot remove ...</code></td><td>مسیر اشتباه، فایل وجود ندارد یا دسترسی کافی نیست</td><td>ابتدا <code>pwd</code> و <code>ls</code> و در صورت نیاز مسیر را بررسی کن</td></tr>
-<tr><td>Wildcard نتیجه مورد انتظار را نمی‌دهد</td><td>الگو با نام‌ها یا مسیر موردنظر تطابق ندارد</td><td>الگو را بررسی و با <code>pwd</code> و <code>ls</code> محیط را بررسی کن</td></tr>
+<tr><td><code>mkdir: cannot create directory ...</code></td><td>والد موردنیاز وجود ندارد</td><td>استفاده از <code>mkdir -p</code></td></tr>
+<tr><td><code>cp: -r not specified; omitting directory</code></td><td>تلاش برای کپی Directory بدون recursive</td><td>استفاده از <code>cp -r</code></td></tr>
+<tr><td><code>rmdir: Directory not empty</code></td><td>دایرکتوری خالی نیست</td><td>ابتدا محتویات را مدیریت کن یا در صورت اطمینان <code>rm -r</code></td></tr>
+<tr><td><code>rm: cannot remove ...</code></td><td>فایل وجود ندارد یا Permission کافی نداری</td><td>مسیر و دسترسی را بررسی کن</td></tr>
+<tr><td>Wildcard نتیجه مورد انتظار را نمی‌دهد</td><td>الگو با نام فایل‌ها تطابق ندارد</td><td>الگو و محل فعلی را با <code>pwd</code> و <code>ls</code> بررسی کن</td></tr>
 </tbody>
 </table>
 </div>
 
-<h2>۱۳. سناریوی ترکیبی عیب‌یابی</h2>
+<h2>۵. سناریوی ترکیبی عیب‌یابی</h2>
 <h3>مسئله</h3>
-<p>در یک سرور، وارد محیط زیر شده‌ای:</p>
+<p>روی یک سرور وارد محیط کاری شده‌ای:</p>
 <div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">$ pwd
-/home/student/project</div></div>
+/home/navid/project</div></div>
 <p>محتویات:</p>
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">app.py
 app1.log
 app2.log
 README.txt
 backup/</div></div>
-<p>وظیفه:</p>
+<p>وظیفه مدیر سیستم این است:</p>
 <ol>
-    <li>Directoryای به نام <code>old_logs</code> بساز.</li>
-    <li>فایل‌های <code>app1.log</code> و <code>app2.log</code> را به آن منتقل کن.</li>
-    <li>از <code>app.py</code> یک کپی داخل <code>backup/</code> ایجاد کن.</li>
-    <li>نام کپی را <code>app_backup.py</code> بگذار.</li>
-    <li>نتیجه را بررسی کن.</li>
+    <li>یک پوشه به نام <code>old_logs</code> بسازی.</li>
+    <li>فایل‌های <code>app1.log</code> و <code>app2.log</code> را به آن منتقل کنی.</li>
+    <li>از <code>app.py</code> یک کپی داخل <code>backup/</code> ایجاد کنی.</li>
+    <li>نام کپی را <code>app_backup.py</code> بگذاری.</li>
+    <li>مطمئن شوی ساختار نهایی درست است.</li>
 </ol>
 
-<h4>پاسخ</h4>
-<h5>مشاهده</h5>
-<p>ابتدا موقعیت و محتویات را بررسی می‌کنیم:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd
-ls</div></div>
-<p>باید مطمئن شویم در:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/student/project</div></div>
-<p>هستیم.</p>
+<h3>پاسخ</h3>
+<h4>مشاهده → تحلیل</h4>
+<p>اول مطمئن می‌شویم در محل درست هستیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">pwd</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/navid/project</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+<p>تا فایل‌ها را ببینیم.</p>
 
-<h5>تحلیل</h5>
-<p>برای ساخت Directory:</p>
+<h4>تشخیص → انتخاب راه‌حل</h4>
+<p>برای ساخت دایرکتوری:</p>
 <div class="code-container"><span class="code-label">ساخت</span><div class="code-block">mkdir old_logs</div></div>
-<p>برای انتخاب دو فایل Log می‌توانیم از:</p>
-<div class="code-container"><span class="code-label">الگو</span><div class="code-block no-prompt">app?.log</div></div>
-<p>استفاده کنیم؛ چون بعد از <code>app</code> دقیقاً یک کاراکتر داریم.</p>
+<p>برای انتخاب دو فایل log می‌توانیم از Wildcard استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">app?.log</div></div>
+<p>چون:</p>
+<div class="code-container"><span class="code-label">تطابق</span><div class="code-block no-prompt">app1.log
+app2.log</div></div>
+<p>هر دو دقیقاً یک کاراکتر بعد از <code>app</code> دارند.</p>
 
-<h5>اجرا</h5>
+<h4>اجرا</h4>
 <div class="code-container"><span class="code-label">انتقال</span><div class="code-block">mv app?.log old_logs/</div></div>
-<p>حالا فایل را کپی می‌کنیم:</p>
+<p>حالا کپی:</p>
 <div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp app.py backup/</div></div>
-<p>و کپی را Rename می‌کنیم:</p>
+<p>و سپس تغییر نام:</p>
 <div class="code-container"><span class="code-label">تغییر نام</span><div class="code-block">mv backup/app.py backup/app_backup.py</div></div>
 
-<h5>بررسی نتیجه</h5>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls
-ls old_logs
-ls backup</div></div>
-<p>ساختار نهایی:</p>
-<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">project/
+<h4>بررسی نتیجه</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls backup</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls old_logs</div></div>
+<p>باید تقریباً چنین ساختاری داشته باشیم:</p>
+<div class="code-container"><span class="code-label">ساختار نهایی</span><div class="code-block no-prompt">project/
 ├── README.txt
 ├── app.py
 ├── backup/
@@ -20736,117 +20787,120 @@ ls backup</div></div>
     ├── app1.log
     └── app2.log</div></div>
 
-<h5>مدل حل مسئله</h5>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">pwd
- ↓
-ls
- ↓
-mkdir
- ↓
-Wildcard + mv
- ↓
-cp
- ↓
-mv
- ↓
-ls برای بررسی</div></div>
+<h4>نتیجه</h4>
+<p>اینجا حداقل سه مفهوم را همزمان استفاده کردیم:</p>
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">Path
+  +
+File/Directory Management
+  +
+Wildcard</div></div>
+<p>این دقیقاً همان چیزی است که در کار واقعی لینوکس اتفاق می‌افتد: <strong>دستورها جدا از هم نیستند؛ برای حل مسئله با هم ترکیب می‌شوند.</strong></p>
 
-<h2>۱۴. جمع‌بندی مفهومی</h2>
-<p>اگر بخواهیم کل جلسه را در یک مدل ساده جمع کنیم:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Filesystem
+<h2>۶. جمع‌بندی به سبک فاینمن</h2>
+<p>اگر بخواهیم کل جلسه را خیلی ساده توضیح دهیم:</p>
+<p>لینوکس اطلاعات را در یک ساختار درختی نگهداری می‌کند. در این ساختار، <strong>Directoryها</strong> برای سازمان‌دهی و <strong>Fileها</strong> برای نگهداری داده استفاده می‌شوند.</p>
+<p>برای اینکه بتوانیم با یک فایل کار کنیم، باید بدانیم <strong>کجاست</strong>. اینجا مفهوم Path وارد می‌شود:</p>
+<div class="code-container"><span class="code-label">Path</span><div class="code-block no-prompt">Absolute → از / شروع می‌شود
+Relative → نسبت به محل فعلی</div></div>
+<p>برای فهمیدن محل فعلی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">pwd</div></div>
+<p>و برای دیدن محتویات:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls</div></div>
+<p>بعد می‌توانیم فایل و دایرکتوری بسازیم:</p>
+<div class="code-container"><span class="code-label">ساخت</span><div class="code-block">touch
+mkdir</div></div>
+<p>آن‌ها را کپی یا جابه‌جا کنیم:</p>
+<div class="code-container"><span class="code-label">کپی/جابه‌جایی</span><div class="code-block">cp
+mv</div></div>
+<p>و در صورت نیاز حذف کنیم:</p>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">rm
+rmdir</div></div>
+<p>اما وقتی تعداد فایل‌ها زیاد می‌شود، نمی‌خواهیم تک‌تک نام‌ها را بنویسیم. اینجا <strong>Wildcard</strong> وارد می‌شود:</p>
+<div class="code-container"><span class="code-label">Wildcard</span><div class="code-block no-prompt">*  → هر تعداد کاراکتر
+?  → یک کاراکتر
+[] → یکی از مجموعه مشخص</div></div>
+<p>و در پشت صحنه، هر فایل اطلاعاتی مانند مالک، Permission، اندازه و زمان‌ها دارد که با <strong>inode</strong> مرتبط است.</p>
+<p>پس تصویر اصلی جلسه این است:</p>
+<div class="code-container"><span class="code-label">تصویر اصلی</span><div class="code-block no-prompt">Filesystem
     ↓
 File / Directory
     ↓
-Path
+Path → پیدا کردن محل
     ↓
-Current Working Directory
+ls / pwd → شناخت محیط
     ↓
-pwd / ls
+touch / mkdir → ایجاد
     ↓
-Create
-touch / mkdir
+cp / mv → کپی و جابه‌جایی
     ↓
-Copy / Move / Rename
-cp / mv
+rm / rmdir → حذف
     ↓
-Delete
-rm / rmdir
-    ↓
-Wildcard
-* / ? / []</div></div>
-<p>یعنی هنگام کار با فایل‌ها معمولاً این سؤال‌ها را به‌ترتیب می‌پرسیم:</p>
-<blockquote><strong>چه چیزی دارم؟ → کجاست؟ → چگونه آن را ببینم؟ → چه تغییری می‌خواهم بدهم؟ → کدام دستور مناسب است؟ → نتیجه را چگونه بررسی کنم؟</strong></blockquote>
-<p>و در پشت صحنه، File System Objectها با inodeهای خود مرتبط هستند؛ این موضوع در جلسات بعدی، به‌خصوص Hard Link، اهمیت بیشتری پیدا می‌کند.</p>
+Wildcards → کار با چند فایل</div></div>
 
-<h2>۱۵. Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">Cheat Sheet</span><div class="code-block no-prompt">pwd             → نمایش Current Working Directory
-ls              → مشاهده محتویات
-ls -l / -a      → جزئیات / موارد مخفی
-ls -i            → نمایش inode number
-touch file      → ایجاد فایل یا به‌روزرسانی timestamp
-mkdir dir       → ایجاد Directory
-mkdir -p a/b/c  → ایجاد مسیر تو‌در‌تو
-cp src dest     → کپی
-cp -r dir dest  → کپی Directory و محتویات
-mv old new      → جابه‌جایی / تغییر نام
-rm file         → حذف فایل
-rm -r dir       → حذف Directory و محتویات
-rmdir dir       → حذف Directory خالی
-* / ? / []      → Wildcardهای اصلی</div></div>
+<h2>۷. Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">Cheat Sheet</span><div class="code-block no-prompt">pwd                  → نمایش مسیر فعلی
+ls / ls -l / ls -a   → مشاهده محتویات
+touch file            → ایجاد فایل خالی
+mkdir dir             → ایجاد Directory
+mkdir -p a/b/c        → ایجاد مسیر تو در تو
+cp file dest          → کپی
+cp -r dir dest        → کپی Directory
+mv old new             → جابه‌جایی / تغییر نام
+rm file                → حذف فایل
+rm -r dir              → حذف Directory و محتویات
+rmdir dir              → حذف Directory خالی
+* → هر تعداد کاراکتر | ? → یک کاراکتر | [] → یک کاراکتر از مجموعه</div></div>
 
-<h2>۱۶. تست پایانی</h2>
+<h2>۸. تست پایانی</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>Current Working Directory برابر است با:</p>
-<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/student/projects</div></div>
+<p>خروجی زیر را داریم:</p>
+<div class="code-container"><span class="code-label">محل</span><div class="code-block no-prompt">/home/navid/projects</div></div>
 <p>و فایل زیر وجود دارد:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/student/projects/app.py</div></div>
-<p>کدام گزینه یک <strong>Relative Path</strong> است؟</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/navid/projects/app.py</div></div>
+<p>کدام دستور به شکل <strong>Relative Path</strong> به این فایل اشاره می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>/home/student/projects/app.py</code></button>
+    <button onclick="selectOption(this)">الف) <code>/home/navid/projects/app.py</code></button>
     <button onclick="selectOption(this)">ب) <code>./app.py</code></button>
     <button onclick="selectOption(this)">ج) <code>/app.py</code></button>
     <button onclick="selectOption(this)">د) <code>../app.py</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>./app.py</code></strong><br><code>./app.py</code> نسبت به Directory فعلی به <code>app.py</code> اشاره می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>./app.py</code></strong><br>چون دایرکتوری فعلی <code>/home/navid/projects</code> است و <code>./app.py</code> یعنی فایل <code>app.py</code> در دایرکتوری فعلی.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>می‌خواهیم ساختار زیر را ایجاد کنیم:</p>
+<p>می‌خواهیم این ساختار را ایجاد کنیم:</p>
 <div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
 └── src/
     └── python/</div></div>
-<p>و هیچ‌کدام از Directoryها وجود ندارند. کدام دستور مناسب‌تر است؟</p>
+<p>در حالی که هیچ‌کدام از این دایرکتوری‌ها وجود ندارند. کدام دستور مناسب‌تر است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>mkdir project/src/python</code></button>
     <button onclick="selectOption(this)">ب) <code>mkdir -p project/src/python</code></button>
     <button onclick="selectOption(this)">ج) <code>touch project/src/python</code></button>
     <button onclick="selectOption(this)">د) <code>cp -r project/src/python</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>mkdir -p project/src/python</code></strong><br><code>-p</code> باعث می‌شود Directoryهای والد موردنیاز نیز ایجاد شوند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>mkdir -p project/src/python</code></strong><br>گزینه <code>-p</code> باعث می‌شود دایرکتوری‌های والد موردنیاز نیز ساخته شوند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۳ — سناریومحور</p>
-<p>فایل‌های زیر در Directory فعلی وجود دارند:</p>
+<p>دایرکتوری فعلی شامل این فایل‌هاست:</p>
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">log1.txt
 log2.txt
 log10.txt
 data1.txt</div></div>
-<p>کدام دستور فقط <code>log1.txt</code> و <code>log2.txt</code> را مطابق الگو انتخاب می‌کند؟</p>
+<p>کدام دستور فقط <code>log1.txt</code> و <code>log2.txt</code> را انتخاب می‌کند؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>ls log*.txt</code></button>
     <button onclick="selectOption(this)">ب) <code>ls log?.txt</code></button>
     <button onclick="selectOption(this)">ج) <code>ls log[10].txt</code></button>
     <button onclick="selectOption(this)">د) <code>ls log[1-10].txt</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>ls log?.txt</code></strong><br><code>?</code> دقیقاً یک کاراکتر را تطبیق می‌دهد: <code>log1.txt</code> ✓، <code>log2.txt</code> ✓، <code>log10.txt</code> ✗</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>ls log?.txt</code></strong><br><code>?</code> دقیقاً یک کاراکتر را جایگزین می‌کند:<br><code>log1.txt</code> ✓<br><code>log2.txt</code> ✓<br><code>log10.txt</code> ✗</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۴ — سناریومحور</p>
-<p>مدیر سیستم می‌خواهد Directory زیر را همراه با تمام محتویات آن کپی کند:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">backup/
-├── app.py
-└── config/</div></div>
+<p>مدیر سیستم می‌خواهد یک Directory به نام <code>backup</code> را به همراه تمام محتویاتش به <code>backup2</code> کپی کند.</p>
 <p>کدام دستور مناسب است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) <code>cp backup backup2</code></button>
@@ -20854,7 +20908,7 @@ data1.txt</div></div>
     <button onclick="selectOption(this)">ج) <code>mv backup backup2</code></button>
     <button onclick="selectOption(this)">د) <code>rm -r backup backup2</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>cp -r backup backup2</code></strong><br>برای کپی Recursive یک Directory همراه با محتویات از <code>cp -r</code> استفاده می‌کنیم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>cp -r backup backup2</code></strong><br>برای کپی Recursive یک Directory و محتویات آن از <code>cp -r</code> استفاده می‌کنیم. <code>mv</code> جابه‌جا می‌کند، نه کپی.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
@@ -20862,27 +20916,19 @@ data1.txt</div></div>
 <div class="quiz-options">
     <button onclick="selectOption(this)">الف) نام فایل مستقیماً داخل inode ذخیره می‌شود.</button>
     <button onclick="selectOption(this)">ب) inode فقط برای Directoryها استفاده می‌شود.</button>
-    <button onclick="selectOption(this)">ج) inode اطلاعاتی مانند مالک، Permission، اندازه و اطلاعات مرتبط با داده‌ی فایل را نگهداری می‌کند.</button>
-    <button onclick="selectOption(this)">د) دو نام متفاوت حتماً باید inode متفاوت داشته باشند.</button>
+    <button onclick="selectOption(this)">ج) inode اطلاعاتی مانند مالک، Permission، اندازه و اطلاعات مرتبط با داده فایل را نگهداری می‌کند.</button>
+    <button onclick="selectOption(this)">د) هر دو فایل با نام متفاوت حتماً inode متفاوت دارند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>نام فایل در Directory ثبت می‌شود و Directory آن نام را به inode مرتبط می‌کند. این موضوع پایه‌ی درک Hard Link است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>inode اطلاعات اصلی فایل را نگهداری می‌کند، اما <strong>نام فایل در Directory قرار دارد</strong> و Directory نام را به inode مرتبط می‌کند. این موضوع پایه درک <strong>Hard Link</strong> در جلسه ۴ است.</div>
 </div>
 
 <h2>🔗 ارتباط با جلسه بعد</h2>
-<p>در این جلسه یاد گرفتیم فایل‌ها و Directoryها چیستند و چگونه آن‌ها را مشاهده، ایجاد، کپی، جابه‌جا و حذف کنیم.</p>
-<p>اما وقتی فایل‌ها زیاد می‌شوند، یک سؤال مهم مطرح می‌شود:</p>
-<blockquote>چگونه چند فایل را برای انتقال، نگهداری یا Backup در قالب مناسب فشرده یا یک‌جا آرشیو کنیم؟</blockquote>
-<p>در جلسه بعد وارد:</p>
-<p><strong>Compression & Archive</strong></p>
-<p>و ابزارهایی مانند:</p>
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">gzip
-bzip2
-xz
-zip
-tar</div></div>
-<p>می‌شویم.</p>
-`
-,
+<p>حالا می‌دانیم فایل چیست، چگونه مسیر آن را پیدا کنیم و چگونه آن را ایجاد، کپی، جابه‌جا و حذف کنیم.</p>
+<p>اما یک مشکل باقی مانده:</p>
+<blockquote>اگر بخواهیم حجم یک فایل را کم کنیم، یا چندین فایل را در یک بسته قرار دهیم تا راحت‌تر منتقل یا نگهداری شوند، چه کنیم؟</blockquote>
+<p>اینجا وارد جلسه ۲ می‌شویم:</p>
+<p><strong>Compression & Archive → <code>gzip</code>، <code>bzip2</code>، <code>xz</code>، <code>zip</code> و <code>tar</code>.</strong></p>
+`,
 "ch4-2": `
 <div class="section-header">
     <div class="section-badge">۴</div>
