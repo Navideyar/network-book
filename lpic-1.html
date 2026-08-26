@@ -965,14 +965,15 @@
             }
 
             .code-block {
-                font-size: 0.78rem;
-                padding: 24px 12px 14px;
-                /* خطوط بلند جمع‌بندی (مثل env → توضیح) داخل کادر می‌شکنند */
-                white-space: pre-wrap;
-                word-break: break-word;
-                overflow-wrap: anywhere;
-                overflow-x: hidden;
-            }
+    font-size: 0.78rem;
+    padding: 24px 12px 14px;
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    min-width: 0;
+    -webkit-overflow-scrolling: touch;
+}
             .code-label {
                 font-size: 0.68rem;
                 left: 10px;
@@ -1047,13 +1048,15 @@
                 font-size: 1.02rem;
             }
             .code-block {
-                font-size: 0.72rem;
-                padding: 22px 10px 12px;
-                white-space: pre-wrap;
-                word-break: break-word;
-                overflow-wrap: anywhere;
-                overflow-x: hidden;
-            }
+    font-size: 0.72rem;
+    padding: 22px 10px 12px;
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    min-width: 0;
+    -webkit-overflow-scrolling: touch;
+}
             table {
                 font-size: 0.78rem;
                 min-width: 360px;
@@ -22401,7 +22404,7 @@ xz؟    → -J</div></div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>tar -xjf backup.tar.bz2</code></strong><br>چون فایل با <code>bzip2</code> فشرده شده است: <code>-j → bzip2</code> و <code>-x → extract</code> و <code>-f → file</code>. گزینه A برای gzip، گزینه C برای xz و گزینه D برای <strong>نمایش محتویات</strong> Archive است، نه Extract کردن.</div>
 </div>
 `
- ,
+,
 "ch4-3": `
 <div class="section-header">
     <div class="section-badge">۴</div>
