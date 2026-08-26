@@ -22409,818 +22409,1142 @@ xz؟    → -J</div></div>
 <div class="section-header">
     <div class="section-badge">۴</div>
     <div>
-        <h1>Backup و <code>dd</code></h1>
+        <h1>Backup &amp; <code>dd</code></h1>
         <div class="meta">فایل‌ها، مجوزها و آرشیو · بخش ۳ از ۷</div>
     </div>
 </div>
 
-<h2>۱. اهداف یادگیری</h2>
+<h2>۱. اهداف کلی درس</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
-<ul>
-    <li>تفاوت <strong>Backup</strong> و <strong>Archive</strong> را درک کنی.</li>
-    <li>با <code>tar</code> یک Backup ساده ایجاد و Restore کنی.</li>
-    <li>مفهوم <strong>Incremental Backup</strong> را توضیح بدهی.</li>
-    <li>نقش <code>tar -g</code> و فایل <code>.snar</code> را در Incremental Backup بشناسی.</li>
-    <li>با <code>tar -t</code> و <code>tar -d</code> آرشیو را بررسی و مقایسه کنی.</li>
-    <li>مفهوم <code>dd</code> و تفاوت آن با Backup فایل‌محور را درک کنی.</li>
-    <li>برای کپی سطح پایین از فایل، پارتیشن یا دیسک از <code>dd</code> استفاده کنی و خطرات آن را بشناسی.</li>
-</ul>
-
-<h2>۲. مسئله و تصویر کلی</h2>
-<h3>۲.۱ کاربرد درس — The Why</h3>
-<p>فرض کن روی یک سرور این اطلاعات را داری:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/navid/project/
-├── config/
-├── src/
-├── database/
-└── logs/</div></div>
-<p>امروز از کل پروژه Backup می‌گیری.</p>
-<p>فردا فقط چند فایل تغییر می‌کنند.</p>
-<p>آیا منطقی است هر روز دوباره <strong>کل اطلاعات</strong> را Backup بگیری؟</p>
-<p>برای داده‌های بزرگ، این کار می‌تواند زمان و فضای زیادی مصرف کند.</p>
-<p>از طرف دیگر، گاهی اصلاً نمی‌خواهی فایل‌ها را Backup کنی؛ بلکه می‌خواهی <strong>تمام محتوای یک دیسک یا پارتیشن را دقیقاً به جای دیگری کپی کنی.</strong></p>
-<p>اینجا دو رویکرد متفاوت داریم:</p>
-<div class="code-container"><span class="code-label">دو رویکرد</span><div class="code-block no-prompt">Backup فایل‌محور
-       ↓
-   tar + Incremental
-       ↓
-تمرکز روی فایل‌ها و تغییرات
-
-کپی سطح پایین
-       ↓
-      dd
-       ↓
-تمرکز روی بلوک‌های داده</div></div>
-
-<h3>۲.۲ مدل ذهنی مرکزی</h3>
-<p>این مهم‌ترین تصویر جلسه است:</p>
-<div class="code-container"><span class="code-label">Big Picture</span><div class="code-block no-prompt">                    Data Protection
-                          │
-             ┌────────────┴────────────┐
-             ↓                         ↓
-      File-Based Backup          Low-Level Copy
-             │                         │
-             ↓                         ↓
-           tar                       dd
-             │                         │
-       ┌─────┴─────┐             ┌────┴────┐
-       ↓           ↓             ↓         ↓
-   Full Backup  Incremental    File    Disk/Partition
-                   │
-                   ↓
-                tar -g
-                   │
-                 .snar</div></div>
-<p>یعنی:</p>
-<p><strong><code>tar</code> می‌گوید چه فایل‌هایی را Backup کنیم.</strong></p>
-<p>اما:</p>
-<p><strong><code>dd</code> می‌گوید داده‌های خام را از یک محل به محل دیگر کپی کن.</strong></p>
-
-<h3>۲.۳ Archive و Backup یکی نیستند</h3>
-<p>در جلسه قبل گفتیم:</p>
-<div class="code-container"><span class="code-label">Archive</span><div class="code-block no-prompt">Archive = چند فایل را در یک بسته قرار دادن</div></div>
-<p>اما Backup یک <strong>هدف</strong> است:</p>
-<blockquote>ایجاد یک نسخه قابل‌بازیابی از اطلاعات برای زمانی که اطلاعات اصلی از بین رفتند یا خراب شدند.</blockquote>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar → ابزار
-Backup → هدف / کاربرد</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -czf backup.tar.gz /home/navid/project</div></div>
-<p>از <code>tar</code> برای ایجاد یک Backup استفاده کرده‌ایم.</p>
-<p>اما <code>tar</code> ذاتاً فقط «ابزار Backup» نیست؛ می‌تواند برای Archive کردن فایل‌ها نیز استفاده شود.</p>
-
-<h2>۳. درسنامه اصلی — Hands-on Core</h2>
-<h3>۳.۱ Full Backup با <code>tar</code></h3>
-<p>ساده‌ترین مدل Backup:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">کل اطلاعات
-    ↓
-Backup</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project-backup.tar.gz project/</div></div>
-<p>این دستور:</p>
 <ol>
-    <li><code>project/</code> را انتخاب می‌کند.</li>
-    <li>با <code>tar</code> آن را Archive می‌کند.</li>
-    <li>با gzip فشرده می‌کند.</li>
-    <li>نتیجه را در <code>project-backup.tar.gz</code> قرار می‌دهد.</li>
+    <li>مفهوم <strong>Backup</strong> و <strong>Restore</strong> را بفهمی و تفاوت آن‌ها را با Archive کردن تشخیص بدهی.</li>
+    <li>با <code>tar</code> یک Backup فایل‌محور بسازی، محتویات آن را بررسی کنی و در صورت نیاز Restore کنی.</li>
+    <li>مفهوم <strong>Incremental Backup</strong> را بفهمی و با <code>tar -g</code> و فایل <code>.snar</code> پیاده‌سازی کنی.</li>
+    <li>تفاوت <code>tar -t</code> و <code>tar -d</code> را بدانی.</li>
+    <li>مفهوم <code>dd</code> و کپی سطح پایین را درک کنی و بتوانی فایل، پارتیشن و دیسک را با آن کپی کنی.</li>
+    <li>تفاوت اساسی <strong>Backup فایل‌محور</strong> و <strong>کپی سطح پایین</strong> را تشخیص بدهی.</li>
 </ol>
 
-<h4>Restore</h4>
-<p>برای بازیابی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf project-backup.tar.gz</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Backup:
-tar -czf
+<h2>۲. ساختار کلی جلسه</h2>
+<p>قبل از ورود به دستورها، باید یک تصویر واحد از Backup داشته باشیم.</p>
 
-Restore:
-tar -xzf</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>Backup و Restore را با هم در ذهن داشته باش:<br><code>-c → Create</code><br><code>-x → Extract</code></div></div>
-
-<h3>۳.۲ چرا Incremental Backup؟</h3>
-<p>فرض کن روز اول:</p>
-<div class="code-container"><span class="code-label">روز اول</span><div class="code-block no-prompt">100 GB</div></div>
-<p>اطلاعات داری.</p>
-<p>روز دوم فقط:</p>
-<div class="code-container"><span class="code-label">روز دوم</span><div class="code-block no-prompt">2 GB</div></div>
-<p>تغییر کرده است.</p>
-<p>اگر هر روز Full Backup بگیری:</p>
-<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">Day 1 → 100 GB
-Day 2 → 100 GB
-Day 3 → 100 GB
-...</div></div>
-<p>فضای زیادی مصرف می‌شود.</p>
-<p>در Incremental Backup هدف این است که فقط اطلاعاتی که از Backup قبلی تغییر کرده‌اند، Backup شوند.</p>
-<p>مدل ساده:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Day 1
-   ↓
-Full Backup
-   ↓
-Day 2
-   ↓
-فقط تغییرات
-   ↓
-Incremental Backup
-   ↓
-Day 3
-   ↓
-فقط تغییرات جدید</div></div>
-
-<h3>۳.۳ Incremental Backup با <code>tar -g</code></h3>
-<p><code>tar</code> قابلیت مدیریت Incremental Backup را دارد.</p>
-<p>گزینه مهم:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-g</div></div>
-<p>که به یک <strong>Snapshot File</strong> نیاز دارد.</p>
-<p>معمولاً این فایل با پسوند:</p>
-<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.snar</div></div>
-<p>ذخیره می‌شود.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup-full.tar.gz \
-    -g backup.snar \
-    project/</div></div>
-<p>در اینجا:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">backup-full.tar.gz</div></div>
-<p>آرشیو Backup است.</p>
-<p>و:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">backup.snar</div></div>
-<p>اطلاعات وضعیت فایل‌ها را برای Incremental Backup نگهداری می‌کند.</p>
-
-<h3>۳.۴ <code>.snar</code> چیست؟</h3>
-<p>فایل <code>.snar</code> را مثل یک <strong>دفترچه وضعیت Backup</strong> تصور کن.</p>
-<p><code>tar</code> از آن استفاده می‌کند تا بفهمد:</p>
-<blockquote>در Backup قبلی وضعیت فایل‌ها چگونه بوده است؟</blockquote>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Backup اول
-    │
-    ├── project/
-    │
-    └── backup.snar
-             │
-             ↓
-       وضعیت فایل‌ها</div></div>
-<p>بعد در Backup بعدی:</p>
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">project/
-   +
-backup.snar
-   ↓
-tar
-   ↓
-تشخیص تغییرات
-   ↓
-Backup جدید</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته مهم</strong><br><code>.snar</code> خود Backup اصلی نیست. بلکه اطلاعات موردنیاز <code>tar</code> برای مدیریت Incremental Backup را نگهداری می‌کند.</div></div>
-
-<h3>۳.۵ Backup اول</h3>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-├── app.py
+<h3>تصویر ذهنی جلسه</h3>
+<p>فرض کن اطلاعات مهمی روی سیستم داریم:</p>
+<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">/home/amir/project/
+├── report.txt
 ├── config.conf
-└── readme.txt</div></div>
-<p>می‌توانیم اولین Backup را بگیریم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup-full.tar.gz -g backup.snar project/</div></div>
-<p>بعد از اجرای دستور معمولاً دو چیز مهم داریم:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">backup-full.tar.gz
-backup.snar</div></div>
-<p>به شکل مفهومی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">project/
-   │
-   ├──────────────→ backup-full.tar.gz
-   │
-   └──────────────→ backup.snar</div></div>
-<p>Backup اول در این سناریو نقش <strong>Full Backup</strong> را دارد.</p>
-
-<h3>۳.۶ Backup بعدی</h3>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">تغییرات</span><div class="code-block no-prompt">app.py</div></div>
-<p>تغییر کرده و فایل جدیدی ساخته‌ای:</p>
-<div class="code-container"><span class="code-label">فایل جدید</span><div class="code-block no-prompt">debug.log</div></div>
-<p>حالا دوباره همان دستور را اجرا می‌کنیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup-2.tar.gz -g backup.snar project/</div></div>
-<p>این بار <code>tar</code> با استفاده از وضعیت موجود در <code>backup.snar</code> می‌تواند تغییرات را شناسایی کند.</p>
-<p>به‌صورت مفهومی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Backup 1
-    ↓
-backup.snar
-    ↓
-تغییر فایل‌ها
-    ↓
-Backup 2
-    ↓
-فقط موارد تغییرکرده</div></div>
-
-<h3>۳.۷ Incremental دقیقاً یعنی چه؟</h3>
-<p>در سطح LPIC-1، مهم است مفهوم را درست بفهمی:</p>
-<blockquote>Incremental Backup بر اساس وضعیت Backup قبلی، تغییرات بعدی را ثبت می‌کند.</blockquote>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Full:
-همه اطلاعات
-
-Incremental:
-تغییرات نسبت به نقطه Backup قبلی</div></div>
-<p>و در <code>tar</code>، این وضعیت با <code>.snar</code> مدیریت می‌شود.</p>
-
-<h3>۳.۸ بررسی محتویات Backup با <code>tar -t</code></h3>
-<p>قبل از Restore، بهتر است بدانیم Backup شامل چه فایل‌هایی است.</p>
-<p>برای یک Archive معمولی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tf backup.tar</div></div>
-<p>برای gzip:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -tzf backup-full.tar.gz</div></div>
-<p>ممکن است ببینی:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">project/
-project/app.py
-project/config.conf
-project/readme.txt</div></div>
-<p>این کار هیچ چیزی را Extract نمی‌کند.</p>
-
-<h3>۳.۹ مقایسه Archive با <code>tar -d</code></h3>
-<p><code>tar</code> قابلیت مقایسه محتویات Archive با فایل‌های موجود را نیز دارد.</p>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-d</div></div>
-<p>یعنی:</p>
-<blockquote>Compare</blockquote>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -df backup.tar</div></div>
-<p>یا در صورت استفاده از gzip:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tar -dzf backup.tar.gz</div></div>
-<p>ایده کلی:</p>
-<div class="code-container"><span class="code-label">ایده</span><div class="code-block no-prompt">فایل‌های روی سیستم
-        │
-        │ compare
-        ↓
-فایل‌های داخل Archive</div></div>
-<p>اگر فایل تغییر کرده باشد، <code>tar</code> می‌تواند تفاوت را گزارش کند.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>این سه گزینه را کنار هم به خاطر بسپار:<br><code>-c → Create</code><br><code>-t → List</code><br><code>-d → Compare</code><br><code>-x → Extract</code></div></div>
-
-<h3>۳.۱۰ Restore کردن Backup</h3>
-<p>فرض کن فایل:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.tar.gz</div></div>
-<p>را داری.</p>
-<p>برای Restore:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
-<p>اگر بخواهی در Directory دیگری استخراج کنی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir restore
-tar -xzf backup.tar.gz -C restore</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">restore/
-└── project/
-    ├── app.py
-    └── ...</div></div>
-
-<h3>۳.۱۱ یک سناریوی Full + Incremental</h3>
-<p>فرض کنیم:</p>
-<h4>روز اول</h4>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">project/
-├── app.py
-├── config
-└── README</div></div>
-<p>Backup:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf day1.tar.gz -g backup.snar project/</div></div>
-
-<h4>روز دوم</h4>
-<p><code>app.py</code> تغییر کرده و <code>database.sql</code> اضافه شده.</p>
-<div class="code-container"><span class="code-label">ساختار جدید</span><div class="code-block no-prompt">project/
-├── app.py        ← تغییر کرده
-├── config
-├── README
-└── database.sql  ← جدید</div></div>
-<p>Backup دوم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf day2.tar.gz -g backup.snar project/</div></div>
-<p>به‌صورت مفهومی:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">day1.tar.gz
-     ↓
-Full
-
-day2.tar.gz
-     ↓
-Incremental
-     ↓
-تغییرات بعد از day1</div></div>
-
-<h3>۳.۱۲ یک نکته مهم درباره <code>.snar</code></h3>
-<p>فایل <code>.snar</code> را نباید بی‌دلیل حذف یا جابه‌جا کنی.</p>
-<p>چرا؟</p>
-<p>چون Backup بعدی برای تشخیص وضعیت قبلی به اطلاعات آن نیاز دارد.</p>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">project
-  │
-  ├── Backup
-  │
-  └── .snar
-        │
-        ↓
-    State / History
-        │
-        ↓
-   Backup بعدی</div></div>
-<p>اگر وضعیت Snapshot از بین برود، فرآیند Incremental بعدی دیگر همان اطلاعات قبلی را برای مقایسه در اختیار ندارد.</p>
-
-<h3>۳.۱۳ <code>dd</code> چیست؟</h3>
-<p>حالا از دنیای Backup فایل‌محور خارج شویم.</p>
-<p><code>dd</code> یک ابزار بسیار مهم برای <strong>کپی سطح پایین داده‌ها</strong> است.</p>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">File-Based Backup
-       ↓
-فایل‌ها و ساختار آن‌ها
-
-dd
-       ↓
-داده‌های خام</div></div>
-<p><code>dd</code> می‌تواند داده را از یک <strong>Input</strong> بخواند و در یک <strong>Output</strong> بنویسد.</p>
-<p>ساختار عمومی:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">dd if=SOURCE of=DESTINATION</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">if → input file
-of → output file</div></div>
-
-<h3>۳.۱۴ <code>if</code> و <code>of</code></h3>
-<p>این دو را خیلی خوب یاد بگیر:</p>
-<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">if = input file
-of = output file</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">dd if=input.img of=output.img</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">input.img
-    ↓
-   dd
-    ↓
-output.img</div></div>
-<p>در اینجا <code>file</code> می‌تواند واقعاً یک فایل باشد، ولی می‌تواند Device هم باشد.</p>
-
-<h3>۳.۱۵ <code>dd</code> برای کپی فایل</h3>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=backup.img</div></div>
-<p>یک کپی سطح پایین از داده ایجاد می‌کند.</p>
-<p>اما قدرت واقعی <code>dd</code> زمانی مشخص می‌شود که با Deviceها کار کنیم.</p>
-
-<h3>۳.۱۶ <code>dd</code> برای کپی Partition</h3>
-<p>فرض کن یک پارتیشن داریم:</p>
-<div class="code-container"><span class="code-label">پارتیشن</span><div class="code-block no-prompt">/dev/sdb1</div></div>
-<p>می‌توانیم داده‌های آن را در یک Image ذخیره کنیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb1 of=partition.img</div></div>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/dev/sdb1
-    │
-    ↓
-   dd
-    │
-    ↓
-partition.img</div></div>
-<p>این دیگر شبیه Backup معمولی <code>tar</code> نیست.</p>
-<p>ما در حال کپی <strong>داده‌های سطح پایین</strong> هستیم.</p>
-
-<h3>۳.۱۷ <code>dd</code> برای کپی Disk</h3>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
-<p>یک دیسک کامل است.</p>
-<p>می‌توانیم آن را در یک Image کپی کنیم:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Entire Disk
-/dev/sdb
-    │
-    ↓
-   dd
-    │
-    ↓
-disk.img</div></div>
-<p>در این حالت می‌توانیم یک Image از کل دیسک داشته باشیم.</p>
-
-<h3>۳.۱۸ تفاوت <code>dd</code> با <code>tar</code></h3>
-<p>این بخش بسیار مهم است.</p>
-<p>فرض کن دیسکی داریم:</p>
-<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
-<p>با:</p>
-<div class="code-container"><span class="code-label">tar</span><div class="code-block">tar</div></div>
-<p>معمولاً با فایل‌ها و Directoryها کار می‌کنیم.</p>
-<p>اما:</p>
-<div class="code-container"><span class="code-label">dd</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
-<p>به ساختار سطح پایین دیسک نگاه می‌کند.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">tar
- ↓
-Files
-Directories
-Metadata
-    ↓
-File-Oriented
-
-dd
- ↓
-Raw Data / Blocks
-    ↓
-Low-Level Copy</div></div>
-
-<h3>۳.۱۹ یک مثال برای درک تفاوت</h3>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
-├── Partition 1
-├── Partition 2
-└── Filesystem
-    ├── file1
-    ├── file2
-    └── file3</div></div>
-<p>اگر از <code>tar</code> استفاده کنیم:</p>
-<div class="code-container"><span class="code-label">tar</span><div class="code-block no-prompt">Filesystem
-   ↓
-Files
-   ↓
-tar
-   ↓
-backup.tar</div></div>
-<p>اما <code>dd</code> می‌تواند کل Device را کپی کند:</p>
-<div class="code-container"><span class="code-label">dd</span><div class="code-block no-prompt">Disk
-   ↓
-dd
-   ↓
-disk.img</div></div>
-<p>بنابراین <code>dd</code> می‌تواند چیزهایی را کپی کند که Backup فایل‌محور لزوماً به همان شکل حفظ نمی‌کند.</p>
-
-<h3>۳.۲۰ <code>dd</code> و Block Size</h3>
-<p>یکی از گزینه‌های مهم <code>dd</code>:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">bs</div></div>
-<p>یعنی:</p>
-<blockquote>Block Size</blockquote>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">dd if=source.img of=backup.img bs=4M</div></div>
-<p>یعنی عملیات خواندن/نوشتن با Block Size چهار مگابایت انجام شود.</p>
-<p>در LPIC-1 باید مفهوم <code>bs</code> را بشناسی؛ لازم نیست وارد بهینه‌سازی‌های پیچیده عملکرد شوی.</p>
-
-<h3>۳.۲۱ <code>count</code></h3>
-<p>گزینه:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">count</div></div>
-<p>تعداد Blockهایی را که باید کپی شوند مشخص می‌کند.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">dd if=input.img of=output.img bs=1M count=100</div></div>
-<p>یعنی تقریباً:</p>
-<div class="code-container"><span class="code-label">محاسبه</span><div class="code-block no-prompt">100 blocks
-×
-1 MB
-=
-100 MB</div></div>
-<p>را کپی کن.</p>
-
-<h3>۳.۲۲ <code>status=progress</code></h3>
-<p>برای دیدن وضعیت عملیات در سیستم‌های GNU/Linux:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=backup.img status=progress</div></div>
-<p>این گزینه برای عملیات بزرگ بسیار مفید است.</p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ خطر بزرگ <code>dd</code></strong><br><code>dd</code> یکی از دستورهایی است که اشتباه در آن می‌تواند بسیار خطرناک باشد.</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور خطرناک</span><div class="code-block">dd if=/dev/sdb of=/dev/sdc</div></div>
-<p>یعنی داده‌های <code>sdb</code> را روی <code>sdc</code> بنویس.</p>
-<p>اگر دستگاه‌ها را اشتباه انتخاب کنی، ممکن است اطلاعات دیسک مقصد را از بین ببری.</p>
-<p>به‌خصوص قسمت:</p>
-<div class="code-container"><span class="code-label">قسمت خطرناک</span><div class="code-block">of=</div></div>
-<p>را همیشه با دقت بررسی کن.</p>
-
-<h4>قانون طلایی</h4>
-<p>قبل از <code>dd</code>:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-<p>را اجرا کن تا Deviceها را بشناسی.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">sda
-├── sda1
-└── sda2
-
-sdb
-└── sdb1</div></div>
-<p>بعد تصمیم بگیر دقیقاً کدام Device <strong>Input</strong> و کدام <strong>Output</strong> است.</p>
-
-<h3>۳.۲۴ <code>dd</code> برای ساخت Image از USB یا Disk</h3>
-<p>یک کاربرد واقعی:</p>
-<p>فرض کن یک USB متصل است:</p>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">/dev/sdb</div></div>
-<p>می‌خواهی Image بگیری:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=usb-backup.img bs=4M status=progress</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">USB
- ↓
-/dev/sdb
- ↓
-dd
- ↓
-usb-backup.img</div></div>
-<p>این Image می‌تواند یک کپی سطح پایین از Device باشد.</p>
-
-<h3>۳.۲۵ Restore با <code>dd</code></h3>
-<p>عملیات برعکس:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=usb-backup.img of=/dev/sdb bs=4M status=progress</div></div>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">usb-backup.img
-      ↓
-     dd
-      ↓
-   /dev/sdb</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>🚨 هشدار بسیار مهم</strong><br>در اینجا اگر <code>/dev/sdb</code> دیسک اشتباهی باشد، داده‌های آن Overwrite می‌شوند. پس: <code>if=</code> → منبع و <code>of=</code> → مقصد را همیشه قبل از Enter بررسی کن.</div></div>
-
-<h3>۳.۲۶ Backup فایل‌محور یا <code>dd</code>؟</h3>
-<p>یک سؤال مهم:</p>
-<blockquote>برای Backup روزانه فایل‌های یک سرور از کدام استفاده کنیم؟</blockquote>
-<p>معمولاً:</p>
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block">tar</div></div>
-<p>چون می‌خواهیم با فایل‌ها و Directoryها کار کنیم.</p>
-<p>اما اگر هدف:</p>
-<blockquote>تهیه Image از کل یک Disk یا Partition</blockquote>
-<p>باشد، <code>dd</code> می‌تواند مناسب باشد.</p>
-<p>جدول ذهنی:</p>
-<div class="table-wrap">
-<table>
-<thead><tr><th>نیاز</th><th>ابزار مناسب</th></tr></thead>
-<tbody>
-<tr><td>Backup فایل‌ها</td><td><code>tar</code></td></tr>
-<tr><td>Archive فایل‌ها</td><td><code>tar</code></td></tr>
-<tr><td>Incremental Backup</td><td><code>tar -g</code></td></tr>
-<tr><td>Image از Partition</td><td><code>dd</code></td></tr>
-<tr><td>Image از Disk</td><td><code>dd</code></td></tr>
-<tr><td>کپی Raw</td><td><code>dd</code></td></tr>
-</tbody>
-</table>
-</div>
-
-<h3>۳.۲۷ خطاهای واقعی</h3>
-<div class="table-wrap">
-<table>
-<thead><tr><th>خطا</th><th>مشکل</th><th>راه‌حل</th></tr></thead>
-<tbody>
-<tr><td><code>tar</code> Backup را کامل بازیابی نمی‌کند</td><td>Archive یا مسیر Restore اشتباه است</td><td>ابتدا <code>tar -t</code> و سپس Restore را بررسی کن</td></tr>
-<tr><td>Incremental Backup تغییرات را درست تشخیص نمی‌دهد</td><td><code>.snar</code> حذف/جابه‌جا/نامناسب شده</td><td>فایل Snapshot را حفظ و ثابت نگه دار</td></tr>
-<tr><td><code>dd</code> روی Device اشتباه اجرا شده</td><td><code>if</code> و <code>of</code> اشتباه انتخاب شده‌اند</td><td>قبل از اجرا <code>lsblk</code> و مسیر Deviceها را بررسی کن</td></tr>
-<tr><td><code>dd</code> خیلی کند است</td><td>Block Size یا شرایط I/O مناسب نیست</td><td>در حد نیاز <code>bs</code> را تنظیم و <code>status=progress</code> استفاده کن</td></tr>
-<tr><td><code>tar -d</code> نتیجه مورد انتظار را نمی‌دهد</td><td>Archive و فایل‌های فعلی متفاوت‌اند یا مسیر درست نیست</td><td>Archive و مسیر فایل‌ها را بررسی کن</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>۴. سناریوی ترکیبی عیب‌یابی</h2>
-<h3>مسئله</h3>
-<p>فرض کن روی یک سرور این وضعیت را داری:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/navid/project/
-├── app.py
-├── config.conf
-├── data/
-│   └── database.db
-└── logs/
-    └── app.log</div></div>
-<p>مدیر سیستم دو نیاز دارد:</p>
-<h4>نیاز اول</h4>
-<p>هر روز از پروژه Backup بگیری، ولی بعد از Backup اول فقط تغییرات روزهای بعد ذخیره شوند.</p>
-<h4>نیاز دوم</h4>
-<p>از یک USB متصل به:</p>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">/dev/sdb</div></div>
-<p>یک Image کامل تهیه شود.</p>
-
-<h4>وظیفه</h4>
-<p>باید تشخیص بدهی:</p>
-<ol>
-    <li>برای پروژه از چه ابزاری استفاده شود؟</li>
-    <li>برای Incremental Backup چه چیزی لازم است؟</li>
-    <li>برای USB از چه ابزاری استفاده شود؟</li>
-    <li>چگونه قبل از عملیات <code>dd</code> از درست بودن Device مطمئن شوی؟</li>
-</ol>
-
-<h4>پاسخ مرحله‌به‌مرحله</h4>
-
-<h5>مشاهده</h5>
-<p>ابتدا فایل‌های پروژه:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -R /home/navid/project</div></div>
-<p>و Deviceها:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-
-<h5>تحلیل</h5>
-<p>برای پروژه:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">File-Based Backup</div></div>
-<p>می‌خواهیم.</p>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">tar</div></div>
-<p>مناسب است.</p>
-<p>برای Incremental:</p>
-<div class="code-container"><span class="code-label">نیاز</span><div class="code-block no-prompt">tar -g</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">نیاز</span><div class="code-block no-prompt">.snar</div></div>
-<p>نیاز داریم.</p>
-<p>برای USB:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Raw / Low-Level Copy</div></div>
-<p>می‌خواهیم.</p>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">dd</div></div>
-<p>مناسب است.</p>
-
-<h5>ایجاد Full Backup</h5>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf day1.tar.gz \
-    -g project.snar \
-    /home/navid/project/</div></div>
-
-<h5>Backup روز بعد</h5>
-<p>اگر فایل‌هایی تغییر کرده باشند:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf day2.tar.gz \
-    -g project.snar \
-    /home/navid/project/</div></div>
-<p><code>project.snar</code> وضعیت Backup قبلی را در اختیار <code>tar</code> قرار می‌دهد.</p>
-
-<h5>بررسی Backup</h5>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf day1.tar.gz</div></div>
-<p>و در صورت نیاز:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf day2.tar.gz</div></div>
-
-<h5>بررسی Device</h5>
-<p>قبل از <code>dd</code>:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
-<p>فرض کنیم مطمئن شدیم:</p>
-<div class="code-container"><span class="code-label">تأیید</span><div class="code-block no-prompt">sdb
-└── sdb1</div></div>
-<p>همان USB موردنظر است.</p>
-
-<h5>ایجاد Image</h5>
-<p>اگر هدف Image از <strong>کل USB</strong> باشد:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=usb.img bs=4M status=progress</div></div>
-<p>دقت کن:</p>
-<div class="code-container"><span class="code-label">منبع</span><div class="code-block no-prompt">if=/dev/sdb</div></div>
-<p>یعنی منبع.</p>
-<p>و:</p>
-<div class="code-container"><span class="code-label">مقصد</span><div class="code-block no-prompt">of=usb.img</div></div>
-<p>یعنی مقصد.</p>
-
-<h5>بررسی نتیجه</h5>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -lh usb.img</div></div>
-<p>حالا دو نوع Backup داریم:</p>
-<div class="code-container"><span class="code-label">نتیجه نهایی</span><div class="code-block no-prompt">Project
-   ↓
-tar
-   ↓
-File-Based Backup
-
-USB
-   ↓
-dd
-   ↓
-Raw Image</div></div>
-
-<h5>نتیجه نهایی</h5>
-<div class="code-container"><span class="code-label">جریان کامل</span><div class="code-block no-prompt">مشاهده
-   ↓
-تشخیص نوع داده
-   ↓
-فایل‌ها → tar
-   ↓
-Incremental → tar -g + .snar
-
-دیسک/USB
-   ↓
-lsblk
-   ↓
-dd
-   ↓
-Image</div></div>
-
-<h2>۵. جمع‌بندی به سبک فاینمن</h2>
-<p>Backup یعنی:</p>
-<blockquote>«اگر اطلاعات اصلی خراب شد، یک نسخه داشته باشم که بتوانم از آن برگردانم.»</blockquote>
-<p>اگر با فایل‌ها و Directoryها سروکار داریم، <code>tar</code> ابزار بسیار مناسبی است:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Files
- ↓
-tar
- ↓
-Backup</div></div>
-<p>اگر Backup اول را گرفته‌ایم و نمی‌خواهیم هر بار کل اطلاعات را دوباره ذخیره کنیم، <code>tar</code> می‌تواند با:</p>
-<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">-g</div></div>
-<p>و فایل:</p>
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">.snar</div></div>
-<p>وضعیت قبلی را نگهداری کند و Backupهای Incremental ایجاد کند.</p>
-<p>اما <code>dd</code> داستان متفاوتی دارد.</p>
-<p><code>dd</code> بیشتر به داده‌ها در سطح پایین نگاه می‌کند:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Disk / Partition
-      ↓
-     dd
-      ↓
-Raw Image</div></div>
-<p>بنابراین اگر بگویی:</p>
-<blockquote>«از فایل‌های پروژه Backup بگیر»</blockquote>
-<p>به <code>tar</code> فکر کن.</p>
-<p>اگر بگویی:</p>
-<blockquote>«از کل USB یا Partition یک Image بگیر»</blockquote>
-<p>به <code>dd</code> فکر کن.</p>
-<p>پس تصویر نهایی:</p>
-<div class="code-container"><span class="code-label">تصویر اصلی</span><div class="code-block no-prompt">                 Backup
+└── docs/
+    ├── a.txt
+    └── b.txt</div></div>
+<p>اگر این اطلاعات از بین بروند، می‌خواهیم بتوانیم آنها را برگردانیم.</p>
+<p>پس فرآیند کلی این است:</p>
+<div class="code-container"><span class="code-label">چرخه</span><div class="code-block no-prompt">              Original Data
+                   │
+                   ▼
+                Backup
+                   │
+                   ▼
+            Backup Storage
+                   │
+              حادثه / حذف
+                   │
+                   ▼
+                Restore
+                   │
+                   ▼
+             Original Data</div></div>
+<p>اما برای Backup دو نگاه متفاوت داریم:</p>
+<div class="code-container"><span class="code-label">دو رویکرد</span><div class="code-block no-prompt">                  Backup
                     │
           ┌─────────┴─────────┐
-          ↓                   ↓
-     File-Oriented        Low-Level
+          │                   │
+    File-Oriented          Low-Level
           │                   │
          tar                  dd
           │                   │
-    ┌─────┴─────┐       ┌─────┴─────┐
-    ↓           ↓       ↓           ↓
-  Full      Incremental File    Disk/Partition
-                │
-          tar -g + .snar</div></div>
+      فایل‌ها و              بلوک‌های
+      ساختارشان              خام دیسک</div></div>
+<p>این تفاوت، <strong>محور اصلی این جلسه</strong> است.</p>
+<p>در روش <code>tar</code> ما می‌گوییم:</p>
+<blockquote>«این فایل‌ها و دایرکتوری‌ها را ذخیره کن.»</blockquote>
+<p>در روش <code>dd</code> می‌گوییم:</p>
+<blockquote>«این قسمت از فضای ذخیره‌سازی را دقیقاً بلوک‌به‌بلوک کپی کن.»</blockquote>
+<p>در ادامه ابتدا Backup فایل‌محور را یاد می‌گیریم، سپس Incremental Backup را اضافه می‌کنیم و در پایان سراغ <code>dd</code> می‌رویم.</p>
 
-<h2>۶. Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">Cheat Sheet</span><div class="code-block no-prompt">tar -czf backup.tar.gz dir/       → Full/File Backup
-tar -xzf backup.tar.gz            → Restore
-tar -tzf backup.tar.gz            → مشاهده محتویات
-tar -dzf backup.tar.gz            → مقایسه
-tar -g backup.snar ...             → Incremental Backup
-.snar                              → وضعیت Snapshot برای tar
-dd if=SOURCE of=DEST               → کپی سطح پایین
-if                                 → Input / Source
-of                                 → Output / Destination
-dd ... bs=4M status=progress       → Block Size + نمایش پیشرفت</div></div>
+<h2>بخش اول — Backup و Restore</h2>
+<h3>۳. Backup چیست؟</h3>
+<p>Backup یعنی:</p>
+<blockquote>ایجاد یک نسخه کپی از اطلاعات، به‌گونه‌ای که در صورت از دست رفتن اطلاعات اصلی بتوانیم آنها را بازیابی کنیم.</blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/home/amir/project
+        │
+        │ Backup
+        ▼
+/backup/project.tar</div></div>
+<p>اگر بعدها فایل اصلی حذف شود:</p>
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block no-prompt">/home/amir/project
+        X</div></div>
+<p>می‌توانیم از Backup استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">بازیابی</span><div class="code-block no-prompt">Backup
+   │
+   │ Restore
+   ▼
+/home/amir/project</div></div>
 
-<h2>۷. تست پایانی</h2>
+<h3>۴. Restore چیست؟</h3>
+<p>Restore یعنی:</p>
+<blockquote>برگرداندن اطلاعات از Backup به محیط موردنظر.</blockquote>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Backup → ساخت نسخه پشتیبان
+Restore → بازیابی نسخه پشتیبان</div></div>
+<p>این دو مفهوم را نباید با هم اشتباه کنیم.</p>
+
+<h3>۵. Backup فقط «کپی کردن» نیست</h3>
+<p>از نظر مفهومی، Backup باید با هدف <strong>بازیابی اطلاعات در آینده</strong> انجام شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">کپی</span><div class="code-block">cp file.txt /tmp/file.txt</div></div>
+<p>این یک Copy ساده است.</p>
+<p>اما اگر یک نسخه منظم از اطلاعات در محل Backup داشته باشیم و در صورت خرابی بتوانیم آن را Restore کنیم، وارد مفهوم Backup شده‌ایم.</p>
+<p>بنابراین سؤال مهم فقط این نیست که:</p>
+<blockquote>«آیا یک کپی از فایل دارم؟»</blockquote>
+<p>بلکه:</p>
+<blockquote>«اگر اطلاعات اصلی از بین رفت، آیا می‌توانم اطلاعات را به شکل قابل‌اعتماد برگردانم؟»</blockquote>
+
+<h2>بخش دوم — Backup با <code>tar</code></h2>
+<h3>۶. چرا <code>tar</code> برای Backup مناسب است؟</h3>
+<p>در جلسه قبل دیدیم:</p>
+<div class="code-container"><span class="code-label">tar</span><div class="code-block no-prompt">tar → Archive</div></div>
+<p>اما همین قابلیت باعث می‌شود <code>tar</code> برای Backup فایل‌محور هم مفید باشد.</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir/project/
+├── file1.txt
+├── file2.txt
+└── docs/
+    ├── a.txt
+    └── b.txt</div></div>
+<p>می‌توانیم بگوییم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf project-backup.tar /home/amir/project</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/amir/project
+        │
+        ▼
+project-backup.tar</div></div>
+<p>یک Backup از مجموعه فایل‌ها داریم.</p>
+
+<h3>۷. Backup فشرده با <code>tar</code></h3>
+<p>می‌توانیم Backup را هم‌زمان Compress کنیم.</p>
+<p>مثلاً با gzip:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project-backup.tar.gz /home/amir/project</div></div>
+<p>ساختار ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Files
+  ↓
+tar
+  ↓
+Archive
+  ↓
+gzip
+  ↓
+Compressed Backup</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">project-backup.tar.gz</div></div>
+
+<h3>۸. Backup یک دایرکتوری</h3>
+<p>یک سناریوی رایج:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf home-backup.tar.gz /home/amir</div></div>
+<p>این دستور محتوای <code>/home/amir</code> را در یک Archive فشرده قرار می‌دهد.</p>
+<p>اما در Backup واقعی باید به مواردی مثل:</p>
+<ul>
+    <li>مجوزها</li>
+    <li>مالکیت</li>
+    <li>زمان فایل‌ها</li>
+    <li>فایل‌های مخفی</li>
+    <li>Symbolic Linkها</li>
+    <li>مسیرها</li>
+</ul>
+<p>هم توجه کنیم.</p>
+<p><code>tar</code> به‌طور معمول بسیاری از metadataهای مهم فایل‌ها را نگهداری می‌کند؛ اما در سناریوهای حرفه‌ای Backup باید گزینه‌ها و شرایط محیط را نیز در نظر گرفت.</p>
+
+<h2>بخش سوم — بررسی Backup قبل از Restore</h2>
+<p>یکی از عادت‌های خوب در مدیریت Backup این است:</p>
+<blockquote>قبل از اینکه Backup را Restore کنیم، اول ببینیم داخل آن چه چیزی وجود دارد.</blockquote>
+<p>برای این کار از <code>tar -t</code> استفاده می‌کنیم.</p>
+
+<h3>۹. گزینه <code>tar -t</code></h3>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-t</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">list</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf project-backup.tar.gz</div></div>
+<p>محتویات Archive را نمایش می‌دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">home/amir/project/
+home/amir/project/file1.txt
+home/amir/project/file2.txt
+home/amir/project/docs/
+home/amir/project/docs/a.txt
+home/amir/project/docs/b.txt</div></div>
+<p>نکته مهم:</p>
+<blockquote><code>tar -t</code> چیزی را Restore نمی‌کند.</blockquote>
+<p>فقط می‌گوید:</p>
+<blockquote>«داخل این Backup چه چیزهایی ذخیره شده؟»</blockquote>
+
+<h3>۱۰. چرا <code>-t</code> قبل از Restore مهم است؟</h3>
+<p>فرض کن Backup را از یک سیستم دیگر گرفته‌ای.</p>
+<p>قبل از اجرای:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
+<p>بهتر است ابتدا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
+<p>را اجرا کنی.</p>
+<p>چون ممکن است متوجه شوی:</p>
+<ul>
+    <li>فایل موردنظر داخل Backup نیست.</li>
+    <li>مسیرها آن چیزی نیستند که انتظار داشتی.</li>
+    <li>Archive مربوط به Backup دیگری است.</li>
+</ul>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Backup
+  ↓
+  -t
+  ↓
+بررسی محتویات
+  ↓
+  -x
+  ↓
+Restore</div></div>
+
+<h2>بخش چهارم — Restore کردن Backup</h2>
+<h3>۱۱. استخراج Backup</h3>
+<p>فرض کن داریم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">project-backup.tar.gz</div></div>
+<p>برای Restore:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf project-backup.tar.gz</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-x → extract
+-z → gzip
+-f → file</div></div>
+
+<h3>۱۲. Restore در مسیر مشخص</h3>
+<p>گاهی نمی‌خواهیم Backup در مسیر فعلی Extract شود.</p>
+<p>مثلاً می‌خواهیم در:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/tmp/restore</div></div>
+<p>بازیابی شود.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf project-backup.tar.gz -C /tmp/restore</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Backup
+  │
+  ▼
+tar -x
+  │
+  ▼
+/tmp/restore</div></div>
+
+<h3>۱۳. Restore فقط «باز کردن فایل» نیست</h3>
+<p>در یک Backup واقعی ممکن است هدف این باشد که:</p>
+<div class="code-container"><span class="code-label">هدف</span><div class="code-block no-prompt">فایل‌ها
++
+دایرکتوری‌ها
++
+metadata
++
+ساختار مسیر</div></div>
+<p>دوباره ایجاد شوند.</p>
+<p>پس Restore یعنی:</p>
+<blockquote>بازسازی وضعیت موردنیاز از روی نسخه پشتیبان.</blockquote>
+
+<h2>بخش پنجم — مشکل Backup معمولی</h2>
+<p>حالا یک مشکل واقعی داریم.</p>
+<p>فرض کن هر روز از <code>/home/amir</code> Backup می‌گیریم.</p>
+<p>روز اول:</p>
+<div class="code-container"><span class="code-label">روز ۱</span><div class="code-block no-prompt">100 GB</div></div>
+<p>روز دوم:</p>
+<div class="code-container"><span class="code-label">روز ۲</span><div class="code-block no-prompt">100 GB</div></div>
+<p>روز سوم:</p>
+<div class="code-container"><span class="code-label">روز ۳</span><div class="code-block no-prompt">100 GB</div></div>
+<p>در حالی که شاید فقط 500 MB فایل تغییر کرده باشد.</p>
+<p>اگر هر روز یک Full Backup بگیریم:</p>
+<div class="code-container"><span class="code-label">فضا</span><div class="code-block no-prompt">Day 1 → 100 GB
+Day 2 → 100 GB
+Day 3 → 100 GB
+Day 4 → 100 GB</div></div>
+<p>فضای زیادی مصرف می‌شود.</p>
+<p>اینجاست که مفهوم <strong>Incremental Backup</strong> وارد می‌شود.</p>
+
+<h2>بخش ششم — Incremental Backup</h2>
+<h3>۱۴. Incremental Backup چیست؟</h3>
+<p>Incremental یعنی:</p>
+<blockquote>در Backup بعدی فقط چیزهایی را ذخیره کنیم که نسبت به وضعیت Backup قبلی تغییر کرده‌اند.</blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">روز ۱</span><div class="code-block no-prompt">Full Backup
+100 GB</div></div>
+<p>روز دوم فقط:</p>
+<div class="code-container"><span class="code-label">روز ۲</span><div class="code-block no-prompt">500 MB changed</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">روز ۲</span><div class="code-block no-prompt">Incremental
+500 MB</div></div>
+<p>روز سوم:</p>
+<div class="code-container"><span class="code-label">روز ۳</span><div class="code-block no-prompt">200 MB changed</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">روز ۳</span><div class="code-block no-prompt">Incremental
+200 MB</div></div>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Full
+  +
+Incremental
+  +
+Incremental
+  +
+Incremental</div></div>
+
+<h3>۱۵. چرا Incremental Backup مفید است؟</h3>
+<p>چون:</p>
+<ul>
+    <li>فضای کمتری مصرف می‌کند.</li>
+    <li>Backupهای بعدی سریع‌تر می‌شوند.</li>
+    <li>حجم داده انتقالی کاهش پیدا می‌کند.</li>
+</ul>
+<p>اما یک هزینه دارد:</p>
+<blockquote>برای Restore کردن وضعیت نهایی، ممکن است به Backup اولیه و Incrementalهای بعدی نیاز داشته باشیم.</blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Full
+  │
+  ├── Incremental 1
+  │
+  ├── Incremental 2
+  │
+  └── Incremental 3</div></div>
+<p>اگر بخواهیم وضعیت روز چهارم را Restore کنیم، باید زنجیره Backup را درست در اختیار داشته باشیم.</p>
+
+<h2>بخش هفتم — <code>tar -g</code></h2>
+<h3>۱۶. <code>tar</code> چطور متوجه تغییرات می‌شود؟</h3>
+<p>اینجا به یکی از مهم‌ترین قسمت‌های جلسه می‌رسیم:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block">tar -g</div></div>
+<p><code>-g</code> برای استفاده از <strong>Incremental Backup</strong> در GNU <code>tar</code> است.</p>
+<p>به زبان ساده:</p>
+<blockquote><code>tar</code> باید somehow بفهمد دفعه قبل وضعیت فایل‌ها چه بوده تا بتواند تغییرات را تشخیص دهد.</blockquote>
+<p>برای این کار از یک فایل Snapshot استفاده می‌کند.</p>
+<p>این فایل معمولاً با پسوند:</p>
+<div class="code-container"><span class="code-label">پسوند</span><div class="code-block no-prompt">.snar</div></div>
+<p>ذخیره می‌شود.</p>
+
+<h3>۱۷. فایل <code>.snar</code> چیست؟</h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">backup.snar</div></div>
+<p>یک فایل معمولی برای نگهداری اطلاعات Snapshot مربوط به Incremental Backup است.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Filesystem
+     │
+     ▼
+   tar -g
+     │
+     ├──────────────► backup.tar
+     │
+     └──────────────► backup.snar</div></div>
+<p><code>tar</code> از <code>.snar</code> برای اینکه بداند وضعیت قبلی فایل‌ها چگونه بوده استفاده می‌کند.</p>
+<p>نکته بسیار مهم:</p>
+<blockquote><code>.snar</code> خود Backup اصلی فایل‌ها نیست.</blockquote>
+<p>بلکه:</p>
+<blockquote>اطلاعات لازم برای مدیریت وضعیت Incremental Backup را نگه می‌دارد.</blockquote>
+
+<h2>بخش هشتم — اولین Incremental Backup با <code>tar -g</code></h2>
+<h3>۱۸. Full Backup اولیه</h3>
+<p>فرض کنیم:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/amir/data/</div></div>
+<p>را می‌خواهیم Backup کنیم.</p>
+<p>اول:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf full.tar.gz -g backup.snar /home/amir/data</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create
+-z → gzip
+-f → archive file
+-g → incremental snapshot</div></div>
+<p>در نتیجه دو چیز مهم داریم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">full.tar.gz
+backup.snar</div></div>
+
+<h3>۱۹. چرا Backup اول Full است؟</h3>
+<p>چون هنوز <code>.snar</code> اطلاعاتی از Backup قبلی ندارد.</p>
+<p>بنابراین اولین اجرای Incremental Backup عملاً باید وضعیت کامل اولیه را ثبت کند.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">اجرای اول</span><div class="code-block no-prompt">اجرای اول
+    │
+    ▼
+Full Backup
+    │
+    └──> ساخت/به‌روزرسانی .snar</div></div>
+
+<h3>۲۰. Backup دوم</h3>
+<p>فرض کن بعد از Backup اول، فقط:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block no-prompt">report.txt</div></div>
+<p>تغییر کرده است.</p>
+<p>دوباره:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf inc1.tar.gz -g backup.snar /home/amir/data</div></div>
+<p>حالا <code>tar</code> از <code>backup.snar</code> استفاده می‌کند تا وضعیت قبلی را بشناسد.</p>
+<p>در نتیجه Backup دوم می‌تواند فقط تغییرات لازم را ذخیره کند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Full Backup
+     │
+     ▼
+backup.snar
+     │
+     │ تغییرات
+     ▼
+Incremental Backup</div></div>
+
+<h3>۲۱. Backup سوم</h3>
+<p>دوباره:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf inc2.tar.gz -g backup.snar /home/amir/data</div></div>
+<p>این بار وضعیت Snapshot بعد از Backup قبلی ملاک قرار می‌گیرد.</p>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">full.tar.gz
+      │
+      ▼
+inc1.tar.gz
+      │
+      ▼
+inc2.tar.gz</div></div>
+<p>و <code>backup.snar</code> در طول این فرآیند به‌روزرسانی می‌شود.</p>
+
+<h3>۲۲. زنجیره Incremental Backup</h3>
+<p>پس یک سناریوی واقعی می‌تواند چنین شکلی داشته باشد:</p>
+<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">              backup.snar
+                   │
+                   ▼
+Day 1 ──→ full.tar.gz
+                   │
+                   ▼
+Day 2 ──→ inc1.tar.gz
+                   │
+                   ▼
+Day 3 ──→ inc2.tar.gz
+                   │
+                   ▼
+Day 4 ──→ inc3.tar.gz</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">پایه</span><div class="code-block no-prompt">full.tar.gz</div></div>
+<p>پایه زنجیره است.</p>
+<p>و:</p>
+<div class="code-container"><span class="code-label">تغییرات</span><div class="code-block no-prompt">inc1
+inc2
+inc3</div></div>
+<p>تغییرات بعدی هستند.</p>
+
+<h2>بخش نهم — یک نکته بسیار مهم درباره <code>.snar</code></h2>
+<p>فایل:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.snar</div></div>
+<p>را نباید بی‌اهمیت بدانیم.</p>
+<p>اگر <code>.snar</code> را گم کنیم، ممکن است نتوانیم زنجیره Incremental را به همان شکل قبلی ادامه دهیم.</p>
+<p>پس در یک سیستم Backup واقعی باید از خود Snapshot نیز محافظت کنیم.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Backup Archive
+      +
+.snar
+      ↓
+وضعیت کامل Backup System</div></div>
+<p>اما دقت کن:</p>
+<blockquote><code>.snar</code> جایگزین Backup Archive نیست.</blockquote>
+<p>اگر:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">full.tar.gz
+inc1.tar.gz
+inc2.tar.gz</div></div>
+<p>را داشته باشی ولی <code>.snar</code> را نداشته باشی، هنوز Archiveهای Backup را داری؛ اما مدیریت ادامه زنجیره Incremental ممکن است دچار مشکل شود.</p>
+
+<h2>بخش دهم — بررسی Archive با <code>-t</code></h2>
+<p>همان‌طور که در Backup معمولی دیدیم، برای Incremental Backup هم باید بتوانیم محتویات Archive را ببینیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf full.tar.gz</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf inc1.tar.gz</div></div>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-t</div></div>
+<p>یعنی:</p>
+<blockquote>فقط محتویات Archive را List کن.</blockquote>
+
+<h3>۲۳. تفاوت <code>-t</code> و <code>-x</code></h3>
+<p>این دو را خوب از هم جدا کن:</p>
+<div class="code-container"><span class="code-label">-t</span><div class="code-block no-prompt">-t → List → فقط ببین چه چیزی داخل Archive است</div></div>
+<p>در مقابل:</p>
+<div class="code-container"><span class="code-label">-x</span><div class="code-block no-prompt">-x → Extract → محتویات را واقعاً استخراج کن</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
+<p>فقط نمایش می‌دهد.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">استخراج</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
+<p>فایل‌ها را Restore می‌کند.</p>
+
+<h2>بخش یازدهم — مقایسه با <code>tar -d</code></h2>
+<h3>۲۴. <code>tar -d</code> چیست؟</h3>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-d</div></div>
+<p>یا شکل کامل:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">--diff</div></div>
+<p>برای <strong>مقایسه محتویات Archive با فایل‌های موجود در سیستم فایل</strong> استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -dzf backup.tar.gz</div></div>
+<p>به <code>tar</code> می‌گوییم:</p>
+<blockquote>محتویات Backup را با وضعیت فعلی فایل‌ها مقایسه کن.</blockquote>
+
+<h3>۲۵. کاربرد <code>tar -d</code></h3>
+<p>فرض کن Backup داریم:</p>
+<div class="code-container"><span class="code-label">Backup</span><div class="code-block no-prompt">backup.tar.gz</div></div>
+<p>بعد از Backup، فایل:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">report.txt</div></div>
+<p>تغییر کرده است.</p>
+<p>می‌توانیم:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">tar -dzf backup.tar.gz</div></div>
+<p>اجرا کنیم.</p>
+<p><code>tar</code> بررسی می‌کند آیا فایل‌های موجود با وضعیت ثبت‌شده در Archive مطابقت دارند یا نه.</p>
+
+<h3>۲۶. <code>-t</code> و <code>-d</code> چه تفاوتی دارند؟</h3>
+<p>این دو بسیار مهم‌اند:</p>
+<h4><code>-t</code></h4>
+<p>می‌گوید:</p>
+<blockquote>چه چیزهایی داخل Archive هستند؟</blockquote>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
+<h4><code>-d</code></h4>
+<p>می‌گوید:</p>
+<blockquote>آیا فایل‌های موجود با Archive مطابقت دارند؟</blockquote>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -dzf backup.tar.gz</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">-t → نمایش محتویات
+-d → مقایسه محتویات Archive با فایل‌های موجود</div></div>
+<p>این تفاوت برای سؤال‌های LPIC-1 مهم است.</p>
+
+<h2>بخش دوازدهم — Restore کردن Incremental Backup</h2>
+<h3>۲۷. Restore کردن Full + Incremental</h3>
+<p>فرض کن داریم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">full.tar.gz
+inc1.tar.gz
+inc2.tar.gz</div></div>
+<p>اگر می‌خواهیم وضعیت نهایی را Restore کنیم، باید زنجیره را به ترتیب درست بازیابی کنیم.</p>
+<p>ابتدا:</p>
+<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">tar -xzf full.tar.gz</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">tar -xzf inc1.tar.gz</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">tar -xzf inc2.tar.gz</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Full
+ ↓
+Incremental 1
+ ↓
+Incremental 2
+ ↓
+Final State</div></div>
+<p>بنابراین Incremental Backup فقط مسئله Backup گرفتن نیست؛ <strong>Restore Strategy</strong> هم اهمیت دارد.</p>
+
+<h3>۲۸. چرا ترتیب مهم است؟</h3>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">Day 1:
+file.txt = A
+
+Day 2:
+file.txt = B
+
+Day 3:
+file.txt = C</div></div>
+<p>اگر می‌خواهی وضعیت Day 3 را برگردانی، نمی‌توانی فقط آخرین تغییر را بدون پایه آن Restore کنی.</p>
+<p>باید زنجیره را داشته باشی:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Day 1
+ ↓
+Day 2
+ ↓
+Day 3</div></div>
+<p>به همین دلیل مدیریت Backupهای Incremental باید با دقت انجام شود.</p>
+
+<h2>بخش سیزدهم — حالا <code>dd</code></h2>
+<p>تا اینجا درباره Backup فایل‌محور صحبت کردیم.</p>
+<p>حالا می‌رسیم به ابزاری که مدل ذهنی کاملاً متفاوتی دارد:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">dd</div></div>
+
+<h3>۲۹. <code>dd</code> چیست؟</h3>
+<p><code>dd</code> یک ابزار برای:</p>
+<blockquote>کپی کردن داده‌ها به شکل بسیار مستقیم و سطح پایین، معمولاً به صورت بلوک‌به‌بلوک.</blockquote>
+<p>است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Source
+   │
+   ▼
+[Block][Block][Block][Block]
+   │
+   ▼
+Destination
+[Block][Block][Block][Block]</div></div>
+<p>در اینجا <code>dd</code> لزوماً نمی‌داند این داده‌ها:</p>
+<ul>
+    <li>فایل هستند</li>
+    <li>filesystem هستند</li>
+    <li>partition هستند</li>
+    <li>boot sector هستند</li>
+</ul>
+<p>بلکه داده را به صورت جریان بلوک‌ها می‌بیند.</p>
+
+<h3>۳۰. ساختار کلی <code>dd</code></h3>
+<p>فرم کلی:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">dd if=SOURCE of=DESTINATION</div></div>
+<p>دو گزینه بسیار مهم:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">if = input file
+of = output file</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">if → از کجا بخوان؟
+of → کجا بنویس؟</div></div>
+
+<h3>۳۱. مثال ساده با فایل</h3>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">source.img</div></div>
+<p>داریم.</p>
+<p>می‌خواهیم یک کپی از آن ایجاد کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=copy.img</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">source.img
+    │
+    │ dd
+    ▼
+copy.img</div></div>
+<p>در این حالت <code>dd</code> داده را به صورت مستقیم کپی می‌کند.</p>
+
+<h3>۳۲. کپی یک فایل با <code>dd</code></h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=file1.img of=file2.img</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file1.img
+   ↓
+dd
+   ↓
+file2.img</div></div>
+<p>در واقع <code>dd</code> برای کپی فایل‌های عادی هم قابل استفاده است، اگرچه برای Copy معمولی معمولاً ابزارهایی مثل <code>cp</code> مناسب‌تر و واضح‌تر هستند.</p>
+
+<h2>بخش چهاردهم — <code>dd</code> و Block Size</h2>
+<h3>۳۳. گزینه <code>bs</code></h3>
+<p>یکی از گزینه‌های مهم:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">bs=</div></div>
+<p>است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=copy.img bs=4M</div></div>
+<p>یعنی اندازه هر واحد خواندن/نوشتن را 4 MiB در نظر بگیر.</p>
+<p>به شکل مفهومی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">bs → Block Size → اندازه بلوک عملیات</div></div>
+<p>در سطح LPIC-1 دانستن مفهوم <code>bs</code> مهم است.</p>
+
+<h3>۳۴. <code>count</code></h3>
+<p>گزینه:</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">count=</div></div>
+<p>تعداد بلوک‌هایی را که باید کپی شوند مشخص می‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=copy.img bs=1M count=10</div></div>
+<p>یعنی تقریباً:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">10 blocks × 1 MiB</div></div>
+<p>از ورودی خوانده شود.</p>
+
+<h3>۳۵. <code>status=progress</code></h3>
+<p>برای دیدن پیشرفت عملیات:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=source.img of=copy.img status=progress</div></div>
+<p>می‌توان استفاده کرد.</p>
+<p>این گزینه در سیستم‌های امروزی بسیار مفید است.</p>
+
+<h2>بخش پانزدهم — کپی پارتیشن با <code>dd</code></h2>
+<p>حالا فرض کنیم یک پارتیشن داریم:</p>
+<div class="code-container"><span class="code-label">پارتیشن</span><div class="code-block no-prompt">/dev/sdb1</div></div>
+<p>و می‌خواهیم یک Image از آن بسازیم.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dd if=/dev/sdb1 of=/backup/sdb1.img bs=4M status=progress</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb1
+    │
+    │ dd
+    ▼
+sdb1.img</div></div>
+<p>اینجا <code>dd</code> مستقیماً داده‌های پارتیشن را کپی می‌کند.</p>
+
+<h3>۳۶. نکته بسیار مهم</h3>
+<p>وقتی می‌گویی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb1 of=/backup/sdb1.img</div></div>
+<p>در واقع داری:</p>
+<blockquote>محتوای خام پارتیشن را کپی می‌کنی.</blockquote>
+<p><code>dd</code> مثل <code>tar</code> نمی‌گوید:</p>
+<blockquote>این فایل <code>report.txt</code> است.</blockquote>
+<p>بلکه کل داده‌های پارتیشن را به صورت خام می‌خواند.</p>
+
+<h2>بخش شانزدهم — کپی کل دیسک با <code>dd</code></h2>
+<p>این قسمت بسیار مهم و در عین حال خطرناک است.</p>
+<p>فرض کن دیسک:</p>
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
+<p>داریم.</p>
+<p>برای گرفتن Image از کل دیسک:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dd if=/dev/sdb of=/backup/sdb.img bs=4M status=progress</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb
+    │
+    ▼
+   dd
+    │
+    ▼
+sdb.img</div></div>
+<p>چون کل دیسک را به عنوان <code>if</code> داده‌ایم، اطلاعات سطح دیسک نیز در Image قرار می‌گیرد.</p>
+
+<h3>۳۷. فرق <code>/dev/sdb</code> و <code>/dev/sdb1</code></h3>
+<p>این تفاوت بسیار مهم است:</p>
+<div class="code-container"><span class="code-label">کل دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
+<p>یعنی:</p>
+<blockquote>کل دیسک</blockquote>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">پارتیشن</span><div class="code-block no-prompt">/dev/sdb1</div></div>
+<p>یعنی:</p>
+<blockquote>پارتیشن اول دیسک</blockquote>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">dd if=/dev/sdb1 of=partition.img</div></div>
+<p>دو کار کاملاً متفاوت هستند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sdb
+│
+├── Partition 1 → /dev/sdb1
+├── Partition 2 → /dev/sdb2
+└── ...</div></div>
+
+<h2>بخش هفدهم — Restore کردن Image با <code>dd</code></h2>
+<p><code>dd</code> فقط برای گرفتن Image نیست.</p>
+<p>می‌توانیم Image را دوباره روی مقصد بنویسیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dd if=/backup/sdb.img of=/dev/sdb bs=4M status=progress</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">sdb.img
+   │
+   │ dd
+   ▼
+/dev/sdb</div></div>
+<p>این می‌تواند وضعیت خام ذخیره‌شده در Image را روی دیسک مقصد بنویسد.</p>
+
+<h3>۳۸. هشدار بسیار مهم درباره <code>dd</code></h3>
+<p>در <code>dd</code>، گزینه‌های:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">if
+of</div></div>
+<p>بسیار حساس‌اند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=/dev/sdc</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/dev/sdb
+    ↓
+کپی
+    ↓
+/dev/sdc</div></div>
+<p>اگر اشتباه کنی:</p>
+<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block">dd if=/dev/sdb of=/dev/sda</div></div>
+<p>ممکن است اطلاعات <code>/dev/sda</code> را نابود کنی.</p>
+<p>پس قبل از اجرای <code>dd</code> همیشه باید:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsblk</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">sudo fdisk -l</div></div>
+<p>را بررسی کنی.</p>
+
+<h2>بخش هجدهم — Backup فایل‌محور در برابر کپی سطح پایین</h2>
+<p>حالا به مهم‌ترین مقایسه جلسه می‌رسیم.</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Disk
+│
+├── Partition
+│     │
+│     └── Filesystem
+│            │
+│            ├── file1
+│            ├── file2
+│            └── file3</div></div>
+<h3><code>tar</code></h3>
+<p>در سطح فایل کار می‌کند:</p>
+<div class="code-container"><span class="code-label">tar</span><div class="code-block no-prompt">Filesystem
+    │
+    ▼
+  Files
+    │
+    ▼
+   tar</div></div>
+<h3><code>dd</code></h3>
+<p>در سطح بلوک کار می‌کند:</p>
+<div class="code-container"><span class="code-label">dd</span><div class="code-block no-prompt">Disk / Partition
+       │
+       ▼
+      dd
+       │
+       ▼
+  Raw Blocks</div></div>
+<p>این تفاوت را خوب در ذهن نگه دار.</p>
+
+<h3>۳۹. Backup فایل‌محور با <code>tar</code></h3>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup.tar.gz /home/amir</div></div>
+<p>در اینجا تمرکز روی:</p>
+<div class="code-container"><span class="code-label">محور</span><div class="code-block no-prompt">/home/amir
+   │
+   ├── file1
+   ├── file2
+   ├── docs
+   └── ...</div></div>
+<p>است.</p>
+<p>یعنی:</p>
+<blockquote>فایل‌ها و ساختار آنها را Backup می‌کنیم.</blockquote>
+<p>مزایا:</p>
+<ul>
+    <li>می‌توان فایل خاصی را Restore کرد.</li>
+    <li>لازم نیست کل دیسک را Restore کنیم.</li>
+    <li>حجم Backup می‌تواند کمتر باشد.</li>
+    <li>Incremental Backup امکان‌پذیر است.</li>
+    <li>برای Backup معمولی فایل‌ها بسیار مناسب است.</li>
+</ul>
+
+<h3>۴۰. کپی سطح پایین با <code>dd</code></h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=sdb.img</div></div>
+<p>اینجا:</p>
+<blockquote>کل داده‌های خام دیسک را کپی می‌کنیم.</blockquote>
+<p>مزایا:</p>
+<ul>
+    <li>می‌تواند یک Image بسیار نزدیک به کپی خام منبع ایجاد کند.</li>
+    <li>برای Clone کردن دیسک مناسب است.</li>
+    <li>می‌تواند اطلاعات خارج از فایل‌های عادی را نیز شامل کند.</li>
+    <li>برای Imaging یک دیسک یا پارتیشن مفید است.</li>
+</ul>
+<p>اما:</p>
+<ul>
+    <li>ممکن است حجم Image بسیار زیاد باشد.</li>
+    <li>فضای خالی هم ممکن است در کپی قرار بگیرد.</li>
+    <li>Incremental Backup فایل‌محور مانند <code>tar -g</code> ندارد.</li>
+    <li>برای Restore فایل منفرد مناسب نیست.</li>
+    <li>در صورت اشتباه می‌تواند بسیار مخرب باشد.</li>
+</ul>
+
+<h3>۴۱. مثال برای درک تفاوت</h3>
+<p>فرض کن یک دیسک:</p>
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
+<p>داریم:</p>
+<div class="code-container"><span class="code-label">ظرفیت</span><div class="code-block no-prompt">500 GB Disk</div></div>
+<p>اما فقط:</p>
+<div class="code-container"><span class="code-label">مصرف</span><div class="code-block no-prompt">100 GB</div></div>
+<p>از آن استفاده شده است.</p>
+<h4>با <code>tar</code></h4>
+<p>مثلاً از فایل‌های موردنظر Backup می‌گیریم:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Backup ≈ حجم واقعی داده‌های انتخاب‌شده</div></div>
+<h4>با <code>dd</code></h4>
+<p>اگر کل دیسک را Image کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=sdb.img</div></div>
+<p>Image می‌تواند تقریباً به اندازه کل فضای مورد کپی باشد:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">sdb.img ≈ 500 GB</div></div>
+<p>حتی اگر فقط 100 GB داده واقعی داشته باشیم.</p>
+<p>البته اندازه واقعی خروجی به روش و محدوده‌ای که کپی می‌کنیم بستگی دارد؛ اما نکته مفهومی این است:</p>
+<blockquote><code>dd</code> فایل‌های «استفاده‌شده» را نمی‌شناسد؛ بلوک‌ها را کپی می‌کند.</blockquote>
+
+<h3>۴۲. چه زمانی <code>tar</code> بهتر است؟</h3>
+<p>مثلاً:</p>
+<blockquote>«می‌خواهم از <code>/home/amir</code> Backup بگیرم و اگر فردا فقط <code>report.txt</code> خراب شد، بتوانم همان فایل را Restore کنم.»</blockquote>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block">tar</div></div>
+<p>انتخاب مناسبی است.</p>
+
+<h3>۴۳. چه زمانی <code>dd</code> مناسب‌تر است؟</h3>
+<p>مثلاً:</p>
+<blockquote>«می‌خواهم از یک دیسک Image بگیرم تا بتوانم کل آن را روی یک دیسک دیگر Clone کنم.»</blockquote>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block">dd</div></div>
+<p>می‌تواند مناسب باشد.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Disk A
+   │
+   ▼
+  dd
+   │
+   ▼
+Disk Image
+   │
+   ▼
+  dd
+   │
+   ▼
+Disk B</div></div>
+
+<h2>بخش نوزدهم — <code>dd</code> و Partition Table</h2>
+<p>اگر کل دیسک را:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
+<p>کپی کنیم، فقط فایل‌های داخل Filesystem مطرح نیستند.</p>
+<p>در سطح کل دیسک، اطلاعات ساختار دیسک نیز می‌تواند در Image قرار بگیرد؛ از جمله اطلاعات مربوط به Partition Table و سایر بخش‌های خام دیسک.</p>
+<p>این یکی از تفاوت‌های مهم آن با Backup فایل‌محور است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/dev/sdb
+│
+├── Partition Table
+├── Partition 1
+├── Partition 2
+└── ...</div></div>
+<p>در کپی کل دیسک، کل این محدوده کپی می‌شود.</p>
+
+<h2>بخش بیستم — مقایسه نهایی <code>tar</code> و <code>dd</code></h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ویژگی</th><th><code>tar</code></th><th><code>dd</code></th></tr></thead>
+<tbody>
+<tr><td>سطح کار</td><td>فایل</td><td>بلوک خام</td></tr>
+<tr><td>Backup فایل‌ها</td><td>عالی</td><td>غیرمستقیم</td></tr>
+<tr><td>Backup کل دیسک</td><td>معمولاً مناسب نیست</td><td>مناسب</td></tr>
+<tr><td>Backup یک پارتیشن</td><td>فایل‌محور</td><td>خام</td></tr>
+<tr><td>Restore یک فایل</td><td>بله</td><td>مناسب نیست</td></tr>
+<tr><td>Incremental با <code>-g</code></td><td>بله</td><td>ندارد</td></tr>
+<tr><td>Compression مستقیم</td><td>با gzip/bzip2/xz</td><td>ذاتاً ندارد</td></tr>
+<tr><td>ساخت Image</td><td>معمولاً نه</td><td>بله</td></tr>
+<tr><td>کپی فضای خالی</td><td>معمولاً نه</td><td>ممکن است</td></tr>
+<tr><td>Clone دیسک</td><td>مناسب نیست</td><td>مناسب</td></tr>
+<tr><td>خطر اشتباه <code>of=</code></td><td>نسبتاً کم</td><td>بسیار زیاد</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>بخش بیست‌ویکم — یک سناریوی کامل Backup</h2>
+<p>حالا یک سناریوی واقعی را از ابتدا تا انتها ببینیم.</p>
+<p>فرض:</p>
+<div class="code-container"><span class="code-label">داده</span><div class="code-block no-prompt">/home/amir/data/</div></div>
+<p>اطلاعات مهم ماست.</p>
+<h4>مرحله ۱ — Full Backup</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf full.tar.gz -g backup.snar /home/amir/data</div></div>
+<p>داریم:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">full.tar.gz
+backup.snar</div></div>
+
+<h4>مرحله ۲ — تغییر فایل‌ها</h4>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block no-prompt">report.txt</div></div>
+<p>تغییر کرده.</p>
+
+<h4>مرحله ۳ — Incremental Backup</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf inc1.tar.gz -g backup.snar /home/amir/data</div></div>
+
+<h4>مرحله ۴ — بررسی Backup</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tar -tzf inc1.tar.gz</div></div>
+
+<h4>مرحله ۵ — بررسی اختلاف</h4>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">tar -dzf inc1.tar.gz</div></div>
+<p>این Archive را با فایل‌های فعلی مقایسه می‌کند.</p>
+
+<h4>مرحله ۶ — Restore</h4>
+<p>ابتدا:</p>
+<div class="code-container"><span class="code-label">مرحله</span><div class="code-block">tar -xzf full.tar.gz</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">مرحله</span><div class="code-block">tar -xzf inc1.tar.gz</div></div>
+<p>حالا وضعیت موردنظر بازسازی می‌شود.</p>
+
+<h2>بخش بیست‌ودوم — سناریوی <code>dd</code></h2>
+<p>فرض کن دیسک:</p>
+<div class="code-container"><span class="code-label">دیسک</span><div class="code-block no-prompt">/dev/sdb</div></div>
+<p>را بررسی کرده‌ایم و مطمئن هستیم همین دیسک موردنظر است.</p>
+<h4>گرفتن Image</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dd if=/dev/sdb of=/backup/sdb.img bs=4M status=progress</div></div>
+<h4>Restore Image</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dd if=/backup/sdb.img of=/dev/sdb bs=4M status=progress</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">          BACKUP
+
+/dev/sdb
+   │
+   ▼
+  dd
+   │
+   ▼
+sdb.img
+
+
+          RESTORE
+
+sdb.img
+   │
+   ▼
+  dd
+   │
+   ▼
+/dev/sdb</div></div>
+
+<h2>نکات مهم جلسه</h2>
+<h3>Backup و Restore</h3>
+<div class="code-container"><span class="code-label">Backup</span><div class="code-block no-prompt">Backup → ایجاد نسخه پشتیبان
+Restore → بازیابی نسخه پشتیبان</div></div>
+
+<h3><code>tar</code></h3>
+<p>برای Backup فایل‌محور بسیار مناسب است:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup.tar.gz /data</div></div>
+
+<h3>بررسی محتویات</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -tzf backup.tar.gz</div></div>
+<p><code>-t</code>:</p>
+<blockquote>فقط محتویات را نمایش می‌دهد.</blockquote>
+
+<h3>مقایسه</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -dzf backup.tar.gz</div></div>
+<p><code>-d</code>:</p>
+<blockquote>محتویات Archive را با فایل‌های موجود مقایسه می‌کند.</blockquote>
+
+<h3>Restore</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
+
+<h3>Incremental Backup</h3>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Full Backup
+     ↓
+Incremental
+     ↓
+Incremental
+     ↓
+Incremental</div></div>
+<p>و <code>tar -g</code> برای مدیریت Snapshot این فرآیند استفاده می‌شود.</p>
+
+<h3><code>.snar</code></h3>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">backup.snar</div></div>
+<p>اطلاعات Snapshot مربوط به وضعیت فایل‌ها را برای Incremental Backup نگه می‌دارد.</p>
+<p>خود Backup فایل‌ها نیست.</p>
+
+<h3><code>dd</code></h3>
+<p>ساختار اصلی:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">dd if=SOURCE of=DESTINATION</div></div>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">if → input
+of → output</div></div>
+
+<h4><code>dd</code> روی فایل</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=file1 of=file2</div></div>
+<h4><code>dd</code> روی پارتیشن</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb1 of=partition.img</div></div>
+<h4><code>dd</code> روی کل دیسک</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
+
+<h4>تفاوت اصلی</h4>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">tar → فایل‌ها را می‌شناسد
+dd → بلوک‌های خام را کپی می‌کند</div></div>
+
+<h2>جمع‌بندی به سبک فاینمن</h2>
+<p>فرض کن می‌خواهی از خانه‌ات نسخه پشتیبان داشته باشی.</p>
+<p>اگر بگویی:</p>
+<blockquote>«اسباب و وسایل داخل خانه را دسته‌بندی کن و در جعبه‌های مشخص قرار بده.»</blockquote>
+<p>داری در سطح <strong>فایل</strong> کار می‌کنی.</p>
+<p>در Linux این مدل به <code>tar</code> نزدیک است:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Files
+ ↓
+tar
+ ↓
+Backup</div></div>
+<p>مزیتش این است که بعداً می‌توانی بگویی:</p>
+<blockquote>فقط همان فایل را به من برگردان.</blockquote>
+<p>اما اگر بگویی:</p>
+<blockquote>«کل خانه را دقیقاً آجر به آجر کپی کن.»</blockquote>
+<p>دیگر اهمیتی ندارد داخل خانه چه چیزی است؛ کل ساختار را کپی می‌کنی.</p>
+<p>این شبیه <code>dd</code> است:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Blocks
+ ↓
+dd
+ ↓
+Image</div></div>
+<p>حالا مشکل Backupهای معمولی را تصور کن. اگر هر روز کل خانه را دوباره کپی کنی، خیلی پرهزینه است. بنابراین می‌گویی:</p>
+<blockquote>روز اول همه‌چیز را ذخیره کن؛ از این به بعد فقط تغییرات را ذخیره کن.</blockquote>
+<p>این همان:</p>
+<blockquote><strong>Incremental Backup</strong></blockquote>
+<p>است.</p>
+<p><code>tar -g</code> برای اینکه بفهمد «چه چیزی نسبت به دفعه قبل تغییر کرده»، از یک Snapshot استفاده می‌کند:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">tar -g
+  │
+  ▼
+.snar
+  │
+  ▼
+شناخت وضعیت قبلی
+  │
+  ▼
+Incremental Backup</div></div>
+<p>و در نهایت سه دستور مهم برای کار با Backup را می‌توانی مثل سه سؤال به خاطر بسپاری:</p>
+<div class="code-container"><span class="code-label">سه سؤال</span><div class="code-block no-prompt">داخل Backup چی دارم؟ → -t
+آیا با وضعیت فعلی فرق دارد؟ → -d
+می‌خواهم برش گردانم؟ → -x</div></div>
+<p>پس کل جلسه در یک تصویر:</p>
+<div class="code-container"><span class="code-label">تصویر نهایی</span><div class="code-block no-prompt">                         BACKUP
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+       File-Oriented                 Low-Level
+             │                           │
+            tar                          dd
+             │                           │
+       ┌─────┴─────┐                Raw Blocks
+       │           │                     │
+     Full     Incremental                │
+                 │                       │
+                -g                       │
+                 │                       │
+               .snar                     │
+                                         │
+                                  File / Partition / Disk</div></div>
+
+<h2>۶ سؤال چهارگزینه‌ای — سطح LPIC-1</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>کدام گزینه بهترین توصیف برای تفاوت <code>tar</code> و <code>dd</code> است؟</p>
+<p>کدام گزینه درباره <code>tar -t</code> صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>tar</code> برای Disk و <code>dd</code> فقط برای فایل‌های متنی است.</button>
-    <button onclick="selectOption(this)">ب) <code>tar</code> عمدتاً با فایل‌ها و Directoryها کار می‌کند، در حالی که <code>dd</code> می‌تواند داده را در سطح پایین از فایل، Partition یا Disk کپی کند.</button>
-    <button onclick="selectOption(this)">ج) هر دو دقیقاً یک نوع Backup ایجاد می‌کنند.</button>
-    <button onclick="selectOption(this)">د) <code>dd</code> فقط برای Compression استفاده می‌شود.</button>
+    <button onclick="selectOption(this)">الف) فایل‌های Archive را Extract می‌کند.</button>
+    <button onclick="selectOption(this)">ب) محتویات Archive را نمایش می‌دهد.</button>
+    <button onclick="selectOption(this)">ج) Archive را با فایل‌های سیستم مقایسه می‌کند.</button>
+    <button onclick="selectOption(this)">د) یک Incremental Backup ایجاد می‌کند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>tar</code> فایل‌محور است، درحالی‌که <code>dd</code> می‌تواند داده خام یک Device را نیز کپی کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>-t</code> مخفف مفهوم <strong>list</strong> است:<br><code>tar -tzf backup.tar.gz</code><br>فقط محتویات Archive را نمایش می‌دهد. مقایسه با <code>-d</code> انجام می‌شود و Extract با <code>-x</code>.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>در Incremental Backup با <code>tar -g</code>، فایل <code>.snar</code> چه نقشی دارد؟</p>
+<p>هدف اصلی <code>tar -g</code> چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) فایل فشرده‌شده Backup است.</button>
-    <button onclick="selectOption(this)">ب) فایل لاگ سیستم است.</button>
-    <button onclick="selectOption(this)">ج) اطلاعات وضعیت لازم برای تشخیص تغییرات Backup را نگهداری می‌کند.</button>
-    <button onclick="selectOption(this)">د) جایگزین فایل <code>tar.gz</code> است.</button>
+    <button onclick="selectOption(this)">الف) فعال کردن gzip</button>
+    <button onclick="selectOption(this)">ب) ایجاد Archive روی دیسک</button>
+    <button onclick="selectOption(this)">ج) مدیریت Snapshot برای Incremental Backup</button>
+    <button onclick="selectOption(this)">د) نمایش محتویات Archive</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>.snar</code> خود Backup نیست؛ <code>tar</code> از آن برای نگهداری اطلاعات وضعیت فایل‌ها و مدیریت Incremental Backup استفاده می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>در GNU <code>tar</code>، گزینه <code>-g</code> برای Incremental Backup و استفاده از Snapshot file به کار می‌رود. Snapshot معمولاً در فایلی مانند <code>backup.snar</code> نگهداری می‌شود.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۳ — سناریومحور</p>
-<p>مدیر سیستم می‌خواهد از کل Directory زیر Backup بگیرد:</p>
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/home/navid/project</div></div>
-<p>و روز بعد فقط تغییرات را Backup کند. کدام روش مناسب‌تر است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>فایل <code>.snar</code> در Incremental Backup چه نقشی دارد؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) هر روز <code>dd</code> روی <code>/home/navid/project</code></button>
-    <button onclick="selectOption(this)">ب) استفاده از <code>tar</code> با <code>-g</code> و یک فایل <code>.snar</code> ثابت</button>
-    <button onclick="selectOption(this)">ج) استفاده از <code>gzip</code> روی Directory</button>
-    <button onclick="selectOption(this)">د) استفاده از <code>rm -r</code></button>
+    <button onclick="selectOption(this)">الف) خود فایل Backup فشرده‌شده است.</button>
+    <button onclick="selectOption(this)">ب) فایل اجرایی <code>tar</code> است.</button>
+    <button onclick="selectOption(this)">ج) اطلاعات Snapshot موردنیاز برای تشخیص تغییرات را نگه می‌دارد.</button>
+    <button onclick="selectOption(this)">د) فایل سیستم را ذخیره می‌کند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب</strong><br><code>tar -g</code> برای Incremental Backup طراحی شده و از فایل Snapshot مانند <code>project.snar</code> استفاده می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br><code>.snar</code> اطلاعات مربوط به وضعیت قبلی فایل‌ها را برای مدیریت Incremental Backup نگه می‌دارد. بنابراین: <code>.snar ≠ Backup Archive</code> بلکه اطلاعات Snapshot است.</div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۴ — سناریومحور</p>
-<p>خروجی <code>lsblk</code> نشان می‌دهد USB موردنظر:</p>
-<div class="code-container"><span class="code-label">USB</span><div class="code-block no-prompt">/dev/sdb</div></div>
-<p>است. می‌خواهی یک Image از <strong>کل USB</strong> در فایل <code>usb.img</code> ایجاد کنی. کدام دستور صحیح است؟</p>
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام دستور محتویات <code>backup.tar.gz</code> را با فایل‌های موجود مقایسه می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>dd if=usb.img of=/dev/sdb</code></button>
-    <button onclick="selectOption(this)">ب) <code>dd if=/dev/sdb of=usb.img</code></button>
-    <button onclick="selectOption(this)">ج) <code>tar if=/dev/sdb of=usb.img</code></button>
-    <button onclick="selectOption(this)">د) <code>dd /dev/sdb usb.img</code></button>
+    <button onclick="selectOption(this)">الف) <code>tar -tzf backup.tar.gz</code></button>
+    <button onclick="selectOption(this)">ب) <code>tar -xzf backup.tar.gz</code></button>
+    <button onclick="selectOption(this)">ج) <code>tar -dzf backup.tar.gz</code></button>
+    <button onclick="selectOption(this)">د) <code>tar -czf backup.tar.gz</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>dd if=/dev/sdb of=usb.img</code></strong><br>چون: <code>if</code> = Source و <code>of</code> = Destination. در اینجا USB منبع و <code>usb.img</code> مقصد است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>tar -dzf backup.tar.gz</code></strong><br>گزینه <code>-d</code> برای <strong>diff / compare</strong> استفاده می‌شود. در مقابل: <code>-t → list</code>، <code>-x → extract</code>، <code>-c → create</code>.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>کدام دستور فقط محتویات یک Backup به نام <code>backup.tar.gz</code> را مشاهده می‌کند و آن را Extract نمی‌کند؟</p>
+<p>کدام دستور یک Image از <strong>کل دیسک</strong> <code>/dev/sdb</code> ایجاد می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">الف) <code>tar -xzf backup.tar.gz</code></button>
-    <button onclick="selectOption(this)">ب) <code>tar -czf backup.tar.gz</code></button>
-    <button onclick="selectOption(this)">ج) <code>tar -tzf backup.tar.gz</code></button>
-    <button onclick="selectOption(this)">د) <code>gzip -d backup.tar.gz</code></button>
+    <button onclick="selectOption(this)">الف) <code>dd if=/dev/sdb1 of=disk.img</code></button>
+    <button onclick="selectOption(this)">ب) <code>dd if=/dev/sdb of=disk.img</code></button>
+    <button onclick="selectOption(this)">ج) <code>tar if=/dev/sdb of=disk.img</code></button>
+    <button onclick="selectOption(this)">د) <code>dd of=/dev/sdb if=disk.img</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج — <code>tar -tzf backup.tar.gz</code></strong><br>چون: <code>-t → List</code>، <code>-z → gzip</code>، <code>-f → Archive File</code> و هیچ Extractی انجام نمی‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ب — <code>dd if=/dev/sdb of=disk.img</code></strong><br><code>/dev/sdb</code> کل دیسک است، اما <code>/dev/sdb1</code> فقط یک پارتیشن است. گزینه D جهت عملیات را برعکس می‌کند و در این سناریو به‌جای گرفتن Backup، Image را روی دیسک می‌نویسد.</div>
 </div>
 
-<h2>🔗 ارتباط با جلسه بعد</h2>
-<p>تا اینجا یاد گرفتیم فایل‌ها را مدیریت و فشرده کنیم و از آن‌ها Backup بگیریم.</p>
-<p>اما در لینوکس یک مفهوم جالب دیگر وجود دارد:</p>
-<blockquote>آیا می‌توانیم <strong>دو نام مختلف</strong> داشته باشیم که به یک فایل اشاره کنند؟</blockquote>
-<p>بله.</p>
-<p>اینجاست که وارد جلسه ۴ می‌شویم:</p>
-<p><strong>Hard Link & Symbolic Link</strong></p>
-<p>و در آن ارتباط <strong>Link ↔ inode ↔ File</strong> را دقیق یاد می‌گیریم.</p>
-` ,
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام گزینه تفاوت <code>tar</code> و <code>dd</code> را بهتر بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">الف) <code>tar</code> در سطح بلوک کار می‌کند و <code>dd</code> در سطح فایل.</button>
+    <button onclick="selectOption(this)">ب) هر دو دقیقاً یک کار انجام می‌دهند و تفاوتی ندارند.</button>
+    <button onclick="selectOption(this)">ج) <code>tar</code> بیشتر فایل‌ها و ساختار آنها را Backup می‌کند، در حالی که <code>dd</code> داده را در سطح خام و بلوکی کپی می‌کند.</button>
+    <button onclick="selectOption(this)">د) <code>dd</code> تنها برای Compression استفاده می‌شود.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: ج</strong><br>این مهم‌ترین مفهوم جلسه است: <code>tar → File-Oriented</code> و <code>dd → Block-Oriented / Raw</code>. به همین دلیل <code>tar</code> برای Backup انتخابی فایل‌ها و Incremental Backup مناسب است، در حالی که <code>dd</code> برای Image و Clone کردن پارتیشن یا دیسک کاربرد دارد.</div>
+</div>
+
+<h3>یک نکته عملی برای ادامه مسیر</h3>
+<p>برای اینکه این جلسه کاملاً جا بیفتد، تمرین ایده‌آل بعدی این است که روی همان VM لینوکسی‌ات یک سناریوی کوچک بسازیم: <strong>Full Backup با <code>tar</code> → تغییر فایل‌ها → Incremental با <code>tar -g</code> → بررسی با <code>-t</code> و <code>-d</code> → Restore</strong> و بعد یک <strong>Image آزمایشی با <code>dd</code> روی یک فایل یا دیسک مجازی غیرحساس</strong> انجام دهیم.</p>
+`
+,
 "ch4-4": `
 <div class="section-header">
     <div class="section-badge">۴</div>
