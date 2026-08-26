@@ -26417,7 +26417,3473 @@ Manual Boot به معنی اجرای Linux بدون Kernel یا بدون GRUB ن
     <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">ls\n ↓\nlinux ...\n ↓\ninitrd ...\n ↓\nboot</div></div>
     <p>جلسه بعد وارد یکی از کاربردی‌ترین بخش‌های این فصل می‌شویم: <strong>Single User Mode در AlmaLinux 9 و Reset کردن Root Password در AlmaLinux 10</strong>؛ جایی که همین مفاهیم Boot و Kernel Parameters را در یک سناریوی واقعی Recovery به کار می‌بریم.</p>
 </div>
+`,
+"ch5-4": `
+<div class="section-header">
+    <div class="section-badge">۵</div>
+    <div>
+        <h1>Single User Mode AlmaLinux 9 + Reset Root Password AlmaLinux 10</h1>
+        <div class="meta">بوت، سیستم‌عامل و مجازی‌سازی · بخش ۴ از ۸</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>مفهوم <strong>Single User / Rescue / Emergency Mode</strong> را در Linux درک کنی.</li>
+    <li>تفاوت <code>multi-user.target</code>، <code>rescue.target</code> و <code>emergency.target</code> را بشناسی.</li>
+    <li>در AlmaLinux 9 از GRUB وارد محیط تعمیراتی شوی.</li>
+    <li>در AlmaLinux 10، در صورت فراموشی Root Password، با <code>rd.break</code> رمز را Reset کنی.</li>
+    <li>نقش <code>chroot</code>، <code>/sysroot</code> و <code>/.autorelabel</code> را در فرآیند Recovery توضیح بدهی.</li>
+</ol>
+
+<hr>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا سه جلسه اول را به Boot اختصاص دادیم:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">جلسه 1\nBoot Process\n   ↓\nجلسه 2\nGRUB\n   ↓\nجلسه 3\nManual Boot\n   ↓\nجلسه 4\nRecovery / Single User</div></div>
+
+<p>حالا می‌خواهیم از همین مفاهیم در یک سناریوی واقعی استفاده کنیم:</p>
+<blockquote><strong>اگر نتوانیم با Root وارد سیستم شویم یا سیستم نیاز به تعمیر داشته باشد، چطور قبل از Boot کامل وارد یک محیط حداقلی شویم؟</strong></blockquote>
+<p>اینجا مفهوم <strong>Single User Mode</strong> مطرح می‌شود.</p>
+<p>اما یک نکته مهم:</p>
+<p>در سیستم‌های جدید مبتنی بر systemd، چیزی که به‌صورت سنتی «Single User Mode» نامیده می‌شد، دیگر دقیقاً یک Runlevel مستقل نیست؛ بیشتر با Targetهایی مثل <code>rescue.target</code> و <code>emergency.target</code> کار می‌کنیم.</p>
+
+<hr>
+
+<h2>درسنامه</h2>
+
+<h3>Single User Mode چیست؟ ⭐⭐⭐</h3>
+<p>در حالت عادی Linux تقریباً همه اجزای سیستم را راه‌اندازی می‌کند:</p>
+
+<div class="code-container"><span class="code-label">Boot عادی</span><div class="code-block no-prompt">Kernel\n ↓\nsystemd\n ↓\nNetwork\n ↓\nSSH\n ↓\nServices\n ↓\nGUI / Login</div></div>
+
+<p>اما در حالت تعمیراتی، نمی‌خواهیم همه سرویس‌ها اجرا شوند.</p>
+<p>می‌خواهیم چیزی شبیه این داشته باشیم:</p>
+
+<div class="code-container"><span class="code-label">محیط Recovery</span><div class="code-block no-prompt">Kernel\n   ↓\nsystemd\n   ↓\nMinimal Environment\n   ↓\nRoot Shell</div></div>
+
+<p>این محیط برای کارهایی مثل:</p>
+<ul>
+    <li>تعمیر سیستم</li>
+    <li>تغییر تنظیمات</li>
+    <li>بررسی Filesystem</li>
+    <li>رفع بعضی مشکلات Boot</li>
+    <li>تغییر Password</li>
+</ul>
+<p>مناسب است.</p>
+
+<hr>
+
+<h3>Single User Mode در سیستم‌های قدیمی</h3>
+<p>در سیستم‌های قدیمی SysV init، Runlevelها اهمیت زیادی داشتند.</p>
+<p>به‌صورت کلاسیک:</p>
+
+<div class="code-container"><span class="code-label">Runlevel 1</span><div class="code-block no-prompt">Runlevel 1\n    ↓\nSingle User Mode</div></div>
+
+<p>یعنی سیستم با حداقل سرویس‌ها و معمولاً برای کارهای مدیریتی/تعمیراتی اجرا می‌شد.</p>
+<p>اما در systemd دیگر بهتر است این مدل ذهنی را داشته باشیم:</p>
+
+<div class="code-container"><span class="code-label">تکامل</span><div class="code-block no-prompt">Traditional SysV\n       ↓\nRunlevel 1\n       ↓\nSingle User\n\nsystemd\n       ↓\nrescue.target</div></div>
+
+<p>بنابراین در Linux مدرن، وقتی می‌گوییم Single User Mode، اغلب منظورمان یک <strong>محیط حداقلی برای Recovery</strong> است.</p>
+
+<hr>
+
+<h3><code>rescue.target</code> ⭐⭐⭐</h3>
+<p>یکی از Targetهای systemd:</p>
+
+<div class="code-container"><span class="code-label">rescue.target</span><div class="code-block no-prompt">rescue.target</div></div>
+
+<p>است.</p>
+<p>این Target یک محیط تعمیراتی نسبتاً کامل‌تر از Emergency ایجاد می‌کند.</p>
+<p>به‌صورت مفهومی:</p>
+
+<div class="code-container"><span class="code-label">مفهوم</span><div class="code-block no-prompt">rescue.target\n      ↓\nحداقل سرویس‌های ضروری\n      ↓\nRoot Shell</div></div>
+
+<p>کاربرد:</p>
+<ul>
+    <li>Troubleshooting</li>
+    <li>تعمیر سیستم</li>
+    <li>تغییر تنظیمات</li>
+    <li>کارهای مدیریتی</li>
+</ul>
+
+<hr>
+
+<h3><code>emergency.target</code> ⭐⭐⭐</h3>
+<p>یک مرحله حتی حداقلی‌تر:</p>
+
+<div class="code-container"><span class="code-label">emergency.target</span><div class="code-block no-prompt">emergency.target</div></div>
+
+<p>است.</p>
+<p>در این حالت سیستم با حداقل امکانات ممکن بالا می‌آید.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">multi-user.target\n      ↓\nسیستم عادی\n\nrescue.target\n      ↓\nسیستم حداقلی برای تعمیر\n\nemergency.target\n      ↓\nحداقل‌ترین محیط برای Recovery</div></div>
+
+<hr>
+
+<h3>تفاوت Rescue و Emergency</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Target</th><th>هدف</th></tr></thead>
+<tbody>
+<tr><td><code>multi-user.target</code></td><td>کار عادی چندکاربره</td></tr>
+<tr><td><code>graphical.target</code></td><td>کار عادی با GUI</td></tr>
+<tr><td><code>rescue.target</code></td><td>محیط تعمیراتی نسبتاً کامل</td></tr>
+<tr><td><code>emergency.target</code></td><td>حداقل محیط اضطراری</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<code>rescue.target</code> و <code>emergency.target</code> را یکی ندان.
+<p><code>emergency.target</code> محیط بسیار محدودتری فراهم می‌کند.</p>
+</div></div>
+
+<hr>
+
+<h3>ورود به Rescue Mode از طریق systemd</h3>
+<p>اگر سیستم به‌طور عادی Boot شده باشد و دسترسی مدیریتی داشته باشیم، می‌توانیم Target را تغییر دهیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">تغییر Target</span><div class="code-block">sudo systemctl isolate rescue.target</div></div>
+
+<p>دستور <code>isolate</code> یعنی systemd را به Target موردنظر ببریم و سرویس‌هایی را که برای آن Target لازم نیستند متوقف کنیم.</p>
+<p>یا برای دیدن Target پیش‌فرض:</p>
+
+<div class="code-container"><span class="code-label">مشاهده</span><div class="code-block">systemctl get-default</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">graphical.target</div></div>
+
+<hr>
+
+<h3>اما اگر اصلاً نتوانیم وارد Linux شویم چه؟</h3>
+<p>اینجا GRUB وارد بازی می‌شود.</p>
+<p>در جلسه ۲ یاد گرفتیم که می‌توانیم Entry مربوط به Kernel را با:</p>
+
+<div class="code-container"><span class="code-label">e</span><div class="code-block no-prompt">e</div></div>
+
+<p>ویرایش کنیم.</p>
+<p>پس می‌توانیم یک Kernel Parameter به آن اضافه کنیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">rescue</span><div class="code-block no-prompt">systemd.unit=rescue.target</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">emergency</span><div class="code-block no-prompt">systemd.unit=emergency.target</div></div>
+
+<p>این یعنی:</p>
+<blockquote>«بعد از Boot شدن Kernel، systemd را با این Target اجرا کن.»</blockquote>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">GRUB\n  ↓\nKernel\n  ↓\nsystemd.unit=rescue.target\n  ↓\nrescue.target</div></div>
+
+<p>این دقیقاً اتصال مفهومی جلسه ۲ و جلسه ۴ است.</p>
+
+<hr>
+
+<h3>Reset کردن Root Password — سناریوی اصلی ⭐⭐⭐</h3>
+<p>حالا به مهم‌ترین بخش جلسه می‌رسیم.</p>
+<p>فرض کن:</p>
+<ul>
+    <li>AlmaLinux نصب است.</li>
+    <li>سیستم سالم است.</li>
+    <li>Root Password را فراموش کرده‌ای.</li>
+    <li>هیچ کاربر دیگری با <code>sudo</code> نداری.</li>
+</ul>
+<p>در این شرایط نمی‌توانی ساده بگویی:</p>
+
+<div class="code-container"><span class="code-label">غیرممکن</span><div class="code-block">sudo passwd root</div></div>
+
+<p>چون اصلاً حساب مدیریتی دیگری نداری.</p>
+<p>پس باید <strong>قبل از Boot کامل سیستم</strong> وارد محیط Recovery شویم.</p>
+<p>در سیستم‌های RHEL/AlmaLinux مدرن، روش استاندارد استفاده از:</p>
+
+<div class="code-container"><span class="code-label">rd.break</span><div class="code-block no-prompt">rd.break</div></div>
+
+<p>است.</p>
+
+<hr>
+
+<h3><code>rd.break</code> چیست؟ ⭐⭐⭐</h3>
+<p><code>rd.break</code> یک Kernel Parameter است.</p>
+<p>وقتی آن را به خط Kernel در GRUB اضافه می‌کنیم، فرآیند Boot در مرحله <strong>initramfs</strong> متوقف می‌شود.</p>
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">GRUB\n ↓\nKernel\n ↓\ninitramfs\n ↓\n⛔ rd.break\n ↓\nRecovery Shell\n ↓\nsystemd</div></div>
+
+<p>هنوز Boot معمولی سیستم کامل نشده است.</p>
+<p>به همین دلیل می‌توانیم Root Filesystem سیستم را برای تعمیر آماده کنیم.</p>
+
+<hr>
+
+<h3>مرحله اول — ورود به GRUB</h3>
+<p>سیستم را Reboot کن.</p>
+<p>وقتی منوی GRUB ظاهر شد:</p>
+
+<div class="code-container"><span class="code-label">e</span><div class="code-block no-prompt">e</div></div>
+
+<p>را بزن.</p>
+<p>خطی شبیه این پیدا می‌کنی:</p>
+
+<div class="code-container"><span class="code-label">خط Kernel</span><div class="code-block no-prompt">linux ... root=/dev/mapper/almalinux-root ro ...</div></div>
+
+<p>به انتهای همین خط اضافه کن:</p>
+
+<div class="code-container"><span class="code-label">اضافه کردن</span><div class="code-block no-prompt">rd.break</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">linux ... root=/dev/mapper/almalinux-root ro ... rd.break</div></div>
+
+<p>سپس:</p>
+
+<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Ctrl + X</div></div>
+
+<p>را بزن.</p>
+
+<hr>
+
+<h3>مرحله دوم — ورود به Shell</h3>
+<p>سیستم Boot می‌شود اما قبل از انتقال کامل کنترل به سیستم نصب‌شده، وارد محیطی شبیه این می‌شوی:</p>
+
+<div class="code-container"><span class="code-label">محیط Recovery</span><div class="code-block no-prompt">switch_root:/#</div></div>
+
+<p>اینجا یک نکته بسیار مهم وجود دارد:</p>
+<blockquote>این هنوز محیط عادی Linux نصب‌شده نیست.</blockquote>
+<p>ما در محیط <strong>initramfs</strong> هستیم.</p>
+
+<hr>
+
+<h3>چرا <code>/sysroot</code> داریم؟ ⭐⭐⭐</h3>
+<p>در این مرحله Root Filesystem واقعی سیستم معمولاً در:</p>
+
+<div class="code-container"><span class="code-label">/sysroot</span><div class="code-block no-prompt">/sysroot</div></div>
+
+<p>قرار دارد.</p>
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">initramfs environment\n        │\n        └── /sysroot\n               ↓\n        Real Linux System\n               ↓\n        /etc\n        /var\n        /home\n        /usr\n        ...</div></div>
+
+<p>پس اگر بخواهیم Password سیستم واقعی را تغییر دهیم، باید وارد <code>/sysroot</code> شویم.</p>
+<p>اما یک مشکل داریم:</p>
+
+<div class="code-container"><span class="code-label">مشکل</span><div class="code-block no-prompt">/sysroot</div></div>
+
+<p>معمولاً <strong>Read-Only</strong> است.</p>
+<p>پس ابتدا باید آن را Read-Write کنیم.</p>
+
+<hr>
+
+<h3>مرحله سوم — Remount کردن <code>/sysroot</code> ⭐⭐⭐</h3>
+<p>دستور:</p>
+
+<div class="code-container"><span class="code-label">Remount</span><div class="code-block">mount -o remount,rw /sysroot</div></div>
+
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">remount\n   ↓\nدوباره Mount کن\n\nrw\n   ↓\nRead-Write\n\n/sysroot\n   ↓\nRoot Filesystem واقعی</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">switch_root:/# mount -o remount,rw /sysroot</div></div>
+
+<hr>
+
+<h3>مرحله چهارم — <code>chroot</code> ⭐⭐⭐</h3>
+<p>حالا باید محیط Root سیستم نصب‌شده را به محیط فعلی تبدیل کنیم:</p>
+
+<div class="code-container"><span class="code-label">chroot</span><div class="code-block">chroot /sysroot</div></div>
+
+<p><code>chroot</code> یعنی:</p>
+<blockquote><strong>Change Root Directory</strong></blockquote>
+<p>قبل:</p>
+
+<div class="code-container"><span class="code-label">قبل</span><div class="code-block no-prompt">/\n└── sysroot\n      └── real Linux</div></div>
+
+<p>بعد:</p>
+
+<div class="code-container"><span class="code-label">بعد</span><div class="code-block no-prompt">/\n├── etc\n├── var\n├── home\n├── usr\n└── ...</div></div>
+
+<p>یعنی از این لحظه به بعد، <code>/sysroot</code> برای ما به‌عنوان <code>/</code> سیستم نصب‌شده دیده می‌شود.</p>
+
+<hr>
+
+<h3>چرا <code>chroot</code> لازم است؟</h3>
+<p>فرض کن بدون <code>chroot</code> این را اجرا کنی:</p>
+
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block">passwd</div></div>
+
+<p>ممکن است Command در محیط initramfs اجرا شود، نه در سیستم نصب‌شده.</p>
+<p>ما می‌خواهیم تغییر روی:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/sysroot/etc/shadow</div></div>
+
+<p>سیستم واقعی اعمال شود.</p>
+<p>با:</p>
+
+<div class="code-container"><span class="code-label">chroot</span><div class="code-block">chroot /sysroot</div></div>
+
+<p>سیستم فایل واقعی تبدیل به Root محیط فعلی می‌شود.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">initramfs\n   ↓\nchroot /sysroot\n   ↓\nReal Linux /\n   ↓\npasswd</div></div>
+
+<hr>
+
+<h3>مرحله پنجم — تغییر Password ⭐⭐⭐</h3>
+<p>حالا:</p>
+
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block">passwd</div></div>
+
+<p>را اجرا کن.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Changing password for user root.\nNew password:\nRetype new password:\npasswd: all authentication tokens updated successfully.</div></div>
+
+<p>در این مرحله Root Password جدید تعیین شده است.</p>
+<p>اما هنوز یک مسئله مهم داریم:</p>
+<p><strong>SELinux</strong></p>
+
+<hr>
+
+<h3>SELinux و <code>.autorelabel</code> ⭐⭐⭐</h3>
+<p>وقتی Password را در این محیط Recovery تغییر می‌دهیم، ممکن است Context مربوط به فایل‌ها نیاز به Relabel شدن داشته باشد.</p>
+<p>به همین دلیل:</p>
+
+<div class="code-container"><span class="code-label">autorelabel</span><div class="code-block">touch /.autorelabel</div></div>
+
+<p>را اجرا می‌کنیم.</p>
+<p>این فایل به سیستم می‌گوید:</p>
+<blockquote>در Boot بعدی، SELinux Contextهای فایل‌ها را دوباره بررسی و Relabel کن.</blockquote>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">زنجیره SELinux</span><div class="code-block no-prompt">passwd\n  ↓\nتغییر Password\n  ↓\ntouch /.autorelabel\n  ↓\nBoot بعدی\n  ↓\nSELinux Relabel\n  ↓\nLogin با Password جدید</div></div>
+
+<hr>
+
+<h3>چرا <code>.autorelabel</code> مهم است؟</h3>
+<p>فرض کن این مرحله را فراموش کنیم:</p>
+
+<div class="code-container"><span class="code-label">فراموشی</span><div class="code-block">touch /.autorelabel</div></div>
+
+<p>ممکن است Password درست تغییر کرده باشد، اما SELinux Context مناسب نباشد و Login بعدی دچار مشکل شود.</p>
+<p>پس در RHEL/AlmaLinux:</p>
+<blockquote><strong>Reset Password + SELinux = باید به Relabel توجه کنیم.</strong></blockquote>
+
+<hr>
+
+<h3>خروج از Recovery</h3>
+<p>حالا داخل <code>chroot</code> هستیم.</p>
+<p>اول:</p>
+
+<div class="code-container"><span class="code-label">خروج اول</span><div class="code-block">exit</div></div>
+
+<p>این دستور ما را از:</p>
+
+<div class="code-container"><span class="code-label">chroot</span><div class="code-block no-prompt">chroot</div></div>
+
+<p>خارج می‌کند.</p>
+<p>دوباره:</p>
+
+<div class="code-container"><span class="code-label">خروج دوم</span><div class="code-block">exit</div></div>
+
+<p>این بار از Shell مربوط به <code>initramfs</code> خارج می‌شویم و فرآیند Boot ادامه پیدا می‌کند.</p>
+<p>پس دو <code>exit</code> داریم:</p>
+
+<div class="code-container"><span class="code-label">دو خروج</span><div class="code-block no-prompt">exit\n ↓\nخروج از chroot\n\nexit\n ↓\nخروج از Recovery / ادامه Boot</div></div>
+
+<hr>
+
+<h3>کل سناریو را یکجا ببین</h3>
+
+<div class="code-container"><span class="code-label">زنجیره کامل</span><div class="code-block no-prompt">GRUB\n  │\n  │ e\n  ↓\nEdit linux line\n  │\n  │ + rd.break\n  ↓\nCtrl+x\n  │\n  ↓\ninitramfs\n  │\n  ↓\nswitch_root:/#\n  │\n  ├── mount -o remount,rw /sysroot\n  │\n  ├── chroot /sysroot\n  │\n  ├── passwd\n  │\n  ├── touch /.autorelabel\n  │\n  ├── exit\n  │\n  └── exit\n  ↓\nNormal Boot\n  ↓\nSELinux Relabel\n  ↓\nLogin</div></div>
+
+<p>این <strong>مهم‌ترین زنجیره عملی این جلسه</strong> است.</p>
+
+<hr>
+
+<h3>AlmaLinux 9 در برابر AlmaLinux 10</h3>
+<p>از نظر مفهوم، روش Recovery در AlmaLinux 9 و 10 بسیار مشابه است:</p>
+
+<div class="code-container"><span class="code-label">روش مشترک</span><div class="code-block no-prompt">GRUB\n ↓\ne\n ↓\nrd.break\n ↓\nCtrl+x\n ↓\n/sysroot\n ↓\nremount rw\n ↓\nchroot\n ↓\npasswd\n ↓\nSELinux relabel</div></div>
+
+<p>بنابراین نکته آموزشی مهم این است:</p>
+<blockquote>تفاوت نسخه 9 و 10 را نباید به شکل «دو روش کاملاً متفاوت» تصور کنی؛ هسته Recovery همان <strong>GRUB → <code>rd.break</code> → <code>/sysroot</code> → <code>chroot</code> → <code>passwd</code> → SELinux relabel</strong> است.</blockquote>
+
+<hr>
+
+<h3>روش جایگزین <code>init=/bin/bash</code> ⭐⭐</h3>
+<p>یک روش دیگر وجود دارد:</p>
+
+<div class="code-container"><span class="code-label">init=/bin/bash</span><div class="code-block no-prompt">init=/bin/bash</div></div>
+
+<p>این روش به‌جای اجرای init system، مستقیماً Bash را اجرا می‌کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">linux ... rw init=/bin/bash</div></div>
+
+<p>در این حالت مستقیماً وارد Bash می‌شوی.</p>
+<p>اما برای LPIC-1:</p>
+<blockquote>روش اصلی و مهم‌تر را <strong><code>rd.break</code></strong> یاد بگیر.</blockquote>
+<p><code>init=/bin/bash</code> را فقط به‌عنوان روش جایگزین بشناس.</p>
+
+<hr>
+
+<h3>Single User Mode با Password Recovery یکی نیست</h3>
+<p>این نکته خیلی مهم است.</p>
+<p>ما سه مفهوم داریم:</p>
+
+<div class="code-container"><span class="code-label">سه مفهوم</span><div class="code-block no-prompt">rescue.target\nemergency.target\nrd.break</div></div>
+
+<p>این‌ها یک چیز نیستند.</p>
+
+<h4><code>rescue.target</code></h4>
+<p>محیط تعمیراتی systemd.</p>
+
+<h4><code>emergency.target</code></h4>
+<p>محیط بسیار حداقلی systemd.</p>
+
+<h4><code>rd.break</code></h4>
+<p>Boot را در <strong>initramfs</strong> متوقف می‌کند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">Normal Boot\n     ↓\nsystemd\n     ├── rescue.target\n     └── emergency.target\n\n\nGRUB\n  ↓\nKernel\n  ↓\ninitramfs\n  └── rd.break</div></div>
+
+<p>این تفاوت را برای آزمون حتماً بلد باش.</p>
+
+<hr>
+
+<h2>نکات مهم</h2>
+<ol>
+    <li>Single User Mode یک اصطلاح قدیمی‌تر است؛ در systemd بیشتر با <code>rescue.target</code> مرتبط است.</li>
+    <li><code>emergency.target</code> از <code>rescue.target</code> حداقلی‌تر است.</li>
+    <li>برای Reset Root Password در RHEL/AlmaLinux، روش مهم <code>rd.break</code> است.</li>
+    <li><code>rd.break</code> فرآیند Boot را در مرحله initramfs متوقف می‌کند.</li>
+    <li><code>/sysroot</code> محل Mount شدن Root Filesystem واقعی سیستم در این محیط است.</li>
+    <li><code>/sysroot</code> ابتدا Read-Only است.</li>
+    <li>برای تغییر Password:
+        <div class="code-container"><span class="code-label">کد</span><div class="code-block">mount -o remount,rw /sysroot</div></div>
+    </li>
+    <li>برای ورود به سیستم نصب‌شده:
+        <div class="code-container"><span class="code-label">کد</span><div class="code-block">chroot /sysroot</div></div>
+    </li>
+    <li>برای تغییر Root Password:
+        <div class="code-container"><span class="code-label">کد</span><div class="code-block">passwd</div></div>
+    </li>
+    <li>برای SELinux:
+        <div class="code-container"><span class="code-label">کد</span><div class="code-block">touch /.autorelabel</div></div>
+    </li>
+    <li>دو <code>exit</code> داریم: یکی خروج از <code>chroot</code> و دیگری خروج از Recovery Shell.</li>
+    <li><code>rd.break</code> با <code>rescue.target</code> یکی نیست.</li>
+</ol>
+
+<hr>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>فرض کن کل سیستم قفل شده و Password اصلی را فراموش کرده‌ای.</p>
+<p>نمی‌توانی وارد Linux شوی تا <code>passwd</code> اجرا کنی.</p>
+<p>پس از <strong>قبل از ورود کامل به Linux</strong> وارد می‌شوی.</p>
+<p>GRUB را باز می‌کنی و می‌گویی:</p>
+
+<div class="code-container"><span class="code-label">rd.break</span><div class="code-block no-prompt">rd.break</div></div>
+
+<p>یعنی:</p>
+<blockquote>«قبل از اینکه Boot کامل شود، همین‌جا متوقف شو.»</blockquote>
+<p>وارد initramfs می‌شوی.</p>
+<p>Root واقعی سیستم در:</p>
+
+<div class="code-container"><span class="code-label">/sysroot</span><div class="code-block no-prompt">/sysroot</div></div>
+
+<p>قرار دارد.</p>
+<p>آن را Read-Write می‌کنی:</p>
+
+<div class="code-container"><span class="code-label">remount</span><div class="code-block">mount -o remount,rw /sysroot</div></div>
+
+<p>بعد می‌گویی:</p>
+<blockquote>«از اینجا به بعد <code>/sysroot</code> را Root سیستم من حساب کن.»</blockquote>
+
+<div class="code-container"><span class="code-label">chroot</span><div class="code-block">chroot /sysroot</div></div>
+
+<p>حالا:</p>
+
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block">passwd</div></div>
+
+<p>و Password تغییر می‌کند.</p>
+<p>چون SELinux داریم:</p>
+
+<div class="code-container"><span class="code-label">autorelabel</span><div class="code-block">touch /.autorelabel</div></div>
+
+<p>و بعد خارج می‌شوی.</p>
+<p>پس کل ایده در یک جمله:</p>
+<blockquote><strong>قبل از Boot کامل وارد initramfs می‌شویم، Root واقعی را در <code>/sysroot</code> قابل‌نوشتن می‌کنیم، با <code>chroot</code> وارد آن می‌شویم، Password را تغییر می‌دهیم و برای SELinux Relabel را فعال می‌کنیم.</strong></blockquote>
+
+<hr>
+
+<h2>سناریوی ترکیبی</h2>
+
+<h3>سناریو: Root Password فراموش شده در AlmaLinux</h3>
+<p>فرض کن AlmaLinux 10 روی VM نصب است و فقط Console ماشین را در اختیار داری.</p>
+<p>Password کاربر <code>root</code> را فراموش کرده‌ای.</p>
+
+<h4>مرحله 1 — Reboot</h4>
+<p>سیستم را Restart کن.</p>
+<p>در GRUB:</p>
+
+<div class="code-container"><span class="code-label">e</span><div class="code-block no-prompt">e</div></div>
+
+<p>را بزن.</p>
+
+<h4>مرحله 2 — پیدا کردن خط Kernel</h4>
+<p>خطی شبیه:</p>
+
+<div class="code-container"><span class="code-label">خط Kernel</span><div class="code-block no-prompt">linux ... root=/dev/mapper/almalinux-root ro ...</div></div>
+
+<p>را پیدا کن.</p>
+<p>به انتهای آن:</p>
+
+<div class="code-container"><span class="code-label">rd.break</span><div class="code-block no-prompt">rd.break</div></div>
+
+<p>اضافه کن.</p>
+
+<h4>مرحله 3 — Boot</h4>
+
+<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Ctrl + X</div></div>
+
+<h4>مرحله 4 — بررسی محیط</h4>
+<p>به چیزی شبیه:</p>
+
+<div class="code-container"><span class="code-label">محیط</span><div class="code-block no-prompt">switch_root:/#</div></div>
+
+<p>می‌رسی.</p>
+<p>یعنی هنوز در محیط initramfs هستی.</p>
+
+<h4>مرحله 5 — Read-Write کردن Root</h4>
+
+<div class="code-container"><span class="code-label">remount</span><div class="code-block">mount -o remount,rw /sysroot</div></div>
+
+<h4>مرحله 6 — ورود به سیستم واقعی</h4>
+
+<div class="code-container"><span class="code-label">chroot</span><div class="code-block">chroot /sysroot</div></div>
+
+<h4>مرحله 7 — تغییر Password</h4>
+
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block">passwd</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">New password:\nRetype new password:\npasswd: all authentication tokens updated successfully.</div></div>
+
+<h4>مرحله 8 — SELinux</h4>
+
+<div class="code-container"><span class="code-label">autorelabel</span><div class="code-block">touch /.autorelabel</div></div>
+
+<h4>مرحله 9 — خروج</h4>
+
+<div class="code-container"><span class="code-label">خروج</span><div class="code-block">exit\nexit</div></div>
+
+<p>سیستم Boot می‌شود و SELinux ممکن است قبل از Login فرآیند Relabel را انجام دهد. این فرآیند بسته به اندازه Filesystem می‌تواند زمان‌بر باشد.</p>
+
+<h4>نتیجه</h4>
+<p>بعد از پایان Boot:</p>
+
+<div class="code-container"><span class="code-label">Login</span><div class="code-block no-prompt">login: root\nPassword: &lt;new-password&gt;</div></div>
+
+<p>و می‌توانی با Password جدید وارد شوی.</p>
+
+<hr>
+
+<h2>Cheat Sheet</h2>
+
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">rescue.target                    → محیط تعمیراتی systemd\nemergency.target                 → حداقل محیط اضطراری\nGRUB → e                         → ویرایش Boot Entry\nrd.break                         → توقف Boot در initramfs\nmount -o remount,rw /sysroot     → RW کردن Root واقعی\nchroot /sysroot                  → ورود به سیستم نصب‌شده\npasswd                           → تغییر Root Password\ntouch /.autorelabel              → Relabel کردن SELinux در Boot بعدی\nexit                             → خروج از chroot\nexit                             → خروج از Recovery و ادامه Boot</div></div>
+
+<hr>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>در systemd، کدام Target بیشتر با مفهوم سنتی Single User Mode مرتبط است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>graphical.target</code></button>
+    <button onclick="selectOption(this)">B) <code>multi-user.target</code></button>
+    <button onclick="selectOption(this)">C) <code>rescue.target</code></button>
+    <button onclick="selectOption(this)">D) <code>network.target</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>rescue.target</code> محیط تعمیراتی و حداقلی برای مدیریت سیستم فراهم می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>پارامتر <code>rd.break</code> چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) GRUB را حذف می‌کند.</button>
+    <button onclick="selectOption(this)">B) Boot را در مرحله initramfs متوقف می‌کند.</button>
+    <button onclick="selectOption(this)">C) systemd را برای همیشه غیرفعال می‌کند.</button>
+    <button onclick="selectOption(this)">D) Kernel را حذف می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>rd.break</code> برای ورود به محیط Recovery قبل از ادامه کامل فرآیند Boot استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>بعد از اجرای <code>rd.break</code>، چرا از دستور زیر استفاده می‌کنیم؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mount -o remount,rw /sysroot</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) برای نصب GRUB</button>
+    <button onclick="selectOption(this)">B) برای Read-Write کردن Root Filesystem واقعی</button>
+    <button onclick="selectOption(this)">C) برای اجرای Kernel</button>
+    <button onclick="selectOption(this)">D) برای فعال کردن Network</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Root واقعی در <code>/sysroot</code> قرار دارد و ابتدا Read-Only است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>هدف اصلی <code>chroot /sysroot</code> چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) تغییر Firmware</button>
+    <button onclick="selectOption(this)">B) تغییر Root Directory به سیستم نصب‌شده</button>
+    <button onclick="selectOption(this)">C) حذف initramfs</button>
+    <button onclick="selectOption(this)">D) Restart کردن systemd</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>بعد از <code>chroot</code>، <code>/sysroot</code> از دید محیط فعلی به‌عنوان <code>/</code> سیستم نصب‌شده دیده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>بعد از تغییر Root Password در محیط Recovery، چرا معمولاً این دستور را اجرا می‌کنیم؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">touch /.autorelabel</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) برای نصب SELinux</button>
+    <button onclick="selectOption(this)">B) برای فعال کردن Relabel شدن SELinux در Boot بعدی</button>
+    <button onclick="selectOption(this)">C) برای حذف Password</button>
+    <button onclick="selectOption(this)">D) برای Restart کردن GRUB</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>این کار باعث می‌شود SELinux در Boot بعدی Contextهای فایل‌ها را دوباره تنظیم کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام ترتیب برای Reset Root Password با <code>rd.break</code> صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>passwd → chroot → rd.break → mount</code></button>
+    <button onclick="selectOption(this)">B) <code>rd.break → mount /sysroot → chroot → passwd</code></button>
+    <button onclick="selectOption(this)">C) <code>chroot → GRUB → passwd → rd.break</code></button>
+    <button onclick="selectOption(this)">D) <code>mount → GRUB → systemctl → passwd</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>ترتیب منطقی: <code>GRUB</code> → <code>rd.break</code> → <code>mount -o remount,rw /sysroot</code> → <code>chroot /sysroot</code> → <code>passwd</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>کاربر Root Password را فراموش کرده و هیچ حساب کاربری دارای <code>sudo</code> هم ندارد. سیستم AlmaLinux به GRUB می‌رسد. بهترین روش Recovery کدام است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) اجرای <code>sudo passwd root</code></button>
+    <button onclick="selectOption(this)">B) حذف <code>/etc/shadow</code></button>
+    <button onclick="selectOption(this)">C) افزودن <code>rd.break</code> به خط Kernel در GRUB و سپس Reset کردن Password از محیط Recovery</button>
+    <button onclick="selectOption(this)">D) تغییر GPT به MBR</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>چون کاربر نمی‌تواند وارد سیستم شود، باید قبل از Boot کامل وارد محیط Recovery شویم. روش <code>rd.break</code> دقیقاً برای چنین سناریویی مناسب است.</div>
+</div>
+
+<div class="summary-box">
+    <h3>🎯 Recall نهایی</h3>
+    <p>این زنجیره را برای امتحان و کار عملی حفظ کن:</p>
+    <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">GRUB\n ↓\ne\n ↓\nlinux ... rd.break\n ↓\nCtrl+x\n ↓\nswitch_root:/#\n ↓\nmount -o remount,rw /sysroot\n ↓\nchroot /sysroot\n ↓\npasswd\n ↓\ntouch /.autorelabel\n ↓\nexit\n ↓\nexit</div></div>
+    <p>و سه مفهوم را از هم جدا نگه دار:</p>
+    <div class="code-container"><span class="code-label">سه مفهوم</span><div class="code-block no-prompt">rescue.target   → Recovery در systemd\nemergency.target → Recovery حداقلی‌تر در systemd\nrd.break        → توقف Boot در initramfs</div></div>
+    <p>این جلسه پایه عملی بسیار خوبی برای جلسه بعد یعنی <strong>Systemd + Send Message</strong> است؛ آنجا همین Targetها و مدیریت سرویس‌ها را از حالت Recovery خارج کرده و در مدیریت عادی سیستم بررسی می‌کنیم.</p>
+</div>
+`,
+"ch5-5": `
+<div class="section-header">
+    <div class="section-badge">۵</div>
+    <div>
+        <h1>Systemd + Send Message</h1>
+        <div class="meta">بوت، سیستم‌عامل و مجازی‌سازی · بخش ۵ از ۸</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>نقش <code>systemd</code> را به‌عنوان <strong>PID 1</strong> و مدیر اصلی سرویس‌ها توضیح بدهی.</li>
+    <li>با مفهوم <strong>Unit، Service و Target</strong> کار کنی.</li>
+    <li>سرویس‌ها را با <code>systemctl</code> بررسی، اجرا، متوقف، Restart و Enable کنی.</li>
+    <li>تفاوت <code>start</code>، <code>stop</code>، <code>restart</code>، <code>enable</code> و <code>disable</code> را بفهمی.</li>
+    <li>وضعیت و Target پیش‌فرض سیستم را مدیریت کنی.</li>
+    <li>در Linux برای ارسال پیام به کاربران Logged-in از ابزارهای مناسب استفاده کنی.</li>
+</ol>
+
+<hr>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا زنجیره Boot را داریم:</p>
+
+<div class="code-container"><span class="code-label">زنجیره Boot</span><div class="code-block no-prompt">BIOS / UEFI\n     ↓\n   GRUB\n     ↓\n   Kernel\n     ↓\n systemd (PID 1)\n     ↓\n Services + Targets\n     ↓\n   Login</div></div>
+
+<p>در جلسه قبل دیدیم که <code>systemd</code> بعد از Kernel وارد عمل می‌شود.</p>
+<p>حالا می‌خواهیم بفهمیم:</p>
+<blockquote><strong>systemd دقیقاً چطور سیستم را مدیریت می‌کند؟</strong></blockquote>
+<p>مدل ذهنی این جلسه:</p>
+
+<div class="code-container"><span class="code-label">مدل ذهنی</span><div class="code-block no-prompt">                  systemd\n                     │\n        ┌────────────┼────────────┐\n        ↓            ↓            ↓\n     Service       Target       Other Units\n        │            │\n        ↓            ↓\n      sshd       multi-user\n      cron       graphical\n      ...        ...</div></div>
+
+<p>ابزار اصلی ما برای صحبت کردن با systemd:</p>
+
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">systemctl</div></div>
+
+<p>است.</p>
+
+<hr>
+
+<h2>درسنامه</h2>
+
+<h3>systemd چیست؟ ⭐⭐⭐</h3>
+<p><code>systemd</code> یک <strong>system and service manager</strong> است.</p>
+<p>یعنی بعد از Boot شدن Kernel، وظیفه دارد بخش بزرگی از User Space را مدیریت کند.</p>
+<p>مهم‌ترین وظایف آن در سطح LPIC-1:</p>
+<ul>
+    <li>مدیریت سرویس‌ها</li>
+    <li>مدیریت Targetها</li>
+    <li>مدیریت Unitها</li>
+    <li>اجرای سرویس‌ها در زمان Boot</li>
+    <li>مدیریت Dependency بین Unitها</li>
+    <li>مدیریت وضعیت سیستم</li>
+    <li>مدیریت بعضی Processها و منابع سیستم</li>
+</ul>
+<p>و مهم‌تر از همه:</p>
+
+<div class="code-container"><span class="code-label">PID 1</span><div class="code-block no-prompt">systemd = PID 1</div></div>
+
+<p>در Linuxهای مدرن.</p>
+
+<hr>
+
+<h3>Unit چیست؟ ⭐⭐⭐</h3>
+<p>systemd تقریباً همه چیز را در قالب مفهومی به نام <strong>Unit</strong> مدیریت می‌کند.</p>
+<p>Unit یک نوع Resource یا Component قابل مدیریت توسط systemd است.</p>
+<p>انواع مهم Unitها:</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>نوع</th><th>پسوند</th><th>کاربرد</th></tr></thead>
+<tbody>
+<tr><td>Service</td><td><code>.service</code></td><td>سرویس</td></tr>
+<tr><td>Target</td><td><code>.target</code></td><td>وضعیت/گروهی از Unitها</td></tr>
+<tr><td>Socket</td><td><code>.socket</code></td><td>Socket activation</td></tr>
+<tr><td>Mount</td><td><code>.mount</code></td><td>Mount Point</td></tr>
+<tr><td>Timer</td><td><code>.timer</code></td><td>زمان‌بندی</td></tr>
+<tr><td>Device</td><td><code>.device</code></td><td>Device</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>برای LPIC-1، مهم‌ترین‌ها:</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐⭐⭐ <code>service</code> و <code>target</code></strong><br>
+هستند.</div></div>
+
+<hr>
+
+<h3>Service چیست؟ ⭐⭐⭐</h3>
+<p>Service معمولاً یک برنامه یا Daemon است که systemd آن را مدیریت می‌کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">sshd</span><div class="code-block no-prompt">sshd.service</div></div>
+
+<p>سرویس SSH است.</p>
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">chronyd</span><div class="code-block no-prompt">chronyd.service</div></div>
+
+<p>برای سرویس زمان‌بندی سیستم.</p>
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">httpd</span><div class="code-block no-prompt">httpd.service</div></div>
+
+<p>برای Web Server در سیستم‌هایی که Apache استفاده می‌کنند.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">systemd\n   ↓\nService\n   ↓\nDaemon / Program</div></div>
+
+<hr>
+
+<h3><code>systemctl</code> — ابزار اصلی مدیریت systemd ⭐⭐⭐</h3>
+<p>برای مدیریت systemd از:</p>
+
+<div class="code-container"><span class="code-label">systemctl</span><div class="code-block">systemctl</div></div>
+
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً برای دیدن وضعیت SSH:</p>
+
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status sshd</div></div>
+
+<p>ممکن است خروجی چیزی شبیه این باشد:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">● sshd.service - OpenSSH server daemon\n     Loaded: loaded\n     Active: active (running)</div></div>
+
+<p>قسمت مهم:</p>
+
+<div class="code-container"><span class="code-label">Active</span><div class="code-block no-prompt">Active: active (running)</div></div>
+
+<p>یعنی سرویس در حال اجراست.</p>
+
+<hr>
+
+<h3><code>start</code> ⭐⭐⭐</h3>
+<p>برای <strong>اجرای سرویس در همین لحظه</strong>:</p>
+
+<div class="code-container"><span class="code-label">start</span><div class="code-block">sudo systemctl start sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>SSH را الان اجرا کن.</blockquote>
+<p>نکته مهم:</p>
+<p><code>start</code> به‌تنهایی باعث نمی‌شود سرویس بعد از Reboot دوباره اجرا شود.</p>
+
+<hr>
+
+<h3><code>stop</code> ⭐⭐⭐</h3>
+<p>برای متوقف کردن سرویس:</p>
+
+<div class="code-container"><span class="code-label">stop</span><div class="code-block">sudo systemctl stop sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>SSH را الان متوقف کن.</blockquote>
+<p>باز هم این تغییر لزوماً دائمی نیست.</p>
+
+<hr>
+
+<h3><code>restart</code> ⭐⭐⭐</h3>
+<p>برای Restart کردن:</p>
+
+<div class="code-container"><span class="code-label">restart</span><div class="code-block">sudo systemctl restart sshd</div></div>
+
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Stop\n ↓\nStart</div></div>
+
+<p>معمولاً زمانی استفاده می‌شود که Configuration سرویس را تغییر داده‌ای و می‌خواهی سرویس دوباره راه‌اندازی شود.</p>
+
+<hr>
+
+<h3><code>reload</code> ⭐⭐</h3>
+<p>گاهی سرویس قابلیت Reload کردن Configuration را دارد:</p>
+
+<div class="code-container"><span class="code-label">reload</span><div class="code-block">sudo systemctl reload sshd</div></div>
+
+<p>تفاوت مفهومی:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">restart\n   ↓\nService دوباره اجرا می‌شود\n\nreload\n   ↓\nConfiguration دوباره خوانده می‌شود\nبدون Restart کامل، در صورت پشتیبانی سرویس</div></div>
+
+<p>اما همه سرویس‌ها <code>reload</code> را پشتیبانی نمی‌کنند.</p>
+<p>برای LPIC-1 مهم است تفاوت <code>restart</code> و <code>reload</code> را بدانی.</p>
+
+<hr>
+
+<h3><code>enable</code> و <code>disable</code> ⭐⭐⭐</h3>
+<p>اینجا یکی از مهم‌ترین تفاوت‌ها را داریم.</p>
+
+<h4><code>enable</code></h4>
+
+<div class="code-container"><span class="code-label">enable</span><div class="code-block">sudo systemctl enable sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>این سرویس را برای اجرای خودکار در Boot تنظیم کن.</blockquote>
+<p>اما الزاماً <strong>همین الان سرویس را اجرا نمی‌کند</strong>.</p>
+
+<h4><code>disable</code></h4>
+
+<div class="code-container"><span class="code-label">disable</span><div class="code-block">sudo systemctl disable sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>اجرای خودکار این سرویس در Boot را غیرفعال کن.</blockquote>
+<p>اما الزاماً سرویس در حال اجرای فعلی را Stop نمی‌کند.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">start\n  → الان اجرا کن\n\nenable\n  → در Boot اجرا کن</div></div>
+
+<p>این دو را با هم اشتباه نکن.</p>
+
+<hr>
+
+<h3><code>enable --now</code> ⭐⭐</h3>
+<p>اگر هم بخواهی سرویس:</p>
+<ol>
+    <li>همین الان اجرا شود</li>
+    <li>در Bootهای بعدی هم اجرا شود</li>
+</ol>
+<p>می‌توانی:</p>
+
+<div class="code-container"><span class="code-label">enable --now</span><div class="code-block">sudo systemctl enable --now sshd</div></div>
+
+<p>استفاده کنی.</p>
+<p>به‌صورت مفهومی:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">enable\n  +\nstart</div></div>
+
+<hr>
+
+<h3>جدول طلایی <code>systemctl</code> ⭐⭐⭐</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>دستور</th><th>عملکرد</th></tr></thead>
+<tbody>
+<tr><td><code>systemctl start X</code></td><td>اجرای X الآن</td></tr>
+<tr><td><code>systemctl stop X</code></td><td>توقف X الآن</td></tr>
+<tr><td><code>systemctl restart X</code></td><td>Restart الآن</td></tr>
+<tr><td><code>systemctl reload X</code></td><td>Reload Configuration، در صورت پشتیبانی</td></tr>
+<tr><td><code>systemctl enable X</code></td><td>اجرای خودکار در Boot</td></tr>
+<tr><td><code>systemctl disable X</code></td><td>عدم اجرای خودکار در Boot</td></tr>
+<tr><td><code>systemctl enable --now X</code></td><td>Enable + Start</td></tr>
+<tr><td><code>systemctl status X</code></td><td>نمایش وضعیت</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<p>این دو جمله را دقیق حفظ کن:</p>
+<blockquote><code>start</code> = <strong>الان</strong></blockquote>
+<blockquote><code>enable</code> = <strong>Bootهای بعدی</strong></blockquote>
+</div></div>
+
+<hr>
+
+<h3>بررسی فعال بودن سرویس در Boot</h3>
+<p>برای اینکه بفهمی سرویس برای Boot فعال شده یا نه:</p>
+
+<div class="code-container"><span class="code-label">is-enabled</span><div class="code-block">systemctl is-enabled sshd</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">enabled</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">disabled</div></div>
+
+<p>برای وضعیت اجرای فعلی:</p>
+
+<div class="code-container"><span class="code-label">is-active</span><div class="code-block">systemctl is-active sshd</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">active</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">is-active\n   ↓\nالان اجراست؟\n\nis-enabled\n   ↓\nبرای Boot فعال است؟</div></div>
+
+<p>این تفکیک بسیار مهم است.</p>
+
+<hr>
+
+<h3>لیست کردن Serviceها ⭐⭐</h3>
+<p>برای مشاهده Service Unitها:</p>
+
+<div class="code-container"><span class="code-label">list-units</span><div class="code-block">systemctl list-units --type=service</div></div>
+
+<p>این دستور Unitهای Service فعال/Loaded را نشان می‌دهد.</p>
+<p>برای دیدن Serviceهای نصب‌شده، حتی اگر در حال حاضر Active نباشند، می‌توان از:</p>
+
+<div class="code-container"><span class="code-label">list-unit-files</span><div class="code-block">systemctl list-unit-files --type=service</div></div>
+
+<p>استفاده کرد.</p>
+<p>در LPIC-1 لازم نیست همه تفاوت‌های این دو را حفظ کنی؛ فقط بدان:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">list-units\n    ↓\nUnitهای Loaded/موجود در وضعیت فعلی\n\nlist-unit-files\n    ↓\nUnit Fileهای نصب‌شده و وضعیت Enable/Disable</div></div>
+
+<hr>
+
+<h3>Dependency چیست؟ ⭐⭐⭐</h3>
+<p>یک سرویس ممکن است به سرویس یا Unit دیگری وابسته باشد.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Network\n   ↓\nApplication</div></div>
+
+<p>اگر Application بدون Network نتواند کار کند، systemd باید این Dependency را مدیریت کند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">وابستگی</span><div class="code-block no-prompt">Unit A\n  │\n  ↓ depends on\nUnit B</div></div>
+
+<p>systemd بر اساس Dependencyها ترتیب مناسب Start شدن Unitها را مدیریت می‌کند.</p>
+<p>این یکی از دلایل مهم قدرت systemd است.</p>
+
+<hr>
+
+<h3>Target چیست؟ ⭐⭐⭐</h3>
+<p>جلسه قبل گفتیم Target را می‌توانیم مثل <strong>هدف یا وضعیت سیستم</strong> تصور کنیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">multi-user</span><div class="code-block no-prompt">multi-user.target</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">graphical</span><div class="code-block no-prompt">graphical.target</div></div>
+
+<p>Target خودش معمولاً برنامه‌ای نیست که مثل یک Daemon اجرا شود.</p>
+<p>بلکه راهی برای <strong>گروه‌بندی Unitها و تعریف یک وضعیت موردنظر سیستم</strong> است.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">graphical.target\n       │\n       ├── display manager\n       ├── network\n       ├── services\n       └── ...</div></div>
+
+<hr>
+
+<h3>دیدن Target پیش‌فرض ⭐⭐⭐</h3>
+<p>برای دیدن Target پیش‌فرض:</p>
+
+<div class="code-container"><span class="code-label">get-default</span><div class="code-block">systemctl get-default</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">graphical.target</div></div>
+
+<p>یعنی سیستم به‌طور پیش‌فرض قصد دارد با محیط گرافیکی Boot شود.</p>
+<p>اگر:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+
+<p>باشد، محیط چندکاربره بدون GUI هدف پیش‌فرض است.</p>
+
+<hr>
+
+<h3>تغییر Target پیش‌فرض ⭐⭐⭐</h3>
+<p>فرض کن می‌خواهی سیستم به‌صورت پیش‌فرض بدون GUI Boot شود:</p>
+
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block">sudo systemctl set-default multi-user.target</div></div>
+
+<p>یا برای GUI:</p>
+
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
+
+<p>تفاوت مهم:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">get-default\n   ↓\nفقط مشاهده\n\nset-default\n   ↓\nتغییر Target پیش‌فرض برای Bootهای بعدی</div></div>
+
+<hr>
+
+<h3><code>isolate</code> ⭐⭐⭐</h3>
+<p>در جلسه قبل با آن برخورد کردیم:</p>
+
+<div class="code-container"><span class="code-label">isolate</span><div class="code-block">sudo systemctl isolate rescue.target</div></div>
+
+<p><code>isolate</code> یعنی systemd را به Target مشخص‌شده ببرد و Unitهایی را که در Target جدید لازم نیستند، متوقف کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo systemctl isolate multi-user.target</div></div>
+
+<p>ممکن است سیستم را از محیط گرافیکی به محیط چندکاربره بدون GUI ببرد.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ توجه</strong><br>
+چون <code>isolate</code> می‌تواند سرویس‌های فعلی را متوقف کند، باید با دقت استفاده شود.</div></div>
+
+<hr>
+
+<h3>Restart کردن سیستم با systemctl</h3>
+<p>systemd فقط سرویس‌ها را مدیریت نمی‌کند.</p>
+<p>می‌توانیم سیستم را نیز مدیریت کنیم.</p>
+<p>برای Reboot:</p>
+
+<div class="code-container"><span class="code-label">reboot</span><div class="code-block">sudo systemctl reboot</div></div>
+
+<p>برای خاموش کردن:</p>
+
+<div class="code-container"><span class="code-label">poweroff</span><div class="code-block">sudo systemctl poweroff</div></div>
+
+<p>در سطح LPIC-1 دانستن این دو مفید است.</p>
+
+<hr>
+
+<h3>Send Message — ارسال پیام به کاربران ⭐⭐⭐</h3>
+<p>حالا بخش دوم جلسه.</p>
+<p>فرض کن روی یک Server چند کاربر Login هستند و می‌خواهی به همه اعلام کنی:</p>
+<blockquote>«سرور تا ۵ دقیقه دیگر Restart می‌شود.»</blockquote>
+<p>Linux ابزارهایی برای ارسال پیام به کاربران Logged-in دارد.</p>
+<p>مهم‌ترین ابزار:</p>
+
+<div class="code-container"><span class="code-label">wall</span><div class="code-block">wall</div></div>
+
+<p>است.</p>
+
+<hr>
+
+<h3>دستور <code>wall</code> ⭐⭐⭐</h3>
+<p><code>wall</code> مخفف:</p>
+<blockquote>Write All</blockquote>
+<p>است.</p>
+<p>پیام را برای کاربران Logged-in روی Terminalهایشان ارسال می‌کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">wall</span><div class="code-block">wall</div></div>
+
+<p>بعد متن را وارد کن:</p>
+
+<div class="code-container"><span class="code-label">متن</span><div class="code-block no-prompt">Server will reboot in 5 minutes.</div></div>
+
+<p>و با:</p>
+
+<div class="code-container"><span class="code-label">خروج</span><div class="code-block no-prompt">Ctrl+D</div></div>
+
+<p>پیام را ارسال کن.</p>
+
+<h4>روش سریع</h4>
+<p>می‌توانی پیام را به‌صورت Argument هم بدهی:</p>
+
+<div class="code-container"><span class="code-label">ارسال سریع</span><div class="code-block">wall "Server will reboot in 5 minutes."</div></div>
+
+<p>پیام برای کاربران Logged-in ارسال می‌شود.</p>
+
+<hr>
+
+<h3>مثال کاربردی</h3>
+<p>فرض کن چند کاربر روی Server هستند:</p>
+
+<div class="code-container"><span class="code-label">کاربران</span><div class="code-block no-prompt">user1\nuser2\nadmin</div></div>
+
+<p>می‌خواهی قبل از Maintenance به همه هشدار بدهی:</p>
+
+<div class="code-container"><span class="code-label">هشدار</span><div class="code-block">sudo wall "System maintenance starts in 10 minutes."</div></div>
+
+<p>روی Terminal کاربران پیامی شبیه این ظاهر می‌شود:</p>
+
+<div class="code-container"><span class="code-label">پیام</span><div class="code-block no-prompt">Broadcast message from root@server\n\nSystem maintenance starts in 10 minutes.</div></div>
+
+<hr>
+
+<h3><code>write</code> — ارسال به یک کاربر خاص ⭐⭐</h3>
+<p>اگر نمی‌خواهی پیام برای همه ارسال شود و فقط یک User خاص را هدف بگیری، ابزار:</p>
+
+<div class="code-container"><span class="code-label">write</span><div class="code-block">write</div></div>
+
+<p>مناسب است.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">write ali</div></div>
+
+<p>بعد متن را وارد می‌کنی.</p>
+<p>برای پایان:</p>
+
+<div class="code-container"><span class="code-label">خروج</span><div class="code-block no-prompt">Ctrl+D</div></div>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">wall\n ↓\nهمه کاربران Logged-in\n\nwrite\n ↓\nیک کاربر مشخص</div></div>
+
+<hr>
+
+<h3>پیدا کردن کاربران Logged-in</h3>
+<p>برای دیدن کاربران فعلی:</p>
+
+<div class="code-container"><span class="code-label">who</span><div class="code-block">who</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">ali      pts/0\nreza     pts/1</div></div>
+
+<p>حالا اگر بخواهی به <code>ali</code> پیام بدهی:</p>
+
+<div class="code-container"><span class="code-label">ارسال</span><div class="code-block">write ali</div></div>
+
+<p>پس این سه ابزار را کنار هم ببین:</p>
+
+<div class="code-container"><span class="code-label">سه ابزار</span><div class="code-block no-prompt">who\n ↓\nچه کسانی Login هستند؟\n\nwrite\n ↓\nپیام به یک User\n\nwall\n ↓\nپیام به همه</div></div>
+
+<p>این یک سناریوی واقعی و کاربردی است.</p>
+
+<hr>
+
+<h3>نکته درباره <code>mesg</code> ⭐⭐</h3>
+<p>کاربر می‌تواند دریافت پیام‌های Terminal را کنترل کند.</p>
+<p>ابزار:</p>
+
+<div class="code-container"><span class="code-label">mesg</span><div class="code-block">mesg</div></div>
+
+<p>برای کنترل این قابلیت استفاده می‌شود.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">فعال</span><div class="code-block">mesg y</div></div>
+
+<p>اجازه دریافت پیام را می‌دهد.</p>
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">غیرفعال</span><div class="code-block">mesg n</div></div>
+
+<p>آن را غیرفعال می‌کند.</p>
+<p>در سطح LPIC-1 مهم‌تر از حفظ تمام جزئیات این است که بدانی:</p>
+<blockquote><code>write</code> و <code>wall</code> برای ارسال پیام به Terminalهای کاربران هستند و <code>mesg</code> می‌تواند دریافت برخی پیام‌های Terminal را کنترل کند.</blockquote>
+
+<hr>
+
+<h3>ارتباط Systemd و Send Message</h3>
+<p>این دو موضوع ظاهراً جدا هستند، اما در مدیریت Server به هم مربوط می‌شوند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">سناریو</span><div class="code-block">sudo wall "Server will reboot in 5 minutes."</div></div>
+
+<p>بعد:</p>
+
+<div class="code-container"><span class="code-label">Reboot</span><div class="code-block">sudo systemctl reboot</div></div>
+
+<p>سناریوی واقعی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Users Logged-in\n      ↑\n     wall\n      ↑\n Administrator\n      ↓\n systemctl reboot\n      ↓\n    Reboot</div></div>
+
+<p>این دقیقاً کاری است که یک Linux Administrator ممکن است انجام دهد.</p>
+
+<hr>
+
+<h2>نکات مهم</h2>
+
+<h3>systemd</h3>
+<ul>
+    <li><code>systemd</code> در سیستم‌های مدرن معمولاً <strong>PID 1</strong> است.</li>
+    <li><code>systemctl</code> ابزار اصلی مدیریت systemd است.</li>
+    <li>Service یک Unit قابل مدیریت است.</li>
+    <li>Target وضعیت/گروهی از Unitها را تعریف می‌کند.</li>
+    <li><code>start</code> → اجرا الآن</li>
+    <li><code>stop</code> → توقف الآن</li>
+    <li><code>restart</code> → Restart الآن</li>
+    <li><code>reload</code> → Reload Configuration، در صورت پشتیبانی</li>
+    <li><code>enable</code> → اجرای خودکار در Boot</li>
+    <li><code>disable</code> → عدم اجرای خودکار در Boot</li>
+    <li><code>enable --now</code> → Enable + Start</li>
+    <li><code>get-default</code> → مشاهده Target پیش‌فرض</li>
+    <li><code>set-default</code> → تغییر Target پیش‌فرض</li>
+    <li><code>isolate</code> → تغییر فعال سیستم به یک Target مشخص</li>
+</ul>
+
+<h3>Send Message</h3>
+<ul>
+    <li><code>wall</code> → پیام به همه کاربران Logged-in</li>
+    <li><code>write USER</code> → پیام به یک User</li>
+    <li><code>who</code> → مشاهده کاربران Logged-in</li>
+    <li><code>mesg</code> → کنترل دریافت پیام‌های Terminal</li>
+</ul>
+
+<hr>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>اگر systemd را مثل <strong>مدیر یک ساختمان</strong> تصور کنیم:</p>
+<ul>
+    <li>Serviceها = کارمندهای ساختمان</li>
+    <li>Targetها = وضعیت موردنظر ساختمان</li>
+    <li>systemd = مدیر</li>
+    <li><code>systemctl</code> = تلفنی که با مدیر صحبت می‌کنیم</li>
+</ul>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl start sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>«مدیر، SSH را همین الان راه بینداز.»</blockquote>
+<p>اما:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl enable sshd</div></div>
+
+<p>یعنی:</p>
+<blockquote>«مدیر، از این به بعد هنگام Boot هم SSH را راه بینداز.»</blockquote>
+<p>این دو جمله خیلی شبیه‌اند، اما <strong>زمان اثرشان متفاوت است</strong>.</p>
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl get-default</div></div>
+
+<p>یعنی:</p>
+<blockquote>«هدف پیش‌فرض ساختمان هنگام شروع چیست؟»</blockquote>
+<p>در بخش پیام‌رسانی هم:</p>
+
+<div class="code-container"><span class="code-label">who</span><div class="code-block">who</div></div>
+
+<p>می‌پرسیم:</p>
+<blockquote>«چه کسانی داخل ساختمان هستند؟»</blockquote>
+
+<div class="code-container"><span class="code-label">write</span><div class="code-block">write ali</div></div>
+
+<p>یعنی:</p>
+<blockquote>«فقط به Ali پیام بده.»</blockquote>
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">wall</span><div class="code-block">wall</div></div>
+
+<p>یعنی:</p>
+<blockquote>«به همه اعلام کن.»</blockquote>
+
+<hr>
+
+<h2>سناریوی ترکیبی</h2>
+
+<h3>سناریو: Maintenance یک Server</h3>
+<p>فرض کن Administrator یک Server را مدیریت می‌کند.</p>
+<p>قرار است SSH Server را Restart کند و سپس سیستم را Reboot کند.</p>
+<p>چند کاربر هم به سیستم Login هستند.</p>
+
+<h4>مرحله 1 — بررسی کاربران</h4>
+
+<div class="code-container"><span class="code-label">who</span><div class="code-block">who</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">ali      pts/0\nreza     pts/1</div></div>
+
+<h4>مرحله 2 — اعلام Maintenance</h4>
+
+<div class="code-container"><span class="code-label">wall</span><div class="code-block">sudo wall "System maintenance will start in 5 minutes."</div></div>
+
+<p>تمام کاربران پیام را دریافت می‌کنند.</p>
+
+<h4>مرحله 3 — بررسی SSH</h4>
+
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status sshd</div></div>
+
+<p>اگر سرویس Running باشد:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Active: active (running)</div></div>
+
+<h4>مرحله 4 — Restart کردن SSH</h4>
+
+<div class="code-container"><span class="code-label">restart</span><div class="code-block">sudo systemctl restart sshd</div></div>
+
+<h4>مرحله 5 — اطمینان از فعال بودن SSH در Boot</h4>
+
+<div class="code-container"><span class="code-label">is-enabled</span><div class="code-block">systemctl is-enabled sshd</div></div>
+
+<p>اگر:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">enabled</div></div>
+
+<p>باشد، SSH در Boot بعدی نیز فعال خواهد شد.</p>
+
+<h4>مرحله 6 — اعلام Reboot</h4>
+
+<div class="code-container"><span class="code-label">اعلام</span><div class="code-block">sudo wall "Server will reboot now."</div></div>
+
+<h4>مرحله 7 — Reboot</h4>
+
+<div class="code-container"><span class="code-label">reboot</span><div class="code-block">sudo systemctl reboot</div></div>
+
+<h4>نکته سناریو</h4>
+<p>در این سناریو چند مفهوم را با هم ترکیب کردیم:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">who\n ↓\nUsers\n\nwall\n ↓\nCommunication\n\nsystemctl status\n ↓\nService Status\n\nsystemctl restart\n ↓\nService Management\n\nsystemctl is-enabled\n ↓\nBoot Configuration\n\nsystemctl reboot\n ↓\nSystem Management</div></div>
+
+<p>این دقیقاً همان چیزی است که باید در سطح LPIC-1 بتوانی انجام دهی.</p>
+
+<hr>
+
+<h2>Cheat Sheet</h2>
+
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">systemctl status X          → وضعیت سرویس\nsystemctl start X           → اجرای الآن\nsystemctl stop X            → توقف الآن\nsystemctl restart X         → Restart الآن\nsystemctl enable X          → اجرای خودکار در Boot\nsystemctl enable --now X    → Enable + Start\nsystemctl get-default       → Target پیش‌فرض\nsystemctl set-default X     → تغییر Target پیش‌فرض\nwall "MESSAGE"              → پیام به همه کاربران\nwrite USER                  → پیام به یک کاربر\nwho                         → کاربران Logged-in</div></div>
+
+<hr>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام دستور سرویس را <strong>همین الآن</strong> اجرا می‌کند ولی الزاماً آن را برای Boot بعدی فعال نمی‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl enable sshd</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl start sshd</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl get-default</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl disable sshd</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>start</code> مربوط به وضعیت فعلی است: <code>start → الآن</code> و <code>enable → Boot</code>.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>مدیر سیستم می‌خواهد SSH را هم همین الآن اجرا کند و هم در Bootهای بعدی فعال باشد. کدام دستور مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl enable sshd</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl start sshd</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl enable --now sshd</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl reload sshd</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>enable --now</code> هر دو کار را انجام می‌دهد: <code>enable + start</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>کدام دستور Target پیش‌فرض سیستم را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl show-target</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl get-default</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl target</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl default</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>مثلاً: <code>systemctl get-default</code> ممکن است <code>graphical.target</code> را نمایش دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>Administrator می‌خواهد به تمام کاربران Logged-in هشدار بدهد که Server در حال Maintenance است. کدام ابزار مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>write</code></button>
+    <button onclick="selectOption(this)">B) <code>wall</code></button>
+    <button onclick="selectOption(this)">C) <code>who</code></button>
+    <button onclick="selectOption(this)">D) <code>mesg</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>wall</code> برای ارسال Broadcast Message به کاربران Logged-in استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>کدام گزینه درباره <code>write</code> و <code>wall</code> صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>write</code> به همه کاربران و <code>wall</code> به یک کاربر پیام می‌دهد.</button>
+    <button onclick="selectOption(this)">B) هر دو فقط برای Restart کردن systemd هستند.</button>
+    <button onclick="selectOption(this)">C) <code>write</code> برای یک User مشخص و <code>wall</code> برای همه کاربران Logged-in است.</button>
+    <button onclick="selectOption(this)">D) هر دو فقط پیام را داخل Log ذخیره می‌کنند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>مدل ساده: <code>write USER → یک کاربر</code> و <code>wall → همه کاربران</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>Administrator می‌خواهد بفهمد SSH در Bootهای بعدی به‌صورت خودکار اجرا خواهد شد یا خیر. کدام دستور مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl is-active sshd</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl is-enabled sshd</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl status boot sshd</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl get-default sshd</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>is-enabled</code> درباره Enable بودن سرویس برای Boot سؤال می‌کند. در مقابل <code>systemctl is-active sshd</code> می‌پرسد: «آیا سرویس همین الآن Active است؟»</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>یک Administrator می‌خواهد سیستم را از محیط گرافیکی به Target چندکاربره بدون GUI ببرد، بدون اینکه Target پیش‌فرض Bootهای آینده را تغییر دهد. کدام دستور مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl set-default multi-user.target</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl isolate multi-user.target</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl enable multi-user.target</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl start graphical.target</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>isolate</code> وضعیت فعلی سیستم را به Target مشخص‌شده می‌برد. در مقابل <code>systemctl set-default multi-user.target</code> Target پیش‌فرض را برای Bootهای آینده تغییر می‌دهد. پس: <code>isolate → الآن</code> و <code>set-default → Bootهای بعدی</code></div>
+</div>
+
+<div class="summary-box">
+    <h3>🎯 Recall نهایی</h3>
+    <p>اگر از این جلسه فقط این چند خط را بلد باشی، هسته اصلی را یاد گرفته‌ای:</p>
+    <div class="code-container"><span class="code-label">هسته اصلی</span><div class="code-block no-prompt">systemd → PID 1 / Service Manager\nsystemctl start X → اجرای الآن\nsystemctl enable X → اجرای خودکار در Boot\nsystemctl enable --now X → هر دو\nsystemctl get-default → Target پیش‌فرض\nsystemctl isolate X → تغییر Target فعلی\nwall "msg" → پیام به همه کاربران\nwrite USER → پیام به یک کاربر</div></div>
+    <p>جلسه بعد وارد <strong>Virtualisation</strong> می‌شویم و از مدیریت سیستم‌عامل وارد دنیای VMها، Hypervisor و تفاوت Virtual Machine با سیستم فیزیکی می‌شویم.</p>
+</div>
+` ,
+"ch5-6": `
+<div class="section-header">
+    <div class="section-badge">۵</div>
+    <div>
+        <h1>Virtualisation</h1>
+        <div class="meta">بوت، سیستم‌عامل و مجازی‌سازی · بخش ۶ از ۸</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>مفهوم <strong>Virtualisation</strong> و دلیل استفاده از آن را توضیح بدهی.</li>
+    <li>تفاوت <strong>Host، Guest، Hypervisor و VM</strong> را تشخیص بدهی.</li>
+    <li>تفاوت <strong>Type 1 و Type 2 Hypervisor</strong> را درک کنی.</li>
+    <li>تفاوت Virtual Machine با Container را در حد LPIC-1 بفهمی.</li>
+    <li>مفاهیم مهم VM مثل <strong>vCPU، RAM، Virtual Disk، Network و Snapshot</strong> را بشناسی.</li>
+</ol>
+
+<hr>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا بیشتر با یک Linux واقعی کار می‌کردیم:</p>
+
+<div class="code-container"><span class="code-label">سیستم فیزیکی</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n     Linux\n       ↓\n    Services</div></div>
+
+<p>اما در دنیای واقعی، لازم نیست برای هر Linux یک کامپیوتر فیزیکی جدا داشته باشیم.</p>
+<p>می‌توانیم یک کامپیوتر قدرتمند داشته باشیم و روی آن چند کامپیوتر <strong>مجازی</strong> بسازیم:</p>
+
+<div class="code-container"><span class="code-label">مجازی‌سازی</span><div class="code-block no-prompt">                Physical Server\n                       │\n                   Hypervisor\n          ┌────────────┼────────────┐\n          ↓            ↓            ↓\n        VM 1          VM 2         VM 3\n       Linux         Linux        Windows</div></div>
+
+<p>هر VM از دید سیستم‌عامل خودش، تا حد زیادی مثل یک کامپیوتر مستقل رفتار می‌کند.</p>
+
+<hr>
+
+<h2>Virtualisation چیست؟ ⭐⭐⭐</h2>
+<p><strong>Virtualisation</strong> یعنی استفاده از یک سیستم فیزیکی برای ساخت چند محیط محاسباتی مستقل و مجازی.</p>
+<p>مثلاً یک Server داریم:</p>
+
+<div class="code-container"><span class="code-label">منابع</span><div class="code-block no-prompt">CPU: 16 Core\nRAM: 64 GB\nStorage: 1 TB</div></div>
+
+<p>می‌توانیم منابع آن را بین چند VM تقسیم کنیم:</p>
+
+<div class="code-container"><span class="code-label">تقسیم منابع</span><div class="code-block no-prompt">Physical Server\n│\n├── VM1 → 4 vCPU + 16 GB RAM\n├── VM2 → 4 vCPU + 16 GB RAM\n├── VM3 → 2 vCPU + 8 GB RAM\n└── باقی منابع → Host / سایر VMها</div></div>
+
+<p>البته Hypervisor و خود VMها هم منابع مصرف می‌کنند.</p>
+
+<hr>
+
+<h3>چرا Virtualisation مهم است؟ ⭐⭐⭐</h3>
+<p>چهار دلیل اصلی را به خاطر بسپار:</p>
+
+<h4>1. استفاده بهتر از Hardware</h4>
+<p>فرض کن یک Server قدرتمند فقط ۱۵٪ CPU مصرف می‌کند.</p>
+<p>به‌جای اینکه چند Server فیزیکی دیگر تهیه کنیم، می‌توانیم VMهای بیشتری روی همان Hardware اجرا کنیم.</p>
+
+<h4>2. Isolation</h4>
+<p>VMها از یکدیگر جدا هستند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">جداسازی</span><div class="code-block no-prompt">VM1 → Web Server\nVM2 → Database\nVM3 → Test Server</div></div>
+
+<p>مشکل در یکی از VMها لزوماً باعث خراب شدن سیستم‌عامل VM دیگر نمی‌شود.</p>
+
+<h4>3. آزمایش و یادگیری</h4>
+<p>برای Lab بسیار مناسب است.</p>
+<p>مثلاً می‌توانی:</p>
+
+<div class="code-container"><span class="code-label">Lab</span><div class="code-block no-prompt">AlmaLinux VM\nDebian VM\nUbuntu VM</div></div>
+
+<p>را روی یک کامپیوتر اجرا کنی.</p>
+
+<h4>4. مدیریت ساده‌تر</h4>
+<p>ساخت، حذف، Clone و Snapshot گرفتن از VMها بسیار راحت‌تر از مدیریت چندین Server فیزیکی است.</p>
+
+<hr>
+
+<h2>مفاهیم اصلی Virtualisation ⭐⭐⭐</h2>
+<p>قبل از دستورات، این چهار واژه را کاملاً یاد بگیر:</p>
+
+<div class="code-container"><span class="code-label">چهار مفهوم</span><div class="code-block no-prompt">Host\nGuest\nHypervisor\nVirtual Machine</div></div>
+
+<h3>Host</h3>
+<p>سیستم فیزیکی‌ای که VMها روی آن اجرا می‌شوند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Host</span><div class="code-block no-prompt">Physical Server\n      ↓\n     Host</div></div>
+
+<p>Host منابع فیزیکی مثل:</p>
+<ul>
+    <li>CPU</li>
+    <li>RAM</li>
+    <li>Disk</li>
+    <li>Network</li>
+</ul>
+<p>را در اختیار دارد.</p>
+
+<h3>Guest</h3>
+<p>سیستم‌عاملی که داخل VM اجرا می‌شود.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Guest</span><div class="code-block no-prompt">Host\n ├── AlmaLinux Guest\n ├── Debian Guest\n └── Windows Guest</div></div>
+
+<h3>Virtual Machine</h3>
+<p>یک کامپیوتر <strong>مجازی</strong> است که منابع Virtualized دارد:</p>
+
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">VM\n├── vCPU\n├── vRAM\n├── Virtual Disk\n├── Virtual NIC\n└── Guest OS</div></div>
+
+<p>مثلاً یک Debian VM ممکن است بگوید:</p>
+
+<div class="code-container"><span class="code-label">منابع مجازی</span><div class="code-block no-prompt">CPU: 2 cores\nRAM: 4 GB\nDisk: 40 GB</div></div>
+
+<p>این‌ها منابع <strong>مجازی</strong> هستند که Hypervisor به VM ارائه می‌کند.</p>
+
+<hr>
+
+<h3>Hypervisor ⭐⭐⭐</h3>
+<p>Hypervisor نرم‌افزار/لایه‌ای است که VMها را ایجاد و مدیریت می‌کند و بین Guestها و Hardware قرار می‌گیرد.</p>
+<p>مدل ساده:</p>
+
+<div class="code-container"><span class="code-label">Hypervisor</span><div class="code-block no-prompt">        VM 1          VM 2\n         │             │\n         └──────┬──────┘\n                ↓\n            Hypervisor\n                ↓\n        Physical Hardware</div></div>
+
+<p>وظایف اصلی:</p>
+<ul>
+    <li>تخصیص CPU</li>
+    <li>تخصیص RAM</li>
+    <li>مدیریت Virtual Disk</li>
+    <li>مدیریت Virtual Network</li>
+    <li>جداسازی VMها</li>
+    <li>مدیریت اجرای VMها</li>
+</ul>
+
+<hr>
+
+<h2>Type 1 و Type 2 Hypervisor ⭐⭐⭐</h2>
+<p>Hypervisorها را معمولاً به دو دسته تقسیم می‌کنیم.</p>
+
+<h3>Type 1 — Bare Metal</h3>
+<p>Hypervisor مستقیماً روی Hardware اجرا می‌شود.</p>
+
+<div class="code-container"><span class="code-label">Type 1</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n   Hypervisor\n       ↓\n ┌─────┼─────┐\n VM1   VM2   VM3</div></div>
+
+<p>در این مدل Host OS سنتی بین Hardware و Hypervisor وجود ندارد.</p>
+<p>نمونه‌های معروف:</p>
+<ul>
+    <li>VMware ESXi</li>
+    <li>Microsoft Hyper-V</li>
+    <li>Xen</li>
+</ul>
+<p>این مدل بیشتر در محیط‌های Server و Datacenter دیده می‌شود.</p>
+
+<h3>Type 2 — Hosted Hypervisor</h3>
+<p>در این مدل ابتدا یک سیستم‌عامل معمولی نصب شده و Hypervisor روی آن اجرا می‌شود.</p>
+
+<div class="code-container"><span class="code-label">Type 2</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n    Host OS\n       ↓\n   Hypervisor\n       ↓\n      VM</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Windows\n   ↓\nVirtualBox\n   ↓\nAlmaLinux VM</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Linux\n  ↓\nVMware Workstation\n  ↓\nVM</div></div>
+
+<hr>
+
+<h3>تفاوت Type 1 و Type 2</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>ویژگی</th><th>Type 1</th><th>Type 2</th></tr></thead>
+<tbody>
+<tr><td>محل Hypervisor</td><td>مستقیماً روی Hardware</td><td>روی Host OS</td></tr>
+<tr><td>کاربرد رایج</td><td>Server / Datacenter</td><td>Desktop / Lab</td></tr>
+<tr><td>لایه اضافه</td><td>کمتر</td><td>بیشتر</td></tr>
+<tr><td>نمونه</td><td>ESXi, Xen, Hyper-V</td><td>VirtualBox, VMware Workstation</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<p>مدل را به شکل زیر حفظ کن:</p>
+<div class="code-container"><span class="code-label">Type 1</span><div class="code-block no-prompt">Hardware\n   ↓\nHypervisor\n   ↓\nVM</div></div>
+<div class="code-container"><span class="code-label">Type 2</span><div class="code-block no-prompt">Hardware\n   ↓\nHost OS\n   ↓\nHypervisor\n   ↓\nVM</div></div>
+</div></div>
+
+<hr>
+
+<h2>Hardware-Assisted Virtualisation ⭐⭐⭐</h2>
+<p>CPUهای مدرن قابلیت‌هایی برای Virtualisation دارند.</p>
+<p>در پردازنده‌های Intel معمولاً با نام:</p>
+
+<div class="code-container"><span class="code-label">Intel</span><div class="code-block no-prompt">Intel VT-x</div></div>
+
+<p>و در AMD:</p>
+
+<div class="code-container"><span class="code-label">AMD</span><div class="code-block no-prompt">AMD-V</div></div>
+
+<p>شناخته می‌شوند.</p>
+<p>این قابلیت‌ها باعث می‌شوند Hypervisor بتواند Virtual Machineها را با پشتیبانی Hardware اجرا کند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">CPU\n ↓\nVirtualisation Extensions\n ↓\nHypervisor\n ↓\nVM</div></div>
+
+<hr>
+
+<h3>چرا این موضوع مهم است؟</h3>
+<p>اگر بخواهی روی یک Linux VM، یک VM دیگر اجرا کنی، یا بعضی Hypervisorها را اجرا کنی، قابلیت‌های Virtualisation CPU اهمیت پیدا می‌کنند.</p>
+<p>در سیستم Linux می‌توانی وجود Flagهای مرتبط را بررسی کنی:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">grep -E 'vmx|svm' /proc/cpuinfo</div></div>
+
+<p>معمولاً:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">vmx → Intel\nsvm → AMD</div></div>
+
+<p>اما وجود Flag فقط نشان می‌دهد CPU قابلیت مربوطه را دارد؛ تنظیمات BIOS/UEFI و Hypervisor نیز باید مناسب باشند.</p>
+
+<hr>
+
+<h2>VM چگونه منابع دریافت می‌کند؟</h2>
+<p>فرض کن Host این منابع را دارد:</p>
+
+<div class="code-container"><span class="code-label">منابع Host</span><div class="code-block no-prompt">CPU = 8 Core\nRAM = 16 GB\nDisk = 500 GB</div></div>
+
+<p>برای VM می‌توانیم تعریف کنیم:</p>
+
+<div class="code-container"><span class="code-label">VM1</span><div class="code-block no-prompt">VM1\n├── 2 vCPU\n├── 4 GB RAM\n├── 50 GB Virtual Disk\n└── 1 Virtual NIC</div></div>
+
+<p>این منابع توسط Hypervisor مدیریت می‌شوند.</p>
+
+<hr>
+
+<h3>vCPU</h3>
+<p>VM CPU فیزیکی مستقل ندارد.</p>
+<p>Hypervisor به آن <strong>Virtual CPU</strong> ارائه می‌کند:</p>
+
+<div class="code-container"><span class="code-label">vCPU</span><div class="code-block no-prompt">Physical CPU\n     ↓\n Hypervisor\n     ↓\n   vCPU\n     ↓\n   Guest OS</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">VM → 4 vCPU</div></div>
+
+<p>یعنی Guest سیستم خود را با ۴ CPU منطقی می‌بیند.</p>
+
+<h3>vRAM</h3>
+<p>همین مفهوم برای Memory وجود دارد.</p>
+
+<div class="code-container"><span class="code-label">vRAM</span><div class="code-block no-prompt">Physical RAM\n     ↓\n Hypervisor\n     ↓\n   vRAM\n     ↓\n   Guest OS</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">VM → 4 GB RAM</div></div>
+
+<p>Guest تصور می‌کند 4GB RAM در اختیار دارد.</p>
+
+<h3>Virtual Disk ⭐⭐⭐</h3>
+<p>Disk VM یک فایل یا Block Device مجازی است که Hypervisor به VM ارائه می‌کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Virtual Disk</span><div class="code-block no-prompt">Host\n │\n └── VM disk\n       ↓\n     Guest\n       ↓\n    /dev/sda</div></div>
+
+<p>ممکن است در Host چیزی مثل یک فایل Virtual Disk وجود داشته باشد، اما Guest آن را مانند یک Disk می‌بیند.</p>
+<p>این نکته بسیار مهم است:</p>
+<blockquote><strong>Guest لازم نیست بداند Disk آن در Host دقیقاً به چه شکلی ذخیره شده است.</strong></blockquote>
+
+<hr>
+
+<h3>Virtual Network Card ⭐⭐⭐</h3>
+<p>VM می‌تواند Network Interface مجازی داشته باشد:</p>
+
+<div class="code-container"><span class="code-label">Virtual NIC</span><div class="code-block no-prompt">Guest\n  ↓\nVirtual NIC\n  ↓\nHypervisor\n  ↓\nPhysical NIC\n  ↓\nNetwork</div></div>
+
+<p>مثلاً Guest ممکن است ببیند:</p>
+
+<div class="code-container"><span class="code-label">ip addr</span><div class="code-block">ip addr</div></div>
+
+<p>و یک Interface مثل:</p>
+
+<div class="code-container"><span class="code-label">ens33</span><div class="code-block no-prompt">ens33</div></div>
+
+<p>داشته باشد.</p>
+<p>اما این Interface می‌تواند توسط Hypervisor به یک Network فیزیکی یا Virtual Network متصل شده باشد.</p>
+
+<hr>
+
+<h2>Network Modeهای مهم VM ⭐⭐⭐</h2>
+<p>برای LPIC-1 لازم نیست وارد جزئیات پیچیده Network Virtualisation شوی؛ اما سه مفهوم را باید بفهمی:</p>
+
+<div class="code-container"><span class="code-label">سه حالت</span><div class="code-block no-prompt">NAT\nBridged\nHost-only</div></div>
+
+<h3>NAT</h3>
+<p>در NAT، VM معمولاً از طریق Host به Network/Internet دسترسی پیدا می‌کند.</p>
+
+<div class="code-container"><span class="code-label">NAT</span><div class="code-block no-prompt">VM\n ↓\nVirtual NAT\n ↓\nHost\n ↓\nInternet</div></div>
+
+<p>برای Lab بسیار رایج است.</p>
+
+<h3>Bridged</h3>
+<p>در حالت Bridged، VM تقریباً مثل یک سیستم مستقل روی همان Network ظاهر می‌شود.</p>
+
+<div class="code-container"><span class="code-label">Bridged</span><div class="code-block no-prompt">              Network\n             /       \\\n          Host        VM</div></div>
+
+<p>مثلاً Router ممکن است برای VM یک IP جداگانه اختصاص دهد.</p>
+
+<h3>Host-only</h3>
+<p>VM فقط با Host و VMهای مرتبط با همان Virtual Network ارتباط دارد و معمولاً مستقیماً به Internet دسترسی ندارد.</p>
+
+<div class="code-container"><span class="code-label">Host-only</span><div class="code-block no-prompt">Host\n │\n ├── VM1\n └── VM2\n\n   ✕ Internet</div></div>
+
+<p>برای Labهای Isolated بسیار مفید است.</p>
+
+<hr>
+
+<h2>Snapshot ⭐⭐</h2>
+<p>Snapshot را می‌توانیم مثل یک <strong>نقطه بازگشت</strong> تصور کنیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Snapshot</span><div class="code-block no-prompt">VM سالم\n   ↓\nSnapshot\n   ↓\nتغییرات خطرناک\n   ↓\nمشکل\n   ↓\nRollback</div></div>
+
+<p>مثلاً قبل از آزمایش تغییرات مهم روی یک VM Snapshot می‌گیری.</p>
+<p>اگر آزمایش خراب شد، می‌توانی VM را به وضعیت Snapshot برگردانی.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اما Snapshot را با Backup یکی ندان.</strong><br>
+<p>Snapshot معمولاً ابزار مناسبی برای <strong>Rollback سریع</strong> است، نه جایگزین Backup واقعی.</p>
+</div></div>
+
+<hr>
+
+<h2>Clone ⭐⭐</h2>
+<p>Clone یعنی ساخت یک VM جدید بر اساس یک VM موجود.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Clone</span><div class="code-block no-prompt">Base VM\n   │\n   ├── Clone 1\n   ├── Clone 2\n   └── Clone 3</div></div>
+
+<p>این کار برای ساخت سریع Lab بسیار مفید است.</p>
+
+<hr>
+
+<h2>Virtual Machine در برابر Physical Machine</h2>
+<p>از دید Guest:</p>
+
+<div class="code-container"><span class="code-label">دید Guest</span><div class="code-block no-prompt">VM\n├── CPU\n├── RAM\n├── Disk\n├── NIC\n└── OS</div></div>
+
+<p>از دید Host:</p>
+
+<div class="code-container"><span class="code-label">دید Host</span><div class="code-block no-prompt">VM\n   ↓\nیک Workload تحت مدیریت Hypervisor</div></div>
+
+<p>بنابراین:</p>
+<blockquote>Guest معمولاً با Hardware مجازی کار می‌کند، نه مستقیماً با Hardware فیزیکی.</blockquote>
+
+<hr>
+
+<h2>Virtualisation در برابر Container ⭐⭐⭐</h2>
+<p>این تفاوت برای ادامه فصل بسیار مهم است، چون جلسه بعد وارد <strong>Docker</strong> می‌شویم.</p>
+
+<h3>Virtual Machine</h3>
+<p>هر VM معمولاً Guest OS خودش را دارد:</p>
+
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Hardware\n   ↓\nHypervisor\n   ↓\nVM\n ┌──────────────┐\n │ Guest OS     │\n │ Applications │\n └──────────────┘</div></div>
+
+<h3>Container</h3>
+<p>Containerها معمولاً Kernel Host را به اشتراک می‌گذارند:</p>
+
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Hardware\n   ↓\nHost Linux Kernel\n   ↓\nContainer Runtime\n   ↓\n┌──────┬──────┬──────┐\n│ C1   │ C2   │ C3   │\n└──────┴──────┴──────┘</div></div>
+
+<p>پس:</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>VM</th><th>Container</th></tr></thead>
+<tbody>
+<tr><td>Guest OS دارد</td><td>معمولاً Guest Kernel مستقل ندارد</td></tr>
+<tr><td>Isolation قوی‌تر در سطح OS</td><td>سبک‌تر</td></tr>
+<tr><td>منابع بیشتر</td><td>معمولاً سبک‌تر</td></tr>
+<tr><td>Boot کامل OS</td><td>Processهای Container</td></tr>
+<tr><td>Hypervisor</td><td>Container Runtime</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته مهم</strong><br>
+<p>Container به این معنی نیست که «یک VM خیلی کوچک» است.</p>
+<p>مدل فنی آن متفاوت است.</p>
+<p>در جلسه Docker این تفاوت را عمیق‌تر بررسی می‌کنیم.</p>
+</div></div>
+
+<hr>
+
+<h2>مزایا و معایب Virtualisation</h2>
+
+<h3>مزایا ⭐⭐⭐</h3>
+<ul>
+    <li>استفاده بهتر از Hardware</li>
+    <li>Isolation</li>
+    <li>ایجاد سریع VM</li>
+    <li>مناسب برای Testing و Lab</li>
+    <li>امکان Snapshot و Clone</li>
+    <li>اجرای چند سیستم‌عامل روی یک Hardware</li>
+</ul>
+
+<h3>معایب ⭐⭐</h3>
+<ul>
+    <li>سربار نسبت به اجرای مستقیم روی Hardware</li>
+    <li>مصرف RAM و CPU</li>
+    <li>پیچیدگی بیشتر در مدیریت</li>
+    <li>اگر Host اصلی خراب شود، ممکن است چند VM همزمان تحت تأثیر قرار بگیرند.</li>
+</ul>
+
+<hr>
+
+<h2>یک مدل ذهنی کامل</h2>
+<p>کل معماری را این‌طور ببین:</p>
+
+<div class="code-container"><span class="code-label">معماری کامل</span><div class="code-block no-prompt">                 Physical Hardware\n                 CPU / RAM / Disk\n                        │\n                        ↓\n                   Hypervisor\n                        │\n             ┌──────────┼──────────┐\n             ↓          ↓          ↓\n            VM1        VM2        VM3\n             │          │          │\n          Linux      Linux      Windows\n             │          │          │\n          vCPU/RAM   vCPU/RAM   vCPU/RAM\n             │          │          │\n        Virtual NIC / Virtual Disk</div></div>
+
+<p>و اگر Type 2 باشد:</p>
+
+<div class="code-container"><span class="code-label">Type 2</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n    Host OS\n       ↓\n   Hypervisor\n       ↓\n      VM</div></div>
+
+<hr>
+
+<h2>نکات مهم</h2>
+<ol>
+    <li><strong>Host</strong> = سیستمی که VMها روی آن اجرا می‌شوند.</li>
+    <li><strong>Guest</strong> = سیستم‌عامل داخل VM.</li>
+    <li><strong>Hypervisor</strong> = لایه مدیریت VM و منابع مجازی.</li>
+    <li>Type 1 مستقیماً روی Hardware قرار می‌گیرد.</li>
+    <li>Type 2 روی Host OS اجرا می‌شود.</li>
+    <li>Intel → <code>VT-x</code></li>
+    <li>AMD → <code>AMD-V</code></li>
+    <li><code>vmx</code> → Intel Virtualisation flag</li>
+    <li><code>svm</code> → AMD Virtualisation flag</li>
+    <li>VM دارای vCPU، vRAM، Virtual Disk و Virtual NIC است.</li>
+    <li>NAT → VM از مسیر Host به شبکه می‌رود.</li>
+    <li>Bridged → VM مانند یک سیستم مستقل روی شبکه قرار می‌گیرد.</li>
+    <li>Host-only → شبکه محدود بین Host و VMها.</li>
+    <li>Snapshot = نقطه بازگشت، نه Backup کامل.</li>
+    <li>VM معمولاً Guest OS مستقل دارد؛ Container معمولاً Kernel Host را به اشتراک می‌گذارد.</li>
+</ol>
+
+<hr>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>فرض کن یک ساختمان بزرگ داریم.</p>
+<p><strong>Hardware</strong> ساختمان است.</p>
+<p><strong>Hypervisor</strong> مدیر ساختمان است.</p>
+<p>مدیر ساختمان می‌تواند چند واحد مستقل بسازد:</p>
+
+<div class="code-container"><span class="code-label">تشبیه</span><div class="code-block no-prompt">      ساختمان\n        │\n      مدیر\n        │\n ┌──────┼──────┐\n ↓      ↓      ↓\nVM1    VM2    VM3</div></div>
+
+<p>هر واحد منابع خودش را دارد:</p>
+
+<div class="code-container"><span class="code-label">منابع</span><div class="code-block no-prompt">VM\n├── CPU\n├── RAM\n├── Disk\n└── Network</div></div>
+
+<p>و سیستم‌عامل داخل هر واحد فکر می‌کند روی یک کامپیوتر واقعی کار می‌کند.</p>
+<p>این همان قدرت Virtualisation است:</p>
+<blockquote><strong>یک Hardware فیزیکی → چند محیط مستقل و قابل مدیریت</strong></blockquote>
+<p>اما Container داستان متفاوتی دارد؛ به‌جای اینکه برای هر محیط یک Guest OS کامل داشته باشیم، Containerها معمولاً Kernel مشترک Host را استفاده می‌کنند.</p>
+<p>و این دقیقاً پلی است که ما را به <strong>Docker</strong> می‌رساند.</p>
+
+<hr>
+
+<h2>سناریوی ترکیبی</h2>
+
+<h3>سناریو: ساخت Lab برای یادگیری Linux</h3>
+<p>فرض کن روی کامپیوتر شخصی‌ات Windows نصب است و می‌خواهی یک Lab لینوکسی بسازی.</p>
+
+<h4>مرحله 1 — Host</h4>
+<p>سیستم فیزیکی:</p>
+
+<div class="code-container"><span class="code-label">Host</span><div class="code-block no-prompt">Physical PC\n   ↓\nWindows</div></div>
+
+<p>Windows در اینجا Host OS است.</p>
+
+<h4>مرحله 2 — Hypervisor</h4>
+<p>مثلاً یک Hosted Hypervisor نصب می‌کنی.</p>
+<p>معماری:</p>
+
+<div class="code-container"><span class="code-label">معماری</span><div class="code-block no-prompt">Hardware\n   ↓\nWindows\n   ↓\nHypervisor</div></div>
+
+<h4>مرحله 3 — ساخت VM</h4>
+<p>یک VM برای AlmaLinux می‌سازی:</p>
+
+<div class="code-container"><span class="code-label">AlmaLinux VM</span><div class="code-block no-prompt">AlmaLinux VM\n├── 2 vCPU\n├── 4 GB RAM\n├── 40 GB Virtual Disk\n└── 1 Virtual NIC</div></div>
+
+<h4>مرحله 4 — Network</h4>
+<p>برای دسترسی ساده VM به Internet:</p>
+
+<div class="code-container"><span class="code-label">Network</span><div class="code-block no-prompt">VM\n ↓\nNAT\n ↓\nWindows\n ↓\nInternet</div></div>
+
+<h4>مرحله 5 — Snapshot</h4>
+<p>بعد از نصب کامل Linux:</p>
+
+<div class="code-container"><span class="code-label">Snapshot</span><div class="code-block no-prompt">AlmaLinux سالم\n       ↓\nCreate Snapshot</div></div>
+
+<p>حالا می‌توانی آزمایش‌های مختلف انجام دهی.</p>
+<p>اگر سیستم خراب شد:</p>
+
+<div class="code-container"><span class="code-label">Rollback</span><div class="code-block no-prompt">Broken VM\n    ↓\nRollback\n    ↓\nSnapshot\n    ↓\nAlmaLinux سالم</div></div>
+
+<h4>مرحله 6 — ساخت VM دوم</h4>
+<p>برای تمرین شبکه:</p>
+
+<div class="code-container"><span class="code-label">دو VM</span><div class="code-block no-prompt">VM1 → AlmaLinux\nVM2 → Debian</div></div>
+
+<p>و می‌توانی آن‌ها را در یک Virtual Network قرار دهی.</p>
+<p>در نتیجه با <strong>یک کامپیوتر فیزیکی</strong> یک Lab چندسیستمی ساخته‌ای.</p>
+
+<hr>
+
+<h2>Cheat Sheet</h2>
+
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Virtualisation → اجرای چند محیط مجازی روی یک Hardware\nHost → سیستم فیزیکی/میزبان VMها\nGuest → سیستم‌عامل داخل VM\nHypervisor → مدیریت VM و منابع\nType 1 → Hardware → Hypervisor → VM\nType 2 → Hardware → Host OS → Hypervisor → VM\nIntel VT-x / AMD-V → Hardware Virtualisation\nvmx / svm → CPU virtualization flags\nNAT → VM → Host → Network\nBridged → VM مثل یک سیستم مستقل روی Network\nSnapshot → نقطه بازگشت؛ Backup نیست</div></div>
+
+<hr>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام گزینه معماری صحیح <strong>Type 1 Hypervisor</strong> را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Hardware → Host OS → Hypervisor → VM</button>
+    <button onclick="selectOption(this)">B) Hardware → Hypervisor → VM</button>
+    <button onclick="selectOption(this)">C) Hardware → VM → Hypervisor</button>
+    <button onclick="selectOption(this)">D) Hardware → Guest OS → Hypervisor → VM</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>در Type 1، Hypervisor مستقیماً روی Hardware قرار می‌گیرد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>در یک VM، عبارت <code>vCPU</code> به چه معناست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) یک CPU فیزیکی اختصاصی که فقط VM از آن استفاده می‌کند</button>
+    <button onclick="selectOption(this)">B) CPU مجازی ارائه‌شده به Guest توسط Hypervisor</button>
+    <button onclick="selectOption(this)">C) یک CPU مخصوص Kernel Host</button>
+    <button onclick="selectOption(this)">D) یک نوع Virtual Disk</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Hypervisor منابع CPU فیزیکی را به شکل CPU مجازی در اختیار Guest قرار می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>روی یک سیستم Intel، کدام Flag در <code>/proc/cpuinfo</code> معمولاً نشان‌دهنده پشتیبانی Virtualisation است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>gpu</code></button>
+    <button onclick="selectOption(this)">B) <code>raid</code></button>
+    <button onclick="selectOption(this)">C) <code>vmx</code></button>
+    <button onclick="selectOption(this)">D) <code>disk</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>به‌صورت معمول: <code>vmx → Intel</code> و <code>svm → AMD</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>تفاوت اصلی Snapshot و Backup چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Snapshot همیشه جایگزین Backup است.</button>
+    <button onclick="selectOption(this)">B) Snapshot معمولاً برای Rollback سریع است و Backup برای نگهداری مستقل داده‌ها.</button>
+    <button onclick="selectOption(this)">C) Backup فقط برای VM و Snapshot فقط برای Physical Server است.</button>
+    <button onclick="selectOption(this)">D) هیچ تفاوتی ندارند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Snapshot ابزار بسیار مفیدی برای بازگشت سریع است، اما نباید آن را معادل Backup مستقل و قابل اتکا در نظر گرفت.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>در حالت Bridged Network، VM معمولاً چگونه در شبکه دیده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) فقط با Host ارتباط دارد.</button>
+    <button onclick="selectOption(this)">B) بدون Network کار می‌کند.</button>
+    <button onclick="selectOption(this)">C) تقریباً مانند یک سیستم مستقل روی همان Network قرار می‌گیرد.</button>
+    <button onclick="selectOption(this)">D) فقط از طریق Loopback ارتباط دارد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>در Bridged، Virtual NIC VM به شبکه‌ای Bridge می‌شود که Host نیز به آن متصل است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام گزینه تفاوت VM و Container را بهتر بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر Container همیشه Guest OS کامل خودش را دارد.</button>
+    <button onclick="selectOption(this)">B) VM و Container از نظر معماری کاملاً یکسان‌اند.</button>
+    <button onclick="selectOption(this)">C) VM معمولاً Guest OS مستقل دارد، اما Container معمولاً Kernel Host را به اشتراک می‌گذارد.</button>
+    <button onclick="selectOption(this)">D) Container فقط روی Windows اجرا می‌شود.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>این تفاوت یکی از مهم‌ترین مفاهیم برای ورود به Docker است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>یک Administrator می‌خواهد دو Linux مختلف را برای تمرین روی یک Server فیزیکی اجرا کند. Server دارای منابع کافی است و هدف این است که سیستم‌ها از یکدیگر جدا باشند. بهترین راهکار کدام است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) نصب هر دو Linux روی یک Partition</button>
+    <button onclick="selectOption(this)">B) استفاده از Virtual Machineها روی یک Hypervisor</button>
+    <button onclick="selectOption(this)">C) اجرای هر دو Kernel به‌صورت همزمان روی یک Boot</button>
+    <button onclick="selectOption(this)">D) تبدیل Server به یک Filesystem</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Virtualisation اجازه می‌دهد چند Guest OS مستقل روی یک Hardware اجرا شوند: <code>Physical Server → Hypervisor → Linux1 / Linux2</code></div>
+</div>
+
+<div class="summary-box">
+    <h3>🎯 Recall نهایی</h3>
+    <p>اگر این جلسه را بخواهی در ۳۰ ثانیه مرور کنی:</p>
+    <div class="code-container"><span class="code-label">مرور سریع</span><div class="code-block no-prompt">Hardware\n   ↓\nHypervisor\n   ↓\nVM → Guest OS + vCPU + vRAM + Virtual Disk + Virtual NIC\n\nType 1 → مستقیم روی Hardware\nType 2 → روی Host OS\n\nNAT → از مسیر Host\nBridged → حضور مستقل‌تر روی Network\nSnapshot → Rollback\n\nVM → Guest OS مستقل\nContainer → معمولاً Kernel مشترک</div></div>
+    <p><strong>جلسه بعدی</strong> دقیقاً از همین خط آخر شروع می‌شود: <strong>Docker و Containerها</strong>؛ آنجا می‌بینیم چرا Container با VM فرق دارد و Docker چطور این مدل را عملی می‌کند.</p>
+</div>
+` , 
+"ch5-7": `
+<div class="section-header">
+    <div class="section-badge">۵</div>
+    <div>
+        <h1>File Search — جستجوی فایل، دستور و محتوای سیستم</h1>
+        <div class="meta">فایل‌ها، مجوزها و آرشیو · بخش ۷ از ۷</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>تفاوت <code>find</code>، <code>locate</code>، <code>which</code> و <code>whereis</code> را توضیح بدهی.</li>
+    <li>با <code>find</code> فایل‌ها را بر اساس نام، نوع، زمان، اندازه و Permission پیدا کنی.</li>
+    <li>با <code>find</code> روی فایل‌های پیدا‌شده عملیات انجام دهی.</li>
+    <li>تفاوت جستجوی زنده (<code>find</code>) و جستجوی مبتنی بر Database (<code>locate</code>) را بفهمی.</li>
+    <li>برای سناریوهای واقعی، ابزار مناسب جستجو را انتخاب کنی.</li>
+</ol>
+
+<hr>
+
+<h2>معرفی جلسه</h2>
+<p>در Linux خیلی وقت‌ها می‌دانیم <strong>چه چیزی</strong> را می‌خواهیم، اما نمی‌دانیم <strong>کجاست</strong>.</p>
+<p>مثلاً: فایل <code>config.conf</code> کجاست؟ یا همه فایل‌های <code>.log</code> که بیشتر از 100MB هستند را پیدا کن. یا تمام فایل‌هایی که در 7 روز گذشته تغییر کرده‌اند را پیدا کن.</p>
+<p>برای این کار چند ابزار داریم، اما مهم‌ترین آن‌ها:</p>
+
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">find\nlocate\nwhich\nwhereis</div></div>
+
+<p>هستند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">                File Search\n                    │\n       ┌────────────┼────────────┐\n       ↓            ↓            ↓\n     find         locate      which/whereis\n       │            │              │\n   جستجوی دقیق   جستجوی سریع     پیدا کردن\n   و زنده         با Database      Command</div></div>
+
+<p>در LPIC-1، <strong><code>find</code> مهم‌ترین ابزار این جلسه است.</strong></p>
+
+<hr>
+
+<h2>درسنامه</h2>
+
+<h3><code>find</code> — مهم‌ترین ابزار جستجو</h3>
+<p><code>find</code> برای جستجوی فایل‌ها و Directoryها در یک مسیر مشخص استفاده می‌شود.</p>
+<p>Syntax کلی:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">find PATH CONDITIONS</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /home -name "test.txt"</div></div>
+
+<p>یعنی: در <code>/home</code> فایل یا Directoryای با نام <code>test.txt</code> پیدا کن.</p>
+
+<hr>
+
+<h4>اولین مثال <code>find</code></h4>
+<p>فرض کن:</p>
+
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir/\n├── notes.txt\n├── test.txt\n├── project/\n│   └── test.txt\n└── backup/\n    └── old.txt</div></div>
+
+<p>اگر بزنیم:</p>
+
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /home/amir -name "test.txt"</div></div>
+
+<p>ممکن است خروجی:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/amir/test.txt\n/home/amir/project/test.txt</div></div>
+
+<p>باشد. <code>find</code> به‌صورت Recursive در زیرشاخه‌ها جستجو می‌کند.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>در <code>find /home/amir -name "test.txt"</code>، قسمت اول <code>/home/amir</code> <strong>محل شروع جستجو</strong> است.</div></div>
+
+<hr>
+
+<h4><code>-name</code></h4>
+<p>رایج‌ترین شرط:</p>
+
+<div class="code-container"><span class="code-label">نام</span><div class="code-block">-name</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /etc -name "sshd_config"</div></div>
+
+<p>یعنی: فایلی با همین نام پیدا کن.</p>
+
+<hr>
+
+<h4>حساسیت به حروف بزرگ و کوچک</h4>
+<p><code>-name</code> به Case حساس است. مثلاً <code>find /tmp -name "test.txt"</code> با <code>test.txt</code> match می‌شود، اما <code>Test.txt</code> یا <code>TEST.TXT</code> لزوماً match نمی‌شوند.</p>
+<p>اگر بخواهیم Case مهم نباشد:</p>
+
+<div class="code-container"><span class="code-label">بدون حساسیت</span><div class="code-block">find /tmp -iname "test.txt"</div></div>
+
+<p>یعنی Ignore Case.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته</strong><br>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">-name  → Case-sensitive\n-iname → Case-insensitive</div></div>
+</div></div>
+
+<hr>
+
+<h4>Wildcard با <code>find</code></h4>
+<p>می‌توانیم از Pattern استفاده کنیم. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">الگو</span><div class="code-block">find /var/log -name "*.log"</div></div>
+
+<p>یعنی: همه فایل‌هایی که نامشان با <code>.log</code> تمام می‌شود. مثلاً: <code>syslog</code>، <code>auth.log</code>، <code>kernel.log</code>، <code>app.log</code>. فقط مواردی که با <code>.log</code> تمام شوند پیدا می‌شوند.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>Wildcard را داخل Quote قرار بده:
+<div class="code-container"><span class="code-label">درست</span><div class="code-block">find /var/log -name "*.log"</div></div>
+<p>نه:</p>
+<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block">find /var/log -name *.log</div></div>
+<p>چون Shell ممکن است <code>*.log</code> را قبل از اجرای <code>find</code> خودش Expand کند.</p>
+</div></div>
+
+<hr>
+
+<h4>جستجو بر اساس Type</h4>
+<p>یکی از مهم‌ترین گزینه‌ها: <code>-type</code> برای مشخص کردن نوع Entry.</p>
+<p>مهم‌ترین موارد:</p>
+
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">f → regular file\nd → directory\nl → symbolic link</div></div>
+
+<p>مثلاً فقط فایل‌ها:</p>
+
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">find /home/amir -type f</div></div>
+
+<p>فقط Directoryها:</p>
+
+<div class="code-container"><span class="code-label">دایرکتوری</span><div class="code-block">find /home/amir -type d</div></div>
+
+<p>فقط Symbolic Linkها:</p>
+
+<div class="code-container"><span class="code-label">لینک</span><div class="code-block">find /home/amir -type l</div></div>
+
+<hr>
+
+<h4>ترکیب <code>-type</code> و <code>-name</code></h4>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">find /var/log -type f -name "*.log"</div></div>
+
+<p>یعنی: فقط Regular Fileهایی که نامشان با <code>.log</code> تمام می‌شود. این بسیار بهتر از <code>find /var/log -name "*.log"</code> است اگر صراحتاً فقط فایل‌ها را بخواهیم.</p>
+
+<hr>
+
+<h4>جستجو در عمق مشخص — <code>-maxdepth</code></h4>
+<p>فرض کن فقط می‌خواهیم در همان Directory و زیرشاخه‌های مستقیم آن جستجو کنیم. می‌توانیم از <code>-maxdepth</code> استفاده کنیم.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">حداکثر عمق</span><div class="code-block">find /home/amir -maxdepth 1 -type f</div></div>
+
+<p>یعنی: فقط در سطح <code>/home/amir</code> جستجو کن و وارد زیرشاخه‌ها نشو.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/amir/a.txt        ← بررسی می‌شود\n/home/amir/b.txt        ← بررسی می‌شود\n/home/amir/project/x    ← بررسی نمی‌شود</div></div>
+
+<hr>
+
+<h4><code>-mindepth</code></h4>
+<p>برعکس، <code>-mindepth</code> حداقل عمق را مشخص می‌کند. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">حداقل عمق</span><div class="code-block">find /home/amir -mindepth 1 -type f</div></div>
+
+<p>یعنی: خود <code>/home/amir</code> را به‌عنوان نتیجه در نظر نگیر و از عمق یک به بعد جستجو کن. برای LPIC-1 دانستن مفهوم <code>-mindepth</code> کافی است؛ <code>-maxdepth</code> کاربرد رایج‌تری دارد.</p>
+
+<hr>
+
+<h4>جستجو بر اساس Size</h4>
+<p>یکی از کاربردهای مهم:</p>
+
+<div class="code-container"><span class="code-label">اندازه</span><div class="code-block">-size</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /var -type f -size +100M</div></div>
+
+<p>یعنی: فایل‌هایی بزرگ‌تر از 100MB پیدا کن.</p>
+<p>مثال:</p>
+
+<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /home -type f -size +1G</div></div>
+
+<p>یعنی فایل‌های بزرگ‌تر از 1GB.</p>
+
+<hr>
+
+<h4>واحدهای <code>-size</code></h4>
+<p>چند واحد مهم:</p>
+
+<div class="code-container"><span class="code-label">واحدها</span><div class="code-block no-prompt">c → bytes\nk → KiB\nM → MiB\nG → GiB</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /tmp -type f -size +10M</div></div>
+
+<hr>
+
+<h4><code>+</code> و <code>-</code> در <code>-size</code></h4>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">-size +100M</div></div>
+
+<p>یعنی بزرگ‌تر از مقدار مشخص.</p>
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">کوچک‌تر</span><div class="code-block">-size -10M</div></div>
+
+<p>یعنی کوچک‌تر از مقدار مشخص.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">+100M → بزرگ‌تر\n-10M  → کوچک‌تر</div></div>
+
+<hr>
+
+<h4>جستجو بر اساس زمان</h4>
+<p><code>find</code> می‌تواند فایل‌ها را بر اساس زمان نیز پیدا کند. مهم‌ترین گزینه‌ها:</p>
+
+<div class="code-container"><span class="code-label">زمان‌ها</span><div class="code-block no-prompt">-mtime\n-atime\n-ctime</div></div>
+
+<p>در LPIC-1 باید تفاوت کلی آن‌ها را بدانی.</p>
+
+<h5><code>mtime</code></h5>
+
+<div class="code-container"><span class="code-label">mtime</span><div class="code-block">find /home -type f -mtime 7</div></div>
+
+<p>بر اساس <strong>Modification Time</strong> جستجو می‌کند. یعنی زمان آخرین تغییر محتوای فایل.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">کمتر از ۷ روز</span><div class="code-block">find /home/amir -type f -mtime -7</div></div>
+
+<p>یعنی: فایل‌هایی که در بازه کمتر از حدود 7 روز گذشته تغییر کرده‌اند.</p>
+
+<h5><code>atime</code></h5>
+<p><code>atime</code> یعنی Access Time. یعنی آخرین زمان Access شدن فایل.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">atime</span><div class="code-block">find /home/amir -type f -atime -7</div></div>
+
+<p>فایل‌هایی را پیدا می‌کند که در حدود 7 روز اخیر Access شده‌اند.</p>
+
+<h5><code>ctime</code></h5>
+<p><code>ctime</code> را با Creation Time اشتباه نکن. در Linux معمولاً <code>ctime</code> = Change Time، یعنی زمان آخرین تغییر Metadata/Status فایل.</p>
+<p>مثلاً تغییراتی مانند Permission، Ownership، برخی Metadata می‌تواند <code>ctime</code> را تغییر دهد.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">mtime → Modification\natime → Access\nctime → Change of file status/metadata</div></div>
+<p>و: <code>ctime</code> لزوماً Creation Time نیست.</p>
+</div></div>
+
+<hr>
+
+<h4><code>-user</code></h4>
+<p>می‌توانیم فایل‌ها را بر اساس Owner پیدا کنیم. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مالک</span><div class="code-block">find /home -type f -user amir</div></div>
+
+<p>یعنی: تمام فایل‌هایی که Owner آن‌ها <code>amir</code> است.</p>
+
+<hr>
+
+<h4><code>-group</code></h4>
+<p>برای Group:</p>
+
+<div class="code-container"><span class="code-label">گروه</span><div class="code-block">find /shared -type f -group developers</div></div>
+
+<p>یعنی: فایل‌هایی که Group آن‌ها <code>developers</code> است.</p>
+
+<hr>
+
+<h4><code>-perm</code></h4>
+<p>یکی از گزینه‌های مهم و کمی ظریف: <code>-perm</code> برای جستجو بر اساس Permission استفاده می‌شود.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Permission</span><div class="code-block">find /home -type f -perm 644</div></div>
+
+<p>یعنی فایل‌هایی با Permission مشخص <code>644</code>.</p>
+
+<hr>
+
+<h4>پیدا کردن فایل‌های Executable</h4>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Executable</span><div class="code-block">find /home/amir -type f -perm /111</div></div>
+
+<p>این مفهوم را فعلاً این‌طور نگه دار: فایل‌هایی که حداقل یکی از بیت‌های Execute را دارند. <code>111</code> یعنی: Owner → x، Group → x، Others → x. علامت <code>/</code> در این شکل از <code>-perm</code> یعنی: حداقل یکی از بیت‌های مشخص‌شده match شود.</p>
+
+<hr>
+
+<h4><code>-exec</code> — انجام عملیات روی نتیجه</h4>
+<p>این قسمت بسیار مهم است. فرض کن می‌خواهیم تمام فایل‌های <code>.log</code> را پیدا کنیم و برایشان <code>ls -l</code> اجرا کنیم.</p>
+<p>می‌توانیم بنویسیم:</p>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">find /var/log -type f -name "*.log" -exec ls -l {} \\;</div></div>
+
+<p>قسمت‌های مهم:</p>
+
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">-exec → برای هر نتیجه یک Command اجرا کن\n{}    → جای فایل پیدا‌شده قرار بگیر\n\\;    → پایان -exec را مشخص می‌کند</div></div>
+
+<hr>
+
+<h4>مثال کاربردی <code>-exec</code></h4>
+<p>مثلاً فایل‌های <code>.tmp</code> را پیدا کرده‌ایم و می‌خواهیم حذف کنیم:</p>
+
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">find /tmp -type f -name "*.tmp" -exec rm {} \\;</div></div>
+
+<p>یعنی: <code>find → پیدا کردن فایل → rm filename → فایل بعدی</code></p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ هشدار مهم</strong><br><code>-exec rm</code> می‌تواند فایل‌های واقعی را حذف کند. قبل از استفاده در سیستم واقعی، ابتدا فقط:
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">find /tmp -type f -name "*.tmp"</div></div>
+<p>را اجرا کن و نتایج را بررسی کن.</p>
+</div></div>
+
+<hr>
+
+<h4><code>-delete</code></h4>
+<p>برای حذف مستقیم نتیجه‌های <code>find</code> نیز می‌توان از <code>-delete</code> استفاده کرد. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">find /tmp -type f -name "*.tmp" -delete</div></div>
+
+<p>اما از نظر آموزشی، مهم‌تر است ابتدا بتوانی <code>find ...</code> را درست بنویسی و نتایج را بررسی کنی.</p>
+
+<hr>
+
+<h4><code>-print</code></h4>
+<p>به‌صورت پیش‌فرض <code>find</code> نتایج را چاپ می‌کند. می‌توانی صریحاً بنویسی:</p>
+
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">find /home -type f -print</div></div>
+
+<p>یعنی: مسیر فایل‌های پیدا‌شده را چاپ کن. برای LPIC-1 دانستن این گزینه مفید است، اما به اندازه <code>-name</code>، <code>-type</code> و <code>-exec</code> مهم نیست.</p>
+
+<hr>
+
+<h4>ترکیب شرط‌ها</h4>
+<p>می‌توانیم چند شرط را هم‌زمان استفاده کنیم. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M</div></div>
+
+<p>یعنی: Directory زیر <code>/var/log</code>، Regular File، نام <code>*.log</code>، بزرگ‌تر از 100M. نتیجه فقط فایل‌هایی است که <strong>همه این شرایط</strong> را داشته باشند.</p>
+
+<hr>
+
+<h4><code>-o</code> — OR</h4>
+<p>گاهی می‌خواهیم فایل <code>.log</code> یا <code>.conf</code> را پیدا کنیم. می‌توانیم از <code>-o</code> استفاده کنیم:</p>
+
+<div class="code-container"><span class="code-label">یا</span><div class="code-block">find /etc -type f \\( -name "*.conf" -o -name "*.cfg" \\)</div></div>
+
+<p>یعنی: <code>.conf</code> OR <code>.cfg</code>. پرانتزها را با <code>\\(</code> و <code>\\)</code> Escape می‌کنیم تا Shell آن‌ها را تفسیر نکند. برای LPIC-1 دانستن مفهوم <code>-o</code> کافی و مهم است.</p>
+
+<hr>
+
+<h4><code>find</code> و Permission</h4>
+<p>با توجه به جلسه قبل می‌توانیم جستجوی Permission نیز انجام دهیم. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Permission دقیق</span><div class="code-block">find /home -type f -perm 600</div></div>
+
+<p>یعنی: فایل‌هایی که دقیقاً Permission <code>600</code> دارند.</p>
+<p>و:</p>
+
+<div class="code-container"><span class="code-label">حداقل یک Execute</span><div class="code-block">find /home -type f -perm /111</div></div>
+
+<p>یعنی: فایل‌هایی که حداقل یک Execute Permission دارند.</p>
+
+<hr>
+
+<h3><code>locate</code></h3>
+<p>حالا ابزار دوم:</p>
+
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">locate sshd_config</div></div>
+
+<p><code>locate</code> معمولاً سریع‌تر از <code>find</code> است، چون برای جستجو از یک <strong>Database</strong> استفاده می‌کند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find\n  ↓\nFilesystem\n  ↓\nجستجوی مستقیم\n  ↓\nنتیجه</div></div>
+
+<p>اما:</p>
+
+<div class="code-container"><span class="code-label">locate</span><div class="code-block no-prompt">locate\n  ↓\nDatabase\n  ↓\nجستجو در Database\n  ↓\nنتیجه</div></div>
+
+<hr>
+
+<h4>مشکل <code>locate</code></h4>
+<p>چون <code>locate</code> بر اساس Database کار می‌کند، ممکن است Database به‌روز نباشد. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">10:00 → file ساخته شد\n10:01 → locate file</div></div>
+
+<p>ممکن است هنوز در Database وجود نداشته باشد. در نتیجه: <code>locate</code> سریع است، اما ممکن است اطلاعات قدیمی داشته باشد.</p>
+
+<hr>
+
+<h4><code>updatedb</code></h4>
+<p>برای به‌روزرسانی Database مربوط به <code>locate</code> معمولاً:</p>
+
+<div class="code-container"><span class="code-label">به‌روزرسانی</span><div class="code-block">sudo updatedb</div></div>
+
+<p>استفاده می‌شود. بعد:</p>
+
+<div class="code-container"><span class="code-label">جستجو</span><div class="code-block">locate filename</div></div>
+
+<p>اطلاعات جدیدتری خواهد داشت.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>تفاوت کلیدی:
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">find   → جستجوی مستقیم در Filesystem\nlocate → جستجو در Database</div></div>
+</div></div>
+
+<hr>
+
+<h4>چه زمانی <code>find</code> و چه زمانی <code>locate</code>؟</h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>نیاز</th><th>ابزار مناسب</th></tr></thead>
+<tbody>
+<tr><td>جستجوی دقیق و شرطی</td><td><code>find</code></td></tr>
+<tr><td>جستجوی سریع بر اساس نام</td><td><code>locate</code></td></tr>
+<tr><td>جستجو بر اساس Size</td><td><code>find</code></td></tr>
+<tr><td>جستجو بر اساس Permission</td><td><code>find</code></td></tr>
+<tr><td>جستجو بر اساس Owner</td><td><code>find</code></td></tr>
+<tr><td>جستجوی Databaseای سریع</td><td><code>locate</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>پس: اگر فقط می‌پرسی «این فایل کجاست؟» → <code>locate</code> می‌تواند سریع باشد. ولی: اگر می‌گویی «فایل‌های بزرگ‌تر از 1GB که Owner آن‌ها فلانی است» → <code>find</code>.</p>
+
+<hr>
+
+<h3><code>which</code></h3>
+<p>گاهی اصلاً دنبال یک File معمولی نیستیم. می‌خواهیم بدانیم: این Command از کجا اجرا می‌شود؟</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">which ls</div></div>
+
+<p>ممکن است <code>/usr/bin/ls</code> برگرداند. <code>which</code> معمولاً مسیر Commandی را پیدا می‌کند که از طریق <code>PATH</code> قابل اجراست. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">which python3</div></div>
+
+<hr>
+
+<h4>چرا <code>which</code> مهم است؟</h4>
+<p>فرض کن چند نسخه از یک برنامه روی سیستم داری. می‌توانی بپرسی:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">which python3</div></div>
+
+<p>و ببینی Shell معمولاً کدام Executable را از <code>PATH</code> پیدا می‌کند.</p>
+<p>مدل:</p>
+
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Command\n   ↓\nPATH\n   ↓\nExecutable</div></div>
+
+<hr>
+
+<h3><code>whereis</code></h3>
+<p><code>whereis</code> کمی گسترده‌تر است. مثلاً:</p>
+
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">whereis ls</div></div>
+
+<p>ممکن است مسیرهایی مربوط به Binary، Source و Manual را نشان دهد. مثلاً خروجی ممکن است شبیه:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">ls: /usr/bin/ls /usr/share/man/man1/ls.1.gz</div></div>
+
+<p>باشد.</p>
+<p>تفاوت مهم:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">which   → معمولاً Executable موجود در PATH\nwhereis → Binary + Source + Manual locations</div></div>
+
+<hr>
+
+<h4><code>which</code> در برابر <code>whereis</code></h4>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>ابزار</th><th>کاربرد</th></tr></thead>
+<tbody>
+<tr><td><code>which</code></td><td>پیدا کردن Command قابل اجرا در PATH</td></tr>
+<tr><td><code>whereis</code></td><td>پیدا کردن Binary / Source / Man page</td></tr>
+<tr><td><code>find</code></td><td>جستجوی قدرتمند در Filesystem</td></tr>
+<tr><td><code>locate</code></td><td>جستجوی سریع در Database</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>این جدول برای مرور امتحان بسیار مهم است.</p>
+
+<hr>
+
+<h3>سناریوی ترکیبی واقعی</h3>
+<p>فرض کن مدیر سیستم می‌گوید: در <code>/var/log</code> فایل‌های Log بزرگ‌تر از 100MB را پیدا کن.</p>
+<p>اول:</p>
+
+<div class="code-container"><span class="code-label">جستجو</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M</div></div>
+
+<p>نتیجه مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/var/log/app.log\n/var/log/old.log</div></div>
+
+<p>حالا می‌خواهیم اطلاعاتشان را ببینیم:</p>
+
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M -exec ls -lh {} \\;</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 root root 150M ... /var/log/app.log\n-rw-r--r-- 1 root root 230M ... /var/log/old.log</div></div>
+
+<p>حالا فرض کن می‌خواهیم فایل‌های Log بزرگ‌تر از 1GB را پیدا کنیم:</p>
+
+<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /var/log -type f -name "*.log" -size +1G</div></div>
+
+<p>این دقیقاً جایی است که <code>find</code> از <code>locate</code> قدرتمندتر می‌شود.</p>
+
+<hr>
+
+<h3>یک سناریوی دوم</h3>
+<p>فرض کن می‌خواهی سریع بفهمی <code>sshd_config</code> کجاست. اگر فقط نام را می‌دانی:</p>
+
+<div class="code-container"><span class="code-label">جستجوی سریع</span><div class="code-block">locate sshd_config</div></div>
+
+<p>می‌تواند سریع جواب بدهد. اما اگر می‌خواهی: فایل <code>sshd_config</code> در <code>/etc</code> پیدا شود و فقط Regular File باشد. می‌نویسی:</p>
+
+<div class="code-container"><span class="code-label">جستجوی دقیق</span><div class="code-block">find /etc -type f -name "sshd_config"</div></div>
+
+<hr>
+
+<h2>نکات مهم</h2>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ مهم‌ترین دستور جلسه</strong><br>
+<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find WHERE WHAT</div></div>
+<p>یا: <code>find PATH CONDITIONS ACTION</code></p>
+</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ گزینه‌های بسیار مهم</strong><br>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-name   → نام\n-iname  → نام بدون حساسیت به Case\n-type   → نوع\n-size   → اندازه\n-user   → Owner\n-group  → Group\n-perm   → Permission\n-mtime  → Modification Time</div></div>
+</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ عملیات</strong><br>
+<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">-exec   → اجرای Command روی نتیجه\n-delete → حذف نتیجه</div></div>
+</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ ابزارهای دیگر</strong><br>
+<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">locate  → Database\nwhich   → Executable در PATH\nwhereis → Binary/Source/Man</div></div>
+</div></div>
+
+<hr>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>چهار ابزار را مثل چهار سؤال مختلف تصور کن:</p>
+<h4>سؤال ۱: «در کل Filesystem بگرد و دقیقاً چیزی را که می‌خواهم پیدا کن.»</h4>
+
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">find</div></div>
+
+<h4>سؤال ۲: «فقط سریع بگو این اسم فایل کجا دیده شده.»</h4>
+
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">locate</div></div>
+
+<p>ولی یادت باشد: Database ممکن است قدیمی باشد.</p>
+<h4>سؤال ۳: «این Command از کجا اجرا می‌شود؟»</h4>
+
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">which</div></div>
+
+<h4>سؤال ۴: «Binary یا Manual این Command کجاست؟»</h4>
+
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">whereis</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">              SEARCH\n                │\n     ┌──────────┼──────────┐\n     ↓          ↓          ↓\n   Files      Commands    Database\n     │          │           │\n   find     which/whereis  locate</div></div>
+
+<p>اما <strong><code>find</code> ابزار اصلی و قدرتمند جلسه است.</strong></p>
+
+<hr>
+
+<h2>Cheat Sheet</h2>
+
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">find /path -name "*.log"                    # جستجو بر اساس نام\nfind /path -type f                          # فقط فایل‌ها\nfind /path -type d                          # فقط Directoryها\nfind /path -type f -size +100M              # فایل‌های بزرگ‌تر از 100MB\nfind /path -type f -mtime -7                # تغییرکرده در حدود 7 روز اخیر\nfind /path -user amir                       # بر اساس Owner\nfind /path -perm 644                        # Permission مشخص\nfind /path -exec ls -l {} \\;                # اجرای Command روی نتایج\nlocate filename                              # جستجو در Database\nwhich command / whereis command             # پیدا کردن Command</div></div>
+
+<hr>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام دستور فقط Regular Fileها را در <code>/home</code> پیدا می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>find /home -type d</code></button>
+    <button onclick="selectOption(this)">B) <code>find /home -type f</code></button>
+    <button onclick="selectOption(this)">C) <code>locate /home -type f</code></button>
+    <button onclick="selectOption(this)">D) <code>which /home -type f</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>-type f</code> یعنی Regular File.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>کدام گزینه درباره <code>locate</code> صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) همیشه مستقیماً Filesystem را اسکن می‌کند</button>
+    <button onclick="selectOption(this)">B) فقط Directoryها را جستجو می‌کند</button>
+    <button onclick="selectOption(this)">C) از Database برای جستجو استفاده می‌کند</button>
+    <button onclick="selectOption(this)">D) فقط Commandها را پیدا می‌کند</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>locate</code> برای سرعت از Database استفاده می‌کند؛ بنابراین ممکن است اطلاعات آن به‌روز نباشد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>کدام دستور فایل‌های <code>.log</code> بزرگ‌تر از 500MB را در <code>/var/log</code> پیدا می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>find /var/log -name "*.log" -size +500M</code></button>
+    <button onclick="selectOption(this)">B) <code>locate /var/log "*.log" 500M</code></button>
+    <button onclick="selectOption(this)">C) <code>which /var/log -name "*.log"</code></button>
+    <button onclick="selectOption(this)">D) <code>find /var/log -type d -size +500M</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>اگر فقط Regular Fileها را بخواهیم، بهتر است: <code>find /var/log -type f -name "*.log" -size +500M</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>برای پیدا کردن Command <code>bash</code> در مسیرهای موجود در <code>PATH</code> معمولاً از کدام دستور استفاده می‌کنیم؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>find</code></button>
+    <button onclick="selectOption(this)">B) <code>locate</code></button>
+    <button onclick="selectOption(this)">C) <code>which</code></button>
+    <button onclick="selectOption(this)">D) <code>du</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>which bash</code> مسیر Executable مورد استفاده را نشان می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>کدام گزینه درباره <code>ctime</code> صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) همیشه Creation Time است</button>
+    <button onclick="selectOption(this)">B) زمان آخرین Access است</button>
+    <button onclick="selectOption(this)">C) زمان تغییر وضعیت/Metadata فایل است</button>
+    <button onclick="selectOption(this)">D) زمان اجرای آخرین Command است</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>در Linux، <code>ctime</code> را نباید به‌عنوان Creation Time در نظر بگیری.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>دستور زیر چه کاری انجام می‌دهد؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /tmp -type f -name "*.tmp" -exec rm {} \\;</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) فقط فایل‌ها را نمایش می‌دهد</button>
+    <button onclick="selectOption(this)">B) فایل‌های <code>.tmp</code> را پیدا کرده و برای هر نتیجه <code>rm</code> اجرا می‌کند</button>
+    <button onclick="selectOption(this)">C) Database مربوط به <code>locate</code> را پاک می‌کند</button>
+    <button onclick="selectOption(this)">D) فقط Directoryهای <code>.tmp</code> را حذف می‌کند</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>{}</code> با مسیر هر فایل پیدا‌شده جایگزین می‌شود. ⚠️ چون <code>rm</code> عملیات حذف انجام می‌دهد، قبل از اجرای آن بهتر است ابتدا خود <code>find</code> را بدون <code>-exec</code> آزمایش کنی.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>مدیر سیستم می‌گوید: «تمام فایل‌های معمولی زیر <code>/home</code> را پیدا کن که Owner آن‌ها <code>amir</code> است، بیشتر از 1GB حجم دارند و در 7 روز اخیر تغییر کرده‌اند.»</p>
+<p>کدام گزینه مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this">A) <code>locate /home amir 1G 7</code></button>
+    <button onclick="selectOption(this)">B) <code>find /home -type f -user amir -size +1G -mtime -7</code></button>
+    <button onclick="selectOption(this)">C) <code>which /home -user amir -size 1G</code></button>
+    <button onclick="selectOption(this)">D) <code>find /home -type d -group amir -size +1G</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون <code>find</code> می‌تواند چند شرط را هم‌زمان روی Filesystem اعمال کند:
+<div class="code-container"><span class="code-label">شرایط</span><div class="code-block no-prompt">-type f     → Regular File\n-user amir  → Owner\n-size +1G   → بزرگ‌تر از 1GB\n-mtime -7   → تغییرکرده در حدود 7 روز اخیر</div></div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>جمع‌بندی فصل چهارم</strong><br>
+<p>با پایان جلسه ۷، فصل چهارم را به این شکل در ذهن داشته باش:</p>
+<div class="code-container"><span class="code-label">فصل ۴</span><div class="code-block no-prompt">فایل‌ها، مجوزها و آرشیو\n│\n├── 1. File & Directory Management\n│\n├── 2. Compression & Archive\n│\n├── 3. Backup & dd\n│\n├── 4. Hard Link & Symbolic Link\n│\n├── 5. File Permissions & Ownership\n│      ├── chmod\n│      ├── chown\n│      └── chgrp\n│\n├── 6. ACL\n│      ├── getfacl\n│      └── setfacl\n│\n└── 7. File Search\n       ├── find\n       ├── locate\n       ├── which\n       └── whereis</div></div>
+<p><strong>هسته اصلی جلسه ۷</strong></p>
+<p>اگر فقط چند چیز را برای آزمون و کار عملی به خاطر بسپاری:</p>
+<div class="code-container"><span class="code-label">چهار ابزار</span><div class="code-block no-prompt">find  → جستجوی دقیق در Filesystem\nlocate → جستجو در Database\nwhich → پیدا کردن Executable از PATH\nwhereis → Binary / Source / Man</div></div>
+<p>و برای <code>find</code>:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-name + -type + -size + -user + -group + -perm</div></div>
+<p>مهم‌ترین ترکیب ذهنی تو هستند.</p>
+<p><strong>با این جلسه، ۷ جلسه فصل چهارم کامل شد.</strong> قدم مفید بعدی این است که یک مرور ترکیبی از کل فصل ۴ با سناریوهای واقعی و تست‌های جامع انجام دهیم تا ارتباط <code>chmod</code>، ACL، <code>find</code>، Archive و Backup کاملاً جا بیفتد.</p>
+</div></div>
+` ,
+"ch5-8": `
+<div class="section-header">
+    <div class="section-badge">۵</div>
+    <div>
+        <h1>Proxmox</h1>
+        <div class="meta">بوت، سیستم‌عامل و مجازی‌سازی · بخش ۸ از ۸</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان جلسه باید بتوانی:</p>
+<ol>
+    <li>مفهوم <strong>Proxmox VE</strong> و کاربرد آن را توضیح بدهی.</li>
+    <li>ارتباط Proxmox با <strong>KVM، QEMU و LXC</strong> را بفهمی.</li>
+    <li>تفاوت <strong>VM و Container</strong> در Proxmox را تشخیص بدهی.</li>
+    <li>مفاهیم اصلی Node، Storage، Network و Cluster را بشناسی.</li>
+    <li>عملیات پایه مانند ساخت، Start، Stop و مدیریت VM/Container را درک کنی.</li>
+</ol>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا مسیر ما این بوده:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Virtualisation
+      │
+      ├── VM
+      │    └── KVM + QEMU
+      │
+      └── Container
+           └── Docker</div></div>
+
+<p>اما در یک Server واقعی ممکن است ده‌ها VM و Container داشته باشیم.</p>
+<p>مدیریت دستی همه آن‌ها سخت می‌شود.</p>
+
+<p>اینجاست که Proxmox وارد می‌شود:</p>
+<div class="code-container"><span class="code-label">Proxmox</span><div class="code-block no-prompt">             Proxmox VE
+                  │
+        ┌─────────┼─────────┐
+        ↓         ↓         ↓
+       VM      Container   Storage
+     KVM/QEMU     LXC      Network</div></div>
+
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>⭐ نکته کلیدی</strong><br>
+Proxmox خودش جایگزین KVM یا LXC نیست.
+<p><strong>Proxmox یک پلتفرم مدیریت Virtualisation است که از فناوری‌هایی مثل KVM و LXC استفاده می‌کند.</strong></p>
+</div></div>
+
+<h2>Proxmox VE چیست؟ ⭐⭐⭐</h2>
+<p><strong>Proxmox VE</strong> مخفف:</p>
+<blockquote>Proxmox Virtual Environment</blockquote>
+<p>یک پلتفرم Open Source برای مدیریت Virtualisation در Server است.</p>
+<p>Proxmox می‌تواند محیطی برای مدیریت:</p>
+<ul>
+    <li>Virtual Machine</li>
+    <li>Linux Container</li>
+    <li>Storage</li>
+    <li>Network</li>
+    <li>Backup</li>
+    <li>Cluster</li>
+</ul>
+<p>فراهم کند.</p>
+
+<p>معماری ذهنی:</p>
+<div class="code-container"><span class="code-label">معماری Proxmox</span><div class="code-block no-prompt">Physical Server
+      ↓
+ Proxmox VE
+      │
+ ┌────┼──────────────┐
+ ↓    ↓              ↓
+ VM   VM           Container
+ │    │               │
+KVM  KVM             LXC</div></div>
+
+<h2>Proxmox چه چیزی نیست؟</h2>
+<p>این نکته مهم است.</p>
+<p>Proxmox را با این موارد اشتباه نکن:</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ Proxmox ≠ KVM</strong><br>KVM فناوری Virtualisation در Linux است.</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ Proxmox ≠ QEMU</strong><br>QEMU یکی از فناوری‌های مورد استفاده برای اجرای VMهاست.</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ Proxmox ≠ Docker</strong><br>Docker برای Containerهاست.</div></div>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>✅ Proxmox چیست؟</strong><br>یک <strong>Management Platform</strong> است که این فناوری‌ها را کنار هم قرار می‌دهد.</div></div>
+
+<h2>معماری Proxmox ⭐⭐⭐</h2>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">معماری کامل</span><div class="code-block no-prompt">                 Proxmox VE
+                     │
+       ┌─────────────┼─────────────┐
+       ↓             ↓             ↓
+   Virtual       Containers      Storage
+   Machines          LXC
+      │
+   KVM/QEMU</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ رابطه طلایی</strong><br>
+<div class="code-container"><span class="code-label">Proxmox</span><div class="code-block no-prompt">Proxmox
+   │
+   ├── KVM/QEMU → VM
+   │
+   └── LXC      → Linux Container</div></div>
+<p>این مهم‌ترین رابطه‌ای است که از این جلسه باید به خاطر بسپاری.</p>
+</div></div>
+
+<h2>Node چیست؟ ⭐⭐⭐</h2>
+<p>یک <strong>Node</strong> در Proxmox یک Server فیزیکی است که Proxmox VE روی آن نصب شده است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Node</span><div class="code-block no-prompt">Physical Server
+      ↓
+Proxmox VE
+      ↓
+    Node</div></div>
+<p>فرض کن سه Server فیزیکی داری:</p>
+<div class="code-container"><span class="code-label">سه Node</span><div class="code-block no-prompt">Node1
+Node2
+Node3</div></div>
+<p>هرکدام می‌توانند VMها و Containerهای خودشان را اجرا کنند.</p>
+
+<h2>VM در Proxmox ⭐⭐⭐</h2>
+<p>برای Virtual Machineهای کامل، Proxmox از KVM/QEMU استفاده می‌کند.</p>
+<div class="code-container"><span class="code-label">جریان VM</span><div class="code-block no-prompt">Proxmox
+   ↓
+KVM/QEMU
+   ↓
+Virtual Machine
+   ↓
+Guest OS</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">VMها</span><div class="code-block no-prompt">Proxmox Node
+│
+├── VM 100 → AlmaLinux
+├── VM 101 → Debian
+└── VM 102 → Windows</div></div>
+<p>هر VM می‌تواند داشته باشد:</p>
+<ul>
+    <li>vCPU</li>
+    <li>RAM</li>
+    <li>Virtual Disk</li>
+    <li>Virtual NIC</li>
+    <li>Guest OS</li>
+</ul>
+<p>یعنی همان مفاهیمی که در جلسه Virtualisation یاد گرفتیم.</p>
+
+<h2>Container در Proxmox — LXC ⭐⭐⭐</h2>
+<p>Proxmox علاوه بر VM، Linux Container هم ارائه می‌کند.</p>
+<p>فناوری اصلی آن:</p>
+<blockquote><strong>LXC — Linux Containers</strong></blockquote>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Container در Proxmox</span><div class="code-block no-prompt">Proxmox
+   ↓
+  LXC
+   ↓
+Linux Container</div></div>
+<p>Container معمولاً Kernel Host را به اشتراک می‌گذارد.</p>
+
+<p>پس:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">VM:
+Proxmox → KVM/QEMU → Guest OS
+
+Container:
+Proxmox → LXC → Container</div></div>
+
+<h2>VM یا LXC؟</h2>
+<p>این مقایسه را خوب یاد بگیر:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ویژگی</th><th>VM</th><th>LXC Container</th></tr></thead>
+<tbody>
+<tr><td>فناوری</td><td>KVM/QEMU</td><td>LXC</td></tr>
+<tr><td>Guest OS کامل</td><td>بله</td><td>خیر</td></tr>
+<tr><td>Kernel مستقل</td><td>بله</td><td>معمولاً خیر</td></tr>
+<tr><td>سربار</td><td>بیشتر</td><td>کمتر</td></tr>
+<tr><td>Isolation</td><td>بیشتر</td><td>سبک‌تر</td></tr>
+<tr><td>اجرای OS متفاوت</td><td>مناسب</td><td>محدودتر به Kernel Host</td></tr>
+</tbody>
+</table>
+</div>
+<p>مثلاً اگر بخواهی یک Windows Server اجرا کنی:</p>
+<div class="code-container"><span class="code-label">Windows</span><div class="code-block no-prompt">VM</div></div>
+<p>راهکار مناسب است.</p>
+<p>اما برای یک Linux Service سبک:</p>
+<div class="code-container"><span class="code-label">Linux Service</span><div class="code-block no-prompt">LXC</div></div>
+<p>می‌تواند گزینه مناسبی باشد.</p>
+
+<h2>Storage در Proxmox ⭐⭐⭐</h2>
+<p>VMها و Containerها به Storage نیاز دارند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Virtual Disk</span><div class="code-block no-prompt">VM
+ ↓
+Virtual Disk
+ ↓
+Storage</div></div>
+<p>Proxmox می‌تواند Storageهای مختلفی را مدیریت کند.</p>
+<p>در سطح LPIC-1 کافی است مفهوم انواع Storage را بشناسی:</p>
+<ul>
+    <li>Local Storage</li>
+    <li>Directory</li>
+    <li>LVM</li>
+    <li>LVM-Thin</li>
+    <li>ZFS</li>
+    <li>NFS</li>
+    <li>Ceph</li>
+</ul>
+<p>لازم نیست وارد جزئیات تخصصی Ceph یا ZFS شویم.</p>
+
+<h3>چرا Storage مهم است؟</h3>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">Diskهای VM</span><div class="code-block no-prompt">VM 100
+ ├── Disk 50GB
+ └── Disk 100GB</div></div>
+<p>این Diskها باید روی یک Storage قرار بگیرند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">ساختار Storage</span><div class="code-block no-prompt">Proxmox
+   │
+   └── Storage
+        ├── VM Disk
+        ├── ISO
+        ├── Backup
+        └── Container Template</div></div>
+
+<h2>ISO چیست؟ ⭐⭐</h2>
+<p>برای نصب یک VM معمولاً به Installation Media نیاز داریم.</p>
+<p>مثلاً ISO مربوط به AlmaLinux:</p>
+<div class="code-container"><span class="code-label">ISO</span><div class="code-block no-prompt">AlmaLinux.iso</div></div>
+<p>آن را روی Storage قرار می‌دهیم و VM از آن Boot می‌شود.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">نصب از ISO</span><div class="code-block no-prompt">ISO
+ ↓
+Virtual CD/DVD
+ ↓
+VM
+ ↓
+Install OS</div></div>
+<p>این دقیقاً مشابه زمانی است که روی یک کامپیوتر فیزیکی از DVD یا USB نصب‌کننده Boot می‌کردیم.</p>
+
+<h2>Network در Proxmox ⭐⭐⭐</h2>
+<p>هر VM یا Container معمولاً به Network نیاز دارد.</p>
+<p>Proxmox از Virtual Network استفاده می‌کند.</p>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">شبکه مجازی</span><div class="code-block no-prompt">Physical NIC
+      ↓
+   Proxmox
+      ↓
+Virtual Bridge
+   ┌──┼──┐
+   ↓  ↓  ↓
+  VM1 VM2 CT1</div></div>
+<p>یکی از مفاهیم مهم:</p>
+<blockquote><strong>Linux Bridge</strong></blockquote>
+<p>است.</p>
+<p>مثلاً Bridge معروف:</p>
+<div class="code-container"><span class="code-label">vmbr0</span><div class="code-block no-prompt">vmbr0</div></div>
+<p>ممکن است برای اتصال VMها به شبکه فیزیکی استفاده شود.</p>
+
+<h3>Bridge چیست؟</h3>
+<p>Bridge را می‌توان مثل یک Switch مجازی تصور کرد:</p>
+<div class="code-container"><span class="code-label">Bridge</span><div class="code-block no-prompt">          Physical Network
+                │
+              vmbr0
+        ┌───────┼───────┐
+        ↓       ↓       ↓
+       VM1     VM2      CT1</div></div>
+<p>VMها به Bridge وصل می‌شوند.</p>
+<p>Bridge نیز می‌تواند به Physical NIC متصل باشد.</p>
+
+<h2>Web Interface ⭐⭐⭐</h2>
+<p>یکی از مزایای Proxmox این است که بسیاری از عملیات را می‌توان از طریق Web Interface انجام داد.</p>
+<p>معمولاً مدیریت Proxmox از طریق رابط وب انجام می‌شود.</p>
+<p>در آن می‌توانی:</p>
+<ul>
+    <li>VM بسازی</li>
+    <li>Container بسازی</li>
+    <li>VM را Start/Stop کنی</li>
+    <li>RAM و CPU را تغییر دهی</li>
+    <li>Storage را مدیریت کنی</li>
+    <li>Network را تنظیم کنی</li>
+    <li>Console VM را باز کنی</li>
+</ul>
+<p>بنابراین به‌جای اجرای همه دستورات از Terminal، یک محیط مدیریتی مرکزی داری.</p>
+
+<h2>ساخت VM — مدل ذهنی</h2>
+<p>فرض کنیم می‌خواهیم یک Debian VM بسازیم.</p>
+<p>فرآیند مفهومی:</p>
+<div class="code-container"><span class="code-label">مراحل ساخت VM</span><div class="code-block no-prompt">1. انتخاب Node
+       ↓
+2. انتخاب ISO
+       ↓
+3. تعیین CPU
+       ↓
+4. تعیین RAM
+       ↓
+5. ساخت Virtual Disk
+       ↓
+6. تنظیم Network
+       ↓
+7. Create VM
+       ↓
+8. Start
+       ↓
+9. Install Debian</div></div>
+<p>این همان Virtualisation است، فقط با یک ابزار مدیریتی مناسب.</p>
+
+<h2>VM ID و Container ID ⭐⭐</h2>
+<p>Proxmox برای VMها و Containerها ID اختصاص می‌دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">IDها</span><div class="code-block no-prompt">VM 100
+VM 101
+CT 200
+CT 201</div></div>
+<p>این ID در مدیریت آن‌ها استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">VM 100 → Debian
+VM 101 → AlmaLinux
+CT 200 → Web Container</div></div>
+
+<h2>Start / Stop / Shutdown ⭐⭐⭐</h2>
+<p>در Proxmox برای VM یا Container عملیات‌هایی مثل:</p>
+<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">Start
+Shutdown
+Stop
+Restart</div></div>
+<p>داریم.</p>
+<p>تفاوت مفهومی مهم:</p>
+<h3>Shutdown</h3>
+<p>از Guest درخواست خاموش شدن می‌کند.</p>
+<p>مثل اینکه داخل Linux بگویی:</p>
+<div class="code-container"><span class="code-label">shutdown</span><div class="code-block">shutdown -h now</div></div>
+<h3>Stop</h3>
+<p>می‌تواند شبیه قطع کردن ناگهانی برق ماشین مجازی باشد.</p>
+<p>پس معمولاً:</p>
+<blockquote><strong>Shutdown انتخاب امن‌تر برای سیستم در حال اجراست.</strong></blockquote>
+
+<h2>Snapshot در Proxmox ⭐⭐⭐</h2>
+<p>در جلسه قبل Snapshot را یاد گرفتیم.</p>
+<p>در Proxmox نیز می‌توان برای VMها Snapshot ایجاد کرد.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Snapshot</span><div class="code-block no-prompt">VM
+ │
+ ├── Snapshot 1
+ │
+ └── Changes
+       ↓
+     Problem
+       ↓
+    Rollback</div></div>
+<p>کاربرد:</p>
+<blockquote>قبل از یک تغییر مهم، نقطه بازگشت ایجاد کن.</blockquote>
+<p>مثلاً قبل از:</p>
+<ul>
+    <li>تغییر Configuration</li>
+    <li>نصب نرم‌افزار مهم</li>
+    <li>آزمایش</li>
+</ul>
+<p>Snapshot می‌تواند مفید باشد.</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اما دوباره تأکید:</strong><br>Snapshot = Backup نیست.</div></div>
+
+<h2>Backup در Proxmox ⭐⭐⭐</h2>
+<p>Backup با Snapshot فرق دارد.</p>
+<p>Backup یعنی یک نسخه پشتیبان از داده/VM تهیه کنیم تا در صورت خرابی بتوانیم آن را Restore کنیم.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Backup</span><div class="code-block no-prompt">VM
+ ↓
+Backup
+ ↓
+Storage دیگر
+ ↓
+Disaster / Failure
+ ↓
+Restore</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Snapshot
+ → Rollback سریع
+
+Backup
+ → Recovery</div></div>
+<p>این دو را با هم اشتباه نکن.</p>
+
+<h2>Cluster چیست؟ ⭐⭐⭐</h2>
+<p>فرض کن فقط یک Proxmox Node داری:</p>
+<div class="code-container"><span class="code-label">یک Node</span><div class="code-block no-prompt">Node1
+ ├── VM1
+ ├── VM2
+ └── CT1</div></div>
+<p>حالا سه Server داری:</p>
+<div class="code-container"><span class="code-label">سه Node</span><div class="code-block no-prompt">Node1
+Node2
+Node3</div></div>
+<p>می‌توانی آن‌ها را در قالب یک <strong>Cluster</strong> مدیریت کنی.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Cluster</span><div class="code-block no-prompt">             Proxmox Cluster
+          ┌───────┼───────┐
+          ↓       ↓       ↓
+        Node1   Node2   Node3
+         │        │       │
+        VMs      VMs     VMs</div></div>
+<p>مزیت:</p>
+<blockquote>مدیریت چند Node به‌صورت یک محیط یکپارچه‌تر.</blockquote>
+
+<h3>High Availability — HA ⭐⭐</h3>
+<p>در محیط‌های چند Node، مفهوم <strong>High Availability</strong> مطرح می‌شود.</p>
+<p>هدف کلی:</p>
+<blockquote>اگر یک Node دچار مشکل شد، Workloadهای مهم بتوانند روی Node دیگری اجرا شوند.</blockquote>
+<p>مدل مفهومی:</p>
+<div class="code-container"><span class="code-label">HA</span><div class="code-block no-prompt">Node1
+ │
+ └── VM100
+       ↓
+    Failure
+       ↓
+Node2
+ │
+ └── VM100</div></div>
+<p>پیاده‌سازی واقعی HA جزئیات بیشتری دارد و در سطح LPIC-1 لازم نیست وارد آن شویم.</p>
+<p>فقط مفهوم را بفهم:</p>
+<blockquote>Cluster + HA → افزایش Availability سرویس‌ها.</blockquote>
+
+<h2>Proxmox و Live Migration ⭐⭐</h2>
+<p>در یک محیط چند Node، امکان جابه‌جایی Workloadها بین Nodeها مطرح می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Migration</span><div class="code-block no-prompt">Node1
+  │
+ VM100
+  │
+  └────────────→ Node2
+                  │
+                 VM100</div></div>
+<p>این فرآیند را <strong>Migration</strong> می‌گوییم.</p>
+<p>در شرایط مناسب، بعضی VMها می‌توانند با Downtime بسیار کم بین Nodeها منتقل شوند.</p>
+<p>این یکی از قابلیت‌های مهم محیط‌های Virtualisation سازمانی است.</p>
+
+<h2>Proxmox و Docker — یک تفاوت مهم ⭐⭐⭐</h2>
+<p>یک اشتباه رایج:</p>
+<blockquote>«چون Proxmox Container دارد، پس Docker هم همان Container است.»</blockquote>
+<p>خیر.</p>
+<p>Proxmox برای Linux Container معمولاً از:</p>
+<div class="code-container"><span class="code-label">LXC</span><div class="code-block no-prompt">LXC</div></div>
+<p>استفاده می‌کند.</p>
+<p>Docker از Container Runtime و ابزارهای مخصوص خودش استفاده می‌کند.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Proxmox
+ ├── KVM/QEMU → VM
+ └── LXC      → Container
+
+Docker
+ └── Docker Engine/Runtime → Container</div></div>
+<p>این‌ها از نظر مفهوم Container مشترک‌اند، اما ابزار و معماری مدیریتشان یکسان نیست.</p>
+
+<h2>Proxmox در یک نگاه</h2>
+<p>حالا تمام فصل را می‌توانیم به این شکل ببینیم:</p>
+<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">                    Physical Server
+                           │
+                           ↓
+                      Proxmox VE
+                           │
+             ┌─────────────┼─────────────┐
+             ↓             ↓             ↓
+          Storage        Network       Compute
+                           │
+             ┌─────────────┴─────────────┐
+             ↓                           ↓
+        KVM/QEMU                       LXC
+             ↓                           ↓
+            VM                       Container
+             ↓                           ↓
+         Guest OS                  Linux User Space</div></div>
+<p>این دیاگرام تقریباً تمام مفاهیم اصلی فصل را به هم وصل می‌کند.</p>
+
+<h2>نکات مهم</h2>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ Proxmox ⭐</strong><br>
+<ul>
+    <li>Proxmox VE = پلتفرم مدیریت Virtualisation</li>
+    <li>VMها → معمولاً KVM/QEMU</li>
+    <li>Containerها → LXC</li>
+    <li>Node = یک Server دارای Proxmox</li>
+    <li>Cluster = چند Node در یک محیط مدیریتی مشترک</li>
+    <li>Storage = محل نگهداری VM Disk، ISO، Backup و...</li>
+    <li><code>vmbr0</code> = نمونه‌ای از Linux Bridge</li>
+    <li>Snapshot = نقطه بازگشت</li>
+    <li>Backup = نسخه پشتیبان</li>
+    <li>Migration = انتقال VM بین Nodeها</li>
+</ul>
+</div></div>
+
+<h3>مقایسه نهایی</h3>
+<div class="code-container"><span class="code-label">مقایسه فناوری‌ها</span><div class="code-block no-prompt">KVM
+ ↓
+Virtual Machine
+
+Docker
+ ↓
+Container
+
+LXC
+ ↓
+Linux Container
+
+Proxmox
+ ↓
+مدیریت VM + Container + Storage + Network</div></div>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>فرض کن یک Datacenter کوچک داری.</p>
+<p>سه Server فیزیکی داری:</p>
+<div class="code-container"><span class="code-label">سه Server</span><div class="code-block no-prompt">Node1
+Node2
+Node3</div></div>
+<p>روی هرکدام Proxmox نصب می‌کنی.</p>
+<p>Proxmox به تو اجازه می‌دهد:</p>
+<div class="code-container"><span class="code-label">مدیریت</span><div class="code-block no-prompt">Node
+ ├── VM
+ ├── VM
+ ├── Container
+ └── Container</div></div>
+<p>را مدیریت کنی.</p>
+<p>برای VM:</p>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Proxmox
+   ↓
+KVM/QEMU
+   ↓
+VM
+   ↓
+Guest OS</div></div>
+<p>برای Container:</p>
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Proxmox
+   ↓
+LXC
+   ↓
+Container</div></div>
+<p>Storage محل نگهداری Disk و فایل‌های موردنیاز است.</p>
+<p>Network با Bridgeهایی مثل <code>vmbr0</code> به VMها و Containerها ارتباط شبکه می‌دهد.</p>
+<p>و اگر چند Node داشته باشی:</p>
+<div class="code-container"><span class="code-label">Cluster</span><div class="code-block no-prompt">Node1 ─┐
+Node2 ─┼── Cluster
+Node3 ─┘</div></div>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>🎯 جمله طلایی جلسه</strong><br>
+<strong>Proxmox خودش «VM» نیست؛ محیط مدیریتی‌ای است که Virtualisation را با فناوری‌هایی مثل KVM و LXC در اختیار Administrator قرار می‌دهد.</strong>
+</div></div>
+
+<h2>سناریوی ترکیبی</h2>
+<h3>سناریو: ساخت یک Lab مجازی با Proxmox</h3>
+<p>فرض کن یک Server فیزیکی داری و می‌خواهی Lab زیر را بسازی:</p>
+<div class="code-container"><span class="code-label">Lab</span><div class="code-block no-prompt">Proxmox Server
+│
+├── VM 100 → AlmaLinux
+├── VM 101 → Debian
+└── CT 200 → Web Container</div></div>
+
+<h4>مرحله 1 — نصب Proxmox</h4>
+<p>روی Server فیزیکی:</p>
+<div class="code-container"><span class="code-label">نصب</span><div class="code-block no-prompt">Physical Hardware
+       ↓
+   Proxmox VE</div></div>
+<p>این Server تبدیل به یک Node می‌شود.</p>
+
+<h4>مرحله 2 — ساخت AlmaLinux VM</h4>
+<p>برای VM:</p>
+<div class="code-container"><span class="code-label">AlmaLinux VM</span><div class="code-block no-prompt">KVM/QEMU
+   ↓
+VM 100
+   ↓
+AlmaLinux</div></div>
+<p>منابع:</p>
+<div class="code-container"><span class="code-label">منابع</span><div class="code-block no-prompt">2 vCPU
+4 GB RAM
+40 GB Disk</div></div>
+
+<h4>مرحله 3 — ساخت Debian VM</h4>
+<div class="code-container"><span class="code-label">Debian VM</span><div class="code-block no-prompt">KVM/QEMU
+   ↓
+VM 101
+   ↓
+Debian</div></div>
+
+<h4>مرحله 4 — ساخت Container</h4>
+<p>برای یک Web Service سبک:</p>
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">LXC
+ ↓
+CT 200</div></div>
+
+<h4>مرحله 5 — Network</h4>
+<p>همه را به Bridge وصل می‌کنیم:</p>
+<div class="code-container"><span class="code-label">شبکه</span><div class="code-block no-prompt">             vmbr0
+        ┌─────┼─────┐
+        ↓     ↓     ↓
+      VM100  VM101  CT200</div></div>
+<p>حالا آن‌ها می‌توانند طبق تنظیمات Network با یکدیگر ارتباط داشته باشند.</p>
+
+<h4>مرحله 6 — Snapshot</h4>
+<p>قبل از تغییر مهم روی VM100:</p>
+<div class="code-container"><span class="code-label">Snapshot</span><div class="code-block no-prompt">VM100
+  ↓
+Snapshot
+  ↓
+Configuration Change</div></div>
+<p>اگر مشکل ایجاد شد:</p>
+<div class="code-container"><span class="code-label">Rollback</span><div class="code-block no-prompt">Rollback</div></div>
+
+<h4>مرحله 7 — Backup</h4>
+<p>برای محافظت در برابر خرابی:</p>
+<div class="code-container"><span class="code-label">Backup</span><div class="code-block no-prompt">VM100
+  ↓
+Backup
+  ↓
+Backup Storage</div></div>
+<p>اینجا تفاوت Snapshot و Backup را عملی می‌بینی.</p>
+
+<h4>نتیجه نهایی</h4>
+<div class="code-container"><span class="code-label">Lab نهایی</span><div class="code-block no-prompt">                  Proxmox Node
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+       VM100         VM101        CT200
+     AlmaLinux       Debian      Web App
+        │              │            │
+      KVM/QEMU       KVM/QEMU      LXC
+          └────────────┼────────────┘
+                       ↓
+                     vmbr0
+                       ↓
+                    Network</div></div>
+<p>این یک Lab کاملاً واقعی و قابل استفاده برای تمرین Linux است.</p>
+
+<h2>Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Proxmox VE → Platform مدیریت Virtualisation
+VM → KVM/QEMU
+Container → LXC
+Node → Server دارای Proxmox
+Cluster → چند Node
+vmbr0 → Linux Bridge
+Storage → VM Disk / ISO / Backup / ...
+Snapshot → Rollback؛ Backup نیست
+Backup → Recovery
+Migration → انتقال Workload بین Nodeها
+Proxmox = مدیریت KVM + LXC + Storage + Network</div></div>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>Proxmox VE چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) یک Linux Container</button>
+    <button onclick="selectOption(this)">B) یک Hypervisor اختصاصی مستقل از Linux</button>
+    <button onclick="selectOption(this)">C) یک Platform برای مدیریت Virtualisation و منابعی مانند VM، Container، Storage و Network</button>
+    <button onclick="selectOption(this)">D) یک فایل ISO</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>Proxmox یک محیط مدیریتی برای Virtualisation است و از فناوری‌هایی مانند KVM و LXC استفاده می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>در Proxmox، معمولاً VMها با کدام فناوری اجرا می‌شوند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Docker</button>
+    <button onclick="selectOption(this)">B) LXC</button>
+    <button onclick="selectOption(this)">C) KVM/QEMU</button>
+    <button onclick="selectOption(this)">D) <code>systemd</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>مدل: <code>Proxmox → KVM/QEMU → VM</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>برای اجرای یک Linux Container در Proxmox معمولاً از چه فناوری‌ای استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) KVM</button>
+    <button onclick="selectOption(this)">B) LXC</button>
+    <button onclick="selectOption(this)">C) GRUB</button>
+    <button onclick="selectOption(this)">D) QEMU</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>در Proxmox: <code>VM → KVM/QEMU</code> و <code>Container → LXC</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام گزینه درباره Snapshot صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Snapshot همیشه جایگزین Backup است.</button>
+    <button onclick="selectOption(this)">B) Snapshot برای ایجاد نقطه بازگشت مناسب است و الزاماً Backup محسوب نمی‌شود.</button>
+    <button onclick="selectOption(this)">C) Snapshot فقط برای Container قابل استفاده است.</button>
+    <button onclick="selectOption(this)">D) Snapshot باعث می‌شود VM دیگر به Storage نیاز نداشته باشد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Snapshot برای Rollback سریع مناسب است، اما برای Disaster Recovery نباید آن را جایگزین Backup واقعی دانست.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>در Proxmox، <code>vmbr0</code> معمولاً به چه چیزی اشاره دارد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Virtual CPU</button>
+    <button onclick="selectOption(this)">B) Linux Bridge</button>
+    <button onclick="selectOption(this)">C) Virtual Disk</button>
+    <button onclick="selectOption(this)">D) Container Image</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Bridge مثل یک Switch مجازی عمل می‌کند و می‌تواند VMها و Containerها را به Network متصل کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام گزینه تفاوت VM و LXC Container را بهتر نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر دو Guest Kernel مستقل دارند.</button>
+    <button onclick="selectOption(this)">B) VM معمولاً Guest OS کامل دارد، ولی LXC معمولاً Kernel Host را به اشتراک می‌گذارد.</button>
+    <button onclick="selectOption(this)">C) LXC فقط روی Windows اجرا می‌شود.</button>
+    <button onclick="selectOption(this)">D) VM هیچ Virtual Hardware ندارد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>این همان تفاوت اساسی VM و Container است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>یک Administrator روی Proxmox سه Node دارد و می‌خواهد VMها را بین Nodeها مدیریت کند و در شرایط مناسب یک VM را از Node1 به Node2 منتقل کند. کدام مفاهیم مستقیماً مرتبط هستند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Cluster و Migration</button>
+    <button onclick="selectOption(this)">B) Docker و <code>wall</code></button>
+    <button onclick="selectOption(this)">C) GRUB و <code>systemctl enable</code></button>
+    <button onclick="selectOption(this)">D) LVM و <code>fdisk</code> فقط</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>مدل: <code>Node1, Node2, Node3 → Cluster</code> و <code>VM100 → Migration → Node2</code></div>
+</div>
+
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی فصل پنجم</strong><br>
+<p>کل فصل را می‌توانی با این زنجیره مرور کنی:</p>
+<div class="code-container"><span class="code-label">زنجیره فصل</span><div class="code-block no-prompt">BIOS / UEFI
+      ↓
+    GRUB
+      ↓
+   Kernel
+      ↓
+  systemd
+      ↓
+ Services / Targets
+      ↓
+ Virtualisation
+      │
+      ├── KVM/QEMU → VM
+      │
+      └── Docker/LXC → Container
+                         │
+                         ↓
+                      Proxmox
+                         │
+              VM + Container + Storage
+                         +
+                       Network</div></div>
+
+<p>و اگر فقط <strong>۱۰ نکته طلایی فصل</strong> را بخواهی:</p>
+<ol>
+    <li><code>systemd</code> معمولاً <strong>PID 1</strong> است.</li>
+    <li><code>systemctl start</code> → الآن؛ <code>enable</code> → Boot.</li>
+    <li><code>Target</code> یک وضعیت/گروه از Unitهاست.</li>
+    <li><strong>VM</strong> دارای Guest OS و معمولاً Guest Kernel مستقل است.</li>
+    <li><strong>Container</strong> معمولاً Kernel Host را به اشتراک می‌گذارد.</li>
+    <li><strong>KVM</strong> فناوری Virtualisation در Linux است.</li>
+    <li><strong>Docker</strong> برای مدیریت Containerهاست.</li>
+    <li><strong>Proxmox VE</strong> پلتفرم مدیریت VM و Container است.</li>
+    <li>Proxmox برای VM از <strong>KVM/QEMU</strong> و برای Linux Container از <strong>LXC</strong> استفاده می‌کند.</li>
+    <li><strong>Snapshot ≠ Backup</strong>؛ Snapshot برای Rollback و Backup برای Recovery است.</li>
+</ol>
+<p>با این جلسه، <strong>فصل پنجم کامل شد</strong>. قدم منطقی بعدی این است که یک مرور ترکیبی از هر ۸ جلسه فصل پنجم انجام بدهی تا ارتباط Boot → systemd → Virtualisation → KVM/Docker → Proxmox کاملاً تثبیت شود.</p>
+</div></div>
 `
+
+
         };
 
         // ============================================================
