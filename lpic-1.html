@@ -1230,16 +1230,18 @@
         { "id": "ch5-8", "title": "Proxmox" }
     ]
 }, {
-            "id": "ch6",
-            "title": "محیط گرافیکی و دسترسی از راه دور",
-            "en": "GUI & Remote Access",
-            "badge": "۶",
-            "sections": [
-                { "id": "ch6-1", "title": "دسکتاپ و X11 / Wayland" },
-                { "id": "ch6-2", "title": "SSH و دسترسی از راه دور" },
-                { "id": "ch6-3", "title": "ابزارهای گرافیکی از راه دور" }
-            ]
-        }, {
+    "id": "ch6",
+    "title": "محیط گرافیکی و دسترسی از راه دور",
+    "en": "GUI & Remote Access",
+    "badge": "۶",
+    "sections": [
+        { "id": "ch6-1", "title": "Intro + GUI Concepts + Install GUI" },
+        { "id": "ch6-2", "title": "GUI + Accessibility" },
+        { "id": "ch6-3", "title": "Remote Desktop + Local Access" },
+        { "id": "ch6-4", "title": "Time Management + Printer Management" },
+        { "id": "ch6-5", "title": "مرور و جمع‌بندی فصل ۶" }
+    ]
+}, {
             "id": "ch7",
             "title": "مدیریت کاربران، لاگ و سرور زمان",
             "en": "Users, Logs & Time",
@@ -29882,6 +29884,3113 @@ Proxmox = مدیریت KVM + LXC + Storage + Network</div></div>
 <p>با این جلسه، <strong>فصل پنجم کامل شد</strong>. قدم منطقی بعدی این است که یک مرور ترکیبی از هر ۸ جلسه فصل پنجم انجام بدهی تا ارتباط Boot → systemd → Virtualisation → KVM/Docker → Proxmox کاملاً تثبیت شود.</p>
 </div></div>
 `
+,
+"ch6-1": `
+<div class="section-header">
+    <div class="section-badge">۶</div>
+    <div>
+        <h1>Intro + GUI Concepts + Install GUI</h1>
+        <div class="meta">محیط گرافیکی و دسترسی از راه دور · بخش ۱ از ۵</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>تفاوت <strong>CLI و GUI</strong> را توضیح بدهی.</li>
+    <li>اجزای اصلی محیط گرافیکی Linux را بشناسی.</li>
+    <li>رابطه‌ی <strong>Display Server، Desktop Environment و Window Manager</strong> را درک کنی.</li>
+    <li>محیط‌های گرافیکی معروف Linux مثل <strong>GNOME و KDE Plasma</strong> را بشناسی.</li>
+    <li>در یک Linux Server محیط GUI را نصب، اجرا و وضعیت آن را بررسی کنی.</li>
+</ol>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا تقریباً تمام کارها را از Terminal انجام داده‌ایم:</p>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">User
+ ↓
+Terminal
+ ↓
+Shell
+ ↓
+Command
+ ↓
+Linux</div></div>
+<p>اما Linux فقط محیط متنی نیست. می‌توانیم یک محیط گرافیکی داشته باشیم:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">User
+ ↓
+GUI
+ ↓
+Desktop Environment
+ ↓
+Display System
+ ↓
+Linux</div></div>
+<p>در این فصل قرار است یاد بگیریم:</p>
+<ul>
+    <li>GUI چیست؟</li>
+    <li>Linux چگونه تصویر را روی صفحه نمایش می‌دهد؟</li>
+    <li>Desktop Environment چیست؟</li>
+    <li>چگونه GUI را نصب و فعال کنیم؟</li>
+    <li>چگونه از راه دور به محیط گرافیکی دسترسی پیدا کنیم؟</li>
+    <li>Accessibility چه کمکی به کاربران می‌کند؟</li>
+    <li>زمان و Printer در محیط Linux چگونه مدیریت می‌شوند؟</li>
+</ul>
+
+<h2>CLI در برابر GUI ⭐⭐⭐</h2>
+
+<h3>CLI</h3>
+<p>در CLI با Command کار می‌کنیم:</p>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block">ls
+cd /etc
+systemctl status sshd</div></div>
+<p>مزیت مهم CLI:</p>
+<blockquote>سریع، قابل اسکریپت‌نویسی و مناسب مدیریت Server.</blockquote>
+
+<h3>GUI</h3>
+<p>در GUI با عناصر گرافیکی کار می‌کنیم:</p>
+<ul>
+    <li>Window</li>
+    <li>Menu</li>
+    <li>Button</li>
+    <li>Icon</li>
+    <li>Mouse</li>
+    <li>Desktop</li>
+</ul>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block no-prompt">┌──────────────────────────────┐
+│ Applications       🔊  🔋    │
+├──────────────────────────────┤
+│                              │
+│       Desktop                │
+│                              │
+│   📁       🌐       🗑️       │
+│                              │
+└──────────────────────────────┘</div></div>
+<p>GUI برای کارهای تعاملی و Desktop بسیار مناسب است.</p>
+
+<h2>مدل ذهنی GUI در Linux ⭐⭐⭐</h2>
+<p>یکی از اشتباهات رایج این است که فکر کنیم:</p>
+<blockquote>«GUI = GNOME»</blockquote>
+<p>در حالی که GUI از چند لایه تشکیل می‌شود. مدل ساده:</p>
+<div class="code-container"><span class="code-label">لایه‌های GUI</span><div class="code-block no-prompt">                 User
+                  ↓
+          Applications
+                  ↓
+      Desktop Environment
+                  ↓
+         Window Manager
+                  ↓
+      Display Server/Protocol
+                  ↓
+             Kernel
+                  ↓
+            Hardware</div></div>
+<p>البته معماری مدرن Linux می‌تواند با <strong>Wayland</strong> کمی متفاوت باشد، اما این مدل برای فهم پایه بسیار مفید است.</p>
+
+<h2>Display Server چیست؟ ⭐⭐⭐</h2>
+<p>سیستم گرافیکی باید بداند:</p>
+<ul>
+    <li>چه چیزی روی صفحه نمایش داده شود؟</li>
+    <li>Mouse کجا قرار دارد؟</li>
+    <li>Keyboard input به کدام برنامه برسد؟</li>
+    <li>Windowها چگونه نمایش داده شوند؟</li>
+</ul>
+<p>این کار در معماری‌های سنتی با <strong>Display Server</strong> انجام می‌شد. دو نام مهم:</p>
+<div class="code-container"><span class="code-label">Display Server</span><div class="code-block no-prompt">X.Org / X11
+Wayland</div></div>
+
+<h2>X Window System / X11 ⭐⭐⭐</h2>
+<p><strong>X Window System</strong> یک سیستم استاندارد برای مدیریت نمایش گرافیکی در Unix/Linux است. معمولاً با نام:</p>
+<div class="code-container"><span class="code-label">نام‌ها</span><div class="code-block no-prompt">X11
+X Window System</div></div>
+<p>آن را می‌بینی. یک نکته مهم:</p>
+<blockquote>X11 خودش Desktop Environment نیست.</blockquote>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">X11 ≠ GNOME
+X11 ≠ KDE</div></div>
+<p>X11 زیرساخت نمایش گرافیکی است.</p>
+
+<h2>Wayland ⭐⭐⭐</h2>
+<p>Wayland نسل جدیدتری از معماری گرافیکی Linux است. در بسیاری از Desktopهای مدرن، Wayland جایگزین معماری X11 شده است.</p>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">Wayland</span><div class="code-block no-prompt">Application
+     ↓
+Desktop / Compositor
+     ↓
+Wayland
+     ↓
+Graphics Hardware</div></div>
+<p>در Wayland معمولاً <strong>Compositor</strong> نقش مهمی دارد. برای LPIC-1 لازم نیست وارد جزئیات داخلی Protocol شویم. فقط این را بدان:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>X11</th><th>Wayland</th></tr></thead>
+<tbody>
+<tr><td>معماری قدیمی‌تر</td><td>معماری جدیدتر</td></tr>
+<tr><td>X Server</td><td>Wayland Protocol</td></tr>
+<tr><td>X Window System</td><td>Compositor-based architecture</td></tr>
+<tr><td>هنوز قابل استفاده</td><td>در Desktopهای مدرن بسیار رایج</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<p>اگر سؤال بپرسد:</p>
+<blockquote>GNOME چیست؟</blockquote>
+<p>جواب: <strong>Desktop Environment</strong></p>
+<p>اگر بپرسد:</p>
+<blockquote>X11 چیست؟</blockquote>
+<p>جواب: <strong>سیستم/معماری نمایش گرافیکی</strong></p>
+<p>اگر بپرسد:</p>
+<blockquote>Wayland چیست؟</blockquote>
+<p>جواب: <strong>Protocol/معماری مدرن برای ارتباط اجزای گرافیکی</strong></p>
+</div></div>
+
+<h2>Desktop Environment چیست؟ ⭐⭐⭐</h2>
+<p>حالا به لایه مهم‌تری می‌رسیم. <strong>Desktop Environment (DE)</strong> مجموعه‌ای از ابزارها و اجزای آماده برای فراهم کردن یک محیط Desktop کامل است. مثلاً:</p>
+<ul>
+    <li>Desktop</li>
+    <li>Panel</li>
+    <li>Settings</li>
+    <li>File Manager</li>
+    <li>Application Launcher</li>
+    <li>Window Management</li>
+    <li>Utilities</li>
+</ul>
+<p>دو نمونه بسیار مهم:</p>
+
+<h3>GNOME</h3>
+<p>در بسیاری از توزیع‌های Linux، مخصوصاً خانواده Red Hat، بسیار رایج است.</p>
+
+<h3>KDE Plasma</h3>
+<p>یکی دیگر از Desktop Environmentهای معروف Linux است.</p>
+
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Desktop Environment</span><div class="code-block no-prompt">Desktop Environment
+│
+├── Desktop
+├── Panel
+├── Settings
+├── File Manager
+├── Applications
+└── Window Management</div></div>
+
+<h2>Window Manager چیست؟ ⭐⭐</h2>
+<p>Window Manager مسئول مدیریت Windowهاست. مثلاً:</p>
+<div class="code-container"><span class="code-label">Window</span><div class="code-block no-prompt">┌──────────────┐
+│ Terminal   X │
+├──────────────┤
+│              │
+│              │
+└──────────────┘</div></div>
+<p>Window Manager می‌تواند مسئول کارهایی مثل:</p>
+<ul>
+    <li>جابه‌جایی Window</li>
+    <li>تغییر اندازه</li>
+    <li>Minimize</li>
+    <li>Maximize</li>
+    <li>قرارگیری Windowها</li>
+</ul>
+<p>باشد. پس:</p>
+<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Window Manager
+      ↓
+مدیریت Windowها</div></div>
+
+<h3>تفاوت با Desktop Environment</h3>
+<p>Desktop Environment بزرگ‌تر است.</p>
+<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">DE
+├── Window Manager / Compositor
+├── File Manager
+├── Settings
+├── Panel
+└── Utilities</div></div>
+
+<h2>GNOME و KDE Plasma ⭐⭐⭐</h2>
+<p>در سطح LPIC-1 این دو را بشناس:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>GNOME</th><th>KDE Plasma</th></tr></thead>
+<tbody>
+<tr><td>Desktop Environment</td><td>Desktop Environment</td></tr>
+<tr><td>رابط مدرن و ساده</td><td>رابط بسیار قابل شخصی‌سازی</td></tr>
+<tr><td>رایج در بسیاری از توزیع‌ها</td><td>بسیار رایج در Linux</td></tr>
+<tr><td>ابزارها و تنظیمات یکپارچه</td><td>ابزارها و تنظیمات یکپارچه</td></tr>
+</tbody>
+</table>
+</div>
+<p>نکته:</p>
+<blockquote>هیچ‌کدام «Linux» نیستند. Linux Kernel می‌تواند بدون این‌ها هم اجرا شود.</blockquote>
+
+<h2>Login Manager / Display Manager ⭐⭐⭐</h2>
+<p>وقتی Linux را Boot می‌کنی و به صفحه‌ای مثل این می‌رسی:</p>
+<div class="code-container"><span class="code-label">Login</span><div class="code-block no-prompt">┌────────────────────────┐
+│                        │
+│       Login            │
+│                        │
+│ Username: ______       │
+│ Password: ______       │
+│                        │
+└────────────────────────┘</div></div>
+<p>یک <strong>Display Manager</strong> معمولاً مسئول این مرحله است. نمونه‌های معروف:</p>
+<ul>
+    <li>GDM → معمولاً مرتبط با GNOME</li>
+    <li>SDDM → معمولاً مرتبط با KDE Plasma</li>
+    <li>LightDM → گزینه‌ای سبک و عمومی</li>
+</ul>
+<p>وظایف اصلی:</p>
+<div class="code-container"><span class="code-label">Display Manager</span><div class="code-block no-prompt">Display Manager
+      ↓
+Login
+      ↓
+Start Desktop Session</div></div>
+
+<h2>کل معماری را یک‌جا ببین</h2>
+<p>حالا قطعات را کنار هم بگذاریم:</p>
+<div class="code-container"><span class="code-label">معماری کامل</span><div class="code-block no-prompt">                  User
+                   │
+                   ↓
+              Login Screen
+                   │
+            Display Manager
+             (GDM / SDDM)
+                   │
+                   ↓
+          Desktop Environment
+          (GNOME / KDE Plasma)
+                   │
+          ┌────────┴────────┐
+          ↓                 ↓
+   Window Manager       Applications
+    / Compositor
+          │
+          ↓
+     X11 / Wayland
+          │
+          ↓
+        Linux
+          │
+          ↓
+       Hardware</div></div>
+<p>این مدل ذهنی برای کل فصل بسیار مهم است.</p>
+
+<h2>GUI روی Server؛ آیا لازم است؟ ⭐⭐⭐</h2>
+<p>در Linux Server معمولاً GUI ضروری نیست. مثلاً یک Web Server می‌تواند کاملاً با CLI مدیریت شود:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">SSH
+ ↓
+Shell
+ ↓
+systemctl
+ ↓
+Web Server</div></div>
+<p>GUI منابع بیشتری مصرف می‌کند. بنابراین:</p>
+<blockquote>Serverهای Production معمولاً تا حد امکان بدون GUI اجرا می‌شوند، مگر اینکه نیاز مشخصی وجود داشته باشد.</blockquote>
+<p>اما برای:</p>
+<ul>
+    <li>Desktop</li>
+    <li>Workstation</li>
+    <li>آموزش</li>
+    <li>برخی ابزارهای مدیریتی</li>
+</ul>
+<p>GUI می‌تواند مفید باشد.</p>
+
+<h2>نصب GUI در Linux</h2>
+<p>روش نصب بسته‌ها به Distribution بستگی دارد. ما در دوره با خانواده‌هایی مثل <strong>AlmaLinux</strong> و <strong>Debian</strong> کار می‌کنیم. پس باید تفاوت Package Managerها را بشناسیم.</p>
+<div class="code-container"><span class="code-label">Package Manager</span><div class="code-block no-prompt">AlmaLinux
+    ↓
+   DNF
+
+Debian
+    ↓
+   APT</div></div>
+
+<h2>نصب GUI در AlmaLinux ⭐⭐⭐</h2>
+<p>در AlmaLinux 9/10، گروه‌های نرم‌افزاری برای نصب مجموعه‌ای از Packageها استفاده می‌شوند. ابتدا می‌توانی گروه‌های موجود را ببینی:</p>
+<div class="code-container"><span class="code-label">گروه‌ها</span><div class="code-block">sudo dnf group list</div></div>
+<p>برای نصب محیط گرافیکی GNOME، در سیستم‌هایی که گروه مربوطه ارائه شده، می‌توان از گروه مناسب GNOME استفاده کرد؛ نام دقیق گروه ممکن است بسته به نسخه و Repositoryها متفاوت باشد. در محیط‌های Enterprise Linux معمولاً یکی از گروه‌های Desktop Environment نصب می‌شود. بعد از نصب باید Target مناسب را فعال کنیم.</p>
+
+<h2>Target گرافیکی ⭐⭐⭐</h2>
+<p>این قسمت به جلسه‌های قبلی وصل می‌شود. در systemd دو Target مهم:</p>
+<div class="code-container"><span class="code-label">Targetها</span><div class="code-block no-prompt">multi-user.target
+graphical.target</div></div>
+
+<h3>multi-user.target</h3>
+<p>سیستم چندکاربره بدون GUI:</p>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">CLI</div></div>
+
+<h3>graphical.target</h3>
+<p>سیستم چندکاربره با GUI:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI</div></div>
+
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">                 systemd
+                    │
+          ┌─────────┴─────────┐
+          ↓                   ↓
+ multi-user.target      graphical.target
+          ↓                   ↓
+         CLI                  GUI</div></div>
+
+<h2>تغییر Default Target ⭐⭐⭐</h2>
+<p>اگر GUI نصب شده ولی سیستم هنگام Boot وارد محیط گرافیکی نمی‌شود، می‌توان Default Target را بررسی کرد:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+<p>اگر بخواهیم به graphical target تغییر کنیم:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
+<p>برای برگشت:</p>
+<div class="code-container"><span class="code-label">برگشت</span><div class="code-block">sudo systemctl set-default multi-user.target</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<p>این دو را خوب حفظ کن:</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl get-default</div></div>
+<p>→ Default Target فعلی</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl set-default graphical.target</div></div>
+<p>→ تعیین GUI به‌عنوان Target پیش‌فرض</p>
+</div></div>
+
+<h2>تغییر Target بدون Reboot ⭐⭐</h2>
+<p>اگر بخواهی همین الان وارد Graphical Target شوی:</p>
+<div class="code-container"><span class="code-label">ایزوله</span><div class="code-block">sudo systemctl isolate graphical.target</div></div>
+<p>و برای CLI:</p>
+<div class="code-container"><span class="code-label">ایزوله</span><div class="code-block">sudo systemctl isolate multi-user.target</div></div>
+<p>اما دقت کن:</p>
+<blockquote><code>isolate</code> وضعیت فعلی سیستم را تغییر می‌دهد؛ <code>set-default</code> تنظیم Bootهای بعدی را تغییر می‌دهد.</blockquote>
+<p>این تفاوت مهم است.</p>
+
+<h2>نصب GUI در Debian ⭐⭐⭐</h2>
+<p>در Debian نیز می‌توان Desktop Environment نصب کرد. ابتدا Repositoryها و Packageها را در اختیار APT داریم.</p>
+<p>برای نصب GNOME:</p>
+<div class="code-container"><span class="code-label">نصب GNOME</span><div class="code-block">sudo apt update
+sudo apt install task-gnome-desktop</div></div>
+<p>در بعضی نصب‌ها می‌توان Desktop Environmentهای دیگری را نیز انتخاب کرد. برای مثال KDE Plasma:</p>
+<div class="code-container"><span class="code-label">نصب KDE</span><div class="code-block">sudo apt install task-kde-desktop</div></div>
+<p>نام دقیق Package/Task می‌تواند بسته به نسخه Debian متفاوت باشد، بنابراین بهتر است قبل از نصب آن را با APT بررسی کنی.</p>
+
+<h2>بررسی وضعیت GUI</h2>
+<p>بعد از نصب می‌توانیم بررسی کنیم Default Target چیست:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>و وضعیت Display Manager را نیز بررسی کنیم. مثلاً در سیستمی که GDM دارد:</p>
+<div class="code-container"><span class="code-label">GDM</span><div class="code-block">systemctl status gdm</div></div>
+<p>یا اگر SDDM استفاده می‌شود:</p>
+<div class="code-container"><span class="code-label">SDDM</span><div class="code-block">systemctl status sddm</div></div>
+
+<h2>GUI از داخل Terminal</h2>
+<p>حتی وقتی GUI داریم، Terminal همچنان در دسترس است. مثلاً:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI
+ │
+ ├── Browser
+ ├── File Manager
+ └── Terminal
+       ↓
+      Shell
+       ↓
+     Commands</div></div>
+<p>پس GUI جای CLI را کاملاً نمی‌گیرد. بلکه:</p>
+<blockquote>GUI و CLI دو روش تعامل با همان سیستم Linux هستند.</blockquote>
+
+<h2>چرا LPIC-1 باید GUI را بشناسد؟</h2>
+<p>ممکن است بگویی:</p>
+<blockquote>«LPIC-1 بیشتر Command Line است، پس چرا GUI؟»</blockquote>
+<p>چون Administrator باید بتواند:</p>
+<ul>
+    <li>Desktop Linux را مدیریت کند.</li>
+    <li>محیط گرافیکی را نصب کند.</li>
+    <li>Display Manager را بشناسد.</li>
+    <li>مشکلات ورود به GUI را تشخیص دهد.</li>
+    <li>Target مناسب systemd را انتخاب کند.</li>
+    <li>از راه دور به محیط گرافیکی دسترسی پیدا کند.</li>
+</ul>
+<p>و جلسات بعد دقیقاً همین موضوعات را ادامه می‌دهند.</p>
+
+<h2>سناریوی ترکیبی</h2>
+
+<h3>سناریو: AlmaLinux Server بدون GUI</h3>
+<p>فرض کن AlmaLinux را نصب کرده‌ای و سیستم در CLI بالا می‌آید. ابتدا بررسی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Boot
+ ↓
+systemd
+ ↓
+multi-user.target
+ ↓
+CLI</div></div>
+<p>حالا تصمیم می‌گیری GUI نصب کنی. بعد از نصب Desktop Environment، بررسی می‌کنی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>اگر هنوز:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+<p>باشد، GUI لزوماً به‌صورت خودکار Default نشده است. آن را تغییر می‌دهی:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">Boot جدید</span><div class="code-block no-prompt">Boot
+ ↓
+systemd
+ ↓
+graphical.target
+ ↓
+Display Manager
+ ↓
+Login Screen
+ ↓
+GNOME
+ ↓
+Desktop</div></div>
+<p>برای اعمال Target فعلی بدون Reboot:</p>
+<div class="code-container"><span class="code-label">isolate</span><div class="code-block">sudo systemctl isolate graphical.target</div></div>
+
+<h2>یک نکته مهم درباره <code>start</code> و <code>set-default</code></h2>
+<p>این موضوع را از فصل systemd به یاد بیاور:</p>
+<div class="code-container"><span class="code-label">start</span><div class="code-block">systemctl start gdm</div></div>
+<p>یعنی: همین الان Service را Start کن. اما:</p>
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block">systemctl set-default graphical.target</div></div>
+<p>یعنی: Target پیش‌فرض Boot را تغییر بده. پس این‌ها یک کار انجام نمی‌دهند.</p>
+
+<h2>اشتباهات رایج ⚠️</h2>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>GNOME همان Linux است.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">درست</span><div class="code-block no-prompt">Linux Kernel
+   ↓
+GNOME</div></div>
+<p>GNOME یک Desktop Environment است.</p>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>X11 همان GNOME است.<br><strong>❌ خیر.</strong><br>X11 سیستم/معماری نمایش است. GNOME Desktop Environment است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>نصب GUI یعنی سیستم حتماً با GUI Boot می‌شود.<br><strong>❌ لزوماً نه.</strong><br>ممکن است Default Target هنوز <code>multi-user.target</code> باشد.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br><code>set-default</code> و <code>isolate</code> یکی هستند.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">set-default → تنظیم پیش‌فرض Boot
+isolate     → تغییر Target فعلی</div></div>
+</div></div>
+
+<h2>نکات مهم</h2>
+<ul>
+    <li><strong>CLI</strong> → تعامل متنی با سیستم.</li>
+    <li><strong>GUI</strong> → تعامل گرافیکی.</li>
+    <li><strong>GNOME / KDE Plasma</strong> → Desktop Environment.</li>
+    <li><strong>X11</strong> → سیستم/معماری گرافیکی قدیمی‌تر.</li>
+    <li><strong>Wayland</strong> → معماری/Protocol مدرن‌تر گرافیکی.</li>
+    <li><strong>Window Manager</strong> → مدیریت Windowها.</li>
+    <li><strong>Display Manager</strong> → Login گرافیکی و آغاز Session.</li>
+    <li><strong>GDM</strong> → Display Manager مرتبط با GNOME.</li>
+    <li><strong>SDDM</strong> → Display Manager رایج KDE.</li>
+    <li><code>graphical.target</code> → محیط گرافیکی.</li>
+    <li><code>multi-user.target</code> → محیط چندکاربره متنی.</li>
+    <li><code>systemctl get-default</code> → Default Target.</li>
+    <li><code>systemctl set-default graphical.target</code> → GUI برای Bootهای بعدی.</li>
+    <li><code>systemctl isolate graphical.target</code> → تغییر Target فعلی.</li>
+</ul>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>برای فهم GUI در Linux، تصور کن Linux یک ساختمان است.</p>
+
+<h3>Kernel</h3>
+<p>پی ساختمان:</p>
+<div class="code-container"><span class="code-label">Kernel</span><div class="code-block no-prompt">Kernel</div></div>
+<p>کار Hardware را مدیریت می‌کند.</p>
+
+<h3>Display System</h3>
+<p>سیستم نمایش:</p>
+<div class="code-container"><span class="code-label">Display</span><div class="code-block no-prompt">X11 / Wayland</div></div>
+
+<h3>Desktop Environment</h3>
+<p>محیطی است که کاربر با آن کار می‌کند:</p>
+<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">GNOME
+KDE Plasma</div></div>
+
+<h3>Display Manager</h3>
+<p>نگهبان ورودی ساختمان:</p>
+<div class="code-container"><span class="code-label">DM</span><div class="code-block no-prompt">GDM
+SDDM</div></div>
+<p>که Login را مدیریت می‌کند.</p>
+
+<p>پس:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Hardware
+   ↓
+Linux Kernel
+   ↓
+X11 / Wayland
+   ↓
+Desktop Environment
+   ↓
+Applications
+   ↓
+User</div></div>
+
+<p>و systemd در Boot تصمیم می‌گیرد سیستم به چه Targetای برسد:</p>
+<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd
+  │
+  ├── multi-user.target → CLI
+  │
+  └── graphical.target  → GUI</div></div>
+
+<p>اگر این ارتباط را فهمیده باشی، بخش بزرگی از مباحث GUI فصل را گرفته‌ای.</p>
+
+<h2>Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">CLI → محیط متنی
+GUI → محیط گرافیکی
+GNOME / KDE Plasma → Desktop Environment
+X11 → سیستم گرافیکی قدیمی‌تر
+Wayland → معماری/Protocol مدرن گرافیکی
+GDM / SDDM → Display Manager
+systemctl get-default → بررسی Default Target
+systemctl set-default graphical.target → GUI در Boot
+systemctl set-default multi-user.target → CLI در Boot
+systemctl isolate graphical.target → GUI همین الان</div></div>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام گزینه یک Desktop Environment است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) X11</button>
+    <button onclick="selectOption(this)">B) Wayland</button>
+    <button onclick="selectOption(this)">C) GNOME</button>
+    <button onclick="selectOption(this)">D) systemd</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — GNOME</strong><br>GNOME یک Desktop Environment است. X11 و Wayland در لایه سیستم گرافیکی قرار می‌گیرند و systemd سیستم init/service manager است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>وظیفه اصلی Display Manager چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) مدیریت Partition</button>
+    <button onclick="selectOption(this)">B) مدیریت Login گرافیکی و آغاز Desktop Session</button>
+    <button onclick="selectOption(this)">C) مدیریت Packageها</button>
+    <button onclick="selectOption(this)">D) مدیریت فایل‌های <code>/etc</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>نمونه‌ها: GDM، SDDM، LightDM</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>کدام Target معمولاً برای محیط گرافیکی استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>boot.target</code></button>
+    <button onclick="selectOption(this)">B) <code>network.target</code></button>
+    <button onclick="selectOption(this)">C) <code>graphical.target</code></button>
+    <button onclick="selectOption(this)">D) <code>shell.target</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — <code>graphical.target</code></strong><br><code>graphical.target</code> → GUI، <code>multi-user.target</code> → CLI</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>برای مشاهده Default Target فعلی کدام دستور صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl show-default</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl get-default</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl default</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl target</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — <code>systemctl get-default</code></strong></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>Administrator می‌خواهد GUI برای Bootهای آینده Default باشد. کدام دستور مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>systemctl start graphical.target</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl isolate graphical.target</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl set-default graphical.target</code></button>
+    <button onclick="selectOption(this)">D) <code>systemctl enable graphical.target.service</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — <code>systemctl set-default graphical.target</code></strong><br>چون هدف سؤال <strong>Default Boot Target</strong> است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام گزینه تفاوت <code>set-default</code> و <code>isolate</code> را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر دو دقیقاً یک کار انجام می‌دهند.</button>
+    <button onclick="selectOption(this)">B) <code>set-default</code> وضعیت فعلی را تغییر می‌دهد و <code>isolate</code> Boot بعدی را.</button>
+    <button onclick="selectOption(this)">C) <code>set-default</code> Default Target را تنظیم می‌کند و <code>isolate</code> Target فعلی را تغییر می‌دهد.</button>
+    <button onclick="selectOption(this)">D) هر دو فقط برای Serviceها هستند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>این یکی از نکات مهم systemd است: <code>set-default → آینده / Boot</code> و <code>isolate → همین الان</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>یک Administrator روی AlmaLinux محیط GNOME را نصب کرده است. بعد از Reboot سیستم همچنان وارد CLI می‌شود. <code>systemctl get-default</code> خروجی زیر را نشان می‌دهد:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+<p>مناسب‌ترین اقدام چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) حذف GNOME</button>
+    <button onclick="selectOption(this)">B) تغییر Default Target به <code>graphical.target</code></button>
+    <button onclick="selectOption(this)">C) حذف systemd</button>
+    <button onclick="selectOption(this)">D) اجرای <code>docker start gnome</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>مثلاً: <code>sudo systemctl set-default graphical.target</code>. بعد از آن، در Boot بعدی سیستم باید به Graphical Target برود؛ البته سالم بودن Desktop و Display Manager نیز باید برقرار باشد.</div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
+<p>اگر فقط این زنجیره را به خاطر بسپاری:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Linux Kernel
+     ↓
+X11 / Wayland
+     ↓
+GNOME / KDE Plasma
+     ↓
+Desktop Applications</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd
+   ↓
+multi-user.target → CLI
+graphical.target  → GUI</div></div>
+<p>و برای مدیریت Boot:</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl get-default
+systemctl set-default graphical.target
+systemctl isolate graphical.target</div></div>
+<p>جلسه بعد می‌رویم سراغ <strong>GUI + Accessibility</strong> و می‌بینیم Linux چگونه محیط گرافیکی را برای کاربران با نیازهای دسترسی متفاوت قابل استفاده‌تر می‌کند.</p>
+</div></div>
+` ,
+"ch6-2": `
+<div class="section-header">
+    <div class="section-badge">۶</div>
+    <div>
+        <h1>GUI + Accessibility</h1>
+        <div class="meta">محیط گرافیکی و دسترسی از راه دور · بخش ۲ از ۵</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>اجزای اصلی یک Desktop Environment را بهتر درک کنی.</li>
+    <li>مفهوم <strong>Accessibility</strong> در Linux را توضیح بدهی.</li>
+    <li>ابزارهای مهم دسترسی‌پذیری مثل <strong>Screen Reader، Magnification و On-Screen Keyboard</strong> را بشناسی.</li>
+    <li>تفاوت Accessibility با تنظیمات معمول GUI را تشخیص بدهی.</li>
+    <li>قابلیت‌های Accessibility در محیط‌هایی مثل GNOME را در حد LPIC-1 مدیریت کنی.</li>
+</ol>
+
+<h2>معرفی جلسه</h2>
+<p>در جلسه قبل یاد گرفتیم که GUI فقط یک «صفحه زیبا» نیست.</p>
+<div class="code-container"><span class="code-label">مرور</span><div class="code-block no-prompt">Linux
+  ↓
+Display System
+  ↓
+Desktop Environment
+  ↓
+Applications
+  ↓
+User</div></div>
+<p>اما همه کاربران به یک شکل با کامپیوتر کار نمی‌کنند. ممکن است کاربری:</p>
+<ul>
+    <li>مشکل بینایی داشته باشد.</li>
+    <li>نتواند به‌راحتی از Mouse استفاده کند.</li>
+    <li>به Keyboard بزرگ‌نمایی‌شده یا مجازی نیاز داشته باشد.</li>
+    <li>به Screen Reader نیاز داشته باشد.</li>
+    <li>به کنتراست یا اندازه متن متفاوت نیاز داشته باشد.</li>
+</ul>
+<p>اینجاست که <strong>Accessibility</strong> مطرح می‌شود.</p>
+<blockquote>Accessibility یعنی طراحی سیستم به‌گونه‌ای که افراد با نیازهای متفاوت نیز بتوانند از آن استفاده کنند.</blockquote>
+
+<h2>Accessibility چیست؟ ⭐⭐⭐</h2>
+<p>در Linux، Accessibility مجموعه‌ای از قابلیت‌ها و تنظیمات است که استفاده از سیستم را برای کاربران مختلف آسان‌تر می‌کند.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">                 GUI
+                  │
+          Accessibility
+                  │
+       ┌──────────┼──────────┐
+       ↓          ↓          ↓
+   Vision      Mobility     Input
+       │          │          │
+ Screen Reader  Mouse       On-Screen
+ Magnification  Keys        Keyboard</div></div>
+<p>هدف:</p>
+<blockquote><strong>تغییر روش تعامل کاربر با سیستم، بدون تغییر عملکرد اصلی سیستم.</strong></blockquote>
+
+<h2>Accessibility در GNOME</h2>
+<p>در GNOME معمولاً تنظیمات Accessibility را از بخش:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Settings → Accessibility</div></div>
+<p>پیدا می‌کنی. بسته به نسخه GNOME، گزینه‌ها ممکن است کمی متفاوت باشند.</p>
+<p>دسته‌های مهم معمولاً شامل:</p>
+<ul>
+    <li>Seeing</li>
+    <li>Hearing</li>
+    <li>Typing</li>
+    <li>Pointing &amp; Clicking</li>
+</ul>
+<p>هستند.</p>
+
+<h2>Seeing — دسترسی برای کاربران دارای مشکل بینایی ⭐⭐⭐</h2>
+<p>یکی از مهم‌ترین بخش‌های Accessibility مربوط به نمایش اطلاعات است.</p>
+
+<h3>Screen Reader</h3>
+<p><strong>Screen Reader</strong> محتوای روی صفحه را به صورت صوتی برای کاربر می‌خواند. در GNOME ابزار معروف:</p>
+<blockquote><strong>Orca</strong></blockquote>
+<p>است.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Application
+     ↓
+Text / UI
+     ↓
+Screen Reader
+     ↓
+Speech
+     ↓
+User</div></div>
+<p>یعنی کاربر لازم نیست حتماً متن را ببیند تا بتواند با سیستم کار کند.</p>
+
+<h3>Orca ⭐⭐⭐</h3>
+<p>Orca یک Screen Reader برای محیط‌های گرافیکی Linux است. کار اصلی:</p>
+<blockquote>خواندن عناصر GUI و اطلاعات صفحه برای کاربر.</blockquote>
+<p>مثلاً وقتی Focus روی یک Button قرار می‌گیرد:</p>
+<div class="code-container"><span class="code-label">دکمه</span><div class="code-block no-prompt">┌───────────────┐
+│    OK         │
+└───────────────┘</div></div>
+<p>Screen Reader می‌تواند به کاربر اطلاع دهد که:</p>
+<blockquote>این عنصر یک Button با نام OK است.</blockquote>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر سؤال پرسید: ابزار Screen Reader معروف در GNOME چیست؟ پاسخ: <strong>Orca</strong></div></div>
+
+<h3>Magnification ⭐⭐⭐</h3>
+<p>گاهی کاربر می‌تواند صفحه را ببیند، اما متن یا عناصر GUI برایش کوچک هستند. در این حالت <strong>Magnification</strong> استفاده می‌شود.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">بزرگ‌نمایی</span><div class="code-block no-prompt">Normal
+┌────────────────┐
+│ Small Text     │
+└────────────────┘
+
+       ↓ Magnify
+
+┌──────────────────────────┐
+│        Large Text        │
+└──────────────────────────┘</div></div>
+<p>Magnifier اندازه قسمت‌هایی از صفحه را بزرگ می‌کند. در GNOME قابلیت بزرگ‌نمایی در تنظیمات Accessibility وجود دارد.</p>
+
+<h3>High Contrast ⭐⭐</h3>
+<p>اگر رنگ‌های معمولی برای کاربر مناسب نباشند، <strong>High Contrast</strong> می‌تواند خوانایی عناصر را افزایش دهد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">کنتراست</span><div class="code-block no-prompt">Normal Contrast
+Text ───── background
+
+High Contrast
+TEXT █████████</div></div>
+<p>هدف: افزایش تفاوت بصری بین Foreground و Background.</p>
+
+<h3>Large Text ⭐⭐</h3>
+<p>یکی دیگر از تنظیمات ساده Accessibility: افزایش اندازه متن. این قابلیت برای کاربرانی مفید است که متن معمولی برایشان کوچک است.</p>
+<p>تفاوت آن با Magnification:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text
+→ متن بزرگ‌تر می‌شود.
+
+Magnification
+→ قسمت‌هایی از صفحه بزرگ‌نمایی می‌شوند.</div></div>
+
+<h2>Hearing — دسترسی برای مشکلات شنوایی ⭐⭐</h2>
+<p>Accessibility فقط مربوط به بینایی نیست. فرض کن برنامه‌ای یک Alert صوتی ایجاد می‌کند. کاربر ممکن است صدا را نشنود. در این حالت می‌توان از <strong>Visual Alerts</strong> استفاده کرد.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">هشدار بصری</span><div class="code-block no-prompt">Audio Alert
+    ↓
+Visual Feedback
+    ↓
+Screen / UI</div></div>
+<p>یعنی به جای اتکا به صدا، یک نشانه بصری نیز نمایش داده شود.</p>
+
+<h2>Typing — دسترسی برای Keyboard ⭐⭐⭐</h2>
+<p>برخی کاربران نمی‌توانند به‌راحتی کلیدها را سریع و همزمان فشار دهند. Linux قابلیت‌هایی برای کمک به این کاربران دارد. مهم‌ترین مفاهیم:</p>
+<ul>
+    <li>Sticky Keys</li>
+    <li>Slow Keys</li>
+    <li>Bounce Keys</li>
+    <li>On-Screen Keyboard</li>
+</ul>
+
+<h3>Sticky Keys ⭐⭐⭐</h3>
+<p>فرض کن باید این کلیدها را همزمان فشار دهی:</p>
+<div class="code-container"><span class="code-label">میانبر</span><div class="code-block no-prompt">Ctrl + Alt + T</div></div>
+<p>برای بعضی کاربران فشار دادن چند کلید همزمان دشوار است. <strong>Sticky Keys</strong> اجازه می‌دهد کلیدهای Modifier مثل:</p>
+<div class="code-container"><span class="code-label">Modifierها</span><div class="code-block no-prompt">Ctrl
+Alt
+Shift
+Super</div></div>
+<p>به‌صورت مرحله‌ای استفاده شوند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">Ctrl
+ ↓
+Alt
+ ↓
+T</div></div>
+<p>به‌جای:</p>
+<div class="code-container"><span class="code-label">همزمان</span><div class="code-block no-prompt">Ctrl + Alt + T</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>Sticky Keys: برای کاربرانی مفید است که فشار دادن چند کلید به‌صورت همزمان برایشان دشوار است.</div></div>
+
+<h3>Slow Keys ⭐⭐</h3>
+<p>Slow Keys برای جلوگیری از ثبت ناخواسته فشارهای کوتاه روی Keyboard طراحی شده است. یعنی سیستم می‌تواند لازم بداند که کلید برای مدت مشخصی نگه داشته شود تا ثبت شود.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">Slow</span><div class="code-block no-prompt">Key Press
+    ↓
+Hold
+    ↓
+Accepted</div></div>
+<p>کاربرد: کاهش ثبت تصادفی کلیدها.</p>
+
+<h3>Bounce Keys ⭐⭐</h3>
+<p>گاهی یک بار فشردن کلید ممکن است به دلیل مشکل فیزیکی یا حرکتی چند بار ثبت شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">ناخواسته</span><div class="code-block no-prompt">a</div></div>
+<p>ناخواسته تبدیل شود به:</p>
+<div class="code-container"><span class="code-label">تکراری</span><div class="code-block no-prompt">aaaa</div></div>
+<p>Bounce Keys می‌تواند بین فشارهای متوالی خیلی سریع محدودیت ایجاد کند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">فیلتر</span><div class="code-block no-prompt">Key
+ ↓
+Rapid Repeated Presses
+ ↓
+Filter
+ ↓
+Single / Controlled Input</div></div>
+
+<h3>On-Screen Keyboard ⭐⭐⭐</h3>
+<p><strong>On-Screen Keyboard (OSK)</strong> یک Keyboard مجازی روی صفحه نمایش است.</p>
+<div class="code-container"><span class="code-label">کیبورد مجازی</span><div class="code-block no-prompt">┌──────────────────────────┐
+│        Application       │
+│                          │
+├──────────────────────────┤
+│ Q W E R T Y U I O P      │
+│ A S D F G H J K L        │
+│ Z X C V B N M            │
+└──────────────────────────┘</div></div>
+<p>کاربر می‌تواند با Mouse یا روش‌های ورودی دیگر روی کلیدها کلیک کند. پس:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">Physical Keyboard
+       یا
+On-Screen Keyboard</div></div>
+
+<h2>Pointing &amp; Clicking ⭐⭐⭐</h2>
+<p>Accessibility برای Mouse و Pointing Device نیز امکاناتی دارد. مثلاً:</p>
+<ul>
+    <li>کنترل سرعت Pointer</li>
+    <li>تنظیم اندازه Pointer</li>
+    <li>قابلیت‌های مربوط به Click</li>
+    <li>کنترل Mouse با Keyboard</li>
+</ul>
+<p>هدف: ساده‌تر کردن کنترل Pointer برای کاربر.</p>
+
+<h3>Mouse Keys ⭐⭐</h3>
+<p><strong>Mouse Keys</strong> اجازه می‌دهد Pointer Mouse را با Keyboard کنترل کنیم.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">کنترل</span><div class="code-block no-prompt">Keyboard
+    ↓
+Mouse Keys
+    ↓
+Pointer</div></div>
+<p>برای کاربری که استفاده از Mouse برایش دشوار است می‌تواند مفید باشد.</p>
+
+<h3>Pointer Size ⭐⭐</h3>
+<p>گاهی پیدا کردن Pointer روی صفحه دشوار است. افزایش اندازه Pointer می‌تواند آن را قابل مشاهده‌تر کند. این قابلیت ساده است، اما مثال خوبی از Accessibility است:</p>
+<blockquote>سیستم همان Mouse را نگه می‌دارد، فقط روش نمایش آن را برای کاربر مناسب‌تر می‌کند.</blockquote>
+
+<h2>Accessibility و Input</h2>
+<p>حالا سه مفهوم را کنار هم بگذار:</p>
+<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Physical Limitation
+       ↓
+┌──────┼─────────┐
+↓      ↓         ↓
+Keyboard Mouse   Vision
+↓      ↓         ↓
+Sticky  Mouse    Orca
+Keys    Keys     Magnifier</div></div>
+<p>هدف همه این‌ها یکی است:</p>
+<blockquote>ایجاد یک مسیر جایگزین برای تعامل با سیستم.</blockquote>
+
+<h2>Keyboard Shortcuts و Accessibility</h2>
+<p>یکی از مزیت‌های مهم GUI این است که بسیاری از کارها را می‌توان با Keyboard انجام داد. مثلاً:</p>
+<div class="code-container"><span class="code-label">Tab</span><div class="code-block no-prompt">Tab</div></div>
+<p>برای حرکت بین عناصر GUI بسیار مهم است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">حرکت</span><div class="code-block no-prompt">Tab
+ ↓
+Button 1
+ ↓
+Button 2
+ ↓
+Input
+ ↓
+Menu</div></div>
+<p>این موضوع برای Accessibility اهمیت زیادی دارد، چون کاربر همیشه نمی‌تواند یا نمی‌خواهد از Mouse استفاده کند.</p>
+
+<h2>Accessibility در Linux فقط GUI نیست</h2>
+<p>این نکته مفهومی مهم است. Accessibility یک Feature صرفاً مربوط به GNOME نیست. ممکن است قابلیت‌های Accessibility در:</p>
+<ul>
+    <li>Desktop Environment</li>
+    <li>Applications</li>
+    <li>Display System</li>
+    <li>Input System</li>
+</ul>
+<p>وجود داشته باشند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">معماری</span><div class="code-block no-prompt">Linux
+  │
+  ├── Desktop
+  │
+  ├── Applications
+  │
+  └── Accessibility
+       ├── Vision
+       ├── Hearing
+       ├── Keyboard
+       └── Pointer</div></div>
+
+<h2>یک نگاه عملی به GNOME</h2>
+<p>در GNOME معمولاً می‌توانی وارد:</p>
+<div class="code-container"><span class="code-label">تنظیمات</span><div class="code-block no-prompt">Settings
+   ↓
+Accessibility</div></div>
+<p>شوی. در آنجا تنظیمات را بر اساس نیاز فعال می‌کنی.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">Seeing
+├── High Contrast
+├── Large Text
+├── Screen Reader
+└── Magnification
+
+Hearing
+└── Visual Alerts
+
+Typing
+├── Sticky Keys
+├── Slow Keys
+├── Bounce Keys
+└── On-Screen Keyboard
+
+Pointing & Clicking
+├── Mouse Keys
+└── Pointer settings</div></div>
+<p>نام و جای دقیق بعضی گزینه‌ها ممکن است بین نسخه‌های GNOME تفاوت داشته باشد.</p>
+
+<h2>Accessibility و Administrator</h2>
+<p>برای LPIC-1 لازم نیست برنامه‌نویسی Accessibility بلد باشی. چیزی که Administrator باید بداند:</p>
+<ol>
+    <li>Accessibility چیست؟</li>
+    <li>چه مشکلاتی را حل می‌کند؟</li>
+    <li>Screen Reader چیست؟</li>
+    <li>Magnification چیست؟</li>
+    <li>Sticky Keys چیست؟</li>
+    <li>On-Screen Keyboard چیست؟</li>
+    <li>تنظیمات Accessibility در Desktop Environment کجا قرار دارند؟</li>
+</ol>
+
+<h2>سناریوی ترکیبی</h2>
+<h3>سناریو: سیستم برای کاربری با نیازهای Accessibility</h3>
+<p>فرض کن یک سیستم AlmaLinux با GNOME داری. کاربر:</p>
+<ul>
+    <li>متن کوچک را سخت می‌بیند.</li>
+    <li>گاهی نمی‌تواند چند کلید را همزمان فشار دهد.</li>
+    <li>ترجیح می‌دهد از Keyboard مجازی نیز استفاده کند.</li>
+</ul>
+
+<h4>مرحله ۱ — ورود به تنظیمات</h4>
+<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block no-prompt">Settings
+   ↓
+Accessibility</div></div>
+
+<h4>مرحله ۲ — بزرگ کردن متن</h4>
+<p>فعال کردن:</p>
+<div class="code-container"><span class="code-label">Large Text</span><div class="code-block no-prompt">Large Text</div></div>
+<p>برای خوانایی بیشتر.</p>
+
+<h4>مرحله ۳ — فعال کردن Magnification</h4>
+<p>اگر Large Text کافی نبود:</p>
+<div class="code-container"><span class="code-label">Magnification</span><div class="code-block no-prompt">Magnification</div></div>
+<p>را فعال می‌کنیم.</p>
+
+<h4>مرحله ۴ — فعال کردن Sticky Keys</h4>
+<p>برای Shortcutهایی که چند Modifier دارند:</p>
+<div class="code-container"><span class="code-label">Sticky Keys</span><div class="code-block no-prompt">Sticky Keys</div></div>
+<p>را فعال می‌کنیم.</p>
+
+<h4>مرحله ۵ — Keyboard مجازی</h4>
+<p>در صورت نیاز:</p>
+<div class="code-container"><span class="code-label">On-Screen Keyboard</span><div class="code-block no-prompt">On-Screen Keyboard</div></div>
+<p>را فعال می‌کنیم.</p>
+
+<h4>نتیجه</h4>
+<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">User
+ │
+ ├── Large Text
+ ├── Magnification
+ ├── Sticky Keys
+ └── On-Screen Keyboard
+          ↓
+       GNOME GUI</div></div>
+<p>یعنی به جای تغییر Application، <strong>روش تعامل کاربر با GUI را مناسب‌تر کرده‌ایم.</strong></p>
+
+<h2>اشتباهات رایج ⚠️</h2>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>Accessibility یعنی فقط Screen Reader.<br><strong>❌ خیر.</strong> Accessibility شامل موارد مختلفی برای Vision، Hearing، Keyboard و Mouse است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>Magnification و Large Text یکی هستند.<br><strong>❌ نه دقیقاً.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text
+→ اندازه متن را افزایش می‌دهد.
+
+Magnification
+→ بخش‌هایی از صفحه را بزرگ می‌کند.</div></div>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>Sticky Keys باعث سریع‌تر شدن Keyboard می‌شود.<br><strong>❌</strong> هدف آن این نیست. Sticky Keys برای کاربری است که فشار دادن چند کلید همزمان برایش دشوار است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>Orca یک Desktop Environment است.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Orca → Screen Reader
+GNOME → Desktop Environment</div></div>
+</div></div>
+
+<h2>نکات مهم</h2>
+<ul>
+    <li>Accessibility = آسان‌تر کردن استفاده از سیستم برای کاربران با نیازهای متفاوت.</li>
+    <li><strong>Orca</strong> = Screen Reader.</li>
+    <li><strong>Magnification</strong> = بزرگ‌نمایی صفحه.</li>
+    <li><strong>Large Text</strong> = افزایش اندازه متن.</li>
+    <li><strong>High Contrast</strong> = افزایش خوانایی با کنتراست بیشتر.</li>
+    <li><strong>Sticky Keys</strong> = امکان استفاده مرحله‌ای از Modifier Keys.</li>
+    <li><strong>Slow Keys</strong> = کاهش ثبت ناخواسته فشارهای سریع.</li>
+    <li><strong>Bounce Keys</strong> = کنترل تکرار سریع ناخواسته کلید.</li>
+    <li><strong>On-Screen Keyboard</strong> = Keyboard مجازی.</li>
+    <li><strong>Mouse Keys</strong> = کنترل Pointer با Keyboard.</li>
+    <li>تنظیمات Accessibility در GNOME معمولاً در <code>Settings → Accessibility</code> قرار دارند.</li>
+</ul>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>فرض کن کامپیوتر یک در است. برای بعضی افراد، در معمولی کاملاً قابل استفاده است. اما برای بعضی‌ها باید روش باز کردن در را تغییر دهیم. Accessibility دقیقاً همین کار را می‌کند.</p>
+<p>اگر کاربر خوب نمی‌بیند:</p>
+<div class="code-container"><span class="code-label">بینایی</span><div class="code-block no-prompt">Screen Reader
+Magnification
+Large Text
+High Contrast</div></div>
+<p>اگر کاربر با Keyboard مشکل دارد:</p>
+<div class="code-container"><span class="code-label">کیبورد</span><div class="code-block no-prompt">Sticky Keys
+Slow Keys
+Bounce Keys
+On-Screen Keyboard</div></div>
+<p>اگر کاربر با Mouse مشکل دارد:</p>
+<div class="code-container"><span class="code-label">ماوس</span><div class="code-block no-prompt">Mouse Keys
+Pointer Settings</div></div>
+<p>پس Accessibility قابلیت سیستم را عوض نمی‌کند؛</p>
+<blockquote><strong>راه تعامل کاربر با سیستم را قابل‌دسترس‌تر می‌کند.</strong></blockquote>
+
+<h2>Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Accessibility → دسترسی‌پذیر کردن GUI
+Orca → Screen Reader
+Magnification → بزرگ‌نمایی صفحه
+Large Text → متن بزرگ‌تر
+High Contrast → کنتراست بیشتر
+Sticky Keys → Modifierها به‌صورت مرحله‌ای
+Slow Keys → جلوگیری از ثبت سریع/ناخواسته
+Bounce Keys → کنترل تکرار سریع کلید
+On-Screen Keyboard → Keyboard مجازی
+Mouse Keys → کنترل Pointer با Keyboard</div></div>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>Orca در محیط Linux چه کاربردی دارد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) مدیریت Printer</button>
+    <button onclick="selectOption(this)">B) Screen Reader</button>
+    <button onclick="selectOption(this)">C) مدیریت Package</button>
+    <button onclick="selectOption(this)">D) مدیریت Network</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Screen Reader</strong><br>Orca برای خواندن عناصر و محتوای GUI به‌صورت صوتی استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>کاربر نمی‌تواند به‌راحتی <code>Ctrl + Alt + T</code> را با هم فشار دهد. کدام قابلیت می‌تواند کمک کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Magnification</button>
+    <button onclick="selectOption(this)">B) Sticky Keys</button>
+    <button onclick="selectOption(this)">C) High Contrast</button>
+    <button onclick="selectOption(this)">D) Bounce Keys</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Sticky Keys</strong><br>Sticky Keys اجازه می‌دهد Modifierها مانند Ctrl و Alt مرحله‌ای استفاده شوند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>کدام گزینه برای بزرگ‌نمایی قسمت‌های صفحه مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Magnification</button>
+    <button onclick="selectOption(this)">B) Sticky Keys</button>
+    <button onclick="selectOption(this)">C) Orca</button>
+    <button onclick="selectOption(this)">D) Mouse Keys</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — Magnification</strong><br>Magnification برای بزرگ‌نمایی محتوای صفحه است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام گزینه تفاوت Large Text و Magnification را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر دو فقط برای Keyboard هستند.</button>
+    <button onclick="selectOption(this)">B) Large Text اندازه متن را افزایش می‌دهد، Magnification صفحه/بخش‌های آن را بزرگ می‌کند.</button>
+    <button onclick="selectOption(this)">C) Large Text یک Screen Reader است.</button>
+    <button onclick="selectOption(this)">D) Magnification فقط برای Mouse است.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Large Text فقط اندازه فونت را بزرگ‌تر می‌کند، در حالی که Magnification کل صفحه یا بخش‌هایی از آن را بزرگ‌نمایی می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>کاربر می‌خواهد با Keyboard، Pointer Mouse را کنترل کند. کدام قابلیت مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Mouse Keys</button>
+    <button onclick="selectOption(this)">B) Sticky Keys</button>
+    <button onclick="selectOption(this)">C) Orca</button>
+    <button onclick="selectOption(this)">D) Visual Alerts</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — Mouse Keys</strong><br>Mouse Keys اجازه می‌دهد Pointer را با صفحه‌کلید کنترل کنید: <code>Keyboard → Mouse Keys → Pointer</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>Bounce Keys بیشتر برای چه مشکلی کاربرد دارد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) بزرگ کردن متن</button>
+    <button onclick="selectOption(this)">B) خواندن متن به صورت صوتی</button>
+    <button onclick="selectOption(this)">C) کنترل ثبت سریع و تکراری ناخواسته کلیدها</button>
+    <button onclick="selectOption(this)">D) اتصال به Printer</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>Bounce Keys از ثبت چندباره یک کلید در اثر فشارهای ناخواسته و سریع جلوگیری می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>کاربری در یک سیستم GNOME:</p>
+<ul>
+    <li>متن کوچک را سخت می‌بیند.</li>
+    <li>نمی‌تواند چند کلید را همزمان فشار دهد.</li>
+    <li>می‌خواهد Keyboard مجازی داشته باشد.</li>
+</ul>
+<p>کدام ترکیب منطقی‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Orca + Mouse Keys + Visual Alerts</button>
+    <button onclick="selectOption(this)">B) Large Text/Magnification + Sticky Keys + On-Screen Keyboard</button>
+    <button onclick="selectOption(this)">C) Bounce Keys + High Contrast + Printer</button>
+    <button onclick="selectOption(this)">D) Wayland + X11 + GDM</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون هر قابلیت یک مشکل مشخص را حل می‌کند: متن کوچک → Large Text / Magnification، فشار همزمان کلیدها → Sticky Keys، Keyboard فیزیکی → On-Screen Keyboard.</div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
+<p>این چهار دسته را در ذهنت نگه دار:</p>
+<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Accessibility
+│
+├── 👁 Vision
+│    ├── Orca
+│    ├── Magnification
+│    ├── Large Text
+│    └── High Contrast
+│
+├── 👂 Hearing
+│    └── Visual Alerts
+│
+├── ⌨️ Typing
+│    ├── Sticky Keys
+│    ├── Slow Keys
+│    ├── Bounce Keys
+│    └── On-Screen Keyboard
+│
+└── 🖱 Pointing
+     └── Mouse Keys</div></div>
+<p>جلسه بعد: <strong>Remote Desktop + Local Access</strong>؛ یعنی بعد از اینکه GUI را شناختیم، یاد می‌گیریم چگونه به یک Linux Desktop از راه دور یا به Sessionهای محلی دسترسی پیدا کنیم.</p>
+</div></div>
+` ,
+"ch6-3": `
+<div class="section-header">
+    <div class="section-badge">۶</div>
+    <div>
+        <h1>Remote Desktop + Local Access</h1>
+        <div class="meta">محیط گرافیکی و دسترسی از راه دور · بخش ۳ از ۵</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>مفهوم <strong>Local Access</strong> و <strong>Remote Access</strong> را از هم تفکیک کنی.</li>
+    <li>تفاوت روش‌های مهم دسترسی به Linux از راه دور را بفهمی.</li>
+    <li>مفهوم <strong>SSH</strong> و ارتباط آن با Remote Access را درک کنی.</li>
+    <li>با <strong>X11 Forwarding</strong> و اجرای برنامه‌های گرافیکی از طریق SSH آشنا شوی.</li>
+    <li>مفهوم Remote Desktop و ابزارهایی مانند <strong>VNC</strong> را در سطح LPIC-1 بشناسی.</li>
+</ol>
+
+<h2>معرفی جلسه</h2>
+<p>تا اینجا GUI را روی Linux شناختیم. حالا یک سؤال مهم:</p>
+<blockquote>اگر Linux روی یک Server در اتاق دیگری باشد، چطور از کامپیوتر خودمان با آن کار کنیم؟</blockquote>
+<p>دو حالت داریم:</p>
+<div class="code-container"><span class="code-label">دسترسی</span><div class="code-block no-prompt">Local Access
+    ↓
+همان سیستم / همان محیط
+
+Remote Access
+    ↓
+سیستم دیگری از طریق Network</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Your PC
+   │
+   │ Network
+   ↓
+Linux Server
+   ↓
+GUI</div></div>
+<p>در مدیریت Linux، Remote Access بسیار مهم است؛ چون Administrator معمولاً لازم نیست کنار Server حضور فیزیکی داشته باشد.</p>
+
+<h2>Local Access چیست؟ ⭐⭐⭐</h2>
+<p><strong>Local Access</strong> یعنی کاربر مستقیماً به همان سیستم Linux دسترسی دارد. مثلاً:</p>
+<div class="code-container"><span class="code-label">محلی</span><div class="code-block no-prompt">Keyboard + Monitor
+        ↓
+    Linux PC</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Linux VM
+   ↓
+VM Console
+   ↓
+Login</div></div>
+<p>در این حالت ارتباط Network برای دسترسی به خود سیستم ضروری نیست.</p>
+
+<h2>Virtual Console در Linux ⭐⭐⭐</h2>
+<p>Linux می‌تواند چند Console متنی داشته باشد. معمولاً با کلیدهای:</p>
+<div class="code-container"><span class="code-label">کلیدها</span><div class="code-block no-prompt">Ctrl + Alt + F1
+Ctrl + Alt + F2
+...</div></div>
+<p>می‌توان بین Virtual Terminalها جابه‌جا شد؛ شماره و رفتار دقیق Function Keyها بسته به Desktop/Distribution و پیکربندی سیستم می‌تواند متفاوت باشد. ممکن است یک Console گرافیکی نیز وجود داشته باشد.</p>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Linux System
+│
+├── Virtual Terminal
+├── Virtual Terminal
+├── Virtual Terminal
+└── GUI Session</div></div>
+
+<h2>TTY چیست؟ ⭐⭐⭐</h2>
+<p>در Linux اصطلاح <strong>TTY</strong> را زیاد می‌بینی. به‌صورت ساده:</p>
+<blockquote>TTY یک Terminal/Console متنی برای تعامل با سیستم است.</blockquote>
+<p>مثلاً ممکن است ببینی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tty</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/dev/tty2</div></div>
+<p>این یعنی Shell فعلی به یک Terminal خاص متصل است.</p>
+
+<h2>GUI Local Access</h2>
+<p>اگر GUI نصب و فعال باشد، Local Access می‌تواند به این شکل باشد:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Monitor
+   ↓
+Display Manager
+   ↓
+Login
+   ↓
+Desktop Environment
+   ↓
+Application</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Monitor
+   ↓
+GDM
+   ↓
+GNOME
+   ↓
+Terminal</div></div>
+<p>این همان چیزی است که در جلسه‌های قبل ساختار آن را یاد گرفتیم.</p>
+
+<h2>Remote Access چیست؟ ⭐⭐⭐</h2>
+<p>حالا فرض کن Server در Data Center است.</p>
+<div class="code-container"><span class="code-label">راه دور</span><div class="code-block no-prompt">Administrator PC
+       │
+       │ Network
+       ↓
+ Linux Server</div></div>
+<p>Administrator از طریق Network به Server وصل می‌شود. این می‌شود:</p>
+<blockquote><strong>Remote Access</strong></blockquote>
+<p>دو دسته کلی را می‌توانیم در نظر بگیریم:</p>
+<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Remote Access
+│
+├── Command-line access
+│      └── SSH
+│
+└── Graphical access
+       └── Remote Desktop / VNC</div></div>
+
+<h2>SSH — مهم‌ترین روش Remote Access ⭐⭐⭐</h2>
+<p><strong>SSH (Secure Shell)</strong> مهم‌ترین ابزار Remote Access متنی در Linux است. با SSH می‌توانی:</p>
+<ul>
+    <li>Login کنی.</li>
+    <li>Command اجرا کنی.</li>
+    <li>فایل منتقل کنی.</li>
+    <li>سیستم را مدیریت کنی.</li>
+</ul>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Client
+  │
+  │ SSH
+  ↓
+Server
+  │
+  ↓
+Shell</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">اتصال</span><div class="code-block">ssh user@192.168.1.100</div></div>
+<p>یعنی: با کاربر <code>user</code> به سیستم دارای IP <code>192.168.1.100</code> متصل شو.</p>
+
+<h2>چرا SSH مهم است؟ ⭐⭐⭐</h2>
+<p>SSH ارتباط را به‌صورت امن برقرار می‌کند. در مقایسه با روش‌های قدیمی و ناامن، SSH برای مدیریت Remote Linux بسیار مناسب‌تر است. به همین دلیل در Server Administration بسیار رایج است.</p>
+
+<h2>SSH و GUI چه ارتباطی دارند؟</h2>
+<p>یک نکته جالب:</p>
+<blockquote>SSH فقط برای Command Line نیست.</blockquote>
+<p>می‌توان از SSH برای اجرای بعضی برنامه‌های گرافیکی نیز استفاده کرد. این کار با <strong>X11 Forwarding</strong> امکان‌پذیر است.</p>
+
+<h2>X11 Forwarding ⭐⭐⭐</h2>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">Your PC
+   │
+   │ SSH
+   ↓
+Linux Server
+   │
+   └── GUI Application</div></div>
+<p>می‌خواهی یک برنامه GUI روی Server اجرا شود، اما Window آن روی سیستم خودت نمایش داده شود. می‌توان از:</p>
+<div class="code-container"><span class="code-label">اتصال با X11</span><div class="code-block">ssh -X user@server</div></div>
+<p>استفاده کرد. بعد مثلاً:</p>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">xclock</div></div>
+<p>را اجرا کنی. در معماری X11، Window برنامه از طریق SSH به سیستم Client منتقل می‌شود.</p>
+<p>مدل مفهومی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Linux Server
+   │
+   └── GUI Application
+          │
+          │ X11 Forwarding
+          ↓
+       SSH Connection
+          ↓
+        Client
+          ↓
+        Window</div></div>
+
+<h2><code>ssh -X</code> و <code>ssh -Y</code> ⭐⭐</h2>
+<p>دو گزینه معروف:</p>
+<div class="code-container"><span class="code-label">ssh -X</span><div class="code-block">ssh -X user@server</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">ssh -Y</span><div class="code-block">ssh -Y user@server</div></div>
+<p>برای X11 Forwarding استفاده می‌شوند. در سطح LPIC-1 بیشتر از همه باید مفهوم <code>-X</code> را بشناسی.</p>
+
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>X11 Forwarding با Remote Desktop کامل یکی نیست. یعنی:
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">ssh -X
+→ اجرای برنامه گرافیکی
+
+Remote Desktop
+→ دسترسی به یک Desktop Session</div></div>
+این تفاوت را حفظ کن.</div></div>
+
+<h2>Remote Desktop چیست؟ ⭐⭐⭐</h2>
+<p>در Remote Desktop هدف این است که کاربر از سیستم دیگری بتواند محیط گرافیکی سیستم مقصد را ببیند و کنترل کند.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Local Computer
+      │
+      │ Network
+      ↓
+Remote Linux
+      │
+      ↓
+Desktop Session</div></div>
+<p>مثلاً Administrator روی Laptop خودش محیط Desktop Server را مشاهده می‌کند.</p>
+
+<h2>VNC ⭐⭐⭐</h2>
+<p>یکی از فناوری‌های معروف Remote Desktop:</p>
+<blockquote><strong>VNC — Virtual Network Computing</strong></blockquote>
+<p>VNC برای مشاهده و کنترل Desktop از راه دور استفاده می‌شود.</p>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">VNC</span><div class="code-block no-prompt">VNC Client
+    │
+    │ Network
+    ↓
+VNC Server
+    │
+    ↓
+Remote Desktop</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block no-prompt">┌─────────────────────┐
+│ Your Computer       │
+│                     │
+│    VNC Client       │
+└──────────┬──────────┘
+           │
+         Network
+           │
+┌──────────▼──────────┐
+│ Linux Server        │
+│                     │
+│   VNC Server        │
+│       ↓             │
+│      GUI            │
+└─────────────────────┘</div></div>
+
+<h2>VNC Client و VNC Server</h2>
+<p>دو طرف ارتباط را جدا کن:</p>
+
+<h3>VNC Server</h3>
+<p>روی سیستم مقصد اجرا می‌شود:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Remote Linux
+   ↓
+VNC Server</div></div>
+
+<h3>VNC Client</h3>
+<p>روی سیستم Administrator اجرا می‌شود:</p>
+<div class="code-container"><span class="code-label">Client</span><div class="code-block no-prompt">Administrator PC
+   ↓
+VNC Client</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">اتصال</span><div class="code-block no-prompt">Client → connects to → Server</div></div>
+<p>این قاعده در بسیاری از سرویس‌های Network صدق می‌کند.</p>
+
+<h2>Remote Desktop با SSH فرق دارد ⭐⭐⭐</h2>
+<p>این تفاوت بسیار مهم است.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>SSH</th><th>Remote Desktop</th></tr></thead>
+<tbody>
+<tr><td>معمولاً CLI</td><td>GUI</td></tr>
+<tr><td>مناسب Administration</td><td>مناسب تعامل کامل گرافیکی</td></tr>
+<tr><td>Shell Session</td><td>Desktop Session</td></tr>
+<tr><td>سبک‌تر</td><td>معمولاً منابع بیشتر</td></tr>
+<tr><td>مثال: <code>ssh</code></td><td>مثال: VNC</td></tr>
+</tbody>
+</table>
+</div>
+<p>پس اگر فقط می‌خواهی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl status sshd</div></div>
+<p>را اجرا کنی، Remote Desktop لازم نیست. SSH کافی است. اما اگر می‌خواهی:</p>
+<div class="code-container"><span class="code-label">Desktop</span><div class="code-block no-prompt">Desktop
+├── Window
+├── File Manager
+├── Browser
+└── GUI Applications</div></div>
+<p>را از راه دور کنترل کنی، Remote Desktop مناسب‌تر است.</p>
+
+<h2>Remote Desktop و Security ⭐⭐⭐</h2>
+<p>Remote Desktop را نباید بدون توجه به امنیت روی شبکه قرار داد.</p>
+<p>مشکل:</p>
+<div class="code-container"><span class="code-label">خطر</span><div class="code-block no-prompt">Internet
+   ↓
+Remote Desktop</div></div>
+<p>اگر سرویس به‌درستی محافظت نشده باشد، خطر امنیتی ایجاد می‌کند. در محیط واقعی باید به مواردی مثل:</p>
+<ul>
+    <li>Authentication</li>
+    <li>Firewall</li>
+    <li>Encryption</li>
+    <li>محدود کردن دسترسی</li>
+</ul>
+<p>توجه کرد. برای مدیریت Server، معمولاً SSH انتخاب اول است؛ مخصوصاً وقتی نیازی به GUI نداریم.</p>
+
+<h2>SSH Tunnel — فقط مفهوم ⭐⭐</h2>
+<p>یکی از کاربردهای SSH ایجاد یک <strong>Tunnel</strong> امن است.</p>
+<p>مدل مفهومی:</p>
+<div class="code-container"><span class="code-label">Tunnel</span><div class="code-block no-prompt">Client
+   │
+   │ Encrypted SSH Tunnel
+   ↓
+Server
+   │
+   ↓
+Service</div></div>
+<p>این موضوع در LPIC-1 بیشتر در حد شناخت مفهوم اهمیت دارد. فعلاً لازم نیست وارد Port Forwardingهای پیچیده شویم.</p>
+
+<h2>Local vs Remote</h2>
+<p>حالا تفاوت را کاملاً روشن کنیم:</p>
+
+<h3>Local</h3>
+<div class="code-container"><span class="code-label">محلی</span><div class="code-block no-prompt">Keyboard
+   ↓
+Linux
+   ↓
+Desktop</div></div>
+
+<h3>Remote CLI</h3>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">PC
+ │
+ │ SSH
+ ↓
+Linux
+ │
+ ↓
+Shell</div></div>
+
+<h3>Remote GUI</h3>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">PC
+ │
+ │ Remote Desktop
+ ↓
+Linux
+ │
+ ↓
+Desktop</div></div>
+
+<h3>Remote GUI Application با X11</h3>
+<div class="code-container"><span class="code-label">X11</span><div class="code-block no-prompt">PC
+ │
+ │ SSH + X11 Forwarding
+ ↓
+Linux
+ │
+ ↓
+GUI Application
+ │
+ ↓
+Window روی Client</div></div>
+<p>این چهار حالت را قاطی نکن.</p>
+
+<h2>چه زمانی از کدام استفاده کنیم؟ ⭐⭐⭐</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>نیاز</th><th>روش مناسب</th></tr></thead>
+<tbody>
+<tr><td>اجرای Command روی Server</td><td>SSH</td></tr>
+<tr><td>مدیریت Server</td><td>SSH</td></tr>
+<tr><td>انتقال امن فایل</td><td>SSH/SCP/SFTP</td></tr>
+<tr><td>اجرای یک GUI Application</td><td>X11 Forwarding</td></tr>
+<tr><td>کنترل کامل Desktop</td><td>Remote Desktop / VNC</td></tr>
+<tr><td>حضور فیزیکی کنار Server</td><td>Local Access</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>سناریوی ترکیبی</h2>
+<h3>سناریو: مدیریت یک Linux Server</h3>
+<p>فرض کن یک Server داری:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Server IP:
+192.168.1.50</div></div>
+<p>می‌خواهی از Laptop آن را مدیریت کنی.</p>
+
+<h4>مرحله ۱ — SSH</h4>
+<div class="code-container"><span class="code-label">اتصال</span><div class="code-block">ssh admin@192.168.1.50</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Laptop
+   ↓ SSH
+Server
+   ↓
+Shell</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl status sshd</div></div>
+
+<h4>مرحله ۲ — اجرای برنامه GUI</h4>
+<p>فرض کن یک برنامه X11 روی Server داری. از Client:</p>
+<div class="code-container"><span class="code-label">اتصال با X11</span><div class="code-block">ssh -X admin@192.168.1.50</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">xclock</div></div>
+<p>اگر زیرساخت X11 و برنامه لازم موجود باشد، Window برنامه روی Client نمایش داده می‌شود.</p>
+
+<h4>مرحله ۳ — نیاز به Desktop کامل</h4>
+<p>حالا فرض کن Administrator می‌خواهد کل Desktop را کنترل کند. SSH به‌تنهایی انتخاب مناسبی برای این نیاز نیست. اینجا باید از Remote Desktop مانند VNC استفاده شود.</p>
+<div class="code-container"><span class="code-label">VNC</span><div class="code-block no-prompt">Laptop
+   │
+   │ VNC
+   ↓
+Server
+   │
+   ↓
+Desktop</div></div>
+
+<h2>اشتباهات رایج ⚠️</h2>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>SSH یعنی Remote Desktop.<br><strong>❌ خیر.</strong> SSH عمدتاً برای Remote Shell است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br><code>ssh -X</code> کل Desktop را منتقل می‌کند.<br><strong>❌ خیر.</strong> X11 Forwarding برای اجرای <strong>برنامه‌های گرافیکی</strong> است، نه لزوماً انتقال کامل Desktop.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>VNC همان SSH است.<br><strong>❌ خیر.</strong> VNC فناوری Remote Desktop است. SSH فناوری Secure Shell است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>برای مدیریت هر Linux Server باید GUI نصب کنیم.<br><strong>❌ کاملاً اشتباه.</strong> اغلب Serverها را می‌توان کاملاً از طریق SSH مدیریت کرد.</div></div>
+
+<h2>نکته مهم درباره X11 و Wayland ⭐⭐</h2>
+<p>در جلسه اول گفتیم:</p>
+<div class="code-container"><span class="code-label">فناوری‌ها</span><div class="code-block no-prompt">X11
+Wayland</div></div>
+<p>دو فناوری مهم در دنیای Linux GUI هستند. X11 Forwarding مستقیماً به معماری X11 مربوط است. بنابراین این دو مفهوم را با هم قاطی نکن:</p>
+<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">SSH
+ └── X11 Forwarding</div></div>
+<p>در مقابل:</p>
+<div class="code-container"><span class="code-label">Remote Desktop</span><div class="code-block no-prompt">Remote Desktop
+ └── انتقال/دسترسی به محیط Desktop</div></div>
+<p>در سیستم‌های مدرن مبتنی بر Wayland، روش‌های Remote GUI ممکن است معماری متفاوتی داشته باشند؛ بنابراین <code>ssh -X</code> را نباید به‌عنوان راه‌حل عمومی همه Remote Desktopهای مدرن در نظر گرفت.</p>
+
+<h2>نکات مهم</h2>
+<ul>
+    <li><strong>Local Access</strong> → دسترسی مستقیم به همان سیستم.</li>
+    <li><strong>Remote Access</strong> → دسترسی از طریق Network.</li>
+    <li><strong>SSH</strong> → مهم‌ترین روش Remote CLI در Linux.</li>
+    <li><code>ssh user@host</code> → اتصال SSH.</li>
+    <li><code>ssh -X user@host</code> → X11 Forwarding.</li>
+    <li>X11 Forwarding → اجرای برنامه GUI، نه انتقال کامل Desktop.</li>
+    <li><strong>VNC</strong> → Remote Desktop.</li>
+    <li>VNC Server روی سیستم مقصد و VNC Client روی سیستم کاربر قرار می‌گیرد.</li>
+    <li>برای مدیریت معمول Server، SSH معمولاً از Remote Desktop مناسب‌تر و سبک‌تر است.</li>
+    <li>Remote Desktop نیازمند توجه جدی به Security است.</li>
+</ul>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>سه نفر را تصور کن:</p>
+
+<h3>نفر اول: Administrator</h3>
+<p>می‌گوید: «فقط می‌خواهم روی Server دستور اجرا کنم.» پس:</p>
+<div class="code-container"><span class="code-label">SSH</span><div class="code-block no-prompt">SSH</div></div>
+
+<h3>نفر دوم:</h3>
+<p>می‌گوید: «یک برنامه گرافیکی روی Server دارم و می‌خواهم Window آن را روی کامپیوتر خودم ببینم.» می‌تواند از:</p>
+<div class="code-container"><span class="code-label">SSH + X11</span><div class="code-block no-prompt">SSH + X11 Forwarding</div></div>
+<p>استفاده کند، در شرایطی که X11 پشتیبانی شود.</p>
+
+<h3>نفر سوم:</h3>
+<p>می‌گوید: «می‌خواهم کل Desktop Server را از راه دور ببینم و کنترل کنم.» پس به:</p>
+<div class="code-container"><span class="code-label">Remote Desktop</span><div class="code-block no-prompt">Remote Desktop
+   ↓
+VNC و فناوری‌های مشابه</div></div>
+<p>نیاز دارد.</p>
+
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Remote Access
+│
+├── CLI
+│    └── SSH
+│
+├── GUI Application
+│    └── X11 Forwarding
+│
+└── Full Desktop
+     └── Remote Desktop / VNC</div></div>
+<p>این مهم‌ترین مدل ذهنی جلسه است.</p>
+
+<h2>Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">ssh user@host → Remote Shell
+ssh -X user@host → X11 Forwarding
+SSH → Remote CLI / Administration
+X11 Forwarding → اجرای GUI Application
+VNC → Remote Desktop
+VNC Server → سیستم مقصد
+VNC Client → سیستم کاربر
+Local Access → دسترسی مستقیم به سیستم
+Remote Access → دسترسی از طریق Network</div></div>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>مناسب‌ترین ابزار برای مدیریت CLI یک Linux Server از راه دور چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) VNC</button>
+    <button onclick="selectOption(this)">B) SSH</button>
+    <button onclick="selectOption(this)">C) GNOME</button>
+    <button onclick="selectOption(this)">D) Orca</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — SSH</strong><br>SSH ابزار اصلی Remote Shell در Linux است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>دستور زیر چه کاری انجام می‌دهد؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ssh -X user@server</div></div>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) کل Desktop را با VNC منتقل می‌کند.</button>
+    <button onclick="selectOption(this)">B) یک SSH Connection با X11 Forwarding برقرار می‌کند.</button>
+    <button onclick="selectOption(this)">C) Server را Reboot می‌کند.</button>
+    <button onclick="selectOption(this)">D) GUI را نصب می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>-X</code> برای X11 Forwarding است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>Administrator می‌خواهد کل Desktop یک Linux Server را از راه دور کنترل کند. کدام گزینه مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>ls</code></button>
+    <button onclick="selectOption(this)">B) SSH Shell</button>
+    <button onclick="selectOption(this)">C) VNC / Remote Desktop</button>
+    <button onclick="selectOption(this)">D) <code>systemctl</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>SSH Shell معمولاً Desktop کامل را ارائه نمی‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام گزینه تفاوت SSH و VNC را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) SSH برای GUI و VNC برای CLI است.</button>
+    <button onclick="selectOption(this)">B) هر دو دقیقاً یک فناوری هستند.</button>
+    <button onclick="selectOption(this)">C) SSH عمدتاً برای Remote Shell است و VNC برای Remote Desktop.</button>
+    <button onclick="selectOption(this)">D) VNC فقط برای Local Access است.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>SSH عمدتاً برای Remote Shell است و VNC برای Remote Desktop.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>در X11 Forwarding، معمولاً چه چیزی روی Client نمایش داده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) کل Kernel</button>
+    <button onclick="selectOption(this)">B) Window برنامه گرافیکی اجراشده روی Server</button>
+    <button onclick="selectOption(this)">C) کل فایل‌سیستم Server</button>
+    <button onclick="selectOption(this)">D) BIOS Server</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>برنامه روی Server اجرا می‌شود، اما خروجی گرافیکی آن می‌تواند روی Client نمایش داده شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام گزینه درباره VNC Server صحیح است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) معمولاً روی سیستم مقصد قرار دارد.</button>
+    <button onclick="selectOption(this)">B) فقط روی Client نصب می‌شود.</button>
+    <button onclick="selectOption(this)">C) همان SSH Client است.</button>
+    <button onclick="selectOption(this)">D) وظیفه آن مدیریت Packageهاست.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>مدل ساده: <code>VNC Client → VNC Server → Desktop</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>یک Administrator می‌خواهد Server را از خانه مدیریت کند. بیشتر کارهای او شامل اجرای این دستورات است:</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl status nginx
+df -h
+journalctl</div></div>
+<p>اما گاهی نیز می‌خواهد یک برنامه GUI خاص را اجرا کند و Window آن را روی کامپیوتر شخصی خود ببیند. کدام راهکار مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) برای همه کارها VNC استفاده کند.</button>
+    <button onclick="selectOption(this)">B) فقط GUI نصب کند و SSH را حذف کند.</button>
+    <button onclick="selectOption(this)">C) برای Administration از SSH و در صورت پشتیبانی برای برنامه GUI از X11 Forwarding استفاده کند.</button>
+    <button onclick="selectOption(this)">D) فقط Local Access استفاده کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>چون نیازها متفاوت‌اند: <code>Administration → SSH</code> و <code>GUI Application → SSH + X11 Forwarding</code>. استفاده از Remote Desktop کامل برای کارهایی که با SSH به‌سادگی انجام می‌شوند، معمولاً غیرضروری است.</div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
+<p>فقط این سؤال را از خودت بپرس:</p>
+<blockquote>«می‌خواهم از راه دور چه چیزی را کنترل کنم؟»</blockquote>
+<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block no-prompt">Command
+  ↓
+ SSH
+
+یک GUI Application
+  ↓
+ SSH + X11 Forwarding
+
+کل Desktop
+  ↓
+ Remote Desktop / VNC</div></div>
+<p>جلسه بعد می‌رویم سراغ <strong>Time Management + Printer Management</strong> و دو مهارت مهم مدیریت سیستم را کنار هم یاد می‌گیریم: تنظیم صحیح زمان سیستم و مدیریت Printer در Linux.</p>
+</div></div>
+` ,
+"ch6-4": `
+<div class="section-header">
+    <div class="section-badge">۶</div>
+    <div>
+        <h1>Time Management + Printer Management</h1>
+        <div class="meta">محیط گرافیکی و دسترسی از راه دور · بخش ۴ از ۵</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>تفاوت <strong>System Time</strong> و <strong>Hardware/RTC Clock</strong> را توضیح بدهی.</li>
+    <li>زمان و Timezone سیستم Linux را با ابزارهای استاندارد بررسی و تنظیم کنی.</li>
+    <li>مفهوم <strong>NTP</strong> و سرویس <strong>chrony</strong> را درک کنی.</li>
+    <li>معماری کلی چاپ در Linux و نقش <strong>CUPS</strong> را بشناسی.</li>
+    <li>Printer را با ابزارهای خط فرمان در حد LPIC-1 مدیریت و عیب‌یابی کنی.</li>
+</ol>
+
+<h2>معرفی جلسه</h2>
+<p>دو موضوع ظاهراً متفاوت داریم، اما هر دو از کارهای معمول Administrator هستند:</p>
+<div class="code-container"><span class="code-label">مدیریت سیستم</span><div class="code-block no-prompt">System Administration
+│
+├── Time Management
+│    ├── Time
+│    ├── Timezone
+│    └── NTP / chrony
+│
+└── Printer Management
+     ├── CUPS
+     ├── Printer
+     └── Print Jobs</div></div>
+<p>چرا Time مهم است؟ چون اگر ساعت سیستم اشتباه باشد:</p>
+<ul>
+    <li>Logها زمان اشتباه دارند.</li>
+    <li>Authentication ممکن است مشکل پیدا کند.</li>
+    <li>Certificateها ممکن است نامعتبر به نظر برسند.</li>
+    <li>ارتباطات Network و سرویس‌های زمان‌محور دچار مشکل می‌شوند.</li>
+</ul>
+<p>Printer هم یکی از سرویس‌های کلاسیک Linux Desktop است و شناخت <strong>CUPS</strong> برای LPIC-1 مهم است.</p>
+
+<h2>بخش اول — Time Management</h2>
+
+<h3>سه مفهوم مهم زمان در Linux ⭐⭐⭐</h3>
+<p>قبل از دستورها، این سه مفهوم را جدا کن:</p>
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">System Clock
+      +
+Hardware Clock (RTC)
+      +
+Timezone</div></div>
+<p>این‌ها یکی نیستند.</p>
+
+<h3>System Clock ⭐⭐⭐</h3>
+<p><strong>System Clock</strong> ساعتی است که Kernel و سیستم‌عامل از آن استفاده می‌کنند. مثلاً:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">date</div></div>
+<p>ممکن است نشان دهد:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Thu Aug 27 02:10:15 +0330 2026</div></div>
+<p>این همان زمانی است که بسیاری از برنامه‌ها و Logهای سیستم استفاده می‌کنند.</p>
+
+<h3>Hardware Clock / RTC ⭐⭐⭐</h3>
+<p>کامپیوتر یک ساعت سخت‌افزاری نیز دارد که معمولاً با نام:</p>
+<blockquote>RTC — Real-Time Clock</blockquote>
+<p>شناخته می‌شود. این ساعت حتی وقتی سیستم‌عامل در حال اجرا نیست، می‌تواند زمان را نگه دارد؛ معمولاً با باتری مادربرد. مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">RTC</span><div class="code-block no-prompt">Hardware
+   │
+   └── RTC
+        │
+        │ هنگام Boot
+        ↓
+      Linux
+        │
+        ↓
+   System Clock</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">RTC ≠ System Clock</div></div>
+<p>هرچند Linux می‌تواند آن‌ها را با هم هماهنگ کند.</p>
+
+<h3>مشاهده System Time ⭐⭐⭐</h3>
+<p>ساده‌ترین دستور:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">date</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Thu Aug 27 02:15:30 +0330 2026</div></div>
+<p>برای دیدن زمان به شکل‌های مختلف نیز می‌توان از گزینه‌های <code>date</code> استفاده کرد. مثلاً:</p>
+<div class="code-container"><span class="code-label">فرمت</span><div class="code-block">date +"%Y-%m-%d %H:%M:%S"</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">2026-08-27 02:15:30</div></div>
+<p>در LPIC-1 مهم است بدانی <code>date</code> برای <strong>نمایش و تنظیم تاریخ/زمان سیستم</strong> استفاده می‌شود.</p>
+
+<h3>تنظیم دستی System Time ⭐⭐</h3>
+<p>اگر لازم باشد زمان سیستم را دستی تغییر دهی، <code>date</code> می‌تواند این کار را انجام دهد. مثلاً:</p>
+<div class="code-container"><span class="code-label">تنظیم</span><div class="code-block">sudo date -s "2026-08-27 03:00:00"</div></div>
+<p>اما در یک سیستم واقعی معمولاً ترجیح می‌دهیم زمان را از یک Time Server بگیریم. چرا؟ چون ساعت سیستم باید دائماً دقیق بماند.</p>
+
+<h3>مشاهده Hardware Clock ⭐⭐⭐</h3>
+<p>برای RTC از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo hwclock</div></div>
+<p>استفاده می‌شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">sudo hwclock --show</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">sudo hwclock -r</div></div>
+<p>این دستور زمان Hardware Clock را نشان می‌دهد. پس:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">date
+  ↓
+System Clock
+
+hwclock
+  ↓
+Hardware Clock / RTC</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+اگر سؤال بپرسد: «کدام ابزار برای دسترسی به Hardware Clock استفاده می‌شود؟» پاسخ: <code>hwclock</code></div></div>
+
+<h3>System Clock و Hardware Clock را هماهنگ کنیم ⭐⭐</h3>
+<p><code>hwclock</code> گزینه‌هایی برای انتقال زمان بین دو Clock دارد. به صورت مفهومی:</p>
+<div class="code-container"><span class="code-label">جهت‌ها</span><div class="code-block no-prompt">System Clock → RTC
+RTC → System Clock</div></div>
+<p>گزینه‌های مهم:</p>
+<div class="code-container"><span class="code-label">systohc</span><div class="code-block">sudo hwclock --systohc</div></div>
+<p>یعنی: System Clock → Hardware Clock</p>
+<div class="code-container"><span class="code-label">hctosys</span><div class="code-block">sudo hwclock --hctosys</div></div>
+<p>یعنی: Hardware Clock → System Clock</p>
+<p>در سیستم‌های مدرن معمولاً سرویس زمان‌بندی Network مدیریت زمان را انجام می‌دهد، بنابراین این دستورات بیشتر برای شناخت و برخی سناریوهای مدیریتی مهم‌اند.</p>
+
+<h3>Timezone چیست؟ ⭐⭐⭐</h3>
+<p>فرض کن یک لحظه مشخص در جهان داریم. UTC. کشورهای مختلف آن را با Offset متفاوت نمایش می‌دهند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">UTC
+ ↓
+Timezone
+ ↓
+Local Time</div></div>
+<p>Timezone تعیین می‌کند زمان محلی سیستم چگونه از زمان مرجع محاسبه شود.</p>
+
+<h3>چرا Timezone مهم است؟</h3>
+<p>فرض کن Server در یک کشور و Administrator در کشور دیگری باشد. اگر Timezone درست تنظیم نشده باشد، Logها می‌توانند گیج‌کننده شوند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Server:
+2026-08-27 10:00
+
+Administrator:
+2026-08-27 06:30</div></div>
+<p>ممکن است هر دو زمان درست باشند، اما Timezone متفاوت باشد.</p>
+
+<h3>systemd و Time Management ⭐⭐⭐</h3>
+<p>در سیستم‌های جدید Linux که از systemd استفاده می‌کنند، ابزار مهم:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">timedatectl</div></div>
+<p>است. اجرای:</p>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">timedatectl</div></div>
+<p>اطلاعاتی مانند:</p>
+<ul>
+    <li>Local time</li>
+    <li>Universal time</li>
+    <li>RTC time</li>
+    <li>Time zone</li>
+    <li>NTP status</li>
+</ul>
+<p>را نمایش می‌دهد. مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Local time: Thu 2026-08-27 02:20:00 +0330
+Universal time: Wed 2026-08-26 22:50:00 UTC
+RTC time: Wed 2026-08-26 22:50:00
+Time zone: Asia/...
+System clock synchronized: yes
+NTP service: active</div></div>
+
+<h3>دیدن Timezone ⭐⭐⭐</h3>
+<p>دستور <code>timedatectl</code> Timezone فعلی را نشان می‌دهد. برای دیدن Timezoneهای موجود:</p>
+<div class="code-container"><span class="code-label">لیست</span><div class="code-block">timedatectl list-timezones</div></div>
+<p>خروجی شامل مواردی مانند:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">UTC
+Europe/London
+Asia/Tokyo
+America/New_York</div></div>
+
+<h3>تغییر Timezone ⭐⭐⭐</h3>
+<p>برای تغییر Timezone:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo timedatectl set-timezone Europe/London</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo timedatectl set-timezone UTC</div></div>
+<p>بعد <code>timedatectl</code> را اجرا کن تا نتیجه را ببینی.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<code>timedatectl set-timezone ZONE</code> → تغییر Timezone</div></div>
+
+<h3>NTP چیست؟ ⭐⭐⭐</h3>
+<p>حالا به مهم‌ترین قسمت Time Management می‌رسیم. فرض کن ساعت Server هر روز کمی عقب بیفتد. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Day 1 → 10:00:00
+Day 2 → 09:59:57
+Day 3 → 09:59:54
+...</div></div>
+<p>اگر بخواهیم مرتباً دستی ساعت را تنظیم کنیم، کار درستی نیست. راه‌حل:</p>
+<blockquote>NTP — Network Time Protocol</blockquote>
+<p>NTP اجازه می‌دهد سیستم زمان خود را با Time Serverهای Network هماهنگ کند. مدل:</p>
+<div class="code-container"><span class="code-label">NTP</span><div class="code-block no-prompt">Linux Server
+     │
+     │ NTP
+     ↓
+Time Server
+     │
+     ↓
+Accurate Time</div></div>
+
+<h3>chrony ⭐⭐⭐</h3>
+<p>در Linuxهای مدرن، یکی از ابزارهای مهم برای Time Synchronization:</p>
+<blockquote>chrony</blockquote>
+<p>است. Chrony مجموعه‌ای از ابزارها برای هماهنگ نگه داشتن ساعت سیستم با منابع زمانی است. دو جزء مهم:</p>
+<div class="code-container"><span class="code-label">اجزا</span><div class="code-block no-prompt">chronyd
+   ↓
+Background daemon
+
+chronyc
+   ↓
+Command-line client</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">           Time Sources
+                ↓
+             chronyd
+                ↓
+          System Clock
+                ↑
+             chronyc</div></div>
+
+<h3>chronyd و chronyc را قاطی نکن ⭐⭐⭐</h3>
+<p>این تفاوت را خوب حفظ کن:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ابزار</th><th>نقش</th></tr></thead>
+<tbody>
+<tr><td><code>chronyd</code></td><td>سرویس/Daemon زمان</td></tr>
+<tr><td><code>chronyc</code></td><td>ابزار خط فرمان برای کنترل و مشاهده chronyd</td></tr>
+</tbody>
+</table>
+</div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status chronyd</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">chronyc tracking</div></div>
+
+<h3>بررسی وضعیت Time Synchronization ⭐⭐⭐</h3>
+<p>برای بررسی وضعیت کلی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">timedatectl</div></div>
+<p>برای بررسی chrony:</p>
+<div class="code-container"><span class="code-label">tracking</span><div class="code-block">chronyc tracking</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">sources</span><div class="code-block">chronyc sources</div></div>
+<p><code>tracking</code> اطلاعاتی درباره وضعیت Synchronization می‌دهد. <code>sources</code> منابع زمانی مورد استفاده را نشان می‌دهد.</p>
+
+<h3>فعال کردن NTP با timedatectl ⭐⭐</h3>
+<p>در سیستم‌هایی که <code>timedatectl</code> مدیریت NTP را ارائه می‌کند:</p>
+<div class="code-container"><span class="code-label">فعال</span><div class="code-block">sudo timedatectl set-ntp true</div></div>
+<p>و برای غیرفعال کردن:</p>
+<div class="code-container"><span class="code-label">غیرفعال</span><div class="code-block">sudo timedatectl set-ntp false</div></div>
+<p>اما اینکه دقیقاً کدام سرویس پشت آن قرار دارد به Distribution و پیکربندی سیستم بستگی دارد. در AlmaLinux معمولاً <strong>chronyd</strong> نقش اصلی را دارد.</p>
+
+<h3>Time Management — مدل کامل</h3>
+<p>حالا کل بحث زمان:</p>
+<div class="code-container"><span class="code-label">مدل کامل</span><div class="code-block no-prompt">                  Time Management
+                         │
+          ┌──────────────┼──────────────┐
+          ↓              ↓              ↓
+     System Clock      RTC          Timezone
+          │              │              │
+        date          hwclock       timedatectl
+          │
+          ↓
+   Network Time Sync
+          │
+          ↓
+       NTP/chrony</div></div>
+<p>این مدل را به خاطر بسپار.</p>
+
+<h2>بخش دوم — Printer Management</h2>
+
+<h3>چاپ در Linux چگونه کار می‌کند؟ ⭐⭐⭐</h3>
+<p>در Linux معمولاً Application مستقیماً با Printer صحبت نمی‌کند. یک سیستم چاپ بین Application و Printer قرار می‌گیرد. مهم‌ترین فناوری:</p>
+<blockquote>CUPS — Common UNIX Printing System</blockquote>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Application
+     ↓
+    CUPS
+     ↓
+Print Queue
+     ↓
+ Printer</div></div>
+
+<h3>CUPS چیست؟ ⭐⭐⭐</h3>
+<p>CUPS سیستم چاپ رایج در Linux و Unix است. وظایفی مانند:</p>
+<ul>
+    <li>مدیریت Printer</li>
+    <li>مدیریت Print Queue</li>
+    <li>دریافت Print Job</li>
+    <li>ارسال Job به Printer</li>
+    <li>مدیریت Printerهای Local و Network</li>
+</ul>
+<p>را انجام می‌دهد. پس:</p>
+<blockquote>CUPS قلب سیستم Printing در Linux است.</blockquote>
+
+<h3>Print Queue چیست؟ ⭐⭐⭐</h3>
+<p>فرض کن سه نفر همزمان چیزی برای چاپ بفرستند:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">User A → Job 1
+User B → Job 2
+User C → Job 3</div></div>
+<p>Printer نمی‌تواند هر سه را همزمان چاپ کند. CUPS آن‌ها را در Queue قرار می‌دهد:</p>
+<div class="code-container"><span class="code-label">Queue</span><div class="code-block no-prompt">CUPS
+ │
+ └── Queue
+      ├── Job 1
+      ├── Job 2
+      └── Job 3
+             ↓
+          Printer</div></div>
+<p>این همان مفهوم <strong>Print Queue</strong> است.</p>
+
+<h3>Printer و Print Job</h3>
+<p>دو مفهوم را جدا کن:</p>
+<h4>Printer</h4>
+<p>دستگاه یا مقصد چاپ.</p>
+<h4>Print Job</h4>
+<p>یک درخواست چاپ. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Printer:
+Office-Printer
+
+Jobs:
+123
+124
+125</div></div>
+
+<h3>بررسی Printerها</h3>
+<p>یکی از ابزارهای مهم CUPS:</p>
+<div class="code-container"><span class="code-label">ابزار</span><div class="code-block">lpstat</div></div>
+<p>است. مثلاً:</p>
+<div class="code-container"><span class="code-label">Printerها</span><div class="code-block">lpstat -p</div></div>
+<p>Printerهای موجود را نشان می‌دهد. برای دیدن وضعیت کلی:</p>
+<div class="code-container"><span class="code-label">اطلاعات کامل</span><div class="code-block">lpstat -t</div></div>
+<p>این گزینه اطلاعات گسترده‌تری درباره Printing System می‌دهد.</p>
+
+<h3>ارسال Print Job با <code>lp</code> ⭐⭐⭐</h3>
+<p>برای چاپ یک فایل:</p>
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">lp file.txt</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">lp report.pdf</div></div>
+<p>CUPS آن را به یک Print Job تبدیل می‌کند. مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">report.pdf
+    ↓
+   lp
+    ↓
+   CUPS
+    ↓
+ Queue
+    ↓
+ Printer</div></div>
+
+<h3>انتخاب Printer ⭐⭐⭐</h3>
+<p>اگر چند Printer داشته باشیم، می‌توانیم Printer مقصد را مشخص کنیم. مثلاً:</p>
+<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block">lp -d OfficePrinter report.pdf</div></div>
+<p>ساختار:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">lp -d PRINTER FILE</div></div>
+<p>یعنی: فایل را برای Printer مشخص‌شده ارسال کن.</p>
+
+<h3>Default Printer ⭐⭐</h3>
+<p>می‌توان یک Printer را به عنوان Default تعیین کرد. مثلاً با <code>lpoptions</code>:</p>
+<div class="code-container"><span class="code-label">تنظیم</span><div class="code-block">lpoptions -d OfficePrinter</div></div>
+<p>حالا وقتی فقط:</p>
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">lp report.pdf</div></div>
+<p>را اجرا کنی، سیستم از Default Printer استفاده می‌کند.</p>
+
+<h3>Print Job ID ⭐⭐⭐</h3>
+<p>وقتی فایلی را چاپ می‌کنی:</p>
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">lp report.pdf</div></div>
+<p>معمولاً CUPS یک Job ID ایجاد می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">request id is OfficePrinter-42</div></div>
+<p>این ID برای مدیریت Job مفید است.</p>
+
+<h3>مشاهده Print Jobs ⭐⭐⭐</h3>
+<p>برای دیدن Queue:</p>
+<div class="code-container"><span class="code-label">Queue</span><div class="code-block">lpq</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">Jobs</span><div class="code-block">lpstat -o</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">OfficePrinter-42  user  1024  report.pdf
+OfficePrinter-43  user  2048  notes.pdf</div></div>
+
+<h3>حذف Print Job ⭐⭐⭐</h3>
+<p>اگر Job اشتباهی ارسال شده باشد:</p>
+<div class="code-container"><span class="code-label">لغو</span><div class="code-block">cancel OfficePrinter-42</div></div>
+<p>می‌توان آن را لغو کرد. برای لغو Job، داشتن Job ID مهم است. مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Print Job
+    ↓
+Job ID
+    ↓
+cancel</div></div>
+
+<h3>CUPS Service ⭐⭐⭐</h3>
+<p>CUPS یک Service نیز دارد. نام رایج Service:</p>
+<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">cups</div></div>
+<p>می‌توان وضعیت آن را بررسی کرد:</p>
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status cups</div></div>
+<p>اگر Service فعال نباشد، سیستم Printing ممکن است کار نکند. برای فعال کردن:</p>
+<div class="code-container"><span class="code-label">شروع</span><div class="code-block">sudo systemctl start cups</div></div>
+<p>و برای فعال شدن خودکار هنگام Boot:</p>
+<div class="code-container"><span class="code-label">فعال</span><div class="code-block">sudo systemctl enable cups</div></div>
+<p>البته در سیستم‌های جدید ممکن است Socket Activation و جزئیات اجرایی متفاوت باشد؛ برای LPIC-1 شناخت نام سرویس و نقش آن کافی است.</p>
+
+<h3>CUPS و Web Interface ⭐⭐</h3>
+<p>CUPS یک Web Interface نیز ارائه می‌کند. به‌صورت معمول از:</p>
+<div class="code-container"><span class="code-label">آدرس</span><div class="code-block no-prompt">http://localhost:631</div></div>
+<p>قابل دسترسی است. این رابط می‌تواند برای:</p>
+<ul>
+    <li>مدیریت Printer</li>
+    <li>مشاهده Queue</li>
+    <li>تنظیم Printer</li>
+</ul>
+<p>استفاده شود. پورت استاندارد CUPS:</p>
+<div class="code-container"><span class="code-label">پورت</span><div class="code-block no-prompt">631</div></div>
+<p>است.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<code>CUPS → Port 631</code> را به عنوان یک نکته مهم بشناس.</div></div>
+
+<h3>Printer Local و Network ⭐⭐⭐</h3>
+<p>Printer می‌تواند مستقیماً به سیستم متصل باشد:</p>
+<div class="code-container"><span class="code-label">Local</span><div class="code-block no-prompt">Linux
+  ↓
+  USB
+  ↓
+Printer</div></div>
+<p>یا روی Network باشد:</p>
+<div class="code-container"><span class="code-label">Network</span><div class="code-block no-prompt">Linux
+  ↓
+Network
+  ↓
+Printer</div></div>
+<p>CUPS می‌تواند هر دو مدل را مدیریت کند.</p>
+
+<h3>Driver و Printer</h3>
+<p>برای چاپ صحیح، Linux باید بتواند با Printer ارتباط برقرار کند. بسته به Printer و CUPS، ممکن است نیاز به Driver یا اطلاعات توصیفی مناسب باشد. در سطح LPIC-1 لازم نیست وارد جزئیات Driverهای خاص هر Printer شویم. فقط بدان:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Application
+   ↓
+CUPS
+   ↓
+Printer Support
+   ↓
+Printer</div></div>
+
+<h2>سناریوی ترکیبی</h2>
+<h3>سناریو: تنظیم زمان و بررسی Printer</h3>
+<p>فرض کن یک Workstation با Linux داری.</p>
+
+<h4>مرحله ۱ — بررسی زمان</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">timedatectl</div></div>
+<p>می‌بینی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Time zone: UTC</div></div>
+<p>اما سیستم باید با Timezone محلی کار کند. Timezone مناسب را پیدا می‌کنی:</p>
+<div class="code-container"><span class="code-label">لیست</span><div class="code-block">timedatectl list-timezones</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo timedatectl set-timezone Europe/London</div></div>
+
+<h4>مرحله ۲ — بررسی Synchronization</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">timedatectl</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">chronyc tracking</div></div>
+<p>اگر chrony فعال باشد، وضعیت Synchronization را بررسی می‌کنی.</p>
+
+<h4>مرحله ۳ — بررسی CUPS</h4>
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status cups</div></div>
+<p>اگر فعال نباشد:</p>
+<div class="code-container"><span class="code-label">شروع</span><div class="code-block">sudo systemctl start cups</div></div>
+
+<h4>مرحله ۴ — دیدن Printer</h4>
+<div class="code-container"><span class="code-label">Printerها</span><div class="code-block">lpstat -p</div></div>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">printer OfficePrinter is idle</div></div>
+
+<h4>مرحله ۵ — چاپ</h4>
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">lp -d OfficePrinter report.pdf</div></div>
+
+<h4>مرحله ۶ — بررسی Queue</h4>
+<div class="code-container"><span class="code-label">Queue</span><div class="code-block">lpq</div></div>
+<p>اگر Job اشتباهی بود:</p>
+<div class="code-container"><span class="code-label">لغو</span><div class="code-block">cancel OfficePrinter-42</div></div>
+<p>سناریو تمام شد.</p>
+
+<h2>اشتباهات رایج ⚠️</h2>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br><code>date</code> زمان Hardware Clock را نشان می‌دهد.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">درست</span><div class="code-block no-prompt">date → System Clock
+hwclock → Hardware Clock / RTC</div></div>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>Timezone همان Time Synchronization است.<br><strong>❌ خیر.</strong><br>Timezone مشخص می‌کند زمان محلی چگونه نمایش داده شود. NTP/chrony زمان سیستم را با منبع زمانی هماهنگ می‌کند.
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Timezone → نمایش Local Time
+NTP → Synchronization</div></div>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>CUPS خود Printer است.<br><strong>❌ خیر.</strong><br>CUPS سیستم مدیریت چاپ است.
+<div class="code-container"><span class="code-label">درست</span><div class="code-block no-prompt">CUPS
+ ↓
+Printer</div></div>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br><code>lp</code> برای مشاهده Queue است.<br><strong>❌</strong>
+<div class="code-container"><span class="code-label">درست</span><div class="code-block no-prompt">lp → ارسال Print Job
+lpq → مشاهده Queue</div></div>
+</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۵</strong><br><code>cancel</code> کل Printer را خاموش می‌کند.<br><strong>❌</strong><br><code>cancel</code> برای لغو Print Job استفاده می‌شود.</div></div>
+
+<h2>نکات مهم جلسه</h2>
+
+<h3>Time</h3>
+<ul>
+    <li><code>date</code> → مشاهده/تنظیم System Clock</li>
+    <li><code>hwclock</code> → Hardware Clock / RTC</li>
+    <li><code>timedatectl</code> → مدیریت Time و Timezone</li>
+    <li><code>timedatectl list-timezones</code> → لیست Timezoneها</li>
+    <li><code>timedatectl set-timezone ...</code> → تغییر Timezone</li>
+    <li>NTP → هماهنگ‌سازی زمان روی Network</li>
+    <li><code>chronyd</code> → سرویس زمان</li>
+    <li><code>chronyc</code> → ابزار مدیریت/بررسی chrony</li>
+    <li><code>chronyc tracking</code> → وضعیت Synchronization</li>
+</ul>
+
+<h3>Printer</h3>
+<ul>
+    <li><strong>CUPS</strong> → سیستم چاپ Linux/Unix</li>
+    <li><code>cups</code> → سرویس CUPS</li>
+    <li><code>lp</code> → ارسال Print Job</li>
+    <li><code>lpstat</code> → اطلاعات Printer/Job</li>
+    <li><code>lpq</code> → Queue</li>
+    <li><code>cancel</code> → لغو Job</li>
+    <li><code>lpoptions -d</code> → تنظیم Default Printer</li>
+    <li>CUPS Web Interface → معمولاً Port <code>631</code></li>
+</ul>
+
+<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
+<p>برای Time یک ساعت را تصور کن. سه چیز داریم:</p>
+<div class="code-container"><span class="code-label">زمان</span><div class="code-block no-prompt">             Time
+              │
+       ┌──────┼──────┐
+       ↓      ↓      ↓
+    System    RTC  Timezone
+     Clock          │
+       │            ↓
+       └──────→ Local Time
+              ↑
+           NTP/chrony</div></div>
+<p><strong>System Clock</strong> چیزی است که Linux هنگام اجرا استفاده می‌کند. <strong>RTC</strong> ساعت سخت‌افزاری است. <strong>Timezone</strong> تعیین می‌کند زمان برای منطقه موردنظر چگونه نمایش داده شود. <strong>NTP/chrony</strong> کمک می‌کند System Clock دقیق بماند.</p>
+
+<p>برای Printer هم یک مسیر داریم:</p>
+<div class="code-container"><span class="code-label">چاپ</span><div class="code-block no-prompt">Application
+     ↓
+   CUPS
+     ↓
+Print Queue
+     ↓
+ Print Job
+     ↓
+ Printer</div></div>
+
+<p>پس اگر پرسیدند: «چه چیزی بین Application و Printer قرار دارد؟» به <strong>CUPS</strong> فکر کن. اگر پرسیدند: «فایل را برای چاپ ارسال کنم؟» <code>lp file.txt</code>. اگر پرسیدند: «Queue را ببینم؟» <code>lpq</code>. اگر پرسیدند: «Job را لغو کنم؟» <code>cancel JOB-ID</code>.</p>
+
+<h2>Cheat Sheet</h2>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">date → System Clock
+hwclock → Hardware Clock / RTC
+timedatectl → Time/Timezone status
+timedatectl set-timezone ZONE → تغییر Timezone
+chronyc tracking → وضعیت Synchronization
+chronyc sources → منابع زمان
+CUPS → سیستم چاپ Linux
+lp FILE → ارسال Print Job
+lpstat -p → Printerها
+lpq / lpstat -o → Print Queue
+cancel JOB-ID → لغو Job</div></div>
+
+<h2>تست پایانی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام دستور برای مشاهده Hardware Clock مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>date</code></button>
+    <button onclick="selectOption(this)">B) <code>hwclock</code></button>
+    <button onclick="selectOption(this)">C) <code>lpq</code></button>
+    <button onclick="selectOption(this)">D) <code>chronyc</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — <code>hwclock</code></strong><br><code>hwclock</code> برای دسترسی به RTC/Hardware Clock استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>کدام گزینه تفاوت Timezone و NTP را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر دو دقیقاً یک کار انجام می‌دهند.</button>
+    <button onclick="selectOption(this)">B) Timezone زمان را با Time Server هماهنگ می‌کند و NTP منطقه زمانی را تغییر می‌دهد.</button>
+    <button onclick="selectOption(this)">C) Timezone نحوه نمایش Local Time را مشخص می‌کند و NTP برای Synchronization زمان استفاده می‌شود.</button>
+    <button onclick="selectOption(this)">D) NTP فقط برای Printer استفاده می‌شود.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>این تفاوت مفهومی بسیار مهم است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>کدام ابزار معمولاً برای بررسی وضعیت chrony استفاده می‌شود؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>chronyc</code></button>
+    <button onclick="selectOption(this)">B) <code>lp</code></button>
+    <button onclick="selectOption(this)">C) <code>hwclock</code></button>
+    <button onclick="selectOption(this)">D) <code>cupsctl</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — <code>chronyc</code></strong><br>مثلاً: <code>chronyc tracking</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام گزینه سیستم چاپ رایج Linux را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) GRUB</button>
+    <button onclick="selectOption(this)">B) CUPS</button>
+    <button onclick="selectOption(this)">C) systemd</button>
+    <button onclick="selectOption(this)">D) chrony</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — CUPS</strong><br>CUPS مسئول مدیریت Printing است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>Administrator می‌خواهد فایل <code>report.pdf</code> را روی Printer به نام <code>OfficePrinter</code> چاپ کند. کدام دستور درست است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>lpq -d OfficePrinter report.pdf</code></button>
+    <button onclick="selectOption(this)">B) <code>cancel OfficePrinter report.pdf</code></button>
+    <button onclick="selectOption(this)">C) <code>lp -d OfficePrinter report.pdf</code></button>
+    <button onclick="selectOption(this)">D) <code>hwclock -d OfficePrinter report.pdf</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — <code>lp -d OfficePrinter report.pdf</code></strong><br>ساختار: <code>lp -d PRINTER FILE</code></div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام دستور برای مشاهده Print Queue مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>lpq</code></button>
+    <button onclick="selectOption(this)">B) <code>lp</code></button>
+    <button onclick="selectOption(this)">C) <code>date</code></button>
+    <button onclick="selectOption(this)">D) <code>timedatectl</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — <code>lpq</code></strong><br><code>lpq</code> وضعیت Queue را نمایش می‌دهد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>Administrator متوجه می‌شود Logهای سیستم زمان اشتباهی دارند. بررسی می‌کند <code>timedatectl</code> و متوجه می‌شود Timezone اشتباه است. همچنین می‌خواهد مطمئن شود ساعت سیستم از یک منبع Network به‌روز می‌شود. کدام اقدامات مناسب‌ترند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) فقط اجرای <code>lp report.txt</code></button>
+    <button onclick="selectOption(this)">B) تنظیم Timezone با <code>timedatectl</code> و بررسی Synchronization با <code>chronyc</code></button>
+    <button onclick="selectOption(this)">C) تغییر Printer با <code>lpoptions</code></button>
+    <button onclick="selectOption(this)">D) اجرای <code>hwclock --systohc</code> به‌عنوان راه‌حل دائمی NTP</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون دو مشکل جدا داریم: Timezone اشتباه → <code>timedatectl set-timezone</code> و Synchronization → <code>chronyc tracking</code>. <code>hwclock --systohc</code> صرفاً System Clock را روی RTC می‌نویسد و جایگزین Network Time Synchronization نیست.</div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
+<p>سه جفت را حتماً در ذهن نگه دار:</p>
+<div class="code-container"><span class="code-label">جفت‌ها</span><div class="code-block no-prompt">date      → System Clock
+hwclock   → Hardware Clock
+
+Timezone  → Local Time representation
+NTP/chrony → Time Synchronization
+
+lp        → Print
+lpq       → Queue
+cancel    → Cancel Job</div></div>
+<p>و مهم‌تر از همه:</p>
+<div class="code-container"><span class="code-label">دو مدل</span><div class="code-block no-prompt">Time:
+System Clock ← chrony/NTP → Time Source
+     ↑
+    RTC
+
+Printing:
+Application
+    ↓
+   CUPS
+    ↓
+ Queue
+    ↓
+ Printer</div></div>
+<p>با این جلسه، چهار جلسه آموزشی اصلی فصل ۶ تمام شد؛ جلسه بعد <strong>مرور و جمع‌بندی فصل</strong> است و همه مفاهیم را یک‌جا به هم وصل می‌کنیم.</p>
+</div></div>
+` ,
+"ch6-5": `
+<div class="section-header">
+    <div class="section-badge">۶</div>
+    <div>
+        <h1>مرور و جمع‌بندی فصل</h1>
+        <div class="meta">محیط گرافیکی و دسترسی از راه دور · بخش ۵ از ۵</div>
+    </div>
+</div>
+
+<h2>اهداف یادگیری</h2>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+    <li>معماری کلی GUI در Linux را توضیح بدهی.</li>
+    <li>تفاوت <strong>Desktop Environment، Window Manager، Display Manager، X11 و Wayland</strong> را تشخیص بدهی.</li>
+    <li>Local و Remote GUI و فناوری‌هایی مثل <strong>X11، VNC، RDP، SPICE و XDMCP</strong> را از هم تفکیک کنی.</li>
+    <li>مفاهیم Accessibility، Time Management و Printing را در سطح LPIC-1 مدیریت و Troubleshoot کنی.</li>
+    <li>از روی یک سناریو، ابزار یا دستور مناسب را انتخاب کنی.</li>
+</ol>
+
+<h2>تصویر بزرگ فصل</h2>
+<p>اگر کل فصل ۶ را در یک تصویر ببینیم:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">                         Linux GUI
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+          ▼                 ▼                 ▼
+       GUI Stack        Accessibility      Access
+          │                 │                 │
+    ┌─────┴─────┐       ┌───┴────┐       ┌────┴────┐
+    │           │       │        │       │         │
+   X11       Wayland   Reader  Magnifier Local   Remote
+    │                                      │         │
+    ├─ X Server                            │    ┌────┼─────┐
+    ├─ Window Manager                      │    │    │     │
+    └─ Display Manager                     │   X11  VNC   RDP
+                                           │              │
+                                           │            SPICE
+                                           │            XDMCP
+                                           │
+                          ┌────────────────┴────────────────┐
+                          ▼                                 ▼
+                         Time                            Printing
+                          │                                 │
+                    ┌─────┼─────┐                         CUPS
+                    │     │     │                           │
+                   RTC  NTP  TZ                        Queue / Job</div></div>
+<p>این نمودار را اگر بفهمی، بخش بزرگی از فصل را فهمیده‌ای.</p>
+
+<h2>بخش اول — GUI را درست تفکیک کنیم ⭐⭐⭐</h2>
+<p>یکی از پرتکرارترین مشکلات مبتدی‌ها این است که همه این‌ها را یکی می‌دانند:</p>
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">GNOME
+KDE
+X11
+Wayland
+GDM
+KWin</div></div>
+<p>اما این‌ها یک چیز نیستند.</p>
+
+<h3>X11 و Wayland</h3>
+<p>این‌ها در سطح <strong>Graphical Display System / Protocol</strong> قرار دارند. به شکل ساده:</p>
+<div class="code-container"><span class="code-label">لایه</span><div class="code-block no-prompt">Applications
+      │
+      ▼
+GUI System
+ ┌────┴────┐
+ │         │
+X11     Wayland</div></div>
+
+<h3>Desktop Environment</h3>
+<p>مثل:</p>
+<ul>
+    <li>GNOME</li>
+    <li>KDE Plasma</li>
+    <li>Xfce</li>
+</ul>
+<p>Desktop Environment مجموعه‌ای از اجزای گرافیکی است که محیط کاری کامل کاربر را می‌سازد. مثلاً:</p>
+<div class="code-container"><span class="code-label">GNOME</span><div class="code-block no-prompt">GNOME
+├── Panel
+├── Settings
+├── File Manager
+├── Applications
+└── Desktop UI</div></div>
+<p>پس: <strong>GNOME ≠ X11</strong> — GNOME یک Desktop Environment است.</p>
+
+<h3>Window Manager ⭐⭐⭐</h3>
+<p>Window Manager وظیفه مدیریت Windowها را دارد:</p>
+<div class="code-container"><span class="code-label">Window</span><div class="code-block no-prompt">┌───────────────┐
+│ Terminal   X  │
+├───────────────┤
+│               │
+│    Window     │
+│               │
+└───────────────┘</div></div>
+<p>نکته مهم: Window Manager با Desktop Environment یکی نیست. Desktop Environment معمولاً مجموعه‌ای بزرگ‌تر از ابزارهاست که Window Management فقط یکی از بخش‌های آن است.</p>
+
+<h3>Display Manager ⭐⭐⭐</h3>
+<p>Display Manager صفحه Login گرافیکی را ارائه می‌کند. مدل:</p>
+<div class="code-container"><span class="code-label">Login</span><div class="code-block no-prompt">Boot
+ │
+ ▼
+Display Manager
+ │
+ ▼
+Login Screen
+ │
+ ▼
+User
+ │
+ ▼
+Desktop Session</div></div>
+<p>نمونه‌های معروف:</p>
+<ul>
+    <li>GDM</li>
+    <li>SDDM</li>
+    <li>LightDM</li>
+</ul>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ Recall</strong><br>
+<code>GDM → Login Manager</code><br>
+<code>GNOME → Desktop Environment</code><br>
+این دو را قاطی نکن.</div></div>
+
+<h2>نصب GUI ⭐⭐⭐</h2>
+<p>در یک Linux Server ممکن است GUI اصلاً نصب نشده باشد. مدل کلی:</p>
+<div class="code-container"><span class="code-label">نصب</span><div class="code-block no-prompt">Minimal Server
+      │
+      │ Install GUI packages
+      ▼
+Desktop Environment
+      │
+      ▼
+Display Manager
+      │
+      ▼
+Graphical Login</div></div>
+<p>در توزیع‌های مختلف ابزار نصب متفاوت است؛ بنابراین چیزی که برای LPIC-1 باید بفهمی این است که: نصب GUI فقط نصب یک Package نیست؛ معمولاً مجموعه‌ای از اجزای Desktop، Display Manager و وابستگی‌های آن نصب می‌شوند.</p>
+
+<h2>Accessibility ⭐⭐⭐</h2>
+<p>هدف Accessibility این است که افراد با محدودیت‌های مختلف بتوانند از سیستم استفاده کنند. چند نمونه مهم:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>قابلیت</th><th>کاربرد</th></tr></thead>
+<tbody>
+<tr><td>Screen Reader</td><td>خواندن محتوای صفحه</td></tr>
+<tr><td>Magnifier</td><td>بزرگ‌نمایی</td></tr>
+<tr><td>On-Screen Keyboard</td><td>ورود اطلاعات بدون Keyboard فیزیکی</td></tr>
+<tr><td>Sticky Keys</td><td>اجرای Shortcutهای چندکلیدی به شکل آسان‌تر</td></tr>
+<tr><td>Bounce Keys</td><td>جلوگیری از ثبت تکراری کلید</td></tr>
+<tr><td>Mouse Keys</td><td>کنترل Mouse با Keyboard</td></tr>
+</tbody>
+</table>
+</div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">User
+ │
+ ▼
+Accessibility Layer
+ │
+ ├── Visual
+ ├── Motor
+ ├── Keyboard
+ └── Input Assistance</div></div>
+
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>نکته</strong><br>Accessibility فقط «بزرگ کردن فونت» نیست. هدف: <strong>قابل‌استفاده کردن سیستم برای کاربر با نیازهای متفاوت</strong></div></div>
+
+<h2>Local vs Remote Access ⭐⭐⭐</h2>
+<p>حالا یکی از مهم‌ترین تفکیک‌های فصل:</p>
+
+<h3>Local</h3>
+<div class="code-container"><span class="code-label">محلی</span><div class="code-block no-prompt">Keyboard
+   │
+Mouse
+   │
+Monitor
+   │
+   ▼
+Linux</div></div>
+<p>کاربر مستقیماً با همان سیستم کار می‌کند.</p>
+
+<h3>Remote</h3>
+<div class="code-container"><span class="code-label">راه دور</span><div class="code-block no-prompt">Client
+   │
+   │ Network
+   ▼
+Linux</div></div>
+<p>کاربر از سیستم دیگری به GUI دسترسی پیدا می‌کند.</p>
+
+<h2>X11 Remote Display ⭐⭐⭐</h2>
+<p>در X11 این جمله را همیشه به خاطر داشته باش:</p>
+<blockquote>X Server نمایش را مدیریت می‌کند.</blockquote>
+<p>ممکن است Client و Server روی دو ماشین باشند.</p>
+<div class="code-container"><span class="code-label">X11</span><div class="code-block no-prompt">Application
+(X Client)
+    │
+    │ X11
+    ▼
+X Server
+    │
+    ▼
+Display</div></div>
+<p>این برخلاف تصور اولیه است که فکر کنیم Server یعنی جایی که برنامه اجرا می‌شود. در معماری X11، نام‌گذاری از دید <strong>Display</strong> انجام می‌شود.</p>
+
+<h2><code>$DISPLAY</code> ⭐⭐⭐</h2>
+<p>یکی از مهم‌ترین متغیرهای محیطی:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">echo $DISPLAY</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">:0</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">GUI Application
+      │
+      ▼
+   DISPLAY
+      │
+      ▼
+ X Server
+      │
+      ▼
+ Screen</div></div>
+<p>اگر برنامه GUI اجرا شود ولی نتواند Display پیدا کند، <code>$DISPLAY</code> یکی از اولین چیزهایی است که باید بررسی شود.</p>
+
+<h2><code>xhost</code> و <code>xauth</code> ⭐⭐⭐</h2>
+<p>این دو را به صورت یک جفت یاد بگیر:</p>
+<div class="code-container"><span class="code-label">xhost</span><div class="code-block no-prompt">xhost
+  ↓
+Host-based Access Control
+
+xauth
+  ↓
+X Authentication Credentials</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>این‌ها را با هم یکی ندان: <code>xhost ≠ xauth</code></div></div>
+
+<h2>X11 Forwarding ⭐⭐⭐</h2>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">SSH -X</span><div class="code-block">ssh -X user@server</div></div>
+<p>هدف: اجرای X Application روی Server و نمایش آن روی Client.</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Server
+┌──────────────┐
+│ GUI App      │
+└──────┬───────┘
+       │ X11
+       ▼
+Client
+┌──────────────┐
+│ Display      │
+└──────────────┘</div></div>
+<p>اما این را با Remote Desktop کامل اشتباه نکن.</p>
+
+<h2>Remote Desktop Protocolها ⭐⭐⭐</h2>
+<p>این بخش را به صورت جدول حفظ کن:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>فناوری</th><th>کلید ذهنی</th></tr></thead>
+<tbody>
+<tr><td><strong>X11</strong></td><td>X Applications / Display</td></tr>
+<tr><td><strong>XDMCP</strong></td><td>X Display Manager</td></tr>
+<tr><td><strong>VNC</strong></td><td>Remote Desktop</td></tr>
+<tr><td><strong>RDP</strong></td><td>Remote Desktop</td></tr>
+<tr><td><strong>SPICE</strong></td><td>Remote GUI / Virtualization</td></tr>
+</tbody>
+</table>
+</div>
+<p>اگر سؤال سناریویی بود، اول ببین <strong>چه چیزی قرار است از راه دور منتقل شود</strong>.</p>
+
+<h2>Time Management ⭐⭐⭐</h2>
+<p>سه مفهوم اصلی:</p>
+<div class="code-container"><span class="code-label">زمان</span><div class="code-block no-prompt">Hardware Clock
+      │
+      ▼
+System Clock
+      │
+      ▼
+Local Time</div></div>
+<p>اما NTP هم در وسط قرار دارد:</p>
+<div class="code-container"><span class="code-label">NTP</span><div class="code-block no-prompt">Network Time Source
+       │
+       │ NTP
+       ▼
+System Clock</div></div>
+
+<h3>Hardware Clock vs System Clock</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>مورد</th><th>معنی</th></tr></thead>
+<tbody>
+<tr><td>Hardware Clock / RTC</td><td>ساعت سخت‌افزاری</td></tr>
+<tr><td>System Clock</td><td>ساعت مدیریت‌شده توسط Kernel</td></tr>
+</tbody>
+</table>
+</div>
+<p>دستورات:</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">date</div></div>
+<p>برای دیدن زمان سیستم.</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">hwclock</div></div>
+<p>برای مشاهده Hardware Clock.</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">timedatectl</div></div>
+<p>برای مدیریت وضعیت زمان.</p>
+
+<h2>Timezone ⭐⭐⭐</h2>
+<p>Timezone را با ساعت اشتباه نکن.</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Correct Time
+     │
+     ▼
+Timezone
+     │
+     ▼
+Local Time</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">timedatectl</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">لیست</span><div class="code-block">timedatectl list-timezones</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo timedatectl set-timezone Asia/Baku</div></div>
+
+<h2>NTP ⭐⭐⭐</h2>
+<p>NTP برای:</p>
+<blockquote>Synchronize کردن ساعت</blockquote>
+<p>است. نه برای تعیین Timezone. پس:</p>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">NTP → درستی زمان
+Timezone → نحوه نمایش زمان محلی</div></div>
+
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>سؤال پرتله</strong><br>
+اگر UTC درست است ولی ساعت محلی اشتباه است؟ اول <strong>Timezone</strong> را بررسی کن.</div></div>
+
+<h2>Printing در Linux ⭐⭐⭐</h2>
+<p>مدل اصلی چاپ:</p>
+<div class="code-container"><span class="code-label">مدل چاپ</span><div class="code-block no-prompt">Application
+     │
+     ▼
+    CUPS
+     │
+     ▼
+Print Queue
+     │
+     ▼
+Print Job
+     │
+     ▼
+Printer</div></div>
+<p>اگر این زنجیره را بفهمی، تقریباً کل مفهوم Printing فصل را فهمیده‌ای.</p>
+
+<h2>CUPS</h2>
+<p><strong>CUPS = Common UNIX Printing System</strong></p>
+<p>نقش اصلی: مدیریت سیستم چاپ و ارتباط با Printerها.</p>
+
+<h3>Print Job vs Print Queue</h3>
+<p>این دو را قاطی نکن.</p>
+<h4>Print Job</h4>
+<p>یک کار چاپ مشخص:</p>
+<div class="code-container"><span class="code-label">Job</span><div class="code-block no-prompt">report.pdf → Job #15</div></div>
+<h4>Queue</h4>
+<p>محل انتظار Jobها:</p>
+<div class="code-container"><span class="code-label">Queue</span><div class="code-block no-prompt">Queue
+├── Job 15
+├── Job 16
+└── Job 17</div></div>
+
+<h2>دستورات مهم Printer ⭐⭐⭐</h2>
+
+<h3>ارسال برای چاپ</h3>
+<div class="code-container"><span class="code-label">lp</span><div class="code-block">lp report.pdf</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">lpr</span><div class="code-block">lpr report.pdf</div></div>
+
+<h3>مشاهده Printerها</h3>
+<div class="code-container"><span class="code-label">lpstat</span><div class="code-block">lpstat -p</div></div>
+
+<h3>مشاهده Jobها</h3>
+<div class="code-container"><span class="code-label">lpstat</span><div class="code-block">lpstat -o</div></div>
+
+<h3>Default Printer</h3>
+<div class="code-container"><span class="code-label">lpstat</span><div class="code-block">lpstat -d</div></div>
+
+<h3>لغو Job</h3>
+<div class="code-container"><span class="code-label">لغو</span><div class="code-block">cancel 15</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">lprm</span><div class="code-block">lprm 15</div></div>
+
+<h2>CUPS Web Interface</h2>
+<p>CUPS معمولاً Web Interface دارد:</p>
+<div class="code-container"><span class="code-label">آدرس</span><div class="code-block no-prompt">localhost:631</div></div>
+<p>عدد مهم:</p>
+<div class="code-container"><span class="code-label">پورت</span><div class="code-block no-prompt">631 → CUPS / IPP</div></div>
+<p><strong>IPP = Internet Printing Protocol</strong></p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">CUPS</span><div class="code-block no-prompt">CUPS
+ │
+ ├── Local Printing
+ │
+ └── Network Printing
+          │
+          └── IPP</div></div>
+
+<h2>Troubleshooting Mindset ⭐⭐⭐</h2>
+<p>این بخش از حفظ کردن دستورات مهم‌تر است. فرض کن: «Printer کار نمی‌کند.» نگو فوراً <code>systemctl restart cups</code>. اول سؤال بپرس:</p>
+
+<h4>1. Printer وجود دارد؟</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lpstat -p</div></div>
+
+<h4>2. Job ایجاد شده؟</h4>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lpstat -o</div></div>
+
+<h4>3. Job در Queue گیر کرده؟</h4>
+<p>اگر بله، مشکل را از Queue/Printer بررسی کن.</p>
+
+<h4>4. سرویس CUPS سالم است؟</h4>
+<div class="code-container"><span class="code-label">وضعیت</span><div class="code-block">systemctl status cups</div></div>
+
+<h4>5. اگر Job اشتباه است:</h4>
+<div class="code-container"><span class="code-label">لغو</span><div class="code-block">cancel JOB_ID</div></div>
+<p>این مدل تفکر در آزمون‌های سناریویی بسیار ارزشمند است.</p>
+
+<h2>یک سناریوی ترکیبی فصل</h2>
+<p>فرض کن مدیر یک Linux Workstation هستی. کاربر می‌گوید: «من از راه دور به سیستم وصل می‌شوم، اما GUI Application اجرا نمی‌شود. همچنین ساعت سیستم یک ساعت اشتباه نشان می‌دهد و Printer هم یک Job گیر کرده دارد.» بیاییم مرحله‌به‌مرحله فکر کنیم.</p>
+
+<h3>مشکل ۱ — GUI Remote</h3>
+<p>اول مشخص می‌کنیم: آیا کاربر Remote Desktop کامل می‌خواهد یا فقط یک Application؟ اگر فقط Application باشد: X11 Forwarding و موارد زیر را بررسی می‌کنیم:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">echo $DISPLAY</div></div>
+<p>و در صورت نیاز: <code>xauth</code>، <code>xhost</code></p>
+
+<h3>مشکل ۲ — زمان</h3>
+<p>ابتدا:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">timedatectl</div></div>
+<p>بررسی می‌کنیم: <code>Time zone</code>، <code>System clock synchronized</code>، <code>NTP service</code>. اگر Timezone غلط باشد: <code>sudo timedatectl set-timezone &lt;ZONE&gt;</code>. اگر Synchronization مشکل داشته باشد، وضعیت سرویس زمان را بررسی می‌کنیم.</p>
+
+<h3>مشکل ۳ — Printer</h3>
+<p>اول:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lpstat -p</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lpstat -o</div></div>
+<p>اگر Job مثلاً شماره 25 باشد: <code>cancel 25</code>. و اگر خود CUPS مشکل داشته باشد: <code>systemctl status cups</code></p>
+
+<h2>نکات امتحانی نهایی ⭐⭐⭐</h2>
+
+<h3>GUI</h3>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GNOME/KDE/Xfce → Desktop Environment
+GDM/SDDM/LightDM → Display Manager</div></div>
+
+<h3>X11</h3>
+<div class="code-container"><span class="code-label">X11</span><div class="code-block no-prompt">X Client → X Server → Display</div></div>
+
+<h3>Remote</h3>
+<div class="code-container"><span class="code-label">Remote</span><div class="code-block no-prompt">X11       → X Applications
+XDMCP     → X Display Manager
+VNC       → Remote Desktop
+RDP       → Remote Desktop
+SPICE     → Remote GUI / VM</div></div>
+
+<h3>X Authentication</h3>
+<div class="code-container"><span class="code-label">X Auth</span><div class="code-block no-prompt">xhost → Access Control
+xauth → Authentication</div></div>
+
+<h3>Time</h3>
+<div class="code-container"><span class="code-label">Time</span><div class="code-block no-prompt">date        → System Time
+hwclock     → Hardware Clock
+timedatectl → Time/Timezone/Synchronization
+NTP         → Time Synchronization</div></div>
+
+<h3>Printing</h3>
+<div class="code-container"><span class="code-label">Printing</span><div class="code-block no-prompt">CUPS       → Printing System
+lp/lpr     → Submit Job
+lpstat     → Inspect
+cancel     → Cancel Job
+631        → CUPS/IPP</div></div>
+
+<h2>اشتباهات پرتکرار LPIC-1 ⚠️</h2>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>GNOME همان X11 است.<br><strong>❌ غلط.</strong><br><code>GNOME → Desktop Environment</code><br><code>X11 → Graphical System/Protocol</code></div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>X Server همان کامپیوتری است که برنامه روی آن اجرا می‌شود.<br><strong>❌ لزوماً نه.</strong><br>X Server جایی است که Display را مدیریت می‌کند.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>NTP Timezone را تنظیم می‌کند.<br><strong>❌</strong><br><code>NTP → Synchronization</code><br><code>Timezone → Local Time Representation</code></div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>CUPS خود Printer است.<br><strong>❌</strong><br>CUPS <strong>سیستم مدیریت چاپ</strong> است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۵</strong><br>Print Job و Queue یکی هستند.<br><strong>❌</strong><br><code>Job → یک کار چاپ</code><br><code>Queue → صف کارهای چاپ</code></div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۶</strong><br>SSH -X یک Remote Desktop کامل است.<br><strong>❌</strong><br><code>ssh -X</code> برای <strong>X11 Forwarding</strong> است؛ معمولاً برای اجرای Applicationهای گرافیکی، نه ارائه Desktop کامل.</div></div>
+
+<h2>مرور سریع کل فصل</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>مفهوم</th><th>باید چه چیزی یادت بماند؟</th></tr></thead>
+<tbody>
+<tr><td>X11</td><td>سیستم/پروتکل گرافیکی و Remote X</td></tr>
+<tr><td>Wayland</td><td>سیستم مدرن Display</td></tr>
+<tr><td>Desktop Environment</td><td>محیط کاری کامل</td></tr>
+<tr><td>Window Manager</td><td>مدیریت Windowها</td></tr>
+<tr><td>Display Manager</td><td>Login گرافیکی</td></tr>
+<tr><td>Accessibility</td><td>قابل‌استفاده کردن GUI برای نیازهای مختلف</td></tr>
+<tr><td>VNC</td><td>Remote Desktop</td></tr>
+<tr><td>RDP</td><td>Remote Desktop Protocol</td></tr>
+<tr><td>SPICE</td><td>Remote GUI، مخصوصاً VM</td></tr>
+<tr><td>XDMCP</td><td>ارتباط با X Display Manager</td></tr>
+<tr><td><code>$DISPLAY</code></td><td>مقصد X Display</td></tr>
+<tr><td><code>xhost</code></td><td>کنترل دسترسی X</td></tr>
+<tr><td><code>xauth</code></td><td>X Authentication</td></tr>
+<tr><td>RTC</td><td>Hardware Clock</td></tr>
+<tr><td>System Clock</td><td>ساعت Kernel</td></tr>
+<tr><td>NTP</td><td>Synchronization</td></tr>
+<tr><td>Timezone</td><td>تبدیل/نمایش Local Time</td></tr>
+<tr><td>CUPS</td><td>سیستم چاپ</td></tr>
+<tr><td>Queue</td><td>صف Jobها</td></tr>
+<tr><td><code>lp</code> / <code>lpr</code></td><td>ارسال Job</td></tr>
+<tr><td><code>lpstat</code></td><td>بررسی Printer/Job</td></tr>
+<tr><td><code>cancel</code></td><td>حذف Job</td></tr>
+<tr><td>IPP</td><td>Network Printing</td></tr>
+<tr><td>631</td><td>پورت رایج CUPS/IPP</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Cheat Sheet نهایی فصل — حداکثر ۸ خط</h2>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block">timedatectl                         # وضعیت Time/Timezone/NTP
+timedatectl set-timezone ZONE      # تغییر Timezone
+date                                # System Clock
+hwclock                             # Hardware Clock / RTC
+lp FILE / lpr FILE                  # ارسال Print Job
+lpstat -p / lpstat -o               # Printer / Queue
+cancel JOB_ID                       # لغو Print Job
+echo $DISPLAY | xhost | xauth       # X Display / Access / Authentication</div></div>
+<p>و برای حفظ مفهومی:</p>
+<div class="code-container"><span class="code-label">کلید مفهومی</span><div class="code-block no-prompt">GNOME → Desktop
+GDM → Login
+X11 → Display
+VNC/RDP → Remote Desktop
+SPICE → VM GUI
+NTP → Time Sync
+CUPS → Printing</div></div>
+
+<h2>تست نهایی فصل — ۷ سؤال ترکیبی</h2>
+
+<div class="quiz-card"><p>❓ سؤال ۱</p>
+<p>کدام گزینه ترتیب مفهومی درست را نشان می‌دهد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) GNOME → Display Manager → X11</button>
+    <button onclick="selectOption(this)">B) Display Manager → Login → Desktop Session</button>
+    <button onclick="selectOption(this)">C) Printer → CUPS → Application</button>
+    <button onclick="selectOption(this)">D) NTP → Timezone → RTC</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Display Manager صفحه Login را فراهم می‌کند و بعد از Authentication، Desktop Session شروع می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۲</p>
+<p>یک برنامه GUI روی Server اجرا شده اما کاربر می‌خواهد آن را روی سیستم Client ببیند. کدام مفهوم مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) CUPS</button>
+    <button onclick="selectOption(this)">B) X11 Forwarding</button>
+    <button onclick="selectOption(this)">C) NTP</button>
+    <button onclick="selectOption(this)">D) RDP فقط برای همین منظور</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>X11 Forwarding برای انتقال نمایش X Application به Client مناسب است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>ساعت UTC سیستم درست است ولی Local Time اشتباه است. محتمل‌ترین مشکل چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) CUPS</button>
+    <button onclick="selectOption(this)">B) XDMCP</button>
+    <button onclick="selectOption(this)">C) Timezone</button>
+    <button onclick="selectOption(this)">D) Print Queue</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>Timezone تعیین می‌کند زمان محلی چگونه نسبت به UTC نمایش داده شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۴</p>
+<p>کدام دستور برای بررسی Jobهای موجود در Print Queue مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) <code>lpstat -o</code></button>
+    <button onclick="selectOption(this)">B) <code>date -q</code></button>
+    <button onclick="selectOption(this)">C) <code>hwclock -p</code></button>
+    <button onclick="selectOption(this)">D) <code>xauth -o</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — <code>lpstat -o</code></strong><br><code>lpstat -o</code> برای مشاهده Jobهای چاپ استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۵</p>
+<p>کدام گزینه تفاوت <code>xhost</code> و <code>xauth</code> را درست بیان می‌کند؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) هر دو فقط برای Printer هستند.</button>
+    <button onclick="selectOption(this)">B) xhost برای Access Control و xauth برای X Authentication است.</button>
+    <button onclick="selectOption(this)">C) xauth برای Timezone و xhost برای NTP است.</button>
+    <button onclick="selectOption(this)">D) هیچ تفاوتی ندارند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>این تفکیک یکی از نکات مهم X11 است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۶</p>
+<p>کدام فناوری بیشترین ارتباط را با Remote Graphical Access به Virtual Machine دارد؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) SPICE</button>
+    <button onclick="selectOption(this)">B) Sticky Keys</button>
+    <button onclick="selectOption(this)">C) CUPS</button>
+    <button onclick="selectOption(this)">D) <code>hwclock</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — SPICE</strong><br>SPICE در محیط‌های Virtualization اهمیت ویژه‌ای دارد.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
+<p>مدیر سیستم باید:</p>
+<ul>
+    <li>یک GUI Application را از Server اجرا کند؛</li>
+    <li>کل Desktop یک سیستم دیگر را از راه دور کنترل کند؛</li>
+    <li>یک Print Job را لغو کند؛</li>
+    <li>Timezone سیستم را اصلاح کند.</li>
+</ul>
+<p>کدام ترکیب مناسب‌تر است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) X11 Forwarding + VNC/RDP + <code>cancel</code> + <code>timedatectl set-timezone</code></button>
+    <button onclick="selectOption(this)">B) CUPS + NTP + <code>xauth</code> + <code>hwclock</code></button>
+    <button onclick="selectOption(this)">C) SPICE + <code>date</code> + <code>lp</code> + <code>xhost</code></button>
+    <button onclick="selectOption(this)">D) XDMCP + <code>lpr</code> + <code>date</code> + CUPS</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>چون: <code>GUI Application → X11 Forwarding</code>، <code>Desktop کامل → VNC/RDP</code>، <code>Cancel Job → cancel</code>، <code>Timezone → timedatectl set-timezone</code></div>
+</div>
+
+<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🧠 جمع‌بندی نهایی فصل ۶</strong><br>
+<p>اگر بخواهم کل فصل را در یک جمله فاینمنی بگویم:</p>
+<blockquote>Linux برای ساخت محیط گرافیکی به یک Stack گرافیکی و Desktop نیاز دارد؛ برای دسترسی کاربران ابزارهای Local/Remote دارد؛ برای کاربران دارای نیازهای خاص Accessibility فراهم می‌کند؛ و در کنار GUI باید زمان و چاپ سیستم را نیز مدیریت کنیم.</blockquote>
+<p>و نقشه نهایی:</p>
+<div class="code-container"><span class="code-label">نقشه نهایی</span><div class="code-block no-prompt">                     Linux GUI
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+        ▼                ▼                ▼
+   GUI Architecture  Accessibility    GUI Access
+        │                                │
+   ┌────┼────┐                      ┌────┴────┐
+   │    │    │                      │         │
+  X11  DE   DM                    Local     Remote
+   │                                      ┌──┼───┐
+   │                                      │  │   │
+   ▼                                     X11 VNC RDP
+DISPLAY                                     │
+                                           SPICE
+                                           XDMCP
+
+        ┌───────────────────────┐
+        │                       │
+        ▼                       ▼
+      Time                   Printing
+        │                       │
+  RTC/System/NTP              CUPS
+  Timezone                    Queue
+                              Job
+                              lp/lpr
+                              lpstat
+                              cancel</div></div>
+<p><strong>برای آزمون LPIC-1، مهم‌ترین مهارت این فصل حفظ کردن فهرست دستورات نیست؛ تشخیص درستِ «این مشکل مربوط به کدام لایه است؟» است.</strong></p>
+</div></div>
+`
+
 
 
         };
