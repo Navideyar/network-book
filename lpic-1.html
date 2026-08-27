@@ -25335,65 +25335,125 @@ whereis → Binary / Source / Man</div></div>
     <li>نقش <strong>Boot Loader</strong> را در فرآیند Boot توضیح بدهی.</li>
     <li>ساختار کلی <strong>GRUB2</strong> را بشناسی.</li>
     <li>تفاوت نقش GRUB با BIOS/UEFI و Kernel را تشخیص بدهی.</li>
-    <li>فایل‌های مهم GRUB و محل تنظیمات آن را در Linux بشناسی.</li>
-    <li>گزینه‌های Kernel در GRUB را درک و در حد LPIC-1 از آن‌ها استفاده کنی.</li>
-    <li>مفهوم <strong>GRUB Menu، Default Entry و Kernel Parameters</strong> را بفهمی.</li>
+    <li>فایل‌های مهم مربوط به Boot و GRUB را بشناسی.</li>
+    <li>مفهوم <strong>GRUB Menu، Boot Entry و Default Entry</strong> را درک کنی.</li>
+    <li>مفهوم <strong>Kernel Parameters</strong> را بفهمی و در حد LPIC-1 از آن‌ها استفاده کنی.</li>
+    <li>تفاوت بین تغییر موقت Boot Entry و تنظیمات دائمی GRUB را بدانی.</li>
+    <li>کاربرد GRUB در انتخاب Kernel و Troubleshooting را درک کنی.</li>
 </ol>
 
 <hr>
 
 <h2>معرفی جلسه</h2>
-<p>در جلسه قبل دیدیم:</p>
+<p>در جلسه قبل دیدیم که فرآیند کلی Boot در Linux را می‌توان به‌صورت زیر تصور کرد:</p>
 
-<div class="code-container"><span class="code-label">مرور</span><div class="code-block no-prompt">BIOS / UEFI\n      ↓\n    GRUB\n      ↓\n   Kernel\n      ↓\n  systemd\n      ↓\n   Login</div></div>
+<div class="code-container"><span class="code-label">زنجیره بوت</span><div class="code-block no-prompt">BIOS / UEFI\n     ↓\n    GRUB\n     ↓\n   Kernel\n     ↓\n  systemd\n     ↓\n Services\n     ↓\n  Login</div></div>
 
-<p>حالا می‌خواهیم روی قسمت <strong>GRUB</strong> تمرکز کنیم.</p>
-<p>GRUB در واقع پلی بین Firmware و Kernel است.</p>
+<p>در این جلسه روی بخش <strong>GRUB</strong> تمرکز می‌کنیم.</p>
+<p>GRUB یک <strong>Boot Loader</strong> است که بین Firmware و Kernel قرار می‌گیرد.</p>
 
-<div class="code-container"><span class="code-label">نقش GRUB</span><div class="code-block no-prompt">Firmware\n   │\n   │ پیدا کردن Boot Loader\n   ↓\n GRUB\n   │\n   │ انتخاب و Load کردن Kernel\n   ↓\nKernel</div></div>
+<div class="code-container"><span class="code-label">جایگاه GRUB</span><div class="code-block no-prompt">Firmware\n    │\n    │ اجرای Boot Loader\n    ↓\n  GRUB\n    │\n    │ انتخاب و Load کردن Kernel\n    ↓\n  Kernel</div></div>
 
-<p>اگر GRUB خراب باشد، ممکن است Kernel سالم باشد، اما سیستم اصلاً به مرحله اجرای Kernel نرسد.</p>
+<p>بنابراین اگر GRUB مشکل داشته باشد، ممکن است Kernel سالم باشد اما سیستم اصلاً به مرحله اجرای Kernel نرسد.</p>
 
 <hr>
 
 <h2>درسنامه</h2>
 
 <h3>Boot Loader چیست؟ ⭐⭐⭐</h3>
-<p>Boot Loader برنامه‌ای است که وظیفه دارد <strong>سیستم‌عامل را برای اجرا آماده و آغاز کند</strong>.</p>
-<p>در Linux رایج‌ترین Boot Loader:</p>
+<p><strong>Boot Loader</strong> برنامه‌ای است که در مراحل ابتدایی Boot اجرا می‌شود و وظیفه دارد Kernel را برای اجرا Load کرده و فرآیند انتقال کنترل به Kernel را آغاز کند.</p>
+<p>در بسیاری از سیستم‌های Linux، Boot Loader مورد استفاده:</p>
 
 <div class="code-container"><span class="code-label">GRUB 2</span><div class="code-block no-prompt">GRUB 2</div></div>
 
 <p>است.</p>
 <p>GRUB مخفف:</p>
 
-<div class="code-container"><span class="code-label">معنی</span><div class="code-block no-prompt">GRand Unified Bootloader</div></div>
+<div class="code-container"><span class="code-label">GRUB</span><div class="code-block no-prompt">GRand Unified Bootloader</div></div>
 
 <p>است.</p>
 <p>GRUB می‌تواند:</p>
 <ul>
     <li>Kernelهای مختلف را نمایش دهد.</li>
-    <li>یک Kernel را انتخاب کند.</li>
+    <li>یک Kernel را برای Boot انتخاب کند.</li>
     <li>Kernel را Load کند.</li>
-    <li>Initial RAM filesystem را Load کند.</li>
-    <li>پارامترهای Boot را به Kernel بدهد.</li>
-    <li>در سیستم‌های چندبوت، سیستم‌عامل‌های مختلف را برای اجرا انتخاب کند.</li>
+    <li>Initial RAM filesystem یا <strong>initramfs</strong> را Load کند.</li>
+    <li>Kernel Parameters را به Kernel منتقل کند.</li>
+    <li>در سیستم‌های چندبوت، Boot Entryهای سیستم‌عامل‌های مختلف را ارائه دهد.</li>
 </ul>
+<p>پس GRUB را نباید با خود Kernel یا سیستم‌عامل اشتباه گرفت.</p>
 
 <hr>
 
-<h3>چرا ممکن است چند Kernel داشته باشیم؟</h3>
-<p>در Linux ممکن است چند Kernel روی سیستم نصب شده باشد:</p>
+<h3>GRUB دقیقاً چه چیزی را Boot می‌کند؟ ⭐⭐⭐</h3>
+<p>برای اینکه Linux بتواند Boot شود، GRUB باید اطلاعات لازم برای اجرای Kernel را در اختیار داشته باشد.</p>
+<p>به‌صورت ساده:</p>
 
-<div class="code-container"><span class="code-label">/boot</span><div class="code-block no-prompt">/boot/\n├── vmlinuz-...\n├── vmlinuz-...\n├── initramfs-...\n└── ...</div></div>
+<div class="code-container"><span class="code-label">اجزای Boot</span><div class="code-block no-prompt">GRUB\n │\n ├── Kernel\n │\n ├── initramfs\n │\n └── Kernel Parameters\n        ↓\n      Kernel\n        ↓\n Root Filesystem</div></div>
 
-<p>این موضوع مفید است.</p>
-<p>مثلاً:</p>
+<p>یک Boot Entry ممکن است مفهوماً چیزی شبیه این داشته باشد:</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Kernel 6.x     ← نسخه جدید\nKernel 5.x     ← نسخه قبلی</div></div>
+<div class="code-container"><span class="code-label">Boot Entry</span><div class="code-block no-prompt">linux /vmlinuz-... root=/dev/...\ninitrd /initramfs-...</div></div>
 
-<p>اگر Kernel جدید مشکل داشته باشد، می‌توانی از GRUB نسخه قبلی را انتخاب کنی.</p>
-<p>به همین دلیل GRUB فقط یک Launcher ساده نیست؛ در فرآیند Recovery هم اهمیت دارد.</p>
+<p>در این مثال:</p>
+
+<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">linux\n  ↓\nKernel را مشخص می‌کند\n\ninitrd\n  ↓\ninitramfs را مشخص می‌کند</div></div>
+
+<p>لازم نیست در این مرحله Syntax داخلی GRUB را به‌صورت کامل حفظ کنی.</p>
+<p>مهم این است که بدانی:</p>
+<blockquote><strong>GRUB Kernel و initramfs را برای Boot در اختیار سیستم قرار می‌دهد و Kernel Parameters را نیز به Kernel منتقل می‌کند.</strong></blockquote>
+
+<hr>
+
+<h3><code>/boot</code> چیست؟ ⭐⭐⭐</h3>
+<p>در Linux، فایل‌های مهم مربوط به فرآیند Boot معمولاً در:</p>
+
+<div class="code-container"><span class="code-label">/boot</span><div class="code-block no-prompt">/boot</div></div>
+
+<p>قرار دارند.</p>
+<p>برای مشاهده محتویات آن:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -lh /boot</div></div>
+
+<p>ممکن است فایل‌هایی شبیه موارد زیر ببینی:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">vmlinuz-...\ninitramfs-....img\ngrub2/</div></div>
+
+<h4>Kernel</h4>
+<p>فایل‌هایی با نامی شبیه:</p>
+
+<div class="code-container"><span class="code-label">vmlinuz</span><div class="code-block no-prompt">vmlinuz-...</div></div>
+
+<p>معمولاً Kernelهای نصب‌شده روی سیستم هستند.</p>
+
+<h4>initramfs</h4>
+<p>فایل‌هایی شبیه:</p>
+
+<div class="code-container"><span class="code-label">initramfs</span><div class="code-block no-prompt">initramfs-....img</div></div>
+
+<p>نیز وجود دارند.</p>
+<p><strong>initramfs</strong> یک محیط اولیه است که در مراحل ابتدایی Boot مورد استفاده قرار می‌گیرد تا Kernel بتواند امکانات و درایورهای لازم برای رسیدن به Root Filesystem را در اختیار داشته باشد.</p>
+<p>فعلاً این مدل ذهنی کافی است:</p>
+
+<div class="code-container"><span class="code-label">ساختار /boot</span><div class="code-block no-prompt">/boot\n │\n ├── vmlinuz\n │      ↓\n │    Kernel\n │\n └── initramfs\n        ↓\n   محیط اولیه Boot</div></div>
+
+<hr>
+
+<h3>چرا ممکن است چند Kernel داشته باشیم؟ ⭐⭐⭐</h3>
+<p>ممکن است چند Kernel روی یک سیستم Linux نصب شده باشد.</p>
+<p>برای مثال:</p>
+
+<div class="code-container"><span class="code-label">چند Kernel</span><div class="code-block no-prompt">/boot/\n├── vmlinuz-...\n├── vmlinuz-...\n├── initramfs-...\n└── ...</div></div>
+
+<p>فرض کن:</p>
+
+<div class="code-container"><span class="code-label">نسخه‌ها</span><div class="code-block no-prompt">Kernel 6.x     ← نسخه جدید\nKernel 5.x     ← نسخه قبلی</div></div>
+
+<p>اگر Kernel جدید مشکل داشته باشد، ممکن است بتوانی از طریق GRUB نسخه قبلی را انتخاب کنی.</p>
+<p>به همین دلیل وجود چند Kernel می‌تواند برای <strong>Recovery و Troubleshooting</strong> مفید باشد.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">انتخاب Kernel</span><div class="code-block no-prompt">              GRUB\n                │\n       ┌────────┴────────┐\n       ↓                 ↓\n   Kernel جدید       Kernel قبلی\n       │                 │\n       ↓                 ↓\n    Boot OK?          Recovery</div></div>
 
 <hr>
 
@@ -25403,295 +25463,311 @@ whereis → Binary / Source / Man</div></div>
 <div class="code-container"><span class="code-label">منوی GRUB</span><div class="code-block no-prompt">GNU GRUB\n\nAlmaLinux\nAlmaLinux (recovery...)\nFirmware Setup</div></div>
 
 <p>هر گزینه یک <strong>Boot Entry</strong> است.</p>
-<p>GRUB براساس تنظیمات خودش یک Entry را به‌صورت پیش‌فرض انتخاب می‌کند.</p>
-<p>اگر کاربر هیچ گزینه‌ای انتخاب نکند، بعد از مدتی Entry پیش‌فرض Boot می‌شود.</p>
+<p>هر Entry مشخص می‌کند که سیستم با چه Kernel و چه تنظیماتی Boot شود.</p>
+<p>GRUB براساس تنظیمات خود یک Entry را به‌صورت پیش‌فرض انتخاب می‌کند.</p>
+<p>اگر کاربر گزینه دیگری انتخاب نکند، پس از پایان زمان انتظار، Entry پیش‌فرض Boot می‌شود.</p>
+<p>این موضوع ما را به دو مفهوم مهم می‌رساند:</p>
 
-<hr>
-
-<h3>GRUB از کجا می‌فهمد چه چیزی را Boot کند؟</h3>
-<p>GRUB باید اطلاعاتی درباره این موارد داشته باشد:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات موردنیاز</span><div class="code-block no-prompt">Kernel\ninitramfs\nKernel parameters\nroot filesystem</div></div>
-
-<p>برای مثال یک Boot Entry ممکن است مفهومی شبیه این داشته باشد:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">linux /vmlinuz-... root=/dev/...\ninitrd /initramfs-...</div></div>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">linux\n  ↓\nKernel را مشخص کن\n\ninitrd\n  ↓\nInitial RAM filesystem را مشخص کن</div></div>
-
-<p>فعلاً لازم نیست Syntax داخلی GRUB را حفظ کنی؛ مهم این است که <strong>Kernel و initramfs باید برای Boot در اختیار GRUB باشند.</strong></p>
+<div class="code-container"><span class="code-label">مفاهیم</span><div class="code-block no-prompt">Boot Entry\nDefault Entry</div></div>
 
 <hr>
 
 <h3>Kernel Parameters چیست؟ ⭐⭐⭐</h3>
 <p>GRUB می‌تواند هنگام اجرای Kernel، پارامترهایی را به آن منتقل کند.</p>
-<p>مثلاً:</p>
+<p>برای مثال:</p>
 
 <div class="code-container"><span class="code-label">root</span><div class="code-block no-prompt">root=/dev/mapper/almalinux-root</div></div>
 
-<p>به Kernel می‌گوید Root Filesystem را از کجا پیدا کند.</p>
+<p>مشخص می‌کند Root Filesystem از کجا در دسترس Kernel قرار گیرد.</p>
 <p>یا:</p>
 
 <div class="code-container"><span class="code-label">ro</span><div class="code-block no-prompt">ro</div></div>
 
-<p>یعنی Root Filesystem در ابتدا به‌صورت Read-Only mount شود.</p>
-<p>یا:</p>
+<p>به Kernel می‌گوید Root Filesystem را در ابتدا به‌صورت Read-Only mount کند.</p>
+<p>پارامتر:</p>
 
 <div class="code-container"><span class="code-label">quiet</span><div class="code-block no-prompt">quiet</div></div>
 
-<p>باعث کاهش پیام‌های نمایشی Boot می‌شود.</p>
+<p>برای کاهش پیام‌های نمایشی Boot استفاده می‌شود.</p>
 <p>یک مثال مهم دیگر:</p>
 
 <div class="code-container"><span class="code-label">systemd.unit</span><div class="code-block no-prompt">systemd.unit=multi-user.target</div></div>
 
-<p>به systemd می‌گوید سیستم را با Target مشخص‌شده بالا بیاورد.</p>
+<p>به systemd می‌گوید Boot را با Target مشخص‌شده ادامه دهد.</p>
+<p>در این جلسه لازم نیست همه Kernel Parameters را حفظ کنی.</p>
+<p>مهم این است که بدانی:</p>
+<blockquote><strong>GRUB می‌تواند پارامترهایی را همراه با Kernel در زمان Boot به Kernel منتقل کند.</strong></blockquote>
 
 <hr>
 
 <h3>ویرایش موقت GRUB ⭐⭐⭐</h3>
-<p>یکی از مهارت‌های مهم برای LPIC-1 این است که بدانی می‌توانی <strong>برای همان Boot</strong> پارامترهای Kernel را موقتاً تغییر دهی.</p>
+<p>یکی از مهارت‌های مهم هنگام Troubleshooting این است که بتوانی <strong>برای همان Boot</strong> پارامترهای Kernel را موقتاً تغییر دهی.</p>
 <p>در منوی GRUB:</p>
 <ol>
     <li>Entry موردنظر را انتخاب کن.</li>
     <li>کلید <code>e</code> را بزن.</li>
     <li>خط مربوط به Kernel را پیدا کن.</li>
     <li>پارامتر موردنظر را تغییر بده.</li>
-    <li>با <code>Ctrl+x</code> یا در برخی نسخه‌ها <code>F10</code> Boot کن.</li>
+    <li>با <code>Ctrl+x</code> یا در برخی سیستم‌ها <code>F10</code> Boot کن.</li>
 </ol>
-<p>مثلاً:</p>
+<p>مثلاً اگر Entry شامل:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">linux ... root=/dev/... quiet</div></div>
 
-<p>را می‌توانی به‌صورت موقت تغییر دهی.</p>
+<p>باشد، می‌توانی پارامترهای آن را برای همان Boot تغییر دهی.</p>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>چرا موقت؟</strong><br>
-چون این تغییر فقط برای همان Boot Session است.
-<p>بعد از Reboot، تنظیم دائمی سیستم تغییر نکرده است.</p>
-<blockquote>⭐ این موضوع در Troubleshooting بسیار مهم است:<br>
-<strong>ویرایش Entry با <code>e</code> تنظیم دائمی GRUB را تغییر نمی‌دهد.</strong></blockquote>
+<h4>چرا این تغییر موقت است؟</h4>
+<p>چون ویرایش Entry با <code>e</code>، Configuration دائمی GRUB را تغییر نمی‌دهد.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">فرآیند ویرایش</span><div class="code-block no-prompt">GRUB Menu\n    ↓\n    e\n    ↓\nEdit Boot Entry\n    ↓\nCtrl+x / F10\n    ↓\nBoot</div></div>
+
+<p>بعد از Reboot، این تغییر معمولاً از بین می‌رود.</p>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته مهم</strong><br>
+ویرایش Boot Entry با <code>e</code> با تغییر دائمی Configuration GRUB متفاوت است.
+<p>این قابلیت در Troubleshooting اهمیت زیادی دارد، چون می‌توانی بدون تغییر دائمی سیستم، یک Kernel Parameter را آزمایش کنی.</p>
 </div></div>
 
 <hr>
 
-<h3><code>/boot</code> چیست؟ ⭐⭐⭐</h3>
-<p>در Linux، فایل‌های مربوط به Boot معمولاً در:</p>
-
-<div class="code-container"><span class="code-label">/boot</span><div class="code-block no-prompt">/boot</div></div>
-
-<p>قرار دارند.</p>
-<p>برای دیدن آن:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -lh /boot</div></div>
-
-<p>ممکن است فایل‌هایی مثل این ببینی:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">vmlinuz-...\ninitramfs-...\ngrub2/</div></div>
-
-<h4>Kernel</h4>
-<p>فایل‌هایی با نام‌هایی شبیه:</p>
-
-<div class="code-container"><span class="code-label">vmlinuz</span><div class="code-block no-prompt">vmlinuz-...</div></div>
-
-<p>معمولاً Kernelهای نصب‌شده هستند.</p>
-
-<h4>initramfs</h4>
-<p>فایل‌هایی شبیه:</p>
-
-<div class="code-container"><span class="code-label">initramfs</span><div class="code-block no-prompt">initramfs-....img</div></div>
-
-<p>وجود دارند.</p>
-<p>initramfs محیط اولیه‌ای است که در مراحل ابتدایی Boot مورد استفاده قرار می‌گیرد تا Kernel بتواند امکانات لازم برای رسیدن به Root Filesystem را فراهم کند.</p>
-<p>فعلاً همین مدل ذهنی کافی است:</p>
-
-<div class="code-container"><span class="code-label">مدل ذهنی</span><div class="code-block no-prompt">GRUB\n ├── Kernel\n └── initramfs\n       ↓\n     Kernel\n       ↓\n Root Filesystem</div></div>
-
-<hr>
-
 <h3>GRUB Configuration ⭐⭐⭐</h3>
-<p>در سیستم‌های GRUB2، یک فایل بسیار مهم وجود دارد:</p>
+<p>تا اینجا دیدیم که GRUB باید بداند:</p>
+<ul>
+    <li>چه Kernelهایی وجود دارند.</li>
+    <li>initramfs کجاست.</li>
+    <li>چه Kernel Parametersای استفاده شوند.</li>
+    <li>کدام Boot Entry به‌صورت پیش‌فرض انتخاب شود.</li>
+</ul>
+<p>این اطلاعات از Configuration مربوط به GRUB به دست می‌آیند.</p>
+<p>در سیستم‌های GRUB2 یک فایل مهم وجود دارد:</p>
 
-<div class="code-container"><span class="code-label">grub.cfg</span><div class="code-block no-prompt">/boot/grub2/grub.cfg</div></div>
+<div class="code-container"><span class="code-label">grub.cfg</span><div class="code-block no-prompt">grub.cfg</div></div>
 
-<p>در سیستم‌های BIOS-based معمولاً این مسیر را می‌بینی.</p>
-<p>در سیستم‌های UEFI ممکن است ساختار مسیر <code>/boot/grub2</code> و EFI متفاوت باشد؛ اما در هر دو حالت مفهوم اصلی یکی است:</p>
-<blockquote>GRUB باید Configuration تولیدشده‌ای داشته باشد تا Boot Entryها را بداند.</blockquote>
+<p>در بسیاری از سیستم‌های RHEL/AlmaLinux مسیرهایی مانند:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/boot/grub2/grub.cfg</div></div>
+
+<p>را می‌بینی.</p>
+<p>اما محل دقیق Configuration و نحوه مدیریت آن می‌تواند به نوع Boot و پیکربندی سیستم وابسته باشد.</p>
+<p>بنابراین در اینجا بهتر است به‌جای حفظ یک مسیر ثابت، این مفهوم را به خاطر بسپاری:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">GRUB Configuration\n        ↓\n   Boot Entries\n        ↓\nKernel + initramfs + Parameters</div></div>
 
 <hr>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>آیا <code>grub.cfg</code> را مستقیماً ویرایش کنیم؟</strong><br>
-<p><strong>خیر.</strong> ⚠️</p>
-<p>این اشتباه رایجی است.</p>
+<h4>آیا <code>grub.cfg</code> را مستقیماً ویرایش کنیم؟</h4>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>خیر.</strong> ⚠️
 <p>فایل:</p>
-<div class="code-container"><span class="code-label">grub.cfg</span><div class="code-block no-prompt">/boot/grub2/grub.cfg</div></div>
-<p>معمولاً فایل <strong>تولیدشده</strong> است.</p>
-<p>برای تغییر دائمی تنظیمات GRUB معمولاً از فایل‌های موجود در:</p>
-<div class="code-container"><span class="code-label">تنظیمات</span><div class="code-block no-prompt">/etc/default/grub\n/etc/grub.d/</div></div>
-<p>استفاده می‌شود و سپس Configuration جدید تولید می‌شود.</p>
+<div class="code-container"><span class="code-label">grub.cfg</span><div class="code-block no-prompt">grub.cfg</div></div>
+<p>معمولاً یک فایل <strong>تولیدشده</strong> است.</p>
+<p>برای تنظیمات دائمی معمولاً با فایل‌هایی مانند:</p>
+<div class="code-container"><span class="code-label">/etc/default/grub</span><div class="code-block no-prompt">/etc/default/grub</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">/etc/grub.d/</span><div class="code-block no-prompt">/etc/grub.d/</div></div>
+<p>کار می‌کنیم و سپس Configuration مناسب GRUB را تولید می‌کنیم.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">تولید</span><div class="code-block no-prompt">/etc/default/grub\n        +\n/etc/grub.d/\n        ↓\nGRUB Configuration\n        ↓\ngrub.cfg</div></div>
 </div></div>
 
 <hr>
 
 <h3><code>/etc/default/grub</code> ⭐⭐⭐</h3>
-<p>این فایل برای تنظیمات عمومی GRUB بسیار مهم است.</p>
-<p>مثلاً:</p>
+<p>فایل:</p>
+
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/etc/default/grub</div></div>
+
+<p>برای تنظیمات عمومی GRUB بسیار مهم است.</p>
+<p>برای مشاهده آن:</p>
 
 <div class="code-container"><span class="code-label">مشاهده</span><div class="code-block">cat /etc/default/grub</div></div>
 
-<p>ممکن است چیزی شبیه این ببینی:</p>
+<p>ممکن است مواردی شبیه این ببینی:</p>
 
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">GRUB_TIMEOUT=5\nGRUB_DEFAULT=saved\nGRUB_CMDLINE_LINUX="..."</div></div>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">GRUB_TIMEOUT=5\nGRUB_DEFAULT=0\nGRUB_CMDLINE_LINUX="..."</div></div>
 
 <p>سه مورد مهم:</p>
 
 <h4><code>GRUB_TIMEOUT</code></h4>
-<p>مدت زمانی که منوی GRUB منتظر انتخاب کاربر می‌ماند.</p>
+<p>مدت زمانی را مشخص می‌کند که GRUB برای انتخاب کاربر منتظر می‌ماند.</p>
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">GRUB_TIMEOUT=5</div></div>
 
 <p>یعنی حدود ۵ ثانیه.</p>
 
+<hr>
+
 <h4><code>GRUB_DEFAULT</code></h4>
 <p>مشخص می‌کند کدام Boot Entry به‌صورت پیش‌فرض انتخاب شود.</p>
+<p>برای مثال:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">GRUB_DEFAULT=0</div></div>
+
+<p>به اولین Entry اشاره می‌کند.</p>
+<p>مقدارهای دیگری مانند <code>saved</code> نیز ممکن است استفاده شوند، اما برای سطح فعلی مهم‌تر است که مفهوم <strong>Default Entry</strong> را درک کنی.</p>
+
+<hr>
 
 <h4><code>GRUB_CMDLINE_LINUX</code></h4>
-<p>پارامترهای Kernel را مشخص می‌کند.</p>
+<p>برای تعیین Kernel Parameters استفاده می‌شود.</p>
 <p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">GRUB_CMDLINE_LINUX="quiet"</div></div>
 
+<p>یعنی پارامتر <code>quiet</code> در Command Line مربوط به Kernel قرار گیرد.</p>
+
 <hr>
 
 <h3><code>/etc/grub.d/</code> ⭐⭐</h3>
-<p>این Directory شامل Scriptهایی است که برای ساخت Configuration مربوط به GRUB استفاده می‌شوند.</p>
-<p>مثلاً:</p>
+<p>Directory زیر:</p>
 
-<div class="code-container"><span class="code-label">grub.d</span><div class="code-block no-prompt">/etc/grub.d/</div></div>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/etc/grub.d/</div></div>
 
-<p>شامل فایل‌هایی با نام‌هایی مانند:</p>
+<p>شامل Scriptهایی است که در تولید Configuration مربوط به GRUB نقش دارند.</p>
+<p>ممکن است فایل‌هایی مانند این ببینی:</p>
 
 <div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">10_linux\n20_linux_xen\n30_os-prober\n40_custom</div></div>
 
-<p>ممکن است باشد.</p>
-<p>در سطح LPIC-1 لازم نیست تک‌تک Scriptها را بشناسی.</p>
-<p>فقط مدل ذهنی زیر را داشته باش:</p>
+<p>در سطح LPIC-1 لازم نیست تک‌تک این Scriptها را بشناسی.</p>
+<p>فقط این رابطه را به خاطر بسپار:</p>
 
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/etc/default/grub\n        +\n   /etc/grub.d/\n        ↓\n  GRUB configuration\n        ↓\n/boot/grub2/grub.cfg</div></div>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">/etc/default/grub\n        +\n/etc/grub.d/\n        ↓\nGRUB Configuration\n        ↓\ngrub.cfg</div></div>
 
 <hr>
 
 <h3>ساخت مجدد Configuration ⭐⭐⭐</h3>
-<p>بعد از تغییر تنظیمات، باید Configuration مناسب GRUB تولید شود.</p>
-<p>در سیستم‌های RHEL/AlmaLinux ممکن است از ابزارهایی مانند:</p>
+<p>وقتی تنظیمات دائمی GRUB را تغییر می‌دهی، باید Configuration مناسب GRUB تولید شود.</p>
+<p>در سیستم‌های RHEL/AlmaLinux ابزارهایی مانند:</p>
 
-<div class="code-container"><span class="code-label">grub2-mkconfig</span><div class="code-block">grub2-mkconfig</div></div>
+<div class="code-container"><span class="code-label">grub2-mkconfig</span><div class="code-block no-prompt">grub2-mkconfig</div></div>
 
-<p>استفاده شود.</p>
-<p>مثلاً:</p>
+<p>برای تولید Configuration استفاده می‌شوند.</p>
+<p>برای مثال، بسته به نوع Boot و ساختار سیستم، ممکن است از دستوری مانند این استفاده شود:</p>
 
-<div class="code-container"><span class="code-label">تولید</span><div class="code-block">sudo grub2-mkconfig -o /boot/grub2/grub.cfg</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo grub2-mkconfig -o /boot/grub2/grub.cfg</div></div>
 
-<p>این دستور Configuration جدید تولید می‌کند.</p>
+<p>این دستور Configuration جدید را تولید می‌کند.</p>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته مهم:</strong><br>
-<p>دستور و مسیر دقیق در سیستم‌های BIOS و UEFI می‌تواند متفاوت باشد. بنابراین در محیط واقعی باید ساختار Boot سیستم را در نظر بگیری.</p>
-<p>برای LPIC-1 مهم‌تر از حفظ یک مسیر خاص این است که بفهمی:</p>
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Configuration\n     ↓\ngrub2-mkconfig\n     ↓\ngrub.cfg</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ نکته مهم</strong><br>
+مسیر خروجی مناسب می‌تواند به نوع Boot سیستم و پیکربندی آن وابسته باشد.
+<p>بنابراین دو مفهوم را از هم جدا کن:</p>
+<div class="code-container"><span class="code-label">تغییر موقت</span><div class="code-block no-prompt">تغییر موقت\n    ↓\nGRUB Menu → e</div></div>
+<p>در مقابل:</p>
+<div class="code-container"><span class="code-label">تغییر دائمی</span><div class="code-block no-prompt">تغییر دائمی\n    ↓\nGRUB Configuration\n    ↓\nتولید مجدد Configuration</div></div>
 </div></div>
 
 <hr>
 
-<h3>تغییر Boot Entry پیش‌فرض</h3>
-<p>فرض کن سیستم چند Kernel دارد و می‌خواهی Kernel خاصی به‌صورت پیش‌فرض Boot شود.</p>
-<p>اینجا دو مفهوم داریم:</p>
+<h3>تغییر Boot Entry پیش‌فرض ⭐⭐⭐</h3>
+<p>فرض کن سیستم چند Kernel دارد:</p>
+
+<div class="code-container"><span class="code-label">Kernelها</span><div class="code-block no-prompt">Kernel A → جدید\nKernel B → قبلی</div></div>
+
+<p>و می‌خواهی یکی از آن‌ها به‌صورت پیش‌فرض Boot شود.</p>
+<p>اینجا مفهوم:</p>
 
 <div class="code-container"><span class="code-label">GRUB_DEFAULT</span><div class="code-block no-prompt">GRUB_DEFAULT</div></div>
 
-<p>و</p>
+<p>مهم می‌شود.</p>
+<p>تنظیمات مربوط به Default Entry را می‌توان در Configuration مربوط به GRUB مشخص کرد و سپس Configuration را مجدداً تولید کرد.</p>
+<p>اما دقت کن:</p>
+<blockquote><strong>انتخاب یک Entry به‌صورت دائمی با ویرایش آن Entry هنگام Boot دو موضوع متفاوت هستند.</strong></blockquote>
+<p>مقایسه:</p>
 
-<div class="code-container"><span class="code-label">saved entry</span><div class="code-block no-prompt">saved entry</div></div>
+<div class="code-container"><span class="code-label">موقت</span><div class="code-block no-prompt">e\n↓\nتغییر موقت\n↓\nفقط همان Boot</div></div>
 
-<p>در بسیاری از سیستم‌ها می‌توان تنظیمات را در:</p>
+<p>در مقابل:</p>
 
-<div class="code-container"><span class="code-label">تنظیمات</span><div class="code-block no-prompt">/etc/default/grub</div></div>
-
-<p>قرار داد و سپس Configuration را مجدداً ساخت.</p>
-<p>نکته مهم این است که:</p>
-<blockquote><strong>تنظیم دائمی</strong> با <strong>ویرایش موقت Entry هنگام Boot</strong> فرق دارد.</blockquote>
-<p>این تفاوت را حتماً حفظ کن.</p>
+<div class="code-container"><span class="code-label">دائمی</span><div class="code-block no-prompt">GRUB_DEFAULT\n↓\nتنظیم دائمی\n↓\nBootهای بعدی</div></div>
 
 <hr>
 
 <h3>GRUB و سیستم‌های چندبوت</h3>
 <p>GRUB فقط برای Linux نیست.</p>
-<p>می‌تواند Boot Entryهای سیستم‌عامل‌های دیگر را نیز ارائه کند.</p>
-<p>مثلاً:</p>
+<p>در یک سیستم چندبوت ممکن است Boot Entryهایی مانند این داشته باشی:</p>
 
-<div class="code-container"><span class="code-label">چندبوت</span><div class="code-block no-prompt">GRUB\n ├── AlmaLinux\n ├── Debian\n └── Windows</div></div>
+<div class="code-container"><span class="code-label">چندبوت</span><div class="code-block no-prompt">GRUB\n │\n ├── AlmaLinux\n ├── Debian\n └── Windows</div></div>
 
-<p>بنابراین یک Boot Loader می‌تواند به کاربر اجازه دهد بین چند سیستم‌عامل انتخاب کند.</p>
+<p>در این حالت کاربر می‌تواند از طریق GRUB سیستم‌عامل موردنظر خود را انتخاب کند.</p>
+<p>بنابراین یکی از وظایف مهم Boot Loader این است که <strong>Entryهای قابل Boot را در اختیار کاربر قرار دهد.</strong></p>
 
 <hr>
 
-<h3>BIOS/UEFI، GRUB و Kernel را قاطی نکن!</h3>
+<h3>BIOS/UEFI، GRUB، Kernel و systemd را قاطی نکن! ⭐⭐⭐</h3>
 <p>این قسمت بسیار مهم است.</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>جزء</th><th>وظیفه</th></tr></thead>
+<thead><tr><th>جزء</th><th>نقش</th></tr></thead>
 <tbody>
 <tr><td>BIOS/UEFI</td><td>Firmware و آغاز فرآیند Boot</td></tr>
 <tr><td>GRUB</td><td>Boot Loader</td></tr>
-<tr><td>Kernel</td><td>هسته سیستم‌عامل</td></tr>
+<tr><td>Kernel</td><td>هسته Linux</td></tr>
+<tr><td>initramfs</td><td>محیط اولیه مورد استفاده در مراحل ابتدایی Boot</td></tr>
 <tr><td>systemd</td><td>اولین Process مهم User Space / PID 1</td></tr>
-<tr><td><code>/boot</code></td><td>محل فایل‌های موردنیاز Boot</td></tr>
-<tr><td><code>grub.cfg</code></td><td>Configuration تولیدشده GRUB</td></tr>
+<tr><td><code>/boot</code></td><td>محل فایل‌های مهم مربوط به Boot</td></tr>
+<tr><td><code>grub.cfg</code></td><td>Configuration تولیدشده برای GRUB</td></tr>
 </tbody>
 </table>
 </div>
 
 <p>مدل نهایی:</p>
 
-<div class="code-container"><span class="code-label">نقشه کامل</span><div class="code-block no-prompt">┌──────────────┐\n│ BIOS / UEFI  │  Firmware\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│     GRUB     │  Boot Loader\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│    Kernel    │  هسته Linux\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│   systemd    │  PID 1\n└──────┬───────┘\n       ↓\n    Services\n       ↓\n     Login</div></div>
+<div class="code-container"><span class="code-label">زنجیره کامل</span><div class="code-block no-prompt">┌──────────────┐\n│ BIOS / UEFI  │  Firmware\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│     GRUB     │  Boot Loader\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│    Kernel    │  هسته Linux\n└──────┬───────┘\n       ↓\n┌──────────────┐\n│   systemd    │  PID 1\n└──────┬───────┘\n       ↓\n   Services\n       ↓\n     Login</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">تفاوت‌ها</span><div class="code-block no-prompt">BIOS/UEFI ≠ GRUB\nGRUB ≠ Kernel\nKernel ≠ systemd</div></div>
+
+<p>هرکدام نقش متفاوتی در فرآیند Boot دارند.</p>
 
 <hr>
 
 <h2>نکات مهم</h2>
 <ul>
-    <li><strong>GRUB2</strong> Boot Loader رایج Linux است.</li>
+    <li><strong>GRUB2</strong> یکی از Boot Loaderهای رایج Linux است.</li>
     <li>GRUB بین Firmware و Kernel قرار دارد.</li>
     <li>GRUB می‌تواند چند Kernel را در اختیار کاربر قرار دهد.</li>
-    <li>فایل‌های Boot معمولاً در <code>/boot</code> قرار دارند.</li>
-    <li><code>vmlinuz</code> معمولاً فایل Kernel است.</li>
+    <li>فایل‌های مهم Boot معمولاً در <code>/boot</code> قرار دارند.</li>
+    <li><code>vmlinuz-*</code> معمولاً فایل Kernel است.</li>
     <li><code>initramfs</code> محیط اولیه موردنیاز در مراحل ابتدایی Boot را فراهم می‌کند.</li>
-    <li>پارامترهای Kernel از طریق GRUB قابل انتقال هستند.</li>
-    <li>با <code>e</code> می‌توان Boot Entry را <strong>موقتاً</strong> ویرایش کرد.</li>
-    <li><code>/etc/default/grub</code> شامل تنظیمات عمومی GRUB است.</li>
+    <li>GRUB می‌تواند Kernel Parameters را به Kernel منتقل کند.</li>
+    <li>با <code>e</code> می‌توان Boot Entry را به‌صورت <strong>موقت</strong> ویرایش کرد.</li>
+    <li>تغییر با <code>e</code> باعث تغییر دائمی Configuration نمی‌شود.</li>
+    <li><code>/etc/default/grub</code> یکی از محل‌های اصلی تنظیمات عمومی GRUB است.</li>
     <li><code>/etc/grub.d/</code> شامل Scriptهای تولید Configuration است.</li>
-    <li><code>grub.cfg</code> فایل Configuration تولیدشده است.</li>
-    <li>مستقیماً ویرایش کردن <code>grub.cfg</code> روش مناسب برای تنظیم دائمی نیست.</li>
-    <li><code>grub2-mkconfig</code> برای تولید مجدد Configuration استفاده می‌شود.</li>
-    <li><code>GRUB_TIMEOUT</code> زمان انتظار منوی GRUB را تعیین می‌کند.</li>
+    <li><code>grub.cfg</code> معمولاً فایل Configuration تولیدشده است.</li>
+    <li>بهتر است <code>grub.cfg</code> را مستقیماً ویرایش نکنی.</li>
+    <li><code>grub2-mkconfig</code> برای تولید Configuration مربوط به GRUB استفاده می‌شود.</li>
+    <li><code>GRUB_TIMEOUT</code> زمان انتظار منوی GRUB را مشخص می‌کند.</li>
     <li><code>GRUB_DEFAULT</code> Entry پیش‌فرض را مشخص می‌کند.</li>
-    <li><code>GRUB_CMDLINE_LINUX</code> برای پارامترهای Kernel استفاده می‌شود.</li>
+    <li><code>GRUB_CMDLINE_LINUX</code> برای Kernel Parameters استفاده می‌شود.</li>
+    <li>GRUB می‌تواند در Recovery و Troubleshooting بسیار مهم باشد.</li>
 </ul>
 
 <hr>
 
 <h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
-<p>GRUB را مثل <strong>مدیر تحویل دادن سیستم به Kernel</strong> تصور کن.</p>
-<p>Firmware اول سیستم را روشن و آماده می‌کند.</p>
+<p>GRUB را مثل <strong>مدیر تحویل سیستم به Kernel</strong> تصور کن.</p>
+<p>Firmware ابتدا سیستم را آماده می‌کند.</p>
 <p>بعد GRUB اجرا می‌شود.</p>
-<p>GRUB می‌گوید:</p>
-<blockquote>«کدام Kernel را باید اجرا کنم؟»</blockquote>
-<p>اگر چند Kernel داشته باشی، انتخاب را در اختیار کاربر می‌گذارد.</p>
-<p>سپس می‌گوید:</p>
-<blockquote>«این Kernel باید با این پارامترها اجرا شود و این initramfs را هم در اختیارش قرار می‌دهم.»</blockquote>
-<p>بعد Kernel اجرا می‌شود و کنترل User Space را به systemd می‌دهد.</p>
-<p>پس GRUB خودش <strong>Kernel نیست</strong> و سیستم‌عامل را هم مدیریت نمی‌کند.</p>
-<p>فقط مسئول مرحله‌ای است که بین Firmware و اجرای Kernel قرار دارد.</p>
+<p>GRUB بررسی می‌کند:</p>
+<blockquote>«کدام Boot Entry را باید اجرا کنم؟»</blockquote>
+<p>اگر چند Kernel داشته باشی، می‌تواند امکان انتخاب Kernel مناسب را فراهم کند.</p>
+<p>سپس اطلاعات لازم برای Boot را در اختیار Kernel قرار می‌دهد:</p>
+
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">Kernel\n+\ninitramfs\n+\nKernel Parameters</div></div>
+
+<p>بعد Kernel اجرا می‌شود و فرآیند وارد User Space می‌شود.</p>
+<p>در سیستم‌های معمول Linux، systemd به‌عنوان PID 1 اجرا می‌شود و ادامه راه‌اندازی سیستم را مدیریت می‌کند.</p>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Firmware\n   ↓\n  GRUB\n   ↓\n Kernel\n   ↓\n systemd\n   ↓\nServices\n   ↓\n Login</div></div>
+
+<p>و مهم‌ترین نکته:</p>
+<blockquote><strong>GRUB مسئول انتخاب و تحویل Kernel برای Boot است؛ Kernel هسته Linux است؛ systemd در User Space و بعد از Kernel اجرا می‌شود.</strong></blockquote>
 
 <hr>
 
@@ -25706,43 +25782,40 @@ whereis → Binary / Source / Man</div></div>
 <p>سیستم را Reboot کن و منوی GRUB را مشاهده کن.</p>
 
 <h4>مرحله 2 — Kernel قبلی را انتخاب کن</h4>
-<p>از گزینه‌های GRUB:</p>
-
-<div class="code-container"><span class="code-label">Advanced options</span><div class="code-block no-prompt">Advanced options</div></div>
-
-<p>یا Entryهای موجود، Kernel قبلی را انتخاب کن.</p>
+<p>از Entryهای موجود، Kernel قبلی را انتخاب کن.</p>
+<p>مثلاً ممکن است گزینه‌ای برای Kernel قبلی یا Advanced Options وجود داشته باشد.</p>
 
 <h4>مرحله 3 — سیستم را Boot کن</h4>
-<p>اگر Kernel قبلی بدون مشکل اجرا شد، مشخص می‌شود که احتمالاً مشکل مربوط به Kernel جدید یا اجزای مرتبط با آن است.</p>
+<p>اگر Kernel قبلی بدون مشکل اجرا شد، احتمال دارد مشکل مربوط به Kernel جدید یا اجزای مرتبط با آن باشد.</p>
 
-<h4>مرحله 4 — بررسی Kernelهای موجود</h4>
+<h4>مرحله 4 — Kernelهای موجود را بررسی کن</h4>
 <p>بعد از Login:</p>
 
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">ls -lh /boot/vmlinuz*</div></div>
 
-<h4>مرحله 5 — بررسی Configuration</h4>
+<h4>مرحله 5 — Configuration را بررسی کن</h4>
 
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">cat /etc/default/grub</div></div>
 
-<h4>مرحله 6 — اگر نیاز به تغییر موقت پارامتر Kernel داری</h4>
+<h4>مرحله 6 — اگر نیاز به تغییر موقت Kernel Parameter داری</h4>
 <p>در Boot بعدی:</p>
 
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">GRUB Menu\n   ↓\ne\n   ↓\nویرایش خط Kernel\n   ↓\nCtrl+x</div></div>
+<div class="code-container"><span class="code-label">ویرایش موقت</span><div class="code-block no-prompt">GRUB Menu\n    ↓\n    e\n    ↓\nEdit Kernel Line\n    ↓\nCtrl+x</div></div>
 
-<p>این تغییر فقط برای همان Boot است.</p>
+<p>این تغییر فقط برای همان Boot اعمال می‌شود.</p>
 
-<div class="summary-box">
-    <h3>نتیجه</h3>
-    <p>GRUB دو قابلیت بسیار مهم در این سناریو به ما می‌دهد:</p>
-    <div class="code-container"><span class="code-label">دو قابلیت</span><div class="code-block no-prompt">انتخاب Kernel\n     +\nتغییر موقت Kernel Parameters</div></div>
-    <p>و هر دو برای Troubleshooting بسیار کاربردی هستند.</p>
-</div>
+<h4>نتیجه</h4>
+<p>GRUB در این سناریو دو قابلیت بسیار مهم در اختیار ما قرار می‌دهد:</p>
+
+<div class="code-container"><span class="code-label">قابلیت‌ها</span><div class="code-block no-prompt">انتخاب Kernel\n      +\nتغییر موقت Kernel Parameters</div></div>
+
+<p>هر دو قابلیت در Troubleshooting اهمیت زیادی دارند.</p>
 
 <hr>
 
 <h2>Cheat Sheet</h2>
 
-<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">GRUB2 → Boot Loader\n/boot → فایل‌های مهم Boot\nvmlinuz → Linux Kernel\ninitramfs → محیط اولیه Boot\ne → ویرایش موقت Boot Entry\nCtrl+x / F10 → اجرای Entry و Boot\n/etc/default/grub → تنظیمات عمومی\n/etc/grub.d/ → Scriptهای تولید Configuration\ngrub2-mkconfig → تولید مجدد grub.cfg\nGRUB_TIMEOUT → زمان نمایش Menu\nGRUB_DEFAULT → Entry پیش‌فرض</div></div>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">GRUB2 → Boot Loader\n\n/boot → فایل‌های مهم Boot\n\nvmlinuz → Linux Kernel\n\ninitramfs → محیط اولیه Boot\n\ne → ویرایش موقت Boot Entry\n\nCtrl+x / F10 → اجرای Entry و Boot\n\n/etc/default/grub → تنظیمات عمومی GRUB\n\n/etc/grub.d/ → Scriptهای تولید Configuration\n\ngrub2-mkconfig → تولید Configuration مربوط به GRUB\n\nGRUB_TIMEOUT → زمان انتظار Menu\n\nGRUB_DEFAULT → Entry پیش‌فرض\n\nGRUB_CMDLINE_LINUX → Kernel Parameters</div></div>
 
 <hr>
 
@@ -25760,7 +25833,7 @@ whereis → Binary / Source / Man</div></div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>کدام فایل معمولاً Kernel Linux را در <code>/boot</code> نشان می‌دهد؟</p>
+<p>کدام گزینه معمولاً Kernel Linux را در <code>/boot</code> نشان می‌دهد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) <code>grub.cfg</code></button>
     <button onclick="selectOption(this)">B) <code>vmlinuz-*</code></button>
@@ -25778,7 +25851,7 @@ whereis → Binary / Source / Man</div></div>
     <button onclick="selectOption(this)">C) Boot Entry برای همان Boot قابل ویرایش می‌شود.</button>
     <button onclick="selectOption(this)">D) Kernel جدید نصب می‌شود.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>ویرایش با <code>e</code> معمولاً <strong>موقتی</strong> است و Configuration دائمی سیستم را تغییر نمی‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>ویرایش با <code>e</code> معمولاً موقتی است و Configuration دائمی سیستم را تغییر نمی‌دهد.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۴</p>
@@ -25789,7 +25862,7 @@ whereis → Binary / Source / Man</div></div>
     <button onclick="selectOption(this)">C) <code>GRUB_WAIT</code></button>
     <button onclick="selectOption(this)">D) <code>GRUB_TIME</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>مثلاً: <code>GRUB_TIMEOUT=5</code> یعنی منو حدود ۵ ثانیه منتظر می‌ماند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>مثلاً: <code>GRUB_TIMEOUT=5</code> یعنی GRUB حدود ۵ ثانیه برای انتخاب کاربر منتظر بماند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
@@ -25804,36 +25877,48 @@ whereis → Binary / Source / Man</div></div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۶</p>
-<p>برای تولید مجدد Configuration مربوط به GRUB در یک سیستم AlmaLinux/RHEL-based کدام دستور مناسب است؟</p>
+<p>برای تولید Configuration مربوط به GRUB در یک سیستم AlmaLinux/RHEL-based کدام ابزار مناسب است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) <code>systemctl grub restart</code></button>
     <button onclick="selectOption(this)">B) <code>grub2-mkconfig</code></button>
     <button onclick="selectOption(this)">C) <code>kernel-build</code></button>
     <button onclick="selectOption(this)">D) <code>systemd-config</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>مثلاً: <code>sudo grub2-mkconfig -o /boot/grub2/grub.cfg</code>. البته مسیر خروجی بسته به نوع Boot سیستم می‌تواند متفاوت باشد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>grub2-mkconfig</code> برای تولید Configuration مربوط به GRUB استفاده می‌شود. مسیر خروجی مناسب می‌تواند بسته به نوع Boot سیستم متفاوت باشد.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
-<p>سیستم بعد از نصب یک Kernel جدید Boot نمی‌شود. کاربر می‌خواهد بدون تغییر دائمی تنظیمات، یک Kernel قدیمی را انتخاب و Boot کند. بهترین راه چیست؟</p>
+<p>سیستم بعد از نصب یک Kernel جدید Boot نمی‌شود. کاربر می‌خواهد بدون تغییر دائمی تنظیمات، Kernel قدیمی را Boot کند. بهترین راه چیست؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) حذف systemd</button>
     <button onclick="selectOption(this)">B) ویرایش <code>/etc/passwd</code></button>
     <button onclick="selectOption(this)">C) انتخاب Kernel قدیمی از GRUB</button>
     <button onclick="selectOption(this)">D) تغییر Partition Table</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>GRUB می‌تواند چند Kernel را در اختیار کاربر قرار دهد. بنابراین یکی از کاربردهای مهم آن، انتخاب Kernel قبلی برای Recovery و Troubleshooting است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>GRUB می‌تواند چند Kernel را در اختیار کاربر قرار دهد؛ بنابراین انتخاب Kernel قبلی یکی از روش‌های مفید برای Recovery و Troubleshooting است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۸ — سناریویی</p>
+<p>کاربر در منوی GRUB با فشردن <code>e</code> یک Kernel Parameter را تغییر می‌دهد. سیستم Boot می‌شود، اما بعد از Reboot تغییر از بین رفته است. علت چیست؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Kernel تغییرات را پاک کرده است.</button>
+    <button onclick="selectOption(this)">B) تغییر با <code>e</code> فقط برای همان Boot موقت بوده است.</button>
+    <button onclick="selectOption(this)">C) systemd Configuration را پاک کرده است.</button>
+    <button onclick="selectOption(this)">D) initramfs دوباره ساخته شده است.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>ویرایش Boot Entry با <code>e</code> Configuration دائمی GRUB را تغییر نمی‌دهد.</div>
 </div>
 
 <div class="summary-box">
-    <h3>🎯 Recall نهایی</h3>
+    <h3>🎯 جمع‌بندی نهایی</h3>
     <p>فقط این زنجیره را به خاطر بسپار:</p>
-    <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">BIOS / UEFI\n     ↓\n    GRUB\n     ↓\n Kernel + initramfs\n     ↓\n  systemd\n     ↓\n Services\n     ↓\n  Login</div></div>
+    <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">BIOS / UEFI\n     ↓\n    GRUB\n     ↓\nKernel + initramfs\n     ↓\n  systemd\n     ↓\n Services\n     ↓\n  Login</div></div>
     <p>و مهم‌تر از همه:</p>
     <blockquote><strong>GRUB انتخاب و تحویل Kernel را انجام می‌دهد؛ Kernel هسته Linux است؛ systemd بعد از Kernel وارد User Space می‌شود.</strong></blockquote>
-    <p>در جلسه بعد، می‌رویم سراغ <strong>Manual Boot Linux</strong>؛ یعنی وقتی GRUB به‌صورت عادی Boot نمی‌کند، چطور به‌صورت دستی Kernel و initramfs را برای Boot معرفی کنیم.</p>
+    <p>در جلسه بعد، می‌رویم سراغ <strong>Manual Boot Linux</strong>؛ یعنی وقتی Boot معمولی انجام نمی‌شود، چگونه Kernel و initramfs را به‌صورت دستی برای Boot معرفی کنیم.</p>
 </div>
-`,
+`
+,
 "ch5-3": `
 <div class="section-header">
     <div class="section-badge">۵</div>
