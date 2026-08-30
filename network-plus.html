@@ -6,66 +6,86 @@
     <title>جزوه جامع - قالب اصلی</title>
 
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-body: #f8fafc;
+            --primary: #E95420;
+            --primary-hover: #c7461a;
+            --primary-soft: #fde8e0;
+            --primary-glow: rgba(233, 84, 32, 0.18);
+
+            --bg-body: #f7f7f7;
             --bg-card: #ffffff;
-            --text-main: #334155;
-            --text-heading: #0f172a;
-            --border: #e2e8f0;
-            --navbar-bg: #ffffff;
+            --text-main: #333333;
+            --text-heading: #1a1a1a;
+            --border: #e0e0e0;
+            --navbar-bg: rgba(255, 255, 255, 0.92);
             --navbar-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            --sidebar-hover: #f1f5f9;
-            --note-bg: #f0fdf4;
-            --note-text: #166534;
-            --important-bg: #eff6ff;
-            --important-text: #1e3a8a;
-            --warning-bg: #fffbeb;
-            --warning-text: #92400e;
-            --text-muted: #94a3b8;
-            --back-btn-bg: #e2e8f0;
-            --back-btn-color: #334155;
-            --back-btn-hover: #cbd5e1;
-            
+            --sidebar-hover: #fde8e0;
+            --note-bg: #e8f5e9;
+            --note-text: #2e7d32;
+            --note-border: #4caf50;
+            --important-bg: #e3f2fd;
+            --important-text: #1565c0;
+            --important-border: #2196f3;
+            --warning-bg: #fff8e1;
+            --warning-text: #e65100;
+            --warning-border: #ff9800;
+            --text-muted: #666666;
+            --back-btn-bg: #f1ede9;
+            --back-btn-color: #333333;
+            --back-btn-hover: #e5ddd6;
+            --code-bg: #2c001e;
+            --code-text: #eeeeee;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
             /* متغیرهای نوار پایین موبایل */
             --bottom-nav-bg: rgba(255, 255, 255, 0.85);
             --bottom-nav-border: rgba(255, 255, 255, 0.9);
             --bottom-nav-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            --bottom-btn-bg: #f1f5f9;
-            --bottom-btn-color: #334155;
+            --bottom-btn-bg: #fde8e0;
+            --bottom-btn-color: #333333;
         }
 
         [data-theme="dark"] {
-            --primary: #3b82f6;
-            --primary-hover: #60a5fa;
-            --bg-body: #0f172a;
-            --bg-card: #1e293b;
-            --text-main: #cbd5e1;
-            --text-heading: #f8fafc;
-            --border: #334155;
-            --navbar-bg: #1e293b;
+            --primary: #E95420;
+            --primary-hover: #ff6b3d;
+            --primary-soft: rgba(233, 84, 32, 0.15);
+            --primary-glow: rgba(233, 84, 32, 0.22);
+
+            --bg-body: #1e1e1e;
+            --bg-card: #2a2a2a;
+            --text-main: #e0e0e0;
+            --text-heading: #ffffff;
+            --border: #404040;
+            --navbar-bg: rgba(42, 42, 42, 0.95);
             --navbar-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            --sidebar-hover: #334155;
-            --note-bg: rgba(34, 197, 94, 0.1);
-            --note-text: #4ade80;
-            --important-bg: rgba(59, 130, 246, 0.1);
-            --important-text: #60a5fa;
-            --warning-bg: rgba(245, 158, 11, 0.1);
-            --warning-text: #fbbf24;
-            --text-muted: #64748b;
-            --back-btn-bg: #334155;
-            --back-btn-color: #cbd5e1;
-            --back-btn-hover: #475569;
-            
-            --bottom-nav-bg: rgba(30, 41, 59, 0.85);
-            --bottom-nav-border: rgba(51, 65, 85, 0.9);
-            --bottom-nav-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-            --bottom-btn-bg: #334155;
-            --bottom-btn-color: #cbd5e1;
+            --sidebar-hover: rgba(233, 84, 32, 0.15);
+            --note-bg: rgba(76, 175, 80, 0.12);
+            --note-text: #81c784;
+            --note-border: #81c784;
+            --important-bg: rgba(33, 150, 243, 0.12);
+            --important-text: #64b5f6;
+            --important-border: #64b5f6;
+            --warning-bg: rgba(255, 152, 0, 0.12);
+            --warning-text: #ffb74d;
+            --warning-border: #ffb74d;
+            --text-muted: #aaaaaa;
+            --back-btn-bg: #404040;
+            --back-btn-color: #e0e0e0;
+            --back-btn-hover: #4d4d4d;
+            --code-bg: #1a1a1a;
+            --code-text: #e0e0e0;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+
+            --bottom-nav-bg: rgba(30, 30, 30, 0.85);
+            --bottom-nav-border: rgba(64, 64, 64, 0.9);
+            --bottom-nav-shadow: 0 -4px 20px rgba(0,0,0,0.35);
+            --bottom-btn-bg: #404040;
+            --bottom-btn-color: #e0e0e0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,7 +96,7 @@
             color: var(--text-main);
             display: flex;
             flex-direction: column;
-            line-height: 1.8;
+            line-height: 1.85;
             font-size: 16px;
             transition: background-color 0.3s ease, color 0.3s ease;
             padding-top: 60px;
@@ -90,7 +110,9 @@
             right: 0;
             z-index: 1000;
             background: var(--navbar-bg);
+            backdrop-filter: blur(12px);
             box-shadow: var(--navbar-shadow);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             padding: 0 16px;
@@ -102,14 +124,25 @@
 
         .navbar-brand {
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             color: var(--primary);
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .navbar-brand i { font-size: 1.2rem; }
+        .navbar-brand i {
+            font-size: 1rem;
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
 
         .navbar-links {
             display: flex;
@@ -141,7 +174,7 @@
             border: 1px solid transparent;
         }
         .navbar-links a:hover { background: var(--sidebar-hover); color: var(--primary); }
-        .navbar-links a.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .navbar-links a.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 3px 10px var(--primary-glow); }
 
         .navbar-actions {
             display: flex;
@@ -171,10 +204,11 @@
         .back-home-btn i { font-size: 1rem; }
         .back-home-btn:hover {
             background: var(--back-btn-hover);
+            color: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
-        
+
         /* مخفی کردن دکمه بازگشت در حالت موبایل */
         @media (max-width: 768px) {
             .back-home-btn {
@@ -183,16 +217,18 @@
         }
 
         .navbar-actions .icon-btn {
-            background: none;
+            background: var(--primary-soft);
             border: none;
-            font-size: 1.3rem;
-            color: var(--text-main);
+            font-size: 1.1rem;
+            color: var(--primary);
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
             transition: 0.2s;
+            flex-shrink: 0;
         }
-        .navbar-actions .icon-btn:hover { background: var(--sidebar-hover); color: var(--primary); }
+        .navbar-actions .icon-btn:hover { background: var(--primary); color: #fff; }
 
         /* ----- محتوای اصلی ----- */
         .main-content {
@@ -206,8 +242,9 @@
             display: none;
             background: var(--bg-card);
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
             animation: fadeIn 0.4s ease;
             transition: background-color 0.3s ease;
         }
@@ -215,45 +252,69 @@
         .chapter.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { color: var(--primary); font-size: 2rem; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px dashed var(--border); }
+        h1 {
+            color: var(--text-heading);
+            font-size: 1.7rem;
+            margin-bottom: 26px;
+            padding-bottom: 15px;
+            padding-right: 16px;
+            border-bottom: 2px solid var(--border);
+            position: relative;
+        }
+        h1::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 4px;
+            bottom: 19px;
+            width: 5px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
         h2, h3, h4 { color: var(--text-heading); margin-top: 30px; margin-bottom: 15px; transition: color 0.3s; }
+        h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
         p { text-align: justify; margin-bottom: 15px; }
         ul, ol { padding-right: 20px; margin-bottom: 15px; }
         li { margin-bottom: 6px; }
+        strong { color: var(--text-heading); }
 
         .box {
-            padding: 15px 20px;
+            padding: 16px 20px;
             border-radius: 10px;
             margin: 20px 0;
-            border-right: 5px solid;
+            border: 1px solid;
             display: flex;
             align-items: flex-start;
             gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: background-color 0.3s, color 0.3s;
         }
-        .box i { font-size: 1.5rem; margin-top: 3px; }
+        .box i { font-size: 1.4rem; margin-top: 3px; flex-shrink: 0; }
 
-        .box.note { background: var(--note-bg); border-color: #22c55e; color: var(--note-text); }
-        .box.note i { color: #22c55e; }
+        .box.note { background: var(--note-bg); border-color: var(--note-border); color: var(--text-main); }
+        .box.note i, .box.note strong { color: var(--note-text); }
 
-        .box.important { background: var(--important-bg); border-color: #3b82f6; color: var(--important-text); }
-        .box.important i { color: #3b82f6; }
+        .box.important { background: var(--important-bg); border-color: var(--important-border); color: var(--text-main); }
+        .box.important i, .box.important strong { color: var(--important-text); }
 
-        .box.warning { background: var(--warning-bg); border-color: #f59e0b; color: var(--warning-text); }
-        .box.warning i { color: #f59e0b; }
+        .box.warning { background: var(--warning-bg); border-color: var(--warning-border); color: var(--text-main); }
+        .box.warning i, .box.warning strong { color: var(--warning-text); }
 
         .code-block {
-            background: #0f172a;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', Consolas, monospace;
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 16px 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', 'Courier New', Consolas, monospace;
+            font-size: 0.9rem;
             direction: ltr;
             text-align: left;
             white-space: pre;
             overflow-x: auto;
             unicode-bidi: plaintext;
             margin: 15px 0;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* ----- اسکرول افقی امن برای جدول‌ها ----- */
@@ -262,49 +323,65 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
             /* جلوگیری از بیرون زدن از کارت فصل */
             max-width: 100%;
         }
         .table-scroll table {
             margin: 0; /* margin روی wrapper است */
+            border: none;
+            border-radius: 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            font-size: 0.95rem;
+            font-size: 0.93rem;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
         }
         th, td {
             border: 1px solid var(--border);
-            padding: 10px 12px;
+            padding: 11px 14px;
             text-align: right;
+            vertical-align: top;
         }
         th {
-            background-color: var(--sidebar-hover);
+            background-color: var(--primary-soft);
             color: var(--text-heading);
             font-weight: 600;
         }
+        tr:hover td { background-color: var(--bg-body); }
 
         .quiz-question {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
+            padding: 20px 22px;
             margin: 30px 0 15px 0;
+            box-shadow: var(--shadow);
             transition: background-color 0.3s;
         }
         .quiz-question p { margin-bottom: 8px; }
+        .quiz-question > p:first-child { font-size: 1.02rem; color: var(--text-heading); }
         .quiz-options { list-style: none; padding-right: 0; }
-        .quiz-options li { margin: 6px 0; }
+        .quiz-options li {
+            margin: 6px 0;
+            padding: 10px 14px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
         .quiz-answer {
             background: var(--note-bg);
             border-radius: 8px;
             padding: 12px 18px;
             margin-top: 12px;
-            border-right: 4px solid #22c55e;
-            color: var(--note-text);
+            border-right: 4px solid var(--note-border);
+            color: var(--text-main);
         }
         .quiz-answer strong { color: var(--text-heading); }
 
@@ -320,24 +397,27 @@
             flex-wrap: wrap;
         }
         .nav-btn {
-            padding: 10px 20px;
+            padding: 11px 22px;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 24px;
             cursor: pointer;
             font-family: inherit;
+            font-size: 0.95rem;
             transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 14px var(--primary-glow);
         }
-        .nav-btn:hover { background: var(--primary-hover); }
+        .nav-btn:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
         .nav-btn:disabled {
             background: var(--border);
             color: var(--text-muted);
             cursor: not-allowed;
-            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
         }
 
         /* ----- نوار پایین موبایل (Bottom Navigation) ----- */
@@ -382,7 +462,7 @@
         }
         .bottom-nav-btn i { font-size: 1.3rem; transition: transform 0.2s; }
         .bottom-nav-btn:active { transform: scale(0.92); }
-        
+
         .bottom-nav-btn:hover:not(:disabled) { background: var(--bottom-btn-bg); }
         .bottom-nav-btn:disabled {
             opacity: 0.4;
@@ -398,7 +478,7 @@
             padding: 0;
             flex: none;
             max-width: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
         .bottom-nav-btn.home-btn i { font-size: 1.4rem; }
         .bottom-nav-btn.home-btn:active { transform: scale(0.90); }
@@ -428,16 +508,16 @@
                 display: inline-flex;
                 align-items: center;
             }
-            
+
             .back-home-btn { font-size: 0.7rem; padding: 4px 10px; }
             .back-home-btn span { display: none; } /* فقط آیکون خانه در موبایل */
-            
+
             .navbar-actions { flex-shrink: 0; }
-            .navbar-actions .icon-btn { font-size: 1.15rem; padding: 4px 8px; }
+            .navbar-actions .icon-btn { font-size: 1rem; width: 34px; height: 34px; }
             .main-content { padding: 16px 12px 24px; overflow-x: hidden; }
             .chapter { padding: 20px 14px; overflow-x: hidden; max-width: 100%; }
-            h1 { font-size: 1.35rem; }
-            
+            h1 { font-size: 1.3rem; }
+
             /* جدول‌ها: اسکرول افقی داخل wrapper، نه کل صفحه */
             .table-scroll {
                 margin: 14px 0;
@@ -454,7 +534,7 @@
         }
 
         @media (max-width: 480px) {
-            .navbar-brand i { font-size: 0.95rem; }
+            .navbar-brand i { font-size: 0.85rem; width: 28px; height: 28px; }
             .navbar-links a {
                 font-size: 0.68rem;
                 padding: 6px 8px;
