@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +11,11 @@
 
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-soft: rgba(99, 102, 241, 0.12);
-            --primary-glow: rgba(99, 102, 241, 0.25);
-            --accent: #22d3ee;
+            --primary: #E95420;
+            --primary-hover: #c7461a;
+            --primary-soft: rgba(233, 84, 32, 0.12);
+            --primary-glow: rgba(233, 84, 32, 0.25);
+            --accent: #fb923c;
 
             --bg-body: #f0f4f8;
             --bg-card: rgba(255, 255, 255, 0.75);
@@ -40,11 +40,11 @@
         }
 
         [data-theme="dark"] {
-            --primary: #818cf8;
-            --primary-hover: #a5b4fc;
-            --primary-soft: rgba(129, 140, 248, 0.15);
-            --primary-glow: rgba(129, 140, 248, 0.3);
-            --accent: #22d3ee;
+            --primary: #ff7a45;
+            --primary-hover: #ffa06e;
+            --primary-soft: rgba(255, 122, 69, 0.16);
+            --primary-glow: rgba(255, 122, 69, 0.3);
+            --accent: #fdba74;
 
             --bg-body: #0b1120;
             --bg-card: rgba(30, 41, 59, 0.65);
@@ -173,7 +173,7 @@
             border-color: var(--border);
         }
         .nav-links a.active {
-            background: linear-gradient(135deg, var(--primary), #818cf8);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             box-shadow: 0 4px 16px var(--primary-glow);
             border-color: transparent;
@@ -476,7 +476,7 @@
         }
         .nav-btn {
             padding: 12px 26px;
-            background: linear-gradient(135deg, var(--primary), #818cf8);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             border: none;
             border-radius: 14px;
@@ -2469,7 +2469,7 @@
             }
         }
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
 

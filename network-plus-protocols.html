@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
@@ -19,11 +19,11 @@
         }
 
         :root {
-            --primary: #7c3aed;
-            --primary-hover: #6d28d9;
-            --primary-soft: rgba(124, 58, 237, 0.14);
-            --primary-glow: rgba(124, 58, 237, 0.28);
-            --accent: #06b6d4;
+            --primary: #E95420;
+            --primary-hover: #c7461a;
+            --primary-soft: rgba(233, 84, 32, 0.14);
+            --primary-glow: rgba(233, 84, 32, 0.28);
+            --accent: #fb923c;
 
             --bg-body: #f1f5f9;
             --bg-card: rgba(255, 255, 255, 0.55);
@@ -49,11 +49,11 @@
         }
 
         [data-theme="dark"] {
-            --primary: #a78bfa;
-            --primary-hover: #c4b5fd;
-            --primary-soft: rgba(167, 139, 250, 0.16);
-            --primary-glow: rgba(167, 139, 250, 0.3);
-            --accent: #22d3ee;
+            --primary: #ff7a45;
+            --primary-hover: #ffa06e;
+            --primary-soft: rgba(255, 122, 69, 0.16);
+            --primary-glow: rgba(255, 122, 69, 0.3);
+            --accent: #fdba74;
 
             --bg-body: #0b1120;
             --bg-card: rgba(30, 41, 59, 0.55);
@@ -169,7 +169,7 @@
             color: var(--primary);
         }
         .nav-links a.active {
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             box-shadow: 0 4px 14px var(--primary-glow);
         }
@@ -719,7 +719,7 @@
         }
         .nav-btn {
             padding: 13px 26px;
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
             border: none;
             border-radius: 14px;
@@ -2649,7 +2649,7 @@
         }
 
         // ====== theme toggle (in-memory, persists for this session) ======
-        let currentTheme = 'light';
+        let currentTheme = 'dark';
         function toggleTheme() {
             const html = document.documentElement;
             currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
