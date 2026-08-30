@@ -28554,669 +28554,763 @@ Manual Boot به معنی اجرای Linux بدون Kernel یا بدون GRUB ن
 <div class="section-header">
     <div class="section-badge">۵</div>
     <div>
-        <h1>File Search — جستجوی فایل، دستور و محتوای سیستم</h1>
-        <div class="meta">فایل‌ها، مجوزها و آرشیو · بخش ۷ از ۷</div>
+        <h1>Docker + KVM</h1>
+        <div class="meta">بوت، سیستم‌عامل و مجازی‌سازی · بخش ۷ از ۸</div>
     </div>
 </div>
 
+<blockquote>این جلسه عمداً دو مفهوم را کنار هم می‌آورد: <strong>Docker/Container</strong> برای Virtualisation در سطح Application و <strong>KVM</strong> برای Virtualisation در سطح Machine. این تفاوت، پایه‌ای است که در جلسه بعد برای Proxmox به آن نیاز داریم.</blockquote>
+
 <h2>اهداف یادگیری</h2>
-<p>در پایان این جلسه باید بتوانی:</p>
+<p>در پایان جلسه باید بتوانی:</p>
 <ol>
-    <li>تفاوت <code>find</code>، <code>locate</code>، <code>which</code> و <code>whereis</code> را توضیح بدهی.</li>
-    <li>با <code>find</code> فایل‌ها را بر اساس نام، نوع، زمان، اندازه و Permission پیدا کنی.</li>
-    <li>با <code>find</code> روی فایل‌های پیدا‌شده عملیات انجام دهی.</li>
-    <li>تفاوت جستجوی زنده (<code>find</code>) و جستجوی مبتنی بر Database (<code>locate</code>) را بفهمی.</li>
-    <li>برای سناریوهای واقعی، ابزار مناسب جستجو را انتخاب کنی.</li>
+    <li>تفاوت <strong>Container و VM</strong> را توضیح بدهی.</li>
+    <li>مفاهیم اصلی Docker مثل <strong>Image، Container، Registry و Volume</strong> را بشناسی.</li>
+    <li>دستورات پایه Docker برای دریافت Image، ساخت، اجرا، توقف و حذف Container را اجرا کنی.</li>
+    <li>مفهوم <strong>KVM</strong> و جایگاه آن در Linux Virtualisation را توضیح بدهی.</li>
+    <li>تفاوت KVM با Docker را درک کنی.</li>
 </ol>
 
 <hr>
 
 <h2>معرفی جلسه</h2>
-<p>در Linux خیلی وقت‌ها می‌دانیم <strong>چه چیزی</strong> را می‌خواهیم، اما نمی‌دانیم <strong>کجاست</strong>.</p>
-<p>مثلاً: فایل <code>config.conf</code> کجاست؟ یا همه فایل‌های <code>.log</code> که بیشتر از 100MB هستند را پیدا کن. یا تمام فایل‌هایی که در 7 روز گذشته تغییر کرده‌اند را پیدا کن.</p>
-<p>برای این کار چند ابزار داریم، اما مهم‌ترین آن‌ها:</p>
+<p>در جلسه قبل گفتیم:</p>
 
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">find\nlocate\nwhich\nwhereis</div></div>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">VM\n├── Guest OS\n├── Applications\n└── Virtual Hardware</div></div>
 
-<p>هستند.</p>
-<p>مدل ذهنی:</p>
+<p>اما Container معمولاً این‌طور است:</p>
 
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">                File Search\n                    │\n       ┌────────────┼────────────┐\n       ↓            ↓            ↓\n     find         locate      which/whereis\n       │            │              │\n   جستجوی دقیق   جستجوی سریع     پیدا کردن\n   و زنده         با Database      Command</div></div>
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Linux Kernel\n     │\n     └── Container Runtime\n            │\n       ┌────┼────┐\n       ↓    ↓    ↓\n      C1   C2   C3</div></div>
 
-<p>در LPIC-1، <strong><code>find</code> مهم‌ترین ابزار این جلسه است.</strong></p>
-
-<hr>
-
-<h2>درسنامه</h2>
-
-<h3><code>find</code> — مهم‌ترین ابزار جستجو</h3>
-<p><code>find</code> برای جستجوی فایل‌ها و Directoryها در یک مسیر مشخص استفاده می‌شود.</p>
-<p>Syntax کلی:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">find PATH CONDITIONS</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /home -name "test.txt"</div></div>
-
-<p>یعنی: در <code>/home</code> فایل یا Directoryای با نام <code>test.txt</code> پیدا کن.</p>
-
-<hr>
-
-<h4>اولین مثال <code>find</code></h4>
-<p>فرض کن:</p>
-
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/home/amir/\n├── notes.txt\n├── test.txt\n├── project/\n│   └── test.txt\n└── backup/\n    └── old.txt</div></div>
-
-<p>اگر بزنیم:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /home/amir -name "test.txt"</div></div>
-
-<p>ممکن است خروجی:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/amir/test.txt\n/home/amir/project/test.txt</div></div>
-
-<p>باشد. <code>find</code> به‌صورت Recursive در زیرشاخه‌ها جستجو می‌کند.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>در <code>find /home/amir -name "test.txt"</code>، قسمت اول <code>/home/amir</code> <strong>محل شروع جستجو</strong> است.</div></div>
-
-<hr>
-
-<h4><code>-name</code></h4>
-<p>رایج‌ترین شرط:</p>
-
-<div class="code-container"><span class="code-label">نام</span><div class="code-block">-name</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /etc -name "sshd_config"</div></div>
-
-<p>یعنی: فایلی با همین نام پیدا کن.</p>
-
-<hr>
-
-<h4>حساسیت به حروف بزرگ و کوچک</h4>
-<p><code>-name</code> به Case حساس است. مثلاً <code>find /tmp -name "test.txt"</code> با <code>test.txt</code> match می‌شود، اما <code>Test.txt</code> یا <code>TEST.TXT</code> لزوماً match نمی‌شوند.</p>
-<p>اگر بخواهیم Case مهم نباشد:</p>
-
-<div class="code-container"><span class="code-label">بدون حساسیت</span><div class="code-block">find /tmp -iname "test.txt"</div></div>
-
-<p>یعنی Ignore Case.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته</strong><br>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">-name  → Case-sensitive\n-iname → Case-insensitive</div></div>
-</div></div>
-
-<hr>
-
-<h4>Wildcard با <code>find</code></h4>
-<p>می‌توانیم از Pattern استفاده کنیم. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">الگو</span><div class="code-block">find /var/log -name "*.log"</div></div>
-
-<p>یعنی: همه فایل‌هایی که نامشان با <code>.log</code> تمام می‌شود. مثلاً: <code>syslog</code>، <code>auth.log</code>، <code>kernel.log</code>، <code>app.log</code>. فقط مواردی که با <code>.log</code> تمام شوند پیدا می‌شوند.</p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه رایج</strong><br>Wildcard را داخل Quote قرار بده:
-<div class="code-container"><span class="code-label">درست</span><div class="code-block">find /var/log -name "*.log"</div></div>
-<p>نه:</p>
-<div class="code-container"><span class="code-label">اشتباه</span><div class="code-block">find /var/log -name *.log</div></div>
-<p>چون Shell ممکن است <code>*.log</code> را قبل از اجرای <code>find</code> خودش Expand کند.</p>
-</div></div>
-
-<hr>
-
-<h4>جستجو بر اساس Type</h4>
-<p>یکی از مهم‌ترین گزینه‌ها: <code>-type</code> برای مشخص کردن نوع Entry.</p>
-<p>مهم‌ترین موارد:</p>
-
-<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">f → regular file\nd → directory\nl → symbolic link</div></div>
-
-<p>مثلاً فقط فایل‌ها:</p>
-
-<div class="code-container"><span class="code-label">فایل</span><div class="code-block">find /home/amir -type f</div></div>
-
-<p>فقط Directoryها:</p>
-
-<div class="code-container"><span class="code-label">دایرکتوری</span><div class="code-block">find /home/amir -type d</div></div>
-
-<p>فقط Symbolic Linkها:</p>
-
-<div class="code-container"><span class="code-label">لینک</span><div class="code-block">find /home/amir -type l</div></div>
-
-<hr>
-
-<h4>ترکیب <code>-type</code> و <code>-name</code></h4>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">find /var/log -type f -name "*.log"</div></div>
-
-<p>یعنی: فقط Regular Fileهایی که نامشان با <code>.log</code> تمام می‌شود. این بسیار بهتر از <code>find /var/log -name "*.log"</code> است اگر صراحتاً فقط فایل‌ها را بخواهیم.</p>
-
-<hr>
-
-<h4>جستجو در عمق مشخص — <code>-maxdepth</code></h4>
-<p>فرض کن فقط می‌خواهیم در همان Directory و زیرشاخه‌های مستقیم آن جستجو کنیم. می‌توانیم از <code>-maxdepth</code> استفاده کنیم.</p>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">حداکثر عمق</span><div class="code-block">find /home/amir -maxdepth 1 -type f</div></div>
-
-<p>یعنی: فقط در سطح <code>/home/amir</code> جستجو کن و وارد زیرشاخه‌ها نشو.</p>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">/home/amir/a.txt        ← بررسی می‌شود\n/home/amir/b.txt        ← بررسی می‌شود\n/home/amir/project/x    ← بررسی نمی‌شود</div></div>
-
-<hr>
-
-<h4><code>-mindepth</code></h4>
-<p>برعکس، <code>-mindepth</code> حداقل عمق را مشخص می‌کند. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">حداقل عمق</span><div class="code-block">find /home/amir -mindepth 1 -type f</div></div>
-
-<p>یعنی: خود <code>/home/amir</code> را به‌عنوان نتیجه در نظر نگیر و از عمق یک به بعد جستجو کن. برای LPIC-1 دانستن مفهوم <code>-mindepth</code> کافی است؛ <code>-maxdepth</code> کاربرد رایج‌تری دارد.</p>
-
-<hr>
-
-<h4>جستجو بر اساس Size</h4>
-<p>یکی از کاربردهای مهم:</p>
-
-<div class="code-container"><span class="code-label">اندازه</span><div class="code-block">-size</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /var -type f -size +100M</div></div>
-
-<p>یعنی: فایل‌هایی بزرگ‌تر از 100MB پیدا کن.</p>
-<p>مثال:</p>
-
-<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /home -type f -size +1G</div></div>
-
-<p>یعنی فایل‌های بزرگ‌تر از 1GB.</p>
-
-<hr>
-
-<h4>واحدهای <code>-size</code></h4>
-<p>چند واحد مهم:</p>
-
-<div class="code-container"><span class="code-label">واحدها</span><div class="code-block no-prompt">c → bytes\nk → KiB\nM → MiB\nG → GiB</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /tmp -type f -size +10M</div></div>
-
-<hr>
-
-<h4><code>+</code> و <code>-</code> در <code>-size</code></h4>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">-size +100M</div></div>
-
-<p>یعنی بزرگ‌تر از مقدار مشخص.</p>
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">کوچک‌تر</span><div class="code-block">-size -10M</div></div>
-
-<p>یعنی کوچک‌تر از مقدار مشخص.</p>
+<p>پس سؤال اصلی:</p>
+<blockquote>اگر برای اجرای یک Application مجبور نباشیم یک OS کامل بالا بیاوریم، چه می‌شود؟</blockquote>
+<p>پاسخ: <strong>Container</strong></p>
+<p>و در Linux برای Virtual Machine هم یک فناوری بسیار مهم داریم:</p>
+<blockquote><strong>KVM — Kernel-based Virtual Machine</strong></blockquote>
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">+100M → بزرگ‌تر\n-10M  → کوچک‌تر</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Docker → Container\nKVM    → Virtual Machine</div></div>
 
 <hr>
 
-<h4>جستجو بر اساس زمان</h4>
-<p><code>find</code> می‌تواند فایل‌ها را بر اساس زمان نیز پیدا کند. مهم‌ترین گزینه‌ها:</p>
+<h2>Docker و Container</h2>
 
-<div class="code-container"><span class="code-label">زمان‌ها</span><div class="code-block no-prompt">-mtime\n-atime\n-ctime</div></div>
-
-<p>در LPIC-1 باید تفاوت کلی آن‌ها را بدانی.</p>
-
-<h5><code>mtime</code></h5>
-
-<div class="code-container"><span class="code-label">mtime</span><div class="code-block">find /home -type f -mtime 7</div></div>
-
-<p>بر اساس <strong>Modification Time</strong> جستجو می‌کند. یعنی زمان آخرین تغییر محتوای فایل.</p>
+<h3>Container چیست؟ ⭐⭐⭐</h3>
+<p>Container یک محیط ایزوله برای اجرای Application است که معمولاً <strong>Kernel سیستم Host را به اشتراک می‌گذارد</strong>.</p>
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">کمتر از ۷ روز</span><div class="code-block">find /home/amir -type f -mtime -7</div></div>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">Host Linux Kernel\n       │\n ┌─────┼─────┐\n ↓     ↓     ↓\nWeb   DB    App\nC1    C2    C3</div></div>
 
-<p>یعنی: فایل‌هایی که در بازه کمتر از حدود 7 روز گذشته تغییر کرده‌اند.</p>
+<p>هر Container می‌تواند:</p>
+<ul>
+    <li>Filesystem خودش</li>
+    <li>Processهای خودش</li>
+    <li>Network خودش</li>
+    <li>Environment خودش</li>
+</ul>
+<p>را داشته باشد.</p>
+<p>اما Kernel جداگانه‌ای مثل VM ندارد.</p>
 
-<h5><code>atime</code></h5>
-<p><code>atime</code> یعنی Access Time. یعنی آخرین زمان Access شدن فایل.</p>
+<hr>
+
+<h3>Container در برابر VM ⭐⭐⭐</h3>
+<p>این تفاوت را خیلی خوب یاد بگیر:</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>VM</th><th>Container</th></tr></thead>
+<tbody>
+<tr><td>Guest OS کامل</td><td>معمولاً بدون Guest Kernel مستقل</td></tr>
+<tr><td>Hypervisor</td><td>Container Runtime</td></tr>
+<tr><td>سنگین‌تر</td><td>سبک‌تر</td></tr>
+<tr><td>Boot OS</td><td>اجرای Process/Application</td></tr>
+<tr><td>Isolation در سطح VM</td><td>Isolation در سطح OS/Process</td></tr>
+<tr><td>مناسب اجرای OSهای مختلف</td><td>مناسب اجرای Applicationها</td></tr>
+</tbody>
+</table>
+</div>
+
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">atime</span><div class="code-block">find /home/amir -type f -atime -7</div></div>
-
-<p>فایل‌هایی را پیدا می‌کند که در حدود 7 روز اخیر Access شده‌اند.</p>
-
-<h5><code>ctime</code></h5>
-<p><code>ctime</code> را با Creation Time اشتباه نکن. در Linux معمولاً <code>ctime</code> = Change Time، یعنی زمان آخرین تغییر Metadata/Status فایل.</p>
-<p>مثلاً تغییراتی مانند Permission، Ownership، برخی Metadata می‌تواند <code>ctime</code> را تغییر دهد.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">mtime → Modification\natime → Access\nctime → Change of file status/metadata</div></div>
-<p>و: <code>ctime</code> لزوماً Creation Time نیست.</p>
-</div></div>
-
-<hr>
-
-<h4><code>-user</code></h4>
-<p>می‌توانیم فایل‌ها را بر اساس Owner پیدا کنیم. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مالک</span><div class="code-block">find /home -type f -user amir</div></div>
-
-<p>یعنی: تمام فایل‌هایی که Owner آن‌ها <code>amir</code> است.</p>
-
-<hr>
-
-<h4><code>-group</code></h4>
-<p>برای Group:</p>
-
-<div class="code-container"><span class="code-label">گروه</span><div class="code-block">find /shared -type f -group developers</div></div>
-
-<p>یعنی: فایل‌هایی که Group آن‌ها <code>developers</code> است.</p>
-
-<hr>
-
-<h4><code>-perm</code></h4>
-<p>یکی از گزینه‌های مهم و کمی ظریف: <code>-perm</code> برای جستجو بر اساس Permission استفاده می‌شود.</p>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Permission</span><div class="code-block">find /home -type f -perm 644</div></div>
-
-<p>یعنی فایل‌هایی با Permission مشخص <code>644</code>.</p>
-
-<hr>
-
-<h4>پیدا کردن فایل‌های Executable</h4>
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Executable</span><div class="code-block">find /home/amir -type f -perm /111</div></div>
-
-<p>این مفهوم را فعلاً این‌طور نگه دار: فایل‌هایی که حداقل یکی از بیت‌های Execute را دارند. <code>111</code> یعنی: Owner → x، Group → x، Others → x. علامت <code>/</code> در این شکل از <code>-perm</code> یعنی: حداقل یکی از بیت‌های مشخص‌شده match شود.</p>
-
-<hr>
-
-<h4><code>-exec</code> — انجام عملیات روی نتیجه</h4>
-<p>این قسمت بسیار مهم است. فرض کن می‌خواهیم تمام فایل‌های <code>.log</code> را پیدا کنیم و برایشان <code>ls -l</code> اجرا کنیم.</p>
-<p>می‌توانیم بنویسیم:</p>
-
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">find /var/log -type f -name "*.log" -exec ls -l {} \\;</div></div>
-
-<p>قسمت‌های مهم:</p>
-
-<div class="code-container"><span class="code-label">تجزیه</span><div class="code-block no-prompt">-exec → برای هر نتیجه یک Command اجرا کن\n{}    → جای فایل پیدا‌شده قرار بگیر\n\\;    → پایان -exec را مشخص می‌کند</div></div>
-
-<hr>
-
-<h4>مثال کاربردی <code>-exec</code></h4>
-<p>مثلاً فایل‌های <code>.tmp</code> را پیدا کرده‌ایم و می‌خواهیم حذف کنیم:</p>
-
-<div class="code-container"><span class="code-label">حذف</span><div class="code-block">find /tmp -type f -name "*.tmp" -exec rm {} \\;</div></div>
-
-<p>یعنی: <code>find → پیدا کردن فایل → rm filename → فایل بعدی</code></p>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ هشدار مهم</strong><br><code>-exec rm</code> می‌تواند فایل‌های واقعی را حذف کند. قبل از استفاده در سیستم واقعی، ابتدا فقط:
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">find /tmp -type f -name "*.tmp"</div></div>
-<p>را اجرا کن و نتایج را بررسی کن.</p>
-</div></div>
-
-<hr>
-
-<h4><code>-delete</code></h4>
-<p>برای حذف مستقیم نتیجه‌های <code>find</code> نیز می‌توان از <code>-delete</code> استفاده کرد. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">حذف</span><div class="code-block">find /tmp -type f -name "*.tmp" -delete</div></div>
-
-<p>اما از نظر آموزشی، مهم‌تر است ابتدا بتوانی <code>find ...</code> را درست بنویسی و نتایج را بررسی کنی.</p>
-
-<hr>
-
-<h4><code>-print</code></h4>
-<p>به‌صورت پیش‌فرض <code>find</code> نتایج را چاپ می‌کند. می‌توانی صریحاً بنویسی:</p>
-
-<div class="code-container"><span class="code-label">چاپ</span><div class="code-block">find /home -type f -print</div></div>
-
-<p>یعنی: مسیر فایل‌های پیدا‌شده را چاپ کن. برای LPIC-1 دانستن این گزینه مفید است، اما به اندازه <code>-name</code>، <code>-type</code> و <code>-exec</code> مهم نیست.</p>
-
-<hr>
-
-<h4>ترکیب شرط‌ها</h4>
-<p>می‌توانیم چند شرط را هم‌زمان استفاده کنیم. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M</div></div>
-
-<p>یعنی: Directory زیر <code>/var/log</code>، Regular File، نام <code>*.log</code>، بزرگ‌تر از 100M. نتیجه فقط فایل‌هایی است که <strong>همه این شرایط</strong> را داشته باشند.</p>
-
-<hr>
-
-<h4><code>-o</code> — OR</h4>
-<p>گاهی می‌خواهیم فایل <code>.log</code> یا <code>.conf</code> را پیدا کنیم. می‌توانیم از <code>-o</code> استفاده کنیم:</p>
-
-<div class="code-container"><span class="code-label">یا</span><div class="code-block">find /etc -type f \\( -name "*.conf" -o -name "*.cfg" \\)</div></div>
-
-<p>یعنی: <code>.conf</code> OR <code>.cfg</code>. پرانتزها را با <code>\\(</code> و <code>\\)</code> Escape می‌کنیم تا Shell آن‌ها را تفسیر نکند. برای LPIC-1 دانستن مفهوم <code>-o</code> کافی و مهم است.</p>
-
-<hr>
-
-<h4><code>find</code> و Permission</h4>
-<p>با توجه به جلسه قبل می‌توانیم جستجوی Permission نیز انجام دهیم. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Permission دقیق</span><div class="code-block">find /home -type f -perm 600</div></div>
-
-<p>یعنی: فایل‌هایی که دقیقاً Permission <code>600</code> دارند.</p>
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">حداقل یک Execute</span><div class="code-block">find /home -type f -perm /111</div></div>
-
-<p>یعنی: فایل‌هایی که حداقل یک Execute Permission دارند.</p>
-
-<hr>
-
-<h3><code>locate</code></h3>
-<p>حالا ابزار دوم:</p>
-
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">locate sshd_config</div></div>
-
-<p><code>locate</code> معمولاً سریع‌تر از <code>find</code> است، چون برای جستجو از یک <strong>Database</strong> استفاده می‌کند.</p>
-<p>مدل ذهنی:</p>
-
-<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find\n  ↓\nFilesystem\n  ↓\nجستجوی مستقیم\n  ↓\nنتیجه</div></div>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Host\n ↓\nHypervisor\n ↓\nVM\n ↓\nLinux Kernel\n ↓\nApplication</div></div>
 
 <p>اما:</p>
 
-<div class="code-container"><span class="code-label">locate</span><div class="code-block no-prompt">locate\n  ↓\nDatabase\n  ↓\nجستجو در Database\n  ↓\nنتیجه</div></div>
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Host\n ↓\nLinux Kernel\n ↓\nContainer Runtime\n ↓\nContainer\n ↓\nApplication</div></div>
 
-<hr>
-
-<h4>مشکل <code>locate</code></h4>
-<p>چون <code>locate</code> بر اساس Database کار می‌کند، ممکن است Database به‌روز نباشد. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">10:00 → file ساخته شد\n10:01 → locate file</div></div>
-
-<p>ممکن است هنوز در Database وجود نداشته باشد. در نتیجه: <code>locate</code> سریع است، اما ممکن است اطلاعات قدیمی داشته باشد.</p>
-
-<hr>
-
-<h4><code>updatedb</code></h4>
-<p>برای به‌روزرسانی Database مربوط به <code>locate</code> معمولاً:</p>
-
-<div class="code-container"><span class="code-label">به‌روزرسانی</span><div class="code-block">sudo updatedb</div></div>
-
-<p>استفاده می‌شود. بعد:</p>
-
-<div class="code-container"><span class="code-label">جستجو</span><div class="code-block">locate filename</div></div>
-
-<p>اطلاعات جدیدتری خواهد داشت.</p>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>تفاوت کلیدی:
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">find   → جستجوی مستقیم در Filesystem\nlocate → جستجو در Database</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong><br>
+Container را <strong>VM کوچک‌شده</strong> تصور نکن.
+<p>معماری این دو متفاوت است.</p>
 </div></div>
 
 <hr>
 
-<h4>چه زمانی <code>find</code> و چه زمانی <code>locate</code>؟</h4>
+<h2>Docker چیست؟ ⭐⭐⭐</h2>
+<p>Docker یک پلتفرم برای <strong>ساخت، اجرا و مدیریت Containerها</strong> است.</p>
+<p>به زبان ساده:</p>
 
-<div class="table-wrap">
-<table>
-<thead><tr><th>نیاز</th><th>ابزار مناسب</th></tr></thead>
-<tbody>
-<tr><td>جستجوی دقیق و شرطی</td><td><code>find</code></td></tr>
-<tr><td>جستجوی سریع بر اساس نام</td><td><code>locate</code></td></tr>
-<tr><td>جستجو بر اساس Size</td><td><code>find</code></td></tr>
-<tr><td>جستجو بر اساس Permission</td><td><code>find</code></td></tr>
-<tr><td>جستجو بر اساس Owner</td><td><code>find</code></td></tr>
-<tr><td>جستجوی Databaseای سریع</td><td><code>locate</code></td></tr>
-</tbody>
-</table>
-</div>
+<div class="code-container"><span class="code-label">Docker</span><div class="code-block no-prompt">Docker\n  ↓\nContainer Management\n  ↓\nApplication Isolation</div></div>
 
-<p>پس: اگر فقط می‌پرسی «این فایل کجاست؟» → <code>locate</code> می‌تواند سریع باشد. ولی: اگر می‌گویی «فایل‌های بزرگ‌تر از 1GB که Owner آن‌ها فلانی است» → <code>find</code>.</p>
+<p>Docker خودش Kernel جداگانه‌ای برای Container نمی‌سازد؛ Containerها از قابلیت‌های Kernel استفاده می‌کنند.</p>
 
 <hr>
 
-<h3><code>which</code></h3>
-<p>گاهی اصلاً دنبال یک File معمولی نیستیم. می‌خواهیم بدانیم: این Command از کجا اجرا می‌شود؟</p>
+<h3>Docker Architecture</h3>
+<p>مدل ساده:</p>
+
+<div class="code-container"><span class="code-label">معماری</span><div class="code-block no-prompt">             Docker Client\n                  │\n                  ↓\n             Docker Daemon\n                  │\n        ┌─────────┼─────────┐\n        ↓         ↓         ↓\n    Container  Container  Container</div></div>
+
+<p>در سیستم‌های جدید Docker معمولاً از اجزای بیشتری در پشت صحنه استفاده می‌کند، اما برای LPIC-1 همین مدل ذهنی کافی است:</p>
+<blockquote>Client به Docker Engine/Daemon درخواست می‌دهد و Docker Containerها را مدیریت می‌کند.</blockquote>
+
+<hr>
+
+<h2>Image چیست؟ ⭐⭐⭐</h2>
+<p>یکی از مهم‌ترین مفاهیم Docker:</p>
+<blockquote><strong>Image = Template برای ساخت Container</strong></blockquote>
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">which ls</div></div>
+<div class="code-container"><span class="code-label">Image</span><div class="code-block no-prompt">Ubuntu Image\n     ↓\n ┌───┼───┐\n ↓   ↓   ↓\nC1  C2  C3</div></div>
 
-<p>ممکن است <code>/usr/bin/ls</code> برگرداند. <code>which</code> معمولاً مسیر Commandی را پیدا می‌کند که از طریق <code>PATH</code> قابل اجراست. مثلاً:</p>
+<p>یک Image می‌تواند مبنای چند Container باشد.</p>
+<p>Image معمولاً شامل موارد موردنیاز برای اجرای Application است، مثل:</p>
+<ul>
+    <li>Filesystem Layer</li>
+    <li>Application</li>
+    <li>Libraries</li>
+    <li>Configurationهای لازم</li>
+</ul>
+<p>اما Container یک <strong>Instance در حال اجرا</strong> از Image است.</p>
+<p>مدل ذهنی:</p>
 
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">which python3</div></div>
-
-<hr>
-
-<h4>چرا <code>which</code> مهم است؟</h4>
-<p>فرض کن چند نسخه از یک برنامه روی سیستم داری. می‌توانی بپرسی:</p>
-
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">which python3</div></div>
-
-<p>و ببینی Shell معمولاً کدام Executable را از <code>PATH</code> پیدا می‌کند.</p>
-<p>مدل:</p>
-
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Command\n   ↓\nPATH\n   ↓\nExecutable</div></div>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Image\n  │\n  ├──→ Container 1\n  ├──→ Container 2\n  └──→ Container 3</div></div>
 
 <hr>
 
-<h3><code>whereis</code></h3>
-<p><code>whereis</code> کمی گسترده‌تر است. مثلاً:</p>
+<h3>Image و Container را اشتباه نگیری</h3>
+<p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">whereis ls</div></div>
+<div class="code-container"><span class="code-label">دریافت Image</span><div class="code-block">docker pull nginx</div></div>
 
-<p>ممکن است مسیرهایی مربوط به Binary، Source و Manual را نشان دهد. مثلاً خروجی ممکن است شبیه:</p>
+<p>یک <strong>Image</strong> دریافت می‌کند.</p>
+<p>ولی:</p>
 
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">ls: /usr/bin/ls /usr/share/man/man1/ls.1.gz</div></div>
+<div class="code-container"><span class="code-label">اجرای Container</span><div class="code-block">docker run nginx</div></div>
 
-<p>باشد.</p>
+<p>بر اساس Image یک <strong>Container</strong> ایجاد و اجرا می‌کند.</p>
+
+<hr>
+
+<h2>Registry چیست؟ ⭐⭐</h2>
+<p>Imageها باید از جایی دریافت یا در جایی ذخیره شوند.</p>
+<p>این محل را <strong>Registry</strong> می‌گوییم.</p>
+<p>یکی از معروف‌ترین Registryها:</p>
+<blockquote>Docker Hub</blockquote>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Registry\n    │\n    ↓\n docker pull\n    │\n    ↓\n Local Image\n    │\n    ↓\n docker run\n    │\n    ↓\n Container</div></div>
+
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Registry → محل نگهداری Image\nImage    → Template\nContainer → Instance اجراشده</div></div>
+
+<hr>
+
+<h2>شروع کار با Docker</h2>
+<p>فرض کنیم Docker روی سیستم نصب است.</p>
+<p>برای بررسی:</p>
+
+<div class="code-container"><span class="code-label">نسخه</span><div class="code-block">docker --version</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block">docker info</div></div>
+
+<hr>
+
+<h3>دریافت Image ⭐⭐⭐</h3>
+<p>برای دریافت یک Image:</p>
+
+<div class="code-container"><span class="code-label">pull</span><div class="code-block">docker pull nginx</div></div>
+
+<p>Docker Image مربوط به <code>nginx</code> را از Registry دریافت می‌کند.</p>
+
+<hr>
+
+<h3>دیدن Imageها</h3>
+
+<div class="code-container"><span class="code-label">لیست</span><div class="code-block">docker images</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">لیست</span><div class="code-block">docker image ls</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">REPOSITORY   TAG       IMAGE ID\nnginx        latest    ...\nubuntu       latest    ...</div></div>
+
+<hr>
+
+<h3>اجرای Container ⭐⭐⭐</h3>
+<p>مهم‌ترین دستور:</p>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">docker run nginx</div></div>
+
+<p>Docker در صورت نیاز:</p>
+<ol>
+    <li>Image را پیدا می‌کند.</li>
+    <li>اگر موجود نباشد، آن را دریافت می‌کند.</li>
+    <li>Container می‌سازد.</li>
+    <li>Container را اجرا می‌کند.</li>
+</ol>
+<p>یعنی:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">docker run\n   ↓\nImage\n   ↓\nContainer\n   ↓\nRunning</div></div>
+
+<hr>
+
+<h3>اجرای Background</h3>
+<p>اگر بخواهیم Container در Background اجرا شود:</p>
+
+<div class="code-container"><span class="code-label">detached</span><div class="code-block">docker run -d nginx</div></div>
+
+<p><code>-d</code> یعنی:</p>
+<blockquote>Detached</blockquote>
+<p>یعنی Terminal را به Process اصلی Container متصل نگه نمی‌دارد.</p>
+
+<hr>
+
+<h3>نام‌گذاری Container ⭐⭐</h3>
+<p>می‌توانیم برای Container نام تعیین کنیم:</p>
+
+<div class="code-container"><span class="code-label">با نام</span><div class="code-block">docker run -d --name web nginx</div></div>
+
+<p>حالا Container نام:</p>
+
+<div class="code-container"><span class="code-label">نام</span><div class="code-block no-prompt">web</div></div>
+
+<p>دارد.</p>
+<p>این کار مدیریت Container را ساده‌تر می‌کند.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">توقف</span><div class="code-block">docker stop web</div></div>
+
+<hr>
+
+<h2>مشاهده Containerها ⭐⭐⭐</h2>
+<p>برای دیدن Containerهای در حال اجرا:</p>
+
+<div class="code-container"><span class="code-label">در حال اجرا</span><div class="code-block">docker ps</div></div>
+
+<p>برای دیدن <strong>همه</strong> Containerها، حتی متوقف‌شده‌ها:</p>
+
+<div class="code-container"><span class="code-label">همه</span><div class="code-block">docker ps -a</div></div>
+
+<p>این تفاوت مهم است.</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">docker ps\n   ↓\nRunning\n\ndocker ps -a\n   ↓\nAll</div></div>
+
+<hr>
+
+<h2>Stop و Start کردن Container ⭐⭐⭐</h2>
+<p>برای توقف:</p>
+
+<div class="code-container"><span class="code-label">توقف</span><div class="code-block">docker stop web</div></div>
+
+<p>برای اجرای دوباره Container متوقف‌شده:</p>
+
+<div class="code-container"><span class="code-label">اجرای مجدد</span><div class="code-block">docker start web</div></div>
+
 <p>تفاوت مهم:</p>
 
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">which   → معمولاً Executable موجود در PATH\nwhereis → Binary + Source + Manual locations</div></div>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">stop\n ↓\nContainer متوقف می‌شود\n\nstart\n ↓\nهمان Container دوباره اجرا می‌شود</div></div>
+
+<p>اما:</p>
+
+<div class="code-container"><span class="code-label">run</span><div class="code-block">docker run nginx</div></div>
+
+<p>معمولاً یک <strong>Container جدید</strong> ایجاد می‌کند.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>اشتباه رایج ⚠️</strong><br>
+<p>این دو را با هم اشتباه نکن:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">docker start web</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">docker run nginx</div></div>
+<p>اولی Container موجود را Start می‌کند؛ دومی برای اجرای Image می‌تواند Container جدید بسازد.</p>
+</div></div>
 
 <hr>
 
-<h4><code>which</code> در برابر <code>whereis</code></h4>
+<h2>حذف Container ⭐⭐</h2>
+<p>برای حذف Container:</p>
+
+<div class="code-container"><span class="code-label">حذف</span><div class="code-block">docker rm web</div></div>
+
+<p>اگر Container Running باشد، معمولاً ابتدا باید Stop شود:</p>
+
+<div class="code-container"><span class="code-label">ترتیب</span><div class="code-block">docker stop web\ndocker rm web</div></div>
+
+<hr>
+
+<h2>حذف Image ⭐⭐</h2>
+<p>برای حذف Image:</p>
+
+<div class="code-container"><span class="code-label">حذف Image</span><div class="code-block">docker rmi nginx</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">حذف Image</span><div class="code-block">docker image rm nginx</div></div>
+
+<p>تفاوت:</p>
+
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">docker rm\n   → Container\n\ndocker rmi\n   → Image</div></div>
+
+<p>این دو مورد سؤال خوبی برای آزمون هستند.</p>
+
+<hr>
+
+<h2>اجرای Shell داخل Container ⭐⭐⭐</h2>
+<p>فرض کن یک Container از Ubuntu اجرا کرده‌ای.</p>
+<p>می‌توانی یک Shell داخل آن اجرا کنی:</p>
+
+<div class="code-container"><span class="code-label">exec</span><div class="code-block">docker exec -it myubuntu bash</div></div>
+
+<p>معنی مهم گزینه‌ها:</p>
+
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-i → Interactive\n-t → TTY</div></div>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block">docker exec -it</div></div>
+
+<p>برای تعامل با Shell داخل Container بسیار رایج است.</p>
+
+<hr>
+
+<h3><code>exec</code> با <code>run</code> فرق دارد</h3>
+<p>این تفاوت مهم است:</p>
+
+<div class="code-container"><span class="code-label">run</span><div class="code-block">docker run ...</div></div>
+
+<p>→ ایجاد/اجرای Container</p>
+<p>اما:</p>
+
+<div class="code-container"><span class="code-label">exec</span><div class="code-block">docker exec ...</div></div>
+
+<p>→ اجرای یک Command داخل <strong>Container موجود و در حال اجرا</strong></p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">docker exec -it web bash</div></div>
+
+<p>یعنی:</p>
+<blockquote>داخل Container موجود <code>web</code> یک Bash اجرا کن.</blockquote>
+
+<hr>
+
+<h2>Port Mapping ⭐⭐⭐</h2>
+<p>فرض کن داخل Container یک Web Server روی Port 80 اجرا می‌شود.</p>
+<p>این Port داخل Container است:</p>
+
+<div class="code-container"><span class="code-label">داخل Container</span><div class="code-block no-prompt">Container\nPort 80</div></div>
+
+<p>اما می‌خواهیم از Host با Port 8080 به آن دسترسی داشته باشیم.</p>
+<p>می‌توانیم:</p>
+
+<div class="code-container"><span class="code-label">Port Mapping</span><div class="code-block">docker run -d -p 8080:80 --name web nginx</div></div>
+
+<p>استفاده کنیم.</p>
+<p>معنی:</p>
+
+<div class="code-container"><span class="code-label">تفسیر</span><div class="code-block no-prompt">Host Port : Container Port\n     8080 : 80</div></div>
+
+<p>مدل:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Browser\n   ↓\nHost:8080\n   ↓\nContainer:80\n   ↓\nNginx</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong><br>
+<p>در:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">-p 8080:80</div></div>
+<p>عدد سمت چپ:</p>
+<blockquote>Host</blockquote>
+<p>عدد سمت راست:</p>
+<blockquote>Container</blockquote>
+</div></div>
+
+<hr>
+
+<h2>Volume ⭐⭐⭐</h2>
+<p>یکی از مشکلات Container این است که اگر داده فقط داخل لایه writable خود Container باشد، مدیریت Persistence می‌تواند مشکل‌ساز شود.</p>
+<p>برای نگهداری داده مستقل از عمر Container از <strong>Volume</strong> استفاده می‌کنیم.</p>
+<p>مدل:</p>
+
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Host\n │\n └── Volume\n       │\n       ↓\n   Container</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">docker run -d \\\n  --name db \\\n  -v mydata:/data \\\n  some-image</div></div>
+
+<p>مفهوم اصلی:</p>
+
+<div class="code-container"><span class="code-label">ارتباط</span><div class="code-block no-prompt">Container\n   ↕\nVolume</div></div>
+
+<p>Volume برای داده‌هایی که باید مستقل از عمر Container باقی بمانند بسیار مهم است.</p>
+
+<hr>
+
+<h2>Docker Networking — در حد LPIC-1 ⭐⭐</h2>
+<p>Containerها Network Interface و Network Stack ایزوله‌شده دارند.</p>
+<p>Docker می‌تواند برای آن‌ها Network ایجاد کند.</p>
+<p>مدل ساده:</p>
+
+<div class="code-container"><span class="code-label">شبکه</span><div class="code-block no-prompt">Host\n │\nDocker Network\n ├── Container 1\n ├── Container 2\n └── Container 3</div></div>
+
+<p>لازم نیست در این مرحله وارد جزئیات پیچیده Docker Networking شوی.</p>
+<p>برای LPIC-1 در این جلسه بیشتر این مفهوم مهم است:</p>
+<blockquote>Containerها می‌توانند Network مستقل و قابل مدیریت داشته باشند.</blockquote>
+
+<hr>
+
+<h2>KVM چیست؟ ⭐⭐⭐</h2>
+<p>حالا برویم سراغ بخش دوم جلسه.</p>
+<p><strong>KVM</strong> مخفف:</p>
+<blockquote>Kernel-based Virtual Machine</blockquote>
+<p>است.</p>
+<p>KVM یک فناوری Virtualisation در Linux است که قابلیت Virtual Machine را در Kernel Linux فراهم می‌کند.</p>
+<p>مدل ذهنی:</p>
+
+<div class="code-container"><span class="code-label">KVM</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n Linux Kernel\n       ↓\n      KVM\n       ↓\n   Virtual Machines</div></div>
+
+<hr>
+
+<h3>KVM دقیقاً چه چیزی است؟</h3>
+<p>یک نکته مهم:</p>
+<blockquote>KVM را نباید صرفاً یک برنامه معمولی مثل Docker در نظر بگیری.</blockquote>
+<p>KVM در Linux به‌صورت Kernel Module پیاده‌سازی شده و از قابلیت‌های Virtualisation پردازنده استفاده می‌کند.</p>
+<p>ماژول‌های مهم:</p>
+
+<div class="code-container"><span class="code-label">ماژول‌ها</span><div class="code-block no-prompt">kvm\nkvm_intel\nkvm_amd</div></div>
+
+<p>بسته به CPU.</p>
+
+<hr>
+
+<h3>بررسی KVM</h3>
+<p>برای بررسی ماژول‌ها:</p>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">lsmod | grep kvm</div></div>
+
+<p>ممکن است مثلاً ببینی:</p>
+
+<div class="code-container"><span class="code-label">خروجی Intel</span><div class="code-block no-prompt">kvm_intel\nkvm</div></div>
+
+<p>روی AMD ممکن است:</p>
+
+<div class="code-container"><span class="code-label">خروجی AMD</span><div class="code-block no-prompt">kvm_amd\nkvm</div></div>
+
+<p>را ببینی.</p>
+
+<hr>
+
+<h2>KVM و QEMU ⭐⭐⭐</h2>
+<p>در عمل معمولاً نام KVM را کنار <strong>QEMU</strong> می‌بینیم.</p>
+<p>این دو نقش یکسانی ندارند.</p>
+<p>مدل ساده:</p>
+
+<div class="code-container"><span class="code-label">رابطه</span><div class="code-block no-prompt">          QEMU\n           │\n           ↓\n     VM Management\n           │\n           ↓\n          KVM\n           │\n           ↓\n       CPU Hardware</div></div>
+
+<h4>KVM</h4>
+<p>Virtualisation را با کمک Kernel و Hardware انجام می‌دهد.</p>
+
+<h4>QEMU</h4>
+<p>وظیفه شبیه‌سازی/ارائه Virtual Hardware و اجرای VM را بر عهده می‌گیرد و می‌تواند از KVM برای Hardware Acceleration استفاده کند.</p>
+<p>برای LPIC-1 لازم نیست وارد معماری داخلی QEMU شوی.</p>
+<p>فقط این ارتباط را حفظ کن:</p>
+<blockquote><strong>QEMU + KVM = ترکیب بسیار رایج برای اجرای VM روی Linux</strong></blockquote>
+
+<hr>
+
+<h2>بررسی پشتیبانی Virtualisation</h2>
+<p>همان‌طور که در جلسه قبل دیدیم:</p>
+
+<div class="code-container"><span class="code-label">بررسی CPU</span><div class="code-block">grep -E 'vmx|svm' /proc/cpuinfo</div></div>
+
+<p>یا:</p>
+
+<div class="code-container"><span class="code-label">lscpu</span><div class="code-block">lscpu</div></div>
+
+<p>می‌توانیم اطلاعات CPU و قابلیت‌های Virtualisation را بررسی کنیم.</p>
+<p>در سیستم Intel معمولاً:</p>
+
+<div class="code-container"><span class="code-label">Intel</span><div class="code-block no-prompt">vmx</div></div>
+
+<p>و در AMD:</p>
+
+<div class="code-container"><span class="code-label">AMD</span><div class="code-block no-prompt">svm</div></div>
+
+<p>دیده می‌شود.</p>
+
+<hr>
+
+<h2>KVM در برابر Docker ⭐⭐⭐</h2>
+<p>این مهم‌ترین مقایسه جلسه است:</p>
 
 <div class="table-wrap">
 <table>
-<thead><tr><th>ابزار</th><th>کاربرد</th></tr></thead>
+<thead><tr><th>KVM</th><th>Docker</th></tr></thead>
 <tbody>
-<tr><td><code>which</code></td><td>پیدا کردن Command قابل اجرا در PATH</td></tr>
-<tr><td><code>whereis</code></td><td>پیدا کردن Binary / Source / Man page</td></tr>
-<tr><td><code>find</code></td><td>جستجوی قدرتمند در Filesystem</td></tr>
-<tr><td><code>locate</code></td><td>جستجوی سریع در Database</td></tr>
+<tr><td>Virtual Machine</td><td>Container</td></tr>
+<tr><td>Guest OS دارد</td><td>معمولاً Guest Kernel ندارد</td></tr>
+<tr><td>Virtual Hardware</td><td>Process/Application Isolation</td></tr>
+<tr><td>KVM + QEMU</td><td>Docker Engine/Runtime</td></tr>
+<tr><td>منابع بیشتر</td><td>معمولاً سبک‌تر</td></tr>
+<tr><td>مناسب اجرای OS کامل</td><td>مناسب Application</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>این جدول برای مرور امتحان بسیار مهم است.</p>
+<p>مدل:</p>
+
+<div class="code-container"><span class="code-label">KVM</span><div class="code-block no-prompt">Hardware\n ↓\nLinux\n ↓\nKVM/QEMU\n ↓\nVM\n ↓\nGuest OS\n ↓\nApplication</div></div>
+
+<p>در مقابل:</p>
+
+<div class="code-container"><span class="code-label">Docker</span><div class="code-block no-prompt">Hardware\n ↓\nLinux Kernel\n ↓\nDocker\n ↓\nContainer\n ↓\nApplication</div></div>
 
 <hr>
 
-<h3>سناریوی ترکیبی واقعی</h3>
-<p>فرض کن مدیر سیستم می‌گوید: در <code>/var/log</code> فایل‌های Log بزرگ‌تر از 100MB را پیدا کن.</p>
-<p>اول:</p>
+<h2>یک نکته بسیار مهم درباره Docker</h2>
+<p>فرض کن Host سیستم‌عامل Linux دارد.</p>
+<p>Container می‌تواند مثلاً User Space مربوط به Ubuntu داشته باشد:</p>
 
-<div class="code-container"><span class="code-label">جستجو</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Ubuntu Container\n     ↓\nUbuntu User Space\n     ↓\nHost Linux Kernel</div></div>
 
-<p>نتیجه مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/var/log/app.log\n/var/log/old.log</div></div>
-
-<p>حالا می‌خواهیم اطلاعاتشان را ببینیم:</p>
-
-<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block">find /var/log -type f -name "*.log" -size +100M -exec ls -lh {} \\;</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- 1 root root 150M ... /var/log/app.log\n-rw-r--r-- 1 root root 230M ... /var/log/old.log</div></div>
-
-<p>حالا فرض کن می‌خواهیم فایل‌های Log بزرگ‌تر از 1GB را پیدا کنیم:</p>
-
-<div class="code-container"><span class="code-label">بزرگ‌تر</span><div class="code-block">find /var/log -type f -name "*.log" -size +1G</div></div>
-
-<p>این دقیقاً جایی است که <code>find</code> از <code>locate</code> قدرتمندتر می‌شود.</p>
+<p>یعنی وجود فایل‌های Ubuntu در Container به این معنی نیست که یک Ubuntu Kernel مستقل داخل آن اجرا می‌شود.</p>
+<p>به همین دلیل Container بسیار سبک‌تر از VM است.</p>
 
 <hr>
 
-<h3>یک سناریوی دوم</h3>
-<p>فرض کن می‌خواهی سریع بفهمی <code>sshd_config</code> کجاست. اگر فقط نام را می‌دانی:</p>
+<h2>سناریوی ترکیبی</h2>
 
-<div class="code-container"><span class="code-label">جستجوی سریع</span><div class="code-block">locate sshd_config</div></div>
+<h3>سناریو: Web Lab</h3>
+<p>فرض کن یک Linux Server داری و می‌خواهی:</p>
+<ul>
+    <li>یک VM برای تست یک Linux کامل داشته باشی.</li>
+    <li>یک Web Server را با Docker اجرا کنی.</li>
+</ul>
 
-<p>می‌تواند سریع جواب بدهد. اما اگر می‌خواهی: فایل <code>sshd_config</code> در <code>/etc</code> پیدا شود و فقط Regular File باشد. می‌نویسی:</p>
+<h4>بخش اول — VM با KVM</h4>
+<p>معماری:</p>
 
-<div class="code-container"><span class="code-label">جستجوی دقیق</span><div class="code-block">find /etc -type f -name "sshd_config"</div></div>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Physical Server\n      ↓\n Linux Host\n      ↓\n   KVM/QEMU\n      ↓\n AlmaLinux VM</div></div>
+
+<p>VM یک Guest OS کامل دارد.</p>
+
+<h4>بخش دوم — Web Server با Docker</h4>
+<p>روی همان Host:</p>
+
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Linux Host\n    ↓\n Docker\n    ↓\n Nginx Container</div></div>
+
+<p>اجرای آن:</p>
+
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">docker run -d \\\n  --name web \\\n  -p 8080:80 \\\n  nginx</div></div>
+
+<p>حالا:</p>
+
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Host:8080\n    ↓\nContainer:80\n    ↓\nNginx</div></div>
+
+<h4>بخش سوم — بررسی Container</h4>
+
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">docker ps</div></div>
+
+<p>باید Container را ببینی.</p>
+
+<h4>بخش چهارم — ورود به Container</h4>
+
+<div class="code-container"><span class="code-label">ورود</span><div class="code-block">docker exec -it web bash</div></div>
+
+<p>حالا داخل Container هستی.</p>
+
+<h4>بخش پنجم — توقف</h4>
+
+<div class="code-container"><span class="code-label">توقف</span><div class="code-block">docker stop web</div></div>
+
+<p>و برای اجرای دوباره:</p>
+
+<div class="code-container"><span class="code-label">اجرای مجدد</span><div class="code-block">docker start web</div></div>
+
+<h4>نتیجه</h4>
+<p>یک Server داریم که همزمان:</p>
+
+<div class="code-container"><span class="code-label">ساختار نهایی</span><div class="code-block no-prompt">Physical Server\n      │\n      └── Linux\n          │\n          ├── KVM\n          │    └── Linux VM\n          │\n          └── Docker\n               └── Nginx Container</div></div>
+
+<p>این سناریو نمونه خوبی از استفاده همزمان VM و Container است.</p>
 
 <hr>
 
 <h2>نکات مهم</h2>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ مهم‌ترین دستور جلسه</strong><br>
-<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find WHERE WHAT</div></div>
-<p>یا: <code>find PATH CONDITIONS ACTION</code></p>
-</div></div>
+<h3>Docker ⭐⭐⭐</h3>
+<ul>
+    <li>Image = Template</li>
+    <li>Container = Instance اجرایی Image</li>
+    <li>Registry = محل نگهداری Image</li>
+    <li><code>docker pull</code> = دریافت Image</li>
+    <li><code>docker run</code> = ایجاد/اجرای Container</li>
+    <li><code>docker ps</code> = Containerهای Running</li>
+    <li><code>docker ps -a</code> = همه Containerها</li>
+    <li><code>docker stop</code> = توقف</li>
+    <li><code>docker start</code> = اجرای دوباره Container موجود</li>
+    <li><code>docker rm</code> = حذف Container</li>
+    <li><code>docker rmi</code> = حذف Image</li>
+    <li><code>docker exec -it</code> = اجرای Shell/Command داخل Container</li>
+    <li><code>-p HOST:CONTAINER</code> = Port Mapping</li>
+    <li>Volume = نگهداری Persistent Data</li>
+</ul>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ گزینه‌های بسیار مهم</strong><br>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-name   → نام\n-iname  → نام بدون حساسیت به Case\n-type   → نوع\n-size   → اندازه\n-user   → Owner\n-group  → Group\n-perm   → Permission\n-mtime  → Modification Time</div></div>
-</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ عملیات</strong><br>
-<div class="code-container"><span class="code-label">عملیات</span><div class="code-block no-prompt">-exec   → اجرای Command روی نتیجه\n-delete → حذف نتیجه</div></div>
-</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ ابزارهای دیگر</strong><br>
-<div class="code-container"><span class="code-label">ابزارها</span><div class="code-block no-prompt">locate  → Database\nwhich   → Executable در PATH\nwhereis → Binary/Source/Man</div></div>
-</div></div>
+<h3>KVM ⭐⭐⭐</h3>
+<ul>
+    <li>KVM = Kernel-based Virtual Machine</li>
+    <li>KVM فناوری Virtualisation در Linux است.</li>
+    <li><code>kvm_intel</code> برای Intel</li>
+    <li><code>kvm_amd</code> برای AMD</li>
+    <li>معمولاً همراه QEMU استفاده می‌شود.</li>
+    <li>KVM → VM</li>
+    <li>Docker → Container</li>
+</ul>
 
 <hr>
 
 <h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
-<p>چهار ابزار را مثل چهار سؤال مختلف تصور کن:</p>
-<h4>سؤال ۱: «در کل Filesystem بگرد و دقیقاً چیزی را که می‌خواهم پیدا کن.»</h4>
+<p>دو روش برای جدا کردن Workloadها داریم.</p>
 
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">find</div></div>
-
-<h4>سؤال ۲: «فقط سریع بگو این اسم فایل کجا دیده شده.»</h4>
-
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">locate</div></div>
-
-<p>ولی یادت باشد: Database ممکن است قدیمی باشد.</p>
-<h4>سؤال ۳: «این Command از کجا اجرا می‌شود؟»</h4>
-
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">which</div></div>
-
-<h4>سؤال ۴: «Binary یا Manual این Command کجاست؟»</h4>
-
-<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">whereis</div></div>
-
+<h3>روش اول: VM</h3>
+<p>می‌گویی:</p>
+<blockquote>«برای این سیستم یک کامپیوتر مجازی کامل بساز.»</blockquote>
 <p>پس:</p>
 
-<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">              SEARCH\n                │\n     ┌──────────┼──────────┐\n     ↓          ↓          ↓\n   Files      Commands    Database\n     │          │           │\n   find     which/whereis  locate</div></div>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">VM\n ├── Virtual CPU\n ├── Virtual RAM\n ├── Virtual Disk\n ├── Guest Kernel\n └── Applications</div></div>
 
-<p>اما <strong><code>find</code> ابزار اصلی و قدرتمند جلسه است.</strong></p>
+<p>KVM در اینجا نقش مهمی دارد.</p>
+
+<h3>روش دوم: Container</h3>
+<p>می‌گویی:</p>
+<blockquote>«من یک OS کامل نمی‌خواهم؛ فقط این Application را در محیطی جدا اجرا کن.»</blockquote>
+<p>پس:</p>
+
+<div class="code-container"><span class="code-label">Container</span><div class="code-block no-prompt">Host Kernel\n    │\n    ├── Container A → Web\n    ├── Container B → DB\n    └── Container C → App</div></div>
+
+<p>Docker این محیط را مدیریت می‌کند.</p>
+<p>بنابراین:</p>
+<blockquote><strong>VM یک کامپیوتر مجازی می‌سازد؛ Container یک محیط ایزوله برای اجرای Application می‌سازد.</strong></blockquote>
+<p>این مهم‌ترین جمله جلسه است.</p>
 
 <hr>
 
 <h2>Cheat Sheet</h2>
 
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">find /path -name "*.log"                    # جستجو بر اساس نام\nfind /path -type f                          # فقط فایل‌ها\nfind /path -type d                          # فقط Directoryها\nfind /path -type f -size +100M              # فایل‌های بزرگ‌تر از 100MB\nfind /path -type f -mtime -7                # تغییرکرده در حدود 7 روز اخیر\nfind /path -user amir                       # بر اساس Owner\nfind /path -perm 644                        # Permission مشخص\nfind /path -exec ls -l {} \\;                # اجرای Command روی نتایج\nlocate filename                              # جستجو در Database\nwhich command / whereis command             # پیدا کردن Command</div></div>
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">docker pull IMAGE                 → دریافت Image\ndocker images                     → لیست Imageها\ndocker run -d --name web nginx    → اجرای Container\ndocker ps                         → Containerهای Running\ndocker ps -a                      → همه Containerها\ndocker stop/start web             → توقف/اجرای دوباره\ndocker exec -it web bash          → Shell داخل Container\ndocker rm web / docker rmi IMAGE  → حذف Container / Image\n-p HOST:CONTAINER                 → Port Mapping\nKVM + QEMU                        → اجرای VM روی Linux\nlsmod | grep kvm                  → بررسی KVM Modules</div></div>
 
 <hr>
 
 <h2>تست پایانی</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>کدام دستور فقط Regular Fileها را در <code>/home</code> پیدا می‌کند؟</p>
+<p>کدام گزینه تفاوت Image و Container را درست بیان می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) <code>find /home -type d</code></button>
-    <button onclick="selectOption(this)">B) <code>find /home -type f</code></button>
-    <button onclick="selectOption(this)">C) <code>locate /home -type f</code></button>
-    <button onclick="selectOption(this)">D) <code>which /home -type f</code></button>
+    <button onclick="selectOption(this)">A) Image در حال اجراست و Container فقط یک فایل است.</button>
+    <button onclick="selectOption(this)">B) Image معمولاً Template است و Container نمونه اجرایی آن است.</button>
+    <button onclick="selectOption(this)">C) هر Container یک Kernel مستقل دارد.</button>
+    <button onclick="selectOption(this)">D) Image فقط برای Virtual Machine استفاده می‌شود.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>-type f</code> یعنی Regular File.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>مدل: <code>Image</code> → <code>Container</code></div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>کدام گزینه درباره <code>locate</code> صحیح است؟</p>
+<p>دستور زیر چه کاری انجام می‌دهد؟</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">docker run -d --name web nginx</div></div>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) همیشه مستقیماً Filesystem را اسکن می‌کند</button>
-    <button onclick="selectOption(this)">B) فقط Directoryها را جستجو می‌کند</button>
-    <button onclick="selectOption(this)">C) از Database برای جستجو استفاده می‌کند</button>
-    <button onclick="selectOption(this)">D) فقط Commandها را پیدا می‌کند</button>
+    <button onclick="selectOption(this)">A) فقط Image <code>nginx</code> را حذف می‌کند.</button>
+    <button onclick="selectOption(this)">B) یک Container به نام <code>web</code> ایجاد و در Background اجرا می‌کند.</button>
+    <button onclick="selectOption(this)">C) Container موجود <code>web</code> را متوقف می‌کند.</button>
+    <button onclick="selectOption(this)">D) فقط Image را دانلود می‌کند و Container نمی‌سازد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>locate</code> برای سرعت از Database استفاده می‌کند؛ بنابراین ممکن است اطلاعات آن به‌روز نباشد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>run</code> برای ایجاد/اجرای Container است و <code>-d</code> آن را Detached اجرا می‌کند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۳</p>
-<p>کدام دستور فایل‌های <code>.log</code> بزرگ‌تر از 500MB را در <code>/var/log</code> پیدا می‌کند؟</p>
+<p>برای دیدن تمام Containerها، حتی Containerهای متوقف‌شده، کدام دستور درست است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) <code>find /var/log -name "*.log" -size +500M</code></button>
-    <button onclick="selectOption(this)">B) <code>locate /var/log "*.log" 500M</code></button>
-    <button onclick="selectOption(this)">C) <code>which /var/log -name "*.log"</code></button>
-    <button onclick="selectOption(this)">D) <code>find /var/log -type d -size +500M</code></button>
+    <button onclick="selectOption(this)">A) <code>docker ps</code></button>
+    <button onclick="selectOption(this)">B) <code>docker images</code></button>
+    <button onclick="selectOption(this)">C) <code>docker ps -a</code></button>
+    <button onclick="selectOption(this)">D) <code>docker list-all</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>اگر فقط Regular Fileها را بخواهیم، بهتر است: <code>find /var/log -type f -name "*.log" -size +500M</code></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>docker ps</code> → Running، <code>docker ps -a</code> → All</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۴</p>
-<p>برای پیدا کردن Command <code>bash</code> در مسیرهای موجود در <code>PATH</code> معمولاً از کدام دستور استفاده می‌کنیم؟</p>
+<p>در دستور زیر:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">docker run -p 8080:80 nginx</div></div>
+<p>Port <code>8080</code> چه چیزی است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) <code>find</code></button>
-    <button onclick="selectOption(this)">B) <code>locate</code></button>
-    <button onclick="selectOption(this)">C) <code>which</code></button>
-    <button onclick="selectOption(this)">D) <code>du</code></button>
+    <button onclick="selectOption(this)">A) Port داخل Container</button>
+    <button onclick="selectOption(this)">B) Port مربوط به Kernel</button>
+    <button onclick="selectOption(this)">C) Port روی Host</button>
+    <button onclick="selectOption(this)">D) Port Registry</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br><code>which bash</code> مسیر Executable مورد استفاده را نشان می‌دهد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>ترتیب: <code>-p HOST:CONTAINER</code> → <code>8080:80</code> پس <code>8080</code> روی Host و <code>80</code> داخل Container است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>کدام گزینه درباره <code>ctime</code> صحیح است؟</p>
+<p>کدام گزینه درباره KVM صحیح است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) همیشه Creation Time است</button>
-    <button onclick="selectOption(this)">B) زمان آخرین Access است</button>
-    <button onclick="selectOption(this)">C) زمان تغییر وضعیت/Metadata فایل است</button>
-    <button onclick="selectOption(this)">D) زمان اجرای آخرین Command است</button>
+    <button onclick="selectOption(this)">A) KVM یک Container Runtime است.</button>
+    <button onclick="selectOption(this)">B) KVM فناوری Virtualisation مبتنی بر Linux Kernel است.</button>
+    <button onclick="selectOption(this)">C) KVM فقط روی Windows اجرا می‌شود.</button>
+    <button onclick="selectOption(this)">D) KVM جایگزین Docker برای اجرای Container است.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>در Linux، <code>ctime</code> را نباید به‌عنوان Creation Time در نظر بگیری.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>KVM قابلیت Virtualisation را در Linux فراهم می‌کند و معمولاً همراه QEMU برای اجرای VM استفاده می‌شود.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۶</p>
-<p>دستور زیر چه کاری انجام می‌دهد؟</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /tmp -type f -name "*.tmp" -exec rm {} \\;</div></div>
+<p>Administrator می‌خواهد یک Linux کامل را داخل یک محیط مجازی اجرا کند. کدام گزینه مناسب‌تر است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) فقط فایل‌ها را نمایش می‌دهد</button>
-    <button onclick="selectOption(this)">B) فایل‌های <code>.tmp</code> را پیدا کرده و برای هر نتیجه <code>rm</code> اجرا می‌کند</button>
-    <button onclick="selectOption(this)">C) Database مربوط به <code>locate</code> را پاک می‌کند</button>
-    <button onclick="selectOption(this)">D) فقط Directoryهای <code>.tmp</code> را حذف می‌کند</button>
+    <button onclick="selectOption(this)">A) Docker Container</button>
+    <button onclick="selectOption(this)">B) KVM Virtual Machine</button>
+    <button onclick="selectOption(this)">C) <code>docker exec</code></button>
+    <button onclick="selectOption(this)">D) Docker Image</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>{}</code> با مسیر هر فایل پیدا‌شده جایگزین می‌شود. ⚠️ چون <code>rm</code> عملیات حذف انجام می‌دهد، قبل از اجرای آن بهتر است ابتدا خود <code>find</code> را بدون <code>-exec</code> آزمایش کنی.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون VM یک Guest OS کامل دارد: <code>KVM/QEMU → VM → Guest Linux</code></div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
-<p>مدیر سیستم می‌گوید: «تمام فایل‌های معمولی زیر <code>/home</code> را پیدا کن که Owner آن‌ها <code>amir</code> است، بیشتر از 1GB حجم دارند و در 7 روز اخیر تغییر کرده‌اند.»</p>
-<p>کدام گزینه مناسب‌تر است؟</p>
+<p>یک Administrator می‌خواهد روی Linux Host دو چیز داشته باشد:</p>
+<ol>
+    <li>یک Debian کامل برای آزمایش Kernel</li>
+    <li>یک Nginx سبک برای Web Service</li>
+</ol>
+<p>کدام طراحی منطقی‌تر است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this">A) <code>locate /home amir 1G 7</code></button>
-    <button onclick="selectOption(this)">B) <code>find /home -type f -user amir -size +1G -mtime -7</code></button>
-    <button onclick="selectOption(this)">C) <code>which /home -user amir -size 1G</code></button>
-    <button onclick="selectOption(this)">D) <code>find /home -type d -group amir -size +1G</code></button>
+    <button onclick="selectOption(this)">A) هر دو را به‌صورت Docker Container اجرا کند.</button>
+    <button onclick="selectOption(this)">B) هر دو را به‌صورت KVM VM اجرا کند.</button>
+    <button onclick="selectOption(this)">C) Debian را در KVM VM و Nginx را در Docker Container اجرا کند.</button>
+    <button onclick="selectOption(this)">D) Debian را با <code>docker exec</code> اجرا کند و Nginx را در KVM قرار دهد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون <code>find</code> می‌تواند چند شرط را هم‌زمان روی Filesystem اعمال کند:
-<div class="code-container"><span class="code-label">شرایط</span><div class="code-block no-prompt">-type f     → Regular File\n-user amir  → Owner\n-size +1G   → بزرگ‌تر از 1GB\n-mtime -7   → تغییرکرده در حدود 7 روز اخیر</div></div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>برای آزمایش Kernel، VM مناسب‌تر است چون Guest OS و Kernel مستقل دارد. برای اجرای یک Web Application سبک، Container انتخاب مناسبی است.</div>
 </div>
 
-<div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>جمع‌بندی فصل چهارم</strong><br>
-<p>با پایان جلسه ۷، فصل چهارم را به این شکل در ذهن داشته باش:</p>
-<div class="code-container"><span class="code-label">فصل ۴</span><div class="code-block no-prompt">فایل‌ها، مجوزها و آرشیو\n│\n├── 1. File & Directory Management\n│\n├── 2. Compression & Archive\n│\n├── 3. Backup & dd\n│\n├── 4. Hard Link & Symbolic Link\n│\n├── 5. File Permissions & Ownership\n│      ├── chmod\n│      ├── chown\n│      └── chgrp\n│\n├── 6. ACL\n│      ├── getfacl\n│      └── setfacl\n│\n└── 7. File Search\n       ├── find\n       ├── locate\n       ├── which\n       └── whereis</div></div>
-<p><strong>هسته اصلی جلسه ۷</strong></p>
-<p>اگر فقط چند چیز را برای آزمون و کار عملی به خاطر بسپاری:</p>
-<div class="code-container"><span class="code-label">چهار ابزار</span><div class="code-block no-prompt">find  → جستجوی دقیق در Filesystem\nlocate → جستجو در Database\nwhich → پیدا کردن Executable از PATH\nwhereis → Binary / Source / Man</div></div>
-<p>و برای <code>find</code>:</p>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-name + -type + -size + -user + -group + -perm</div></div>
-<p>مهم‌ترین ترکیب ذهنی تو هستند.</p>
-<p><strong>با این جلسه، ۷ جلسه فصل چهارم کامل شد.</strong> قدم مفید بعدی این است که یک مرور ترکیبی از کل فصل ۴ با سناریوهای واقعی و تست‌های جامع انجام دهیم تا ارتباط <code>chmod</code>، ACL، <code>find</code>، Archive و Backup کاملاً جا بیفتد.</p>
-</div></div>
-` ,
+<div class="summary-box">
+    <h3>🎯 Recall نهایی</h3>
+    <p>اگر بخواهی جلسه ۷ را در یک دقیقه مرور کنی:</p>
+    <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Image      → Template\nContainer  → Instance اجراشده\nRegistry   → محل نگهداری Image\ndocker run → ایجاد/اجرای Container\ndocker ps  → Containerهای Running\ndocker exec → اجرای Command داخل Container\nVolume     → Persistent Data\n-p H:C     → Host Port → Container Port\nKVM        → Linux Virtualisation\nQEMU+KVM   → Virtual Machine\nDocker     → Container\nVM         → Guest OS مستقل</div></div>
+
+    <h3>پل مفهومی به جلسه بعد</h3>
+    <p>حالا سه لایه مهم را داریم:</p>
+    <div class="code-container"><span class="code-label">سه لایه</span><div class="code-block no-prompt">Physical Hardware\n       ↓\n      Linux\n       │\n       ├── KVM → VM\n       │\n       └── Docker → Container</div></div>
+    <p>در <strong>جلسه ۸ — Proxmox</strong> این مفاهیم را کنار هم می‌گذاریم و می‌بینیم یک پلتفرم Virtualisation واقعی چطور VM، Container، Storage و Network را در یک محیط مدیریتی واحد مدیریت می‌کند.</p>
+</div>
+`
+,
 "ch5-8": `
 <div class="section-header">
     <div class="section-badge">۵</div>
