@@ -556,28 +556,45 @@
         <!-- ============================================================
              تمرین ۲ تا ۴ — قالب آماده برای افزودن سؤالات بعدی
              ============================================================ -->
+        <!-- ============================================================
+             تمرین ۲
+             ============================================================ -->
         <section class="page" id="ex2">
             <div class="page-header">
                 <h1><i class="fas fa-circle-check" style="color:var(--primary)"></i> تمرین ۲</h1>
-                <p>سؤالات این بخش هنوز اضافه نشده‌اند.</p>
+                <p>تست‌های تمرین دوم — روی یک گزینه بزنید تا نتیجه و توضیحات تشریحی نمایش داده شود.</p>
             </div>
-            <div class="placeholder">
-                <i class="fas fa-laptop-code"></i>
-                <p>سؤالات تمرین ۲ به‌زودی اضافه می‌شود.</p>
+            <div class="toolbar">
+                <button class="btn" onclick="showAllAnswers('ex2')"><i class="fas fa-eye"></i> نمایش همه پاسخ‌ها</button>
+                <button class="btn" onclick="hideAllAnswers('ex2')"><i class="fas fa-eye-slash"></i> مخفی کردن همه پاسخ‌ها</button>
+                <button class="btn" onclick="resetExercise('ex2')"><i class="fas fa-rotate-right"></i> شروع دوباره</button>
+                <div class="toolbar-spacer"></div>
+                <div class="score-badge">امتیاز: <span id="score-ex2">۰</span> از <span id="total-ex2">۰</span></div>
             </div>
+            <div id="cards-ex2"></div>
         </section>
 
+        <!-- ============================================================
+             تمرین ۳
+             ============================================================ -->
         <section class="page" id="ex3">
             <div class="page-header">
                 <h1><i class="fas fa-circle-check" style="color:var(--primary)"></i> تمرین ۳</h1>
-                <p>سؤالات این بخش هنوز اضافه نشده‌اند.</p>
+                <p>تست‌های تمرین سوم — روی یک گزینه بزنید تا نتیجه و توضیحات تشریحی نمایش داده شود.</p>
             </div>
-            <div class="placeholder">
-                <i class="fas fa-laptop-code"></i>
-                <p>سؤالات تمرین ۳ به‌زودی اضافه می‌شود.</p>
+            <div class="toolbar">
+                <button class="btn" onclick="showAllAnswers('ex3')"><i class="fas fa-eye"></i> نمایش همه پاسخ‌ها</button>
+                <button class="btn" onclick="hideAllAnswers('ex3')"><i class="fas fa-eye-slash"></i> مخفی کردن همه پاسخ‌ها</button>
+                <button class="btn" onclick="resetExercise('ex3')"><i class="fas fa-rotate-right"></i> شروع دوباره</button>
+                <div class="toolbar-spacer"></div>
+                <div class="score-badge">امتیاز: <span id="score-ex3">۰</span> از <span id="total-ex3">۰</span></div>
             </div>
+            <div id="cards-ex3"></div>
         </section>
 
+        <!-- ============================================================
+             تمرین ۴
+             ============================================================ -->
         <section class="page" id="ex4">
             <div class="page-header">
                 <h1><i class="fas fa-circle-check" style="color:var(--primary)"></i> تمرین ۴</h1>
@@ -945,8 +962,397 @@
                         ]
             }
 ],
-            ex2: [],
-            ex3: [],
+           ex2: [
+    {
+        "q": "کدام دسته شامل block دیوایس‌ها نیستند؟",
+        "options": ["USB devices", "hard drives", "network cards"],
+        "correct": 2,
+        "explain": "دستگاه‌های Block دستگاه‌هایی هستند که داده را به صورت بلوک‌های ثابت خوانده/نوشته و عموماً ذخیره‌سازی هستند (مانند هارد دیسک، SSD، فلش مموری). کارت‌های شبکه از نوع Character Device یا دستگاه‌های شبكه‌ای هستند، نه Block.",
+        "other_options": [
+            "<strong>USB devices:</strong> – اگر منظور حافظه‌ی USB باشد، یک Block Device محسوب می‌شود.",
+            "<strong>hard drives:</strong> – قطعاً Block Device هستند."
+        ]
+    },
+    {
+        "q": "برای انتقال داده یک دیسک به دیسک دیگر از چه فرمانی استفاده می‌شود؟",
+        "options": ["cp", "dd", "disk"],
+        "correct": 1,
+        "explain": "دستور <code>dd</code> برای کپی‌کردن سطح پایین (raw) دیسک‌ها، پارتیشن‌ها و بایت‌به‌بایت استفاده می‌شود.",
+        "other_options": [
+            "<strong>cp:</strong> – برای کپی فایل‌ها و دایرکتوری‌هاست، نه کل دیسک.",
+            "<strong>disk:</strong> – یک فرمان استاندارد در لینوکس نیست."
+        ]
+    },
+    {
+        "q": "فایل `/proc/interrupts/` شامل چه اطلاعاتی است؟",
+        "options": ["Memory", "IRQ", "IO"],
+        "correct": 1,
+        "explain": "این فایل آمار وقفه‌های (Interrupt) سیستم را به تفکیک CPU و دستگاه‌ها نشان می‌دهد.",
+        "other_options": [
+            "<strong>Memory:</strong> – اطلاعات حافظه در `/proc/meminfo` است.",
+            "<strong>IO:</strong> – اطلاعات ورودی/خروجی در `/proc/ioports` یا `/proc/iomem` قرار دارد."
+        ]
+    },
+    {
+        "q": "کدام فرمان برای مدیریت کردن ماژول‌های هسته استفاده نمی‌شود؟",
+        "options": ["lsmod", "insmod", "modprobe"],
+        "correct": 0,
+        "explain": "هر سه فرمان برای مدیریت ماژول‌ها به کار می‌روند، اما <code>lsmod</code> فقط کار نمایش را انجام می‌دهد و عملیات بارگذاری/باربرداری انجام نمی‌دهد.",
+        "other_options": [
+            "<strong>insmod:</strong> – بارگذاری یک ماژول.",
+            "<strong>modprobe:</strong> – بارگذاری هوشمند ماژول به همراه وابستگی‌ها."
+        ]
+    },
+    {
+        "q": "سویچ تغییر رفتار `fdisk` از حالت MBR به GPT کدام است؟",
+        "options": ["g", "q", "n"],
+        "correct": 0,
+        "explain": "در محیط <code>fdisk</code> با فشردن کلید <code>g</code> یک جدول پارتیشن جدید از نوع GPT ساخته می‌شود.",
+        "other_options": [
+            "<strong>q:</strong> – خروج بدون ذخیره‌سازی تغییرات.",
+            "<strong>n:</strong> – ایجاد یک پارتیشن جدید."
+        ]
+    },
+    {
+        "q": "سویچ خطرناک `rm` کدام است؟",
+        "options": ["r", "f", "fr"],
+        "correct": 1,
+        "explain": "سویچ <code>-f</code> (force) باعث می‌شود که <code>rm</code> بدون هیچ تأییدی فایل‌ها را پاک کند و حتی خطاهای مربوط به عدم وجود فایل را نادیده بگیرد. ترکیب <code>-rf</code> بسیار خطرناک است.",
+        "other_options": [
+            "<strong>r:</strong> – حذف بازگشتی دایرکتوری‌هاست، ولی به‌تنهایی تأیید می‌خواهد.",
+            "<strong>fr:</strong> – یک سویچ استاندارد نیست؛ معمولاً به صورت <code>-rf</code> نوشته می‌شود."
+        ]
+    },
+    {
+        "q": "کدام روش فشرده‌سازی است که فایل اصلی را پاک نمی‌کند؟",
+        "options": ["xz", "zip", "gzip"],
+        "correct": 1,
+        "explain": "دستور <code>zip</code> به‌صورت پیش‌فرض فایل اصلی را حفظ کرده و یک بایگانی با پسوند <code>.zip</code> ایجاد می‌کند.",
+        "other_options": [
+            "<strong>xz و gzip:</strong> – به‌طور پیش‌فرض فایل اصلی را با نسخه‌ی فشرده جایگزین می‌کنند (مگر با استفاده از گزینه‌ی <code>-k</code>)."
+        ]
+    },
+    {
+        "q": "عدد ۷ در سطح دسترسی معادل کدام مقدار است؟",
+        "options": ["rwx", "wx-", "-rw"],
+        "correct": 0,
+        "explain": "عدد ۷ = ۴ (خواندن) + ۲ (نوشتن) + ۱ (اجرا) = <code>rwx</code>."
+    },
+    {
+        "q": "سطح دسترسی `4750` مربوط به کدام بخش است؟",
+        "options": ["Sticky Bit", "suid", "sgid"],
+        "correct": 1,
+        "explain": "رقم اول (۴) نشان‌دهنده‌ی <strong>SUID</strong> (Set User ID) است.",
+        "other_options": [
+            "<strong>Sticky Bit:</strong> – رقم اول آن <code>1</code> است.",
+            "<strong>sgid:</strong> – رقم اول آن <code>2</code> است."
+        ]
+    },
+    {
+        "q": "مرحله POST در بخش راه‌اندازی سیستم در کدام بخش است؟",
+        "options": ["firmware", "Bios", "boot loader"],
+        "correct": 1,
+        "explain": "POST (Power-On Self-Test) توسط بایوس (یا UEFI) اجرا می‌شود تا سخت‌افزارهای اولیه را بررسی کند.",
+        "other_options": [
+            "<strong>firmware:</strong> – مفهوم کلی‌تر است، ولی در پاسخ‌های استاندارد، خود بایوس مسئول POST است.",
+            "<strong>boot loader:</strong> – مرحله‌ی بعد از POST است."
+        ]
+    },
+    {
+        "q": "برای نصب کردن GRUB ورژن ۲ از چه فرمانی استفاده می‌شود؟",
+        "options": ["grub-install", "grub2-mkconfig", "grub2-mkconfig > /boot/grub2/grub.cfg"],
+        "correct": 0,
+        "explain": "دستور <code>grub-install</code> (یا <code>grub2-install</code>) بوت‌لودر GRUB را روی دیسک یا پارتیشن نصب می‌کند.",
+        "other_options": [
+            "<strong>grub2-mkconfig:</strong> – فقط فایل پیکربندی <code>/boot/grub2/grub.cfg</code> را تولید می‌کند.",
+            "<strong>گزینه‌ی سوم:</strong> – همان تولید پیکربندی است، نه نصب."
+        ]
+    },
+    {
+        "q": "برای اینکه لینوکس شما در حالت بدون گرافیک راه‌اندازی شود از کدام فرمان استفاده می‌کنید؟",
+        "options": ["systemctl get-default", "systemctl set-default", "systemctl set-default multi-user.target"],
+        "correct": 2,
+        "explain": "هدف <code>multi-user.target</code> حالت متنی (رن‌لول ۳) را تعیین می‌کند.",
+        "other_options": [
+            "<strong>systemctl get-default:</strong> – فقط وضعیت فعلی را نمایش می‌دهد.",
+            "<strong>systemctl set-default:</strong> – به‌تنهایی کامل نیست و باید هدف را مشخص کرد."
+        ]
+    },
+    {
+        "q": "در `systemctl` بخش `is-active` چه کار انجام می‌دهد؟",
+        "options": ["سرویس را فعال می‌کند", "از فعال بودن سرویس مطمئن می‌شود", "فعال بودن را نمایش می‌دهد"],
+        "correct": 2,
+        "explain": "<code>systemctl is-active</code> بررسی می‌کند که سرویس در حال اجرا است یا خیر و خروجی <code>active</code> یا <code>inactive</code> را نشان می‌دهد.",
+        "other_options": [
+            "<strong>گزینه اول:</strong> – مربوط به <code>start</code> یا <code>enable</code> است.",
+            "<strong>گزینه دوم:</strong> – مربوط به <code>is-active</code> نیست، بلکه خودش وضعیت را گزارش می‌دهد."
+        ]
+    },
+    {
+        "q": "بعد از ورود کاربر به سیستم کدام فایل برای نمایش پیام استفاده می‌شود؟",
+        "options": ["/etc/issue", "/etc/issue.net", "/etc/motd"],
+        "correct": 2,
+        "explain": "فایل <code>motd</code> (Message of the Day) محتوایی است که پس از ورود موفق کاربر نمایش داده می‌شود.",
+        "other_options": [
+            "<strong>/etc/issue:</strong> – پیام قبل از ورود (در ترمینال محلی) نمایش داده می‌شود.",
+            "<strong>/etc/issue.net:</strong> – پیام قبل از ورود از طریق شبکه (مثل تلنت) است."
+        ]
+    },
+    {
+        "q": "ساختار KVM کدام نوع از Hypervisorها است؟",
+        "options": ["کانتینر است", "نوع دو", "نوع یک"],
+        "correct": 2,
+        "explain": "KVM یک Hypervisor <strong>Type 1</strong> (Bare-metal) است که مستقیماً روی سخت‌افزار و درون هسته لینوکس اجرا می‌شود.",
+        "other_options": [
+            "<strong>کانتینر نیست:</strong> – ماشین مجازی کامل است.",
+            "<strong>نوع دو:</strong> – نیست (مانند VirtualBox که روی یک سیستم عامل میزبان نصب می‌شود)."
+        ]
+    },
+    {
+        "q": "برای ورود به خط فرمان GRUB2 از چه کلیدی استفاده می‌شود؟",
+        "options": ["i", "e", "c"],
+        "correct": 2,
+        "explain": "در منوی GRUB با فشردن کلید <code>c</code> وارد محیط خط فرمان (Command Line) می‌شوید.",
+        "other_options": [
+            "<strong>e:</strong> – برای ویرایش یک ورودی بوت.",
+            "<strong>i:</strong> – کلید استانداردی در GRUB نیست."
+        ]
+    },
+    {
+        "q": "سطح دسترسی `1777` مربوط به کدام بخش است؟",
+        "options": ["sgid", "Sticky Bit", "suid"],
+        "correct": 1,
+        "explain": "رقم اول (۱) نشان‌دهنده‌ی <strong>Sticky Bit</strong> است (معمولاً برای دایرکتوری <code>/tmp</code> استفاده می‌شود).",
+        "other_options": [
+            "<strong>sgid:</strong> – رقم اول <code>2</code>.",
+            "<strong>suid:</strong> – رقم اول <code>4</code>."
+        ]
+    },
+    {
+        "q": "برای نمایش آدرس فایل اصلی یک Soft Link در `ls` از کدام سوئیچ‌ها استفاده می‌شود؟",
+        "options": ["og", "lh", "il"],
+        "correct": 1,
+        "explain": "سوئیچ <code>-l</code> (نمایش جزئیات) در خروجی، مسیر فایل مقصد را به صورت <code>link -> target</code> نشان می‌دهد. گزینه‌ی <code>lh</code> (ترکیب <code>-l</code> و <code>-h</code>) نیز این کار را انجام می‌دهد و حجم را به صورت خوانا نشان می‌دهد.",
+        "other_options": [
+            "<strong>og:</strong> – مربوط به <code>-o</code> (بدون گروه) و <code>-g</code> (بدون مالک) است و ربطی به نمایش هدف لینک ندارد.",
+            "<strong>il:</strong> – ترکیب <code>-i</code> (نمایش inode) و <code>-l</code> است، ولی برای نمایش هدف لینک، نیازی به <code>-i</code> نیست و <code>-l</code> کافی است."
+        ]
+    },
+    {
+        "q": "برای دریافت تأییدیه قبل از پاک کردن توسط `rm` از کدام سوئیچ استفاده می‌شود؟",
+        "options": ["y", "d", "i"],
+        "correct": 2,
+        "explain": "<code>rm -i</code> برای هر فایل یک سوال تأیید (<code>y/n</code>) می‌پرسد.",
+        "other_options": [
+            "<strong>y:</strong> – در <code>rm</code> معنی ندارد (معمولاً برای پاسخ به تأیید است).",
+            "<strong>d:</strong> – برای <code>rmdir</code> جهت حذف دایرکتوری خالی استفاده می‌شود."
+        ]
+    },
+    {
+        "q": "فرمان ایجاد کردن فایل سیستم در لینوکس چیست؟",
+        "options": ["fdisk", "mkfs", "format"],
+        "correct": 1,
+        "explain": "<code>mkfs</code> (Make FileSystem) برای ایجاد سیستم فایل روی یک پارتیشن استفاده می‌شود (مانند <code>mkfs.ext4</code>).",
+        "other_options": [
+            "<strong>fdisk:</strong> – برای مدیریت جدول پارتیشن است، نه ایجاد فایل‌سیستم.",
+            "<strong>format:</strong> – یک فرمان ویندوزی است و در لینوکس استاندارد نیست."
+        ]
+    }
+],
+            ex3: [
+    {
+        "q": "در ساختار FTP برای ارسال دیتا از کدام پورت استفاده می‌شود؟",
+        "options": ["22", "20", "21"],
+        "correct": 1,
+        "explain": "پروتکل FTP از دو پورت مجزا استفاده می‌کند: پورت <strong>۲۰</strong> برای انتقال خود داده‌ها (Data Connection) و پورت <strong>۲۱</strong> برای ارسال دستورات و کنترل (Command Connection).",
+        "other_options": [
+            "<strong>گزینه ۱ (۲۲):</strong> این پورت متعلق به پروتکل SSH است و برای اتصال امن به سیستم استفاده می‌شود، ربطی به FTP ندارد.",
+            "<strong>گزینه ۳ (۲۱):</strong> این پورت برای ارسال دستورات کنترلی استفاده می‌شود، نه خود دیتا."
+        ]
+    },
+    {
+        "q": "برنامه File Manager در محیط Cinnamon کدام است؟",
+        "options": ["Nemo", "Dolphin", "Nautilus"],
+        "correct": 0,
+        "explain": "فایل‌منیجر پیش‌فرض محیط Cinnamon، <strong>Nemo</strong> است که در واقع یک فورک (انشعاب) از Nautilus محسوب می‌شود.",
+        "other_options": [
+            "<strong>Dolphin:</strong> این فایل‌منیجر مختص محیط KDE است.",
+            "<strong>Nautilus:</strong> این فایل‌منیجر مختص محیط GNOME است (با نام Files هم شناخته می‌شود)."
+        ]
+    },
+    {
+        "q": "کدام روش در ارسال، گارانتی ارسال داده ندارد؟",
+        "options": ["UDP", "TCP"],
+        "correct": 0,
+        "explain": "پروتکل UDP غیرقابل‌اطمینان (Connectionless) است و هیچ تأییدیه دریافت (ACK) یا ارسال مجدد بسته‌های از دست‌رفته را انجام نمی‌دهد؛ بنابراین تحویل داده را تضمین نمی‌کند.",
+        "other_options": [
+            "<strong>TCP:</strong> پروتکل TCP با برقراری اتصال و استفاده از مکانیزم تأییدیه (ACK) و ارسال مجدد، تحویل صحیح داده‌ها را تضمین می‌کند."
+        ]
+    },
+    {
+        "q": "برنامه File Manager در محیط KDE کدام است؟",
+        "options": ["Nautilus", "Nemo", "Dolphin"],
+        "correct": 2,
+        "explain": "فایل‌منیجر پیش‌فرض محیط KDE، <strong>Dolphin</strong> است.",
+        "other_options": [
+            "<strong>Nautilus:</strong> مختص GNOME است.",
+            "<strong>Nemo:</strong> مختص Cinnamon است."
+        ]
+    },
+    {
+        "q": "شاخه‌ای برای ذخیره‌سازی فایل‌های اولیهٔ Home Directory هر کاربر زمان ایجاد آن؟",
+        "options": ["/etc/skel", "/etc/default/useradd"],
+        "correct": 0,
+        "explain": "دایرکتوری <strong>/etc/skel</strong> (اسکلت) شامل فایل‌های پیکربندی اولیه مانند <code>.bashrc</code>، <code>.profile</code> و غیره است که هنگام ایجاد یک کاربر جدید، محتویات آن به‌طور خودکار در هوم‌دایرکتوری کاربر کپی می‌شود.",
+        "other_options": [
+            "<strong>/etc/default/useradd:</strong> این فایل فقط تنظیمات پیش‌فرض مربوط به فرمان <code>useradd</code> (مثل شل پیش‌فرض یا مسیر هوم) را نگه می‌دارد و خودش فایل‌های اولیه را در اختیار کاربر قرار نمی‌دهد."
+        ]
+    },
+    {
+        "q": "برنامه Display Manager پیش‌فرض محیط Xfce کدام است؟",
+        "options": ["GDM", "LightDM", "KDM"],
+        "correct": 1,
+        "explain": "دیسپلی‌منیجر (صفحه ورود) پیش‌فرض محیط Xfce، <strong>LightDM</strong> است.",
+        "other_options": [
+            "<strong>GDM:</strong> مختص محیط GNOME است.",
+            "<strong>KDM:</strong> مختص محیط KDE است (هرچند در نسخه‌های جدید KDE با SDDM جایگزین شده، اما در سوال سنتی KDM ذکر شده)."
+        ]
+    },
+    {
+        "q": "کاراکترهای !! یا ! در فیلد دوم از فایل shadow به چه معناست؟",
+        "options": ["کاربر نمی‌تواند وارد شود", "رمز کاربر مخفی است"],
+        "correct": 0,
+        "explain": "در فایل <code>/etc/shadow</code>، فیلد دوم مربوط به رمز عبور هش‌شده است. اگر این فیلد با <code>!</code> یا <code>!!</code> شروع شود، به معنای <strong>قفل بودن حساب کاربری</strong> است و آن کاربر اجازه ورود به سیستم را ندارد (معمولاً با دستور <code>passwd -l</code> اعمال می‌شود).",
+        "other_options": [
+            "<strong>رمز کاربر مخفی است:</strong> رمزها در این فایل به صورت هش ذخیره می‌شوند و ذاتاً مخفی هستند، اما وجود <code>!</code> ربطی به مخفی بودن ندارد، بلکه نشان‌دهنده قفل بودن است."
+        ]
+    },
+    {
+        "q": "برنامه File Manager در محیط GNOME کدام است؟",
+        "options": ["Nemo", "Nautilus", "Dolphin"],
+        "correct": 1,
+        "explain": "فایل‌منیجر پیش‌فرض محیط GNOME، <strong>Nautilus</strong> است که در برخی توزیع‌ها با نام «Files» نمایش داده می‌شود.",
+        "other_options": [
+            "<strong>Nemo:</strong> مختص Cinnamon است.",
+            "<strong>Dolphin:</strong> مختص KDE است."
+        ]
+    },
+    {
+        "q": "فرمانی برای تغییر دادن زمان رمزعبور یک کاربر؟",
+        "options": ["passwd", "chage"],
+        "correct": 1,
+        "explain": "فرمان <strong>chage</strong> (Change Age) به‌طور اختصاصی برای مدیریت زمان‌های مربوط به رمز عبور طراحی شده است؛ مانند تاریخ انقضا، حداقل و حداکثر روزهای اعتبار، و تاریخ آخرین تغییر.",
+        "other_options": [
+            "<strong>passwd:</strong> این فرمان برای تغییر خودِ رشته رمز عبور، یا قفل/باز کردن حساب کاربری استفاده می‌شود و برای تغییر زمان‌بندی رمز کاربرد مستقیم ندارد (هرچند می‌توان با آن رمز را مجبور به انقضا کرد، اما ابزار اصلی <code>chage</code> است)."
+        ]
+    },
+    {
+        "q": "برنامه File Manager در محیط Xfce کدام است؟",
+        "options": ["Caja", "Thunar", "Nemo"],
+        "correct": 1,
+        "explain": "فایل‌منیجر پیش‌فرض محیط Xfce، <strong>Thunar</strong> است که سبک و سریع طراحی شده است.",
+        "other_options": [
+            "<strong>Caja:</strong> مختص محیط MATE است.",
+            "<strong>Nemo:</strong> مختص محیط Cinnamon است."
+        ]
+    },
+    {
+        "q": "محل ذخیره‌سازی رمز کاربران؟",
+        "options": ["passwd", "shadow"],
+        "correct": 1,
+        "explain": "رمزهای عبور کاربران به‌صورت هش‌شده در فایل <strong>/etc/shadow</strong> ذخیره می‌شوند که فقط کاربر روت قادر به خواندن آن است.",
+        "other_options": [
+            "<strong>passwd:</strong> فایل <code>/etc/passwd</code> فقط اطلاعات عمومی کاربر (نام کاربری، UID، GID، توضیحات، مسیر هوم و شل) را نگه می‌دارد و در گذشته رمزها اینجا ذخیره می‌شد، اما امروزه به دلایل امنیتی رمزها به <code>shadow</code> منتقل شده و در <code>passwd</code> فقط یک <code>x</code> قرار دارد."
+        ]
+    },
+    {
+        "q": "برنامه‌ای برای مدیریت کردن زمان سخت‌افزاری؟",
+        "options": ["hwclock", "date"],
+        "correct": 0,
+        "explain": "دستور <strong>hwclock</strong> برای خواندن و تنظیم ساعت سخت‌افزاری (RTC یا بایوس) استفاده می‌شود.",
+        "other_options": [
+            "<strong>date:</strong> این دستور مربوط به زمان نرم‌افزاری سیستم‌عامل (سیستم‌کلاک) است و تأثیری روی ساعت سخت‌افزاری ندارد."
+        ]
+    },
+    {
+        "q": "برنامه Display Manager پیش‌فرض محیط GNOME کدام است؟",
+        "options": ["KDM", "GDM", "LightDM"],
+        "correct": 1,
+        "explain": "دیسپلی‌منیجر پیش‌فرض محیط GNOME، <strong>GDM</strong> (GNOME Display Manager) است.",
+        "other_options": [
+            "<strong>KDM:</strong> مختص KDE است.",
+            "<strong>LightDM:</strong> مختص Xfce (و برخی محیط‌های دیگر مانند Unity) است."
+        ]
+    },
+    {
+        "q": "فرمان `usermod -s` برای ... استفاده می‌شود.",
+        "options": ["تغییر رمز", "تغییر شاخه home", "تغییر Shell"],
+        "correct": 2,
+        "explain": "سوییچ <code>-s</code> در فرمان <code>usermod</code> برای تغییر شل (Shell) پیش‌فرض کاربر استفاده می‌شود.",
+        "other_options": [
+            "<strong>تغییر رمز:</strong> تغییر رمز با دستور <code>passwd</code> انجام می‌شود.",
+            "<strong>تغییر شاخه home:</strong> تغییر مسیر هوم با سوییچ <code>-d</code> در <code>usermod</code> انجام می‌شود."
+        ]
+    },
+    {
+        "q": "فایل `login.defs` شامل چه اطلاعاتی است؟",
+        "options": ["اطلاعات پیش‌فرض فرمان gpasswd", "اطلاعات پیش‌فرض فرمان passwd"],
+        "correct": 1,
+        "explain": "فایل <code>/etc/login.defs</code> شامل پارامترهای پیش‌فرض مربوط به سیاست‌های رمز عبور است (مانند طول عمر رمز، حداقل طول، تعداد روزهای هشدار و...) که توسط فرمان‌های <code>passwd</code> و <code>chage</code> مورد استفاده قرار می‌گیرد.",
+        "other_options": [
+            "<strong>اطلاعات پیش‌فرض فرمان gpasswd:</strong> تنظیمات مربوط به مدیریت گروه‌ها در این فایل تعریف نشده است."
+        ]
+    },
+    {
+        "q": "برنامه File Manager در محیط MATE کدام است؟",
+        "options": ["Dolphin", "Caja", "Nemo"],
+        "correct": 1,
+        "explain": "فایل‌منیجر پیش‌فرض محیط MATE، <strong>Caja</strong> است که خود فورکی از Nautilus نسخه‌های قدیمی محسوب می‌شود.",
+        "other_options": [
+            "<strong>Dolphin:</strong> مختص KDE است.",
+            "<strong>Nemo:</strong> مختص Cinnamon است."
+        ]
+    },
+    {
+        "q": "فرمان `useradd -D` برای چه کار استفاده می‌شود؟",
+        "options": ["نمایش اطلاعات پیش‌فرض اضافه کردن یک کاربر", "پاک کردن کاربر", "نمایش اطلاعات یک کاربر"],
+        "correct": 0,
+        "explain": "سوییچ <code>-D</code> (یا <code>--defaults</code>) در فرمان <code>useradd</code>، تنظیمات پیش‌فرض ایجاد کاربر را که در فایل <code>/etc/default/useradd</code> ذخیره شده است، نمایش می‌دهد.",
+        "other_options": [
+            "<strong>پاک کردن کاربر:</strong> حذف کاربر با فرمان <code>userdel</code> انجام می‌شود.",
+            "<strong>نمایش اطلاعات یک کاربر:</strong> نمایش اطلاعات یک کاربر با دستوراتی مانند <code>id</code> یا بررسی محتوای <code>/etc/passwd</code> انجام می‌شود."
+        ]
+    },
+    {
+        "q": "فرمان نمایش وضعیت رمز یک کاربر؟",
+        "options": ["passwd -S", "passwd -I"],
+        "correct": 0,
+        "explain": "سوییچ <code>-S</code> (یا <code>--status</code>) در فرمان <code>passwd</code> وضعیت رمز کاربر را نشان می‌دهد؛ مثلاً اینکه آیا کاربر رمز دارد، رمز قفل است یا خیر، و تاریخ آخرین تغییر.",
+        "other_options": [
+            "<strong>passwd -I:</strong> چنین سوییچی در فرمان <code>passwd</code> معتبر نیست (ممکن است با <code>-l</code> برای قفل کردن اشتباه گرفته شود)."
+        ]
+    },
+    {
+        "q": "برنامه Display Manager پیش‌فرض محیط KDE کدام است؟",
+        "options": ["LightDM", "KDM", "GDM"],
+        "correct": 1,
+        "explain": "دیسپلی‌منیجر سنتی محیط KDE، <strong>KDM</strong> (KDE Display Manager) است. (توجه: در نسخه‌های جدیدتر KDE معمولاً از SDDM استفاده می‌شود، اما بر اساس سوال و توضیحات داده‌شده، پاسخ KDM است).",
+        "other_options": [
+            "<strong>LightDM:</strong> مختص Xfce است.",
+            "<strong>GDM:</strong> مختص GNOME است."
+        ]
+    },
+    {
+        "q": "سرور Sendmail یک ..... است؟",
+        "options": ["MUA", "MDA", "MTA"],
+        "correct": 2,
+        "explain": "Sendmail یک <strong>MTA</strong> (Mail Transfer Agent) است که وظیفه انتقال و مسیریابی ایمیل‌ها بین سرورهای پستی را بر عهده دارد.",
+        "other_options": [
+            "<strong>MUA:</strong> MUA (Mail User Agent) نرم‌افزار کاربر نهایی است، مانند Outlook یا Thunderbird که برای خواندن و نوشتن ایمیل استفاده می‌شود.",
+            "<strong>MDA:</strong> MDA (Mail Delivery Agent) وظیفه تحویل نهایی ایمیل به صندوق پستی کاربر محلی را دارد (مانند Procmail یا Dovecot)."
+        ]
+    }
+],
             ex4: []
         };
 
@@ -1114,6 +1520,8 @@
         // ۱۰ – مقداردهی اولیه
         // ============================================================
         buildExercise('ex1');
+        buildExercise('ex2');
+        buildExercise('ex3');
     </script>
 
 </body>
