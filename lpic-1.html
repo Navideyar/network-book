@@ -31218,73 +31218,84 @@ Mouse Keys → کنترل Pointer با Keyboard</div></div>
 <h2>اهداف یادگیری</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-    <li>مفهوم <strong>Local Access</strong> و <strong>Remote Access</strong> را از هم تفکیک کنی.</li>
-    <li>تفاوت روش‌های مهم دسترسی به Linux از راه دور را بفهمی.</li>
-    <li>مفهوم <strong>SSH</strong> و ارتباط آن با Remote Access را درک کنی.</li>
-    <li>با <strong>X11 Forwarding</strong> و اجرای برنامه‌های گرافیکی از طریق SSH آشنا شوی.</li>
-    <li>مفهوم Remote Desktop و ابزارهایی مانند <strong>VNC</strong> را در سطح LPIC-1 بشناسی.</li>
+    <li>تفاوت Local Access و Remote Access را توضیح بدهی.</li>
+    <li>مفهوم Virtual Terminal و TTY را در سطح پایه بشناسی.</li>
+    <li>کاربرد SSH را بدانی.</li>
+    <li>مفهوم X11 Forwarding را درک کنی.</li>
+    <li>تفاوت X11 Forwarding و Remote Desktop را بدانی.</li>
+    <li>VNC را به‌عنوان یک فناوری Remote Desktop بشناسی.</li>
+    <li>بر اساس نیاز، روش مناسب دسترسی را انتخاب کنی.</li>
 </ol>
 
 <h2>معرفی جلسه</h2>
-<p>تا اینجا GUI را روی Linux شناختیم. حالا یک سؤال مهم:</p>
-<blockquote>اگر Linux روی یک Server در اتاق دیگری باشد، چطور از کامپیوتر خودمان با آن کار کنیم؟</blockquote>
-<p>دو حالت داریم:</p>
-<div class="code-container"><span class="code-label">دسترسی</span><div class="code-block no-prompt">Local Access
-    ↓
-همان سیستم / همان محیط
-
-Remote Access
-    ↓
-سیستم دیگری از طریق Network</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Your PC
-   │
-   │ Network
-   ↓
-Linux Server
-   ↓
-GUI</div></div>
-<p>در مدیریت Linux، Remote Access بسیار مهم است؛ چون Administrator معمولاً لازم نیست کنار Server حضور فیزیکی داشته باشد.</p>
-
-<h2>Local Access چیست؟ ⭐⭐⭐</h2>
-<p><strong>Local Access</strong> یعنی کاربر مستقیماً به همان سیستم Linux دسترسی دارد. مثلاً:</p>
-<div class="code-container"><span class="code-label">محلی</span><div class="code-block no-prompt">Keyboard + Monitor
-        ↓
-    Linux PC</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Linux VM
-   ↓
-VM Console
-   ↓
-Login</div></div>
-<p>در این حالت ارتباط Network برای دسترسی به خود سیستم ضروری نیست.</p>
-
-<h2>Virtual Console در Linux ⭐⭐⭐</h2>
-<p>Linux می‌تواند چند Console متنی داشته باشد. معمولاً با کلیدهای:</p>
-<div class="code-container"><span class="code-label">کلیدها</span><div class="code-block no-prompt">Ctrl + Alt + F1
-Ctrl + Alt + F2
-...</div></div>
-<p>می‌توان بین Virtual Terminalها جابه‌جا شد؛ شماره و رفتار دقیق Function Keyها بسته به Desktop/Distribution و پیکربندی سیستم می‌تواند متفاوت باشد. ممکن است یک Console گرافیکی نیز وجود داشته باشد.</p>
-<p>مدل ساده:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Linux System
+<p>در جلسه‌های قبل با محیط گرافیکی Linux و قابلیت‌های Accessibility آشنا شدیم. حالا یک سؤال مهم مطرح می‌شود:</p>
+<blockquote>اگر سیستم Linux جلوی ما نباشد، چگونه به آن دسترسی پیدا کنیم؟</blockquote>
+<p>برای پاسخ به این سؤال ابتدا باید دو مفهوم اصلی را بشناسیم:</p>
+<div class="code-container"><span class="code-label">Access</span><div class="code-block no-prompt">Access
 │
-├── Virtual Terminal
-├── Virtual Terminal
-├── Virtual Terminal
-└── GUI Session</div></div>
+├── Local Access
+│
+└── Remote Access</div></div>
+<p>سپس بررسی می‌کنیم که برای هر نوع نیاز، چه روشی مناسب است.</p>
 
-<h2>TTY چیست؟ ⭐⭐⭐</h2>
-<p>در Linux اصطلاح <strong>TTY</strong> را زیاد می‌بینی. به‌صورت ساده:</p>
-<blockquote>TTY یک Terminal/Console متنی برای تعامل با سیستم است.</blockquote>
-<p>مثلاً ممکن است ببینی:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">tty</div></div>
-<p>خروجی:</p>
+<h2>Local Access و Remote Access</h2>
+<p>برای دسترسی به یک سیستم Linux دو حالت کلی داریم:</p>
+<div class="code-container"><span class="code-label">دسترسی</span><div class="code-block no-prompt">Access
+│
+├── Local Access
+│
+└── Remote Access</div></div>
+
+<h3>Local Access</h3>
+<p>یعنی کاربر مستقیماً با همان سیستم Linux کار می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">Local</span><div class="code-block no-prompt">Keyboard + Monitor
+        ↓
+    Linux System</div></div>
+<p>یا در یک ماشین مجازی:</p>
+<div class="code-container"><span class="code-label">VM</span><div class="code-block no-prompt">Linux VM
+    ↓
+VM Console
+    ↓
+Login</div></div>
+<p>در Local Access، برای دسترسی به خود سیستم نیازی به Network نداریم.</p>
+
+<h3>Remote Access</h3>
+<p>یعنی کاربر از طریق Network به سیستم دیگری متصل می‌شود.</p>
+<div class="code-container"><span class="code-label">Remote</span><div class="code-block no-prompt">Administrator PC
+       │
+       │ Network
+       ↓
+ Linux Server</div></div>
+<p>این روش در مدیریت Linux بسیار مهم است، زیرا Administrator معمولاً لازم نیست کنار Server حضور فیزیکی داشته باشد.</p>
+
+<h2>Local Access در Linux</h2>
+<p>وقتی مستقیماً کنار سیستم هستیم، می‌توانیم از دو محیط استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">Local Access</span><div class="code-block no-prompt">Local Access
+│
+├── Text Console
+│
+└── GUI</div></div>
+
+<h2>Virtual Terminal و TTY ⭐⭐⭐</h2>
+<p>Linux می‌تواند چند محیط متنی یا Console داشته باشد. به این محیط‌های متنی معمولاً <strong>Virtual Terminal</strong> گفته می‌شود. ممکن است با ترکیب‌هایی مانند:</p>
+<div class="code-container"><span class="code-label">ترکیب</span><div class="code-block no-prompt">Ctrl + Alt + F1
+Ctrl + Alt + F2</div></div>
+<p>بین Virtual Terminalها جابه‌جا شویم.</p>
+<p>نکته مهم:</p>
+<blockquote>شماره و رفتار دقیق Function Keyها ممکن است بسته به Distribution و Desktop متفاوت باشد.</blockquote>
+
+<h3>TTY چیست؟</h3>
+<p>در Linux اصطلاح <strong>TTY</strong> را زیاد می‌بینیم. در سطح پایه:</p>
+<blockquote>TTY یک Terminal یا Console متنی برای تعامل با سیستم است.</blockquote>
+<p>برای دیدن Terminal فعلی:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tty</div></div>
+<p>ممکن است خروجی مانند زیر باشد:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/dev/tty2</div></div>
-<p>این یعنی Shell فعلی به یک Terminal خاص متصل است.</p>
+<p>یعنی Shell فعلی به یک Terminal مشخص متصل است.</p>
 
-<h2>GUI Local Access</h2>
-<p>اگر GUI نصب و فعال باشد، Local Access می‌تواند به این شکل باشد:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Monitor
+<h2>Local GUI Access</h2>
+<p>اگر محیط گرافیکی نصب و فعال باشد، Local Access می‌تواند به این شکل باشد:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">Monitor
    ↓
 Display Manager
    ↓
@@ -31292,7 +31303,7 @@ Login
    ↓
 Desktop Environment
    ↓
-Application</div></div>
+Applications</div></div>
 <p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Monitor
    ↓
@@ -31301,485 +31312,374 @@ GDM
 GNOME
    ↓
 Terminal</div></div>
-<p>این همان چیزی است که در جلسه‌های قبل ساختار آن را یاد گرفتیم.</p>
+<p>این همان ساختاری است که در جلسه اول با آن آشنا شدیم.</p>
 
-<h2>Remote Access چیست؟ ⭐⭐⭐</h2>
-<p>حالا فرض کن Server در Data Center است.</p>
-<div class="code-container"><span class="code-label">راه دور</span><div class="code-block no-prompt">Administrator PC
-       │
-       │ Network
-       ↓
- Linux Server</div></div>
-<p>Administrator از طریق Network به Server وصل می‌شود. این می‌شود:</p>
-<blockquote><strong>Remote Access</strong></blockquote>
-<p>دو دسته کلی را می‌توانیم در نظر بگیریم:</p>
-<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Remote Access
+<h2>Remote Access چیست؟</h2>
+<p>حالا فرض کن Server در یک مکان دیگر قرار دارد:</p>
+<div class="code-container"><span class="code-label">Remote</span><div class="code-block no-prompt">Your PC
+   │
+   │ Network
+   ↓
+Linux Server</div></div>
+<p>ما از طریق Network به Server متصل می‌شویم. روش‌های اصلی Remote Access را می‌توان این‌گونه دسته‌بندی کرد:</p>
+<div class="code-container"><span class="code-label">روش‌ها</span><div class="code-block no-prompt">Remote Access
 │
-├── Command-line access
-│      └── SSH
+├── Command Line
+│     └── SSH
 │
-└── Graphical access
-       └── Remote Desktop / VNC</div></div>
+├── GUI Application
+│     └── SSH + X11 Forwarding
+│
+└── Full Desktop
+      └── Remote Desktop / VNC</div></div>
+<p>این مهم‌ترین نقشه ذهنی جلسه است.</p>
 
 <h2>SSH — مهم‌ترین روش Remote Access ⭐⭐⭐</h2>
-<p><strong>SSH (Secure Shell)</strong> مهم‌ترین ابزار Remote Access متنی در Linux است. با SSH می‌توانی:</p>
+<p>SSH مخفف <strong>Secure Shell</strong> است. SSH مهم‌ترین روش برای دسترسی متنی و مدیریت Linux از راه دور است. با SSH می‌توانیم:</p>
 <ul>
-    <li>Login کنی.</li>
-    <li>Command اجرا کنی.</li>
-    <li>فایل منتقل کنی.</li>
-    <li>سیستم را مدیریت کنی.</li>
+    <li>Login کنیم.</li>
+    <li>Command اجرا کنیم.</li>
+    <li>سیستم را مدیریت کنیم.</li>
+    <li>فایل منتقل کنیم.</li>
 </ul>
 <p>مدل:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Client
-  │
-  │ SSH
-  ↓
-Server
-  │
-  ↓
-Shell</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">اتصال</span><div class="code-block">ssh user@192.168.1.100</div></div>
-<p>یعنی: با کاربر <code>user</code> به سیستم دارای IP <code>192.168.1.100</code> متصل شو.</p>
-
-<h2>چرا SSH مهم است؟ ⭐⭐⭐</h2>
-<p>SSH ارتباط را به‌صورت امن برقرار می‌کند. در مقایسه با روش‌های قدیمی و ناامن، SSH برای مدیریت Remote Linux بسیار مناسب‌تر است. به همین دلیل در Server Administration بسیار رایج است.</p>
-
-<h2>SSH و GUI چه ارتباطی دارند؟</h2>
-<p>یک نکته جالب:</p>
-<blockquote>SSH فقط برای Command Line نیست.</blockquote>
-<p>می‌توان از SSH برای اجرای بعضی برنامه‌های گرافیکی نیز استفاده کرد. این کار با <strong>X11 Forwarding</strong> امکان‌پذیر است.</p>
-
-<h2>X11 Forwarding ⭐⭐⭐</h2>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">سناریو</span><div class="code-block no-prompt">Your PC
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Client
    │
    │ SSH
    ↓
-Linux Server
-   │
-   └── GUI Application</div></div>
-<p>می‌خواهی یک برنامه GUI روی Server اجرا شود، اما Window آن روی سیستم خودت نمایش داده شود. می‌توان از:</p>
-<div class="code-container"><span class="code-label">اتصال با X11</span><div class="code-block">ssh -X user@server</div></div>
-<p>استفاده کرد. بعد مثلاً:</p>
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">xclock</div></div>
-<p>را اجرا کنی. در معماری X11، Window برنامه از طریق SSH به سیستم Client منتقل می‌شود.</p>
-<p>مدل مفهومی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Linux Server
-   │
-   └── GUI Application
-          │
-          │ X11 Forwarding
-          ↓
-       SSH Connection
-          ↓
-        Client
-          ↓
-        Window</div></div>
+Server
+   ↓
+Shell</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ssh user@192.168.1.100</div></div>
+<p>یعنی: با کاربر <code>user</code> به سیستم دارای IP <code>192.168.1.100</code> متصل شو.</p>
 
-<h2><code>ssh -X</code> و <code>ssh -Y</code> ⭐⭐</h2>
-<p>دو گزینه معروف:</p>
-<div class="code-container"><span class="code-label">ssh -X</span><div class="code-block">ssh -X user@server</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">ssh -Y</span><div class="code-block">ssh -Y user@server</div></div>
-<p>برای X11 Forwarding استفاده می‌شوند. در سطح LPIC-1 بیشتر از همه باید مفهوم <code>-X</code> را بشناسی.</p>
+<h2>چرا SSH مهم است؟</h2>
+<p>SSH ارتباط Remote را به‌صورت امن برقرار می‌کند. به همین دلیل برای مدیریت Linux Server بسیار رایج است. مثلاً اگر فقط می‌خواهیم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl status sshd</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">df -h</div></div>
+<p>را اجرا کنیم، نیازی به Remote Desktop نداریم.</p>
+<div class="code-container"><span class="code-label">Need</span><div class="code-block no-prompt">Need:
+Run Commands
+     ↓
+    SSH</div></div>
 
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong><br>X11 Forwarding با Remote Desktop کامل یکی نیست. یعنی:
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">ssh -X
-→ اجرای برنامه گرافیکی
+<h2>SSH فقط برای Command Line نیست</h2>
+<p>یک نکته مهم:</p>
+<blockquote>SSH فقط برای اجرای Command نیست.</blockquote>
+<p>در بعضی شرایط می‌توان از SSH برای اجرای برنامه‌های گرافیکی نیز استفاده کرد. این مفهوم را با <strong>X11 Forwarding</strong> می‌شناسیم.</p>
 
-Remote Desktop
-→ دسترسی به یک Desktop Session</div></div>
-این تفاوت را حفظ کن.</div></div>
+<h2>X11 Forwarding ⭐⭐⭐</h2>
+<p>فرض کن یک برنامه گرافیکی روی Linux Server وجود دارد. می‌خواهیم:</p>
+<ul>
+    <li>برنامه روی Server اجرا شود.</li>
+    <li>Window برنامه روی سیستم Client نمایش داده شود.</li>
+</ul>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Linux Server
+    │
+    │ GUI Application
+    ↓
+X11 Forwarding
+    │
+    │ SSH
+    ↓
+Client
+    ↓
+Window</div></div>
+<p>برای اتصال می‌توان از:</p>
+<div class="code-container"><span class="code-label">اتصال</span><div class="code-block">ssh -X user@server</div></div>
+<p>استفاده کرد. بعد از اتصال، در صورت وجود زیرساخت لازم، می‌توان یک برنامه X11 مانند:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">xclock</div></div>
+<p>را اجرا کرد.</p>
+
+<h2>تفاوت مهم X11 Forwarding و Remote Desktop ⭐⭐⭐</h2>
+<p>این دو مفهوم را با هم اشتباه نگیر.</p>
+<div class="code-container"><span class="code-label">X11 Forwarding</span><div class="code-block no-prompt">SSH + X11 Forwarding
+        ↓
+اجرای یک GUI Application</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Remote Desktop</span><div class="code-block no-prompt">Remote Desktop
+        ↓
+دسترسی به Desktop Session</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">X11 Forwarding → یک برنامه گرافیکی
+Remote Desktop → کل محیط Desktop</div></div>
 
 <h2>Remote Desktop چیست؟ ⭐⭐⭐</h2>
-<p>در Remote Desktop هدف این است که کاربر از سیستم دیگری بتواند محیط گرافیکی سیستم مقصد را ببیند و کنترل کند.</p>
-<p>مدل:</p>
+<p>در Remote Desktop، کاربر می‌تواند محیط گرافیکی سیستم مقصد را از راه دور مشاهده و کنترل کند.</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Local Computer
       │
       │ Network
       ↓
 Remote Linux
-      │
       ↓
 Desktop Session</div></div>
-<p>مثلاً Administrator روی Laptop خودش محیط Desktop Server را مشاهده می‌کند.</p>
+<p>مثلاً Administrator می‌تواند:</p>
+<ul>
+    <li>Windowها را ببیند.</li>
+    <li>File Manager را باز کند.</li>
+    <li>برنامه‌های GUI را اجرا کند.</li>
+    <li>با Desktop سیستم مقصد کار کند.</li>
+</ul>
 
 <h2>VNC ⭐⭐⭐</h2>
-<p>یکی از فناوری‌های معروف Remote Desktop:</p>
-<blockquote><strong>VNC — Virtual Network Computing</strong></blockquote>
-<p>VNC برای مشاهده و کنترل Desktop از راه دور استفاده می‌شود.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">VNC</span><div class="code-block no-prompt">VNC Client
-    │
-    │ Network
-    ↓
-VNC Server
-    │
-    ↓
-Remote Desktop</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">نمایش</span><div class="code-block no-prompt">┌─────────────────────┐
-│ Your Computer       │
-│                     │
-│    VNC Client       │
-└──────────┬──────────┘
-           │
-         Network
-           │
-┌──────────▼──────────┐
-│ Linux Server        │
-│                     │
-│   VNC Server        │
-│       ↓             │
-│      GUI            │
-└─────────────────────┘</div></div>
+<p>یکی از فناوری‌های معروف Remote Desktop <strong>VNC</strong> است. VNC مخفف <strong>Virtual Network Computing</strong> است. VNC برای مشاهده و کنترل Desktop از راه دور استفاده می‌شود.</p>
 
-<h2>VNC Client و VNC Server</h2>
-<p>دو طرف ارتباط را جدا کن:</p>
+<h3>VNC Client و VNC Server</h3>
+<p>در VNC دو بخش اصلی داریم:</p>
 
-<h3>VNC Server</h3>
-<p>روی سیستم مقصد اجرا می‌شود:</p>
+<h4>VNC Server</h4>
+<p>روی سیستم مقصد قرار می‌گیرد:</p>
 <div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Remote Linux
-   ↓
+     ↓
 VNC Server</div></div>
 
-<h3>VNC Client</h3>
-<p>روی سیستم Administrator اجرا می‌شود:</p>
+<h4>VNC Client</h4>
+<p>روی سیستم کاربر یا Administrator قرار می‌گیرد:</p>
 <div class="code-container"><span class="code-label">Client</span><div class="code-block no-prompt">Administrator PC
-   ↓
+      ↓
 VNC Client</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">اتصال</span><div class="code-block no-prompt">Client → connects to → Server</div></div>
-<p>این قاعده در بسیاری از سرویس‌های Network صدق می‌کند.</p>
+<p>مدل کامل:</p>
+<div class="code-container"><span class="code-label">مدل کامل</span><div class="code-block no-prompt">VNC Client
+     │
+     │ Network
+     ↓
+VNC Server
+     ↓
+Remote Desktop</div></div>
+<p>پس همیشه این ارتباط را به خاطر بسپار:</p>
+<div class="code-container"><span class="code-label">Client → Server</span><div class="code-block no-prompt">Client
+   ↓ connects to
+Server</div></div>
 
-<h2>Remote Desktop با SSH فرق دارد ⭐⭐⭐</h2>
-<p>این تفاوت بسیار مهم است.</p>
+<h2>SSH و Remote Desktop چه تفاوتی دارند؟ ⭐⭐⭐</h2>
 <div class="table-wrap">
 <table>
-<thead><tr><th>SSH</th><th>Remote Desktop</th></tr></thead>
+<thead><tr><th>SSH</th><th>Remote Desktop / VNC</th></tr></thead>
 <tbody>
-<tr><td>معمولاً CLI</td><td>GUI</td></tr>
-<tr><td>مناسب Administration</td><td>مناسب تعامل کامل گرافیکی</td></tr>
+<tr><td>معمولاً Command Line</td><td>محیط گرافیکی</td></tr>
 <tr><td>Shell Session</td><td>Desktop Session</td></tr>
-<tr><td>سبک‌تر</td><td>معمولاً منابع بیشتر</td></tr>
+<tr><td>سبک‌تر</td><td>معمولاً منابع بیشتری نیاز دارد</td></tr>
+<tr><td>مناسب مدیریت Server</td><td>مناسب کنترل GUI</td></tr>
 <tr><td>مثال: <code>ssh</code></td><td>مثال: VNC</td></tr>
 </tbody>
 </table>
 </div>
-<p>پس اگر فقط می‌خواهی:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl status sshd</div></div>
-<p>را اجرا کنی، Remote Desktop لازم نیست. SSH کافی است. اما اگر می‌خواهی:</p>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">Command</span><div class="code-block no-prompt">می‌خواهم Command اجرا کنم
+        ↓
+       SSH</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Desktop</span><div class="code-block no-prompt">می‌خواهم کل Desktop را کنترل کنم
+        ↓
+Remote Desktop / VNC</div></div>
+
+<h2>چه زمانی از کدام روش استفاده کنیم؟</h2>
+<p>بهترین روش این است که ابتدا نیاز خود را مشخص کنیم.</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>نیاز</th><th>روش مناسب</th></tr></thead>
+<tbody>
+<tr><td>حضور مستقیم کنار سیستم</td><td>Local Access</td></tr>
+<tr><td>اجرای Command روی Server</td><td>SSH</td></tr>
+<tr><td>مدیریت Server</td><td>SSH</td></tr>
+<tr><td>اجرای یک GUI Application</td><td>SSH + X11 Forwarding</td></tr>
+<tr><td>کنترل کامل Desktop</td><td>Remote Desktop / VNC</td></tr>
+</tbody>
+</table>
+</div>
+<p>پس همیشه این سؤال را بپرس:</p>
+<blockquote>می‌خواهم دقیقاً چه چیزی را کنترل کنم؟</blockquote>
+
+<h2>سناریوی عملی</h2>
+<p>فرض کن یک Linux Server داریم:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Server
+IP: 192.168.1.50</div></div>
+<p>و Administrator می‌خواهد از Laptop خود با آن کار کند.</p>
+
+<h4>حالت اول: اجرای Command</h4>
+<div class="code-container"><span class="code-label">SSH</span><div class="code-block">ssh admin@192.168.1.50</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Laptop
+   │
+   │ SSH
+   ↓
+Server
+   ↓
+Shell</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl status sshd</div></div>
+<p>در این حالت:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">SSH کافی است.</div></div>
+
+<h4>حالت دوم: اجرای یک برنامه گرافیکی</h4>
+<p>Administrator می‌خواهد یک برنامه GUI روی Server اجرا کند.</p>
+<div class="code-container"><span class="code-label">X11 Forwarding</span><div class="code-block">ssh -X admin@192.168.1.50</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">xclock</div></div>
+<p>مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Laptop
+   ↑
+GUI Window
+   │
+SSH + X11 Forwarding
+   │
+Server
+   ↓
+GUI Application</div></div>
+
+<h4>حالت سوم: کنترل کامل Desktop</h4>
+<p>Administrator می‌خواهد:</p>
 <div class="code-container"><span class="code-label">Desktop</span><div class="code-block no-prompt">Desktop
 ├── Window
 ├── File Manager
 ├── Browser
 └── GUI Applications</div></div>
-<p>را از راه دور کنترل کنی، Remote Desktop مناسب‌تر است.</p>
+<p>را کنترل کند. در این حالت:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Remote Desktop
+      ↓
+     VNC</div></div>
+<p>می‌تواند مناسب باشد.</p>
 
-<h2>Remote Desktop و Security ⭐⭐⭐</h2>
-<p>Remote Desktop را نباید بدون توجه به امنیت روی شبکه قرار داد.</p>
-<p>مشکل:</p>
-<div class="code-container"><span class="code-label">خطر</span><div class="code-block no-prompt">Internet
-   ↓
-Remote Desktop</div></div>
-<p>اگر سرویس به‌درستی محافظت نشده باشد، خطر امنیتی ایجاد می‌کند. در محیط واقعی باید به مواردی مثل:</p>
+<h2>نکته امنیتی مهم</h2>
+<p>دسترسی از راه دور باید با توجه به Security مدیریت شود. مفاهیم مهم:</p>
 <ul>
     <li>Authentication</li>
     <li>Firewall</li>
     <li>Encryption</li>
     <li>محدود کردن دسترسی</li>
 </ul>
-<p>توجه کرد. برای مدیریت Server، معمولاً SSH انتخاب اول است؛ مخصوصاً وقتی نیازی به GUI نداریم.</p>
+<p>نکته اصلی:</p>
+<blockquote>وقتی به GUI نیاز نداریم، برای مدیریت معمول Linux Server، SSH معمولاً انتخاب مناسب‌تر و سبک‌تری است.</blockquote>
 
-<h2>SSH Tunnel — فقط مفهوم ⭐⭐</h2>
-<p>یکی از کاربردهای SSH ایجاد یک <strong>Tunnel</strong> امن است.</p>
-<p>مدل مفهومی:</p>
-<div class="code-container"><span class="code-label">Tunnel</span><div class="code-block no-prompt">Client
-   │
-   │ Encrypted SSH Tunnel
-   ↓
-Server
-   │
-   ↓
-Service</div></div>
-<p>این موضوع در LPIC-1 بیشتر در حد شناخت مفهوم اهمیت دارد. فعلاً لازم نیست وارد Port Forwardingهای پیچیده شویم.</p>
+<h2>اشتباهات رایج</h2>
 
-<h2>Local vs Remote</h2>
-<p>حالا تفاوت را کاملاً روشن کنیم:</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>SSH یعنی Remote Desktop.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">SSH → Remote Shell</div></div>
+</div></div>
 
-<h3>Local</h3>
-<div class="code-container"><span class="code-label">محلی</span><div class="code-block no-prompt">Keyboard
-   ↓
-Linux
-   ↓
-Desktop</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br><code>ssh -X</code> کل Desktop را منتقل می‌کند.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">ssh -X → X11 Forwarding → اجرای GUI Application</div></div>
+<p>نه لزوماً انتقال کامل Desktop.</p>
+</div></div>
 
-<h3>Remote CLI</h3>
-<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">PC
- │
- │ SSH
- ↓
-Linux
- │
- ↓
-Shell</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>VNC همان SSH است.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">SSH → Secure Shell
+VNC → Remote Desktop</div></div>
+</div></div>
 
-<h3>Remote GUI</h3>
-<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">PC
- │
- │ Remote Desktop
- ↓
-Linux
- │
- ↓
-Desktop</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>برای مدیریت هر Linux Server باید GUI داشته باشیم.<br><strong>❌ خیر.</strong><br>بسیاری از Linux Serverها کاملاً از طریق <code>SSH → Command Line</code> مدیریت می‌شوند.</div></div>
 
-<h3>Remote GUI Application با X11</h3>
-<div class="code-container"><span class="code-label">X11</span><div class="code-block no-prompt">PC
- │
- │ SSH + X11 Forwarding
- ↓
-Linux
- │
- ↓
-GUI Application
- │
- ↓
-Window روی Client</div></div>
-<p>این چهار حالت را قاطی نکن.</p>
-
-<h2>چه زمانی از کدام استفاده کنیم؟ ⭐⭐⭐</h2>
-<div class="table-wrap">
-<table>
-<thead><tr><th>نیاز</th><th>روش مناسب</th></tr></thead>
-<tbody>
-<tr><td>اجرای Command روی Server</td><td>SSH</td></tr>
-<tr><td>مدیریت Server</td><td>SSH</td></tr>
-<tr><td>انتقال امن فایل</td><td>SSH/SCP/SFTP</td></tr>
-<tr><td>اجرای یک GUI Application</td><td>X11 Forwarding</td></tr>
-<tr><td>کنترل کامل Desktop</td><td>Remote Desktop / VNC</td></tr>
-<tr><td>حضور فیزیکی کنار Server</td><td>Local Access</td></tr>
-</tbody>
-</table>
-</div>
-
-<h2>سناریوی ترکیبی</h2>
-<h3>سناریو: مدیریت یک Linux Server</h3>
-<p>فرض کن یک Server داری:</p>
-<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Server IP:
-192.168.1.50</div></div>
-<p>می‌خواهی از Laptop آن را مدیریت کنی.</p>
-
-<h4>مرحله ۱ — SSH</h4>
-<div class="code-container"><span class="code-label">اتصال</span><div class="code-block">ssh admin@192.168.1.50</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Laptop
-   ↓ SSH
-Server
-   ↓
-Shell</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl status sshd</div></div>
-
-<h4>مرحله ۲ — اجرای برنامه GUI</h4>
-<p>فرض کن یک برنامه X11 روی Server داری. از Client:</p>
-<div class="code-container"><span class="code-label">اتصال با X11</span><div class="code-block">ssh -X admin@192.168.1.50</div></div>
-<p>سپس:</p>
-<div class="code-container"><span class="code-label">اجرا</span><div class="code-block">xclock</div></div>
-<p>اگر زیرساخت X11 و برنامه لازم موجود باشد، Window برنامه روی Client نمایش داده می‌شود.</p>
-
-<h4>مرحله ۳ — نیاز به Desktop کامل</h4>
-<p>حالا فرض کن Administrator می‌خواهد کل Desktop را کنترل کند. SSH به‌تنهایی انتخاب مناسبی برای این نیاز نیست. اینجا باید از Remote Desktop مانند VNC استفاده شود.</p>
-<div class="code-container"><span class="code-label">VNC</span><div class="code-block no-prompt">Laptop
-   │
-   │ VNC
-   ↓
-Server
-   │
-   ↓
-Desktop</div></div>
-
-<h2>اشتباهات رایج ⚠️</h2>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>SSH یعنی Remote Desktop.<br><strong>❌ خیر.</strong> SSH عمدتاً برای Remote Shell است.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br><code>ssh -X</code> کل Desktop را منتقل می‌کند.<br><strong>❌ خیر.</strong> X11 Forwarding برای اجرای <strong>برنامه‌های گرافیکی</strong> است، نه لزوماً انتقال کامل Desktop.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>VNC همان SSH است.<br><strong>❌ خیر.</strong> VNC فناوری Remote Desktop است. SSH فناوری Secure Shell است.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>برای مدیریت هر Linux Server باید GUI نصب کنیم.<br><strong>❌ کاملاً اشتباه.</strong> اغلب Serverها را می‌توان کاملاً از طریق SSH مدیریت کرد.</div></div>
-
-<h2>نکته مهم درباره X11 و Wayland ⭐⭐</h2>
-<p>در جلسه اول گفتیم:</p>
-<div class="code-container"><span class="code-label">فناوری‌ها</span><div class="code-block no-prompt">X11
-Wayland</div></div>
-<p>دو فناوری مهم در دنیای Linux GUI هستند. X11 Forwarding مستقیماً به معماری X11 مربوط است. بنابراین این دو مفهوم را با هم قاطی نکن:</p>
-<div class="code-container"><span class="code-label">تفکیک</span><div class="code-block no-prompt">SSH
- └── X11 Forwarding</div></div>
-<p>در مقابل:</p>
-<div class="code-container"><span class="code-label">Remote Desktop</span><div class="code-block no-prompt">Remote Desktop
- └── انتقال/دسترسی به محیط Desktop</div></div>
-<p>در سیستم‌های مدرن مبتنی بر Wayland، روش‌های Remote GUI ممکن است معماری متفاوتی داشته باشند؛ بنابراین <code>ssh -X</code> را نباید به‌عنوان راه‌حل عمومی همه Remote Desktopهای مدرن در نظر گرفت.</p>
-
-<h2>نکات مهم</h2>
-<ul>
-    <li><strong>Local Access</strong> → دسترسی مستقیم به همان سیستم.</li>
-    <li><strong>Remote Access</strong> → دسترسی از طریق Network.</li>
-    <li><strong>SSH</strong> → مهم‌ترین روش Remote CLI در Linux.</li>
-    <li><code>ssh user@host</code> → اتصال SSH.</li>
-    <li><code>ssh -X user@host</code> → X11 Forwarding.</li>
-    <li>X11 Forwarding → اجرای برنامه GUI، نه انتقال کامل Desktop.</li>
-    <li><strong>VNC</strong> → Remote Desktop.</li>
-    <li>VNC Server روی سیستم مقصد و VNC Client روی سیستم کاربر قرار می‌گیرد.</li>
-    <li>برای مدیریت معمول Server، SSH معمولاً از Remote Desktop مناسب‌تر و سبک‌تر است.</li>
-    <li>Remote Desktop نیازمند توجه جدی به Security است.</li>
-</ul>
-
-<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
-<p>سه نفر را تصور کن:</p>
-
-<h3>نفر اول: Administrator</h3>
-<p>می‌گوید: «فقط می‌خواهم روی Server دستور اجرا کنم.» پس:</p>
-<div class="code-container"><span class="code-label">SSH</span><div class="code-block no-prompt">SSH</div></div>
-
-<h3>نفر دوم:</h3>
-<p>می‌گوید: «یک برنامه گرافیکی روی Server دارم و می‌خواهم Window آن را روی کامپیوتر خودم ببینم.» می‌تواند از:</p>
-<div class="code-container"><span class="code-label">SSH + X11</span><div class="code-block no-prompt">SSH + X11 Forwarding</div></div>
-<p>استفاده کند، در شرایطی که X11 پشتیبانی شود.</p>
-
-<h3>نفر سوم:</h3>
-<p>می‌گوید: «می‌خواهم کل Desktop Server را از راه دور ببینم و کنترل کنم.» پس به:</p>
-<div class="code-container"><span class="code-label">Remote Desktop</span><div class="code-block no-prompt">Remote Desktop
-   ↓
-VNC و فناوری‌های مشابه</div></div>
-<p>نیاز دارد.</p>
-
-<p>در نتیجه:</p>
-<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Remote Access
+<h2>جمع‌بندی مفهومی</h2>
+<p>کل جلسه را با این مسیر به خاطر بسپار:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Access
 │
-├── CLI
-│    └── SSH
+├── Local
+│     │
+│     ├── Virtual Terminal / TTY
+│     │
+│     └── Local GUI
 │
-├── GUI Application
-│    └── X11 Forwarding
-│
-└── Full Desktop
-     └── Remote Desktop / VNC</div></div>
-<p>این مهم‌ترین مدل ذهنی جلسه است.</p>
+└── Remote
+      │
+      ├── Command
+      │      ↓
+      │     SSH
+      │
+      ├── GUI Application
+      │      ↓
+      │ SSH + X11 Forwarding
+      │
+      └── Full Desktop
+             ↓
+        Remote Desktop / VNC</div></div>
 
 <h2>Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">ssh user@host → Remote Shell
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Local Access → دسترسی مستقیم به سیستم
+Remote Access → دسترسی از طریق Network
+
+TTY → Terminal / Console متنی
+SSH → Remote Shell
+ssh user@host → اتصال SSH
 ssh -X user@host → X11 Forwarding
-SSH → Remote CLI / Administration
+
 X11 Forwarding → اجرای GUI Application
-VNC → Remote Desktop
+Remote Desktop → دسترسی به Desktop کامل
+VNC → فناوری Remote Desktop
 VNC Server → سیستم مقصد
-VNC Client → سیستم کاربر
-Local Access → دسترسی مستقیم به سیستم
-Remote Access → دسترسی از طریق Network</div></div>
+VNC Client → سیستم کاربر</div></div>
 
 <h2>تست پایانی</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>مناسب‌ترین ابزار برای مدیریت CLI یک Linux Server از راه دور چیست؟</p>
+<p>Administrator می‌خواهد از راه دور روی Server دستور اجرا کند. بهترین انتخاب چیست؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) VNC</button>
     <button onclick="selectOption(this)">B) SSH</button>
     <button onclick="selectOption(this)">C) GNOME</button>
     <button onclick="selectOption(this)">D) Orca</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — SSH</strong><br>SSH ابزار اصلی Remote Shell در Linux است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — SSH</strong><br>SSH برای اجرای Command و مدیریت Server از راه دور مناسب‌ترین انتخاب است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
 <p>دستور زیر چه کاری انجام می‌دهد؟</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ssh -X user@server</div></div>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) کل Desktop را با VNC منتقل می‌کند.</button>
-    <button onclick="selectOption(this)">B) یک SSH Connection با X11 Forwarding برقرار می‌کند.</button>
-    <button onclick="selectOption(this)">C) Server را Reboot می‌کند.</button>
-    <button onclick="selectOption(this)">D) GUI را نصب می‌کند.</button>
+    <button onclick="selectOption(this)">A) نصب GUI</button>
+    <button onclick="selectOption(this)">B) اتصال SSH همراه با X11 Forwarding</button>
+    <button onclick="selectOption(this)">C) انتقال کامل Desktop</button>
+    <button onclick="selectOption(this)">D) Reboot کردن Server</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>-X</code> برای X11 Forwarding است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br><code>ssh -X</code> امکان X11 Forwarding را فعال می‌کند و اجازه می‌دهد برنامه‌های GUI روی Server اجرا شده و روی Client نمایش داده شوند.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۳</p>
-<p>Administrator می‌خواهد کل Desktop یک Linux Server را از راه دور کنترل کند. کدام گزینه مناسب‌تر است؟</p>
+<p>Administrator می‌خواهد کل Desktop یک Linux Server را کنترل کند. کدام گزینه مناسب‌تر است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) <code>ls</code></button>
-    <button onclick="selectOption(this)">B) SSH Shell</button>
+    <button onclick="selectOption(this)">A) SSH</button>
+    <button onclick="selectOption(this)">B) <code>ls</code></button>
     <button onclick="selectOption(this)">C) VNC / Remote Desktop</button>
     <button onclick="selectOption(this)">D) <code>systemctl</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>SSH Shell معمولاً Desktop کامل را ارائه نمی‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — VNC / Remote Desktop</strong><br>برای کنترل کامل Desktop از راه دور، Remote Desktop یا VNC انتخاب مناسب‌تری است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۴</p>
-<p>کدام گزینه تفاوت SSH و VNC را درست بیان می‌کند؟</p>
+<p>تفاوت X11 Forwarding و Remote Desktop چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) SSH برای GUI و VNC برای CLI است.</button>
-    <button onclick="selectOption(this)">B) هر دو دقیقاً یک فناوری هستند.</button>
-    <button onclick="selectOption(this)">C) SSH عمدتاً برای Remote Shell است و VNC برای Remote Desktop.</button>
-    <button onclick="selectOption(this)">D) VNC فقط برای Local Access است.</button>
+    <button onclick="selectOption(this)">A) هیچ تفاوتی ندارند.</button>
+    <button onclick="selectOption(this)">B) X11 Forwarding برای اجرای برنامه گرافیکی و Remote Desktop برای دسترسی به Desktop کامل است.</button>
+    <button onclick="selectOption(this)">C) X11 Forwarding فقط برای Local Access است.</button>
+    <button onclick="selectOption(this)">D) Remote Desktop فقط Command اجرا می‌کند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>SSH عمدتاً برای Remote Shell است و VNC برای Remote Desktop.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>X11 Forwarding فقط یک برنامه GUI خاص را به Client منتقل می‌کند، در حالی که Remote Desktop کل محیط Desktop را در اختیار کاربر قرار می‌دهد.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>در X11 Forwarding، معمولاً چه چیزی روی Client نمایش داده می‌شود؟</p>
+<p>VNC Server معمولاً کجا قرار دارد؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) کل Kernel</button>
-    <button onclick="selectOption(this)">B) Window برنامه گرافیکی اجراشده روی Server</button>
-    <button onclick="selectOption(this)">C) کل فایل‌سیستم Server</button>
-    <button onclick="selectOption(this)">D) BIOS Server</button>
+    <button onclick="selectOption(this)">A) روی سیستم مقصد</button>
+    <button onclick="selectOption(this)">B) فقط روی Client</button>
+    <button onclick="selectOption(this)">C) روی Keyboard</button>
+    <button onclick="selectOption(this)">D) داخل Shell</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>برنامه روی Server اجرا می‌شود، اما خروجی گرافیکی آن می‌تواند روی Client نمایش داده شود.</div>
-</div>
-
-<div class="quiz-card"><p>❓ سؤال ۶</p>
-<p>کدام گزینه درباره VNC Server صحیح است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) معمولاً روی سیستم مقصد قرار دارد.</button>
-    <button onclick="selectOption(this)">B) فقط روی Client نصب می‌شود.</button>
-    <button onclick="selectOption(this)">C) همان SSH Client است.</button>
-    <button onclick="selectOption(this)">D) وظیفه آن مدیریت Packageهاست.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: A</strong><br>مدل ساده: <code>VNC Client → VNC Server → Desktop</code></div>
-</div>
-
-<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
-<p>یک Administrator می‌خواهد Server را از خانه مدیریت کند. بیشتر کارهای او شامل اجرای این دستورات است:</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl status nginx
-df -h
-journalctl</div></div>
-<p>اما گاهی نیز می‌خواهد یک برنامه GUI خاص را اجرا کند و Window آن را روی کامپیوتر شخصی خود ببیند. کدام راهکار مناسب‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) برای همه کارها VNC استفاده کند.</button>
-    <button onclick="selectOption(this)">B) فقط GUI نصب کند و SSH را حذف کند.</button>
-    <button onclick="selectOption(this)">C) برای Administration از SSH و در صورت پشتیبانی برای برنامه GUI از X11 Forwarding استفاده کند.</button>
-    <button onclick="selectOption(this)">D) فقط Local Access استفاده کند.</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>چون نیازها متفاوت‌اند: <code>Administration → SSH</code> و <code>GUI Application → SSH + X11 Forwarding</code>. استفاده از Remote Desktop کامل برای کارهایی که با SSH به‌سادگی انجام می‌شوند، معمولاً غیرضروری است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — روی سیستم مقصد</strong><br>VNC Server روی سیستمی که قرار است از راه دور کنترل شود (مقصد) اجرا می‌شود و VNC Client روی سیستم کاربر قرار می‌گیرد.</div>
 </div>
 
 <div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
 <p>فقط این سؤال را از خودت بپرس:</p>
-<blockquote>«می‌خواهم از راه دور چه چیزی را کنترل کنم؟»</blockquote>
-<div class="code-container"><span class="code-label">انتخاب</span><div class="code-block no-prompt">Command
-  ↓
- SSH
-
-یک GUI Application
-  ↓
- SSH + X11 Forwarding
-
-کل Desktop
-  ↓
- Remote Desktop / VNC</div></div>
-<p>جلسه بعد می‌رویم سراغ <strong>Time Management + Printer Management</strong> و دو مهارت مهم مدیریت سیستم را کنار هم یاد می‌گیریم: تنظیم صحیح زمان سیستم و مدیریت Printer در Linux.</p>
+<blockquote><strong>«می‌خواهم چه چیزی را کنترل کنم؟»</strong></blockquote>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">دسترسی مستقیم → Local Access
+Command → SSH
+یک GUI Application → SSH + X11 Forwarding
+کل Desktop → Remote Desktop / VNC</div></div>
+<p>اگر این چهار ارتباط را به خاطر بسپاری، مهم‌ترین مفاهیم جلسه را یاد گرفته‌ای.</p>
+<p><strong>مسیر جلسه بعد:</strong> در جلسه بعد وارد موضوع <strong>Time Management + Printer Management</strong> می‌شویم و با دو موضوع مهم مدیریت سیستم آشنا خواهیم شد: مدیریت زمان در Linux و مدیریت Printer در Linux.</p>
 </div></div>
-` ,
+`,
 "ch6-4": `
 <div class="section-header">
     <div class="section-badge">۶</div>
