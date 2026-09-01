@@ -30073,57 +30073,53 @@ Proxmox = مدیریت KVM + LXC + Storage + Network</div></div>
 <h2>اهداف یادگیری</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-    <li>تفاوت <strong>CLI و GUI</strong> را توضیح بدهی.</li>
-    <li>اجزای اصلی محیط گرافیکی Linux را بشناسی.</li>
-    <li>رابطه‌ی <strong>Display Server، Desktop Environment و Window Manager</strong> را درک کنی.</li>
-    <li>محیط‌های گرافیکی معروف Linux مثل <strong>GNOME و KDE Plasma</strong> را بشناسی.</li>
-    <li>در یک Linux Server محیط GUI را نصب، اجرا و وضعیت آن را بررسی کنی.</li>
+    <li>تفاوت CLI و GUI را توضیح بدهی.</li>
+    <li>مفهوم GUI در Linux را درک کنی.</li>
+    <li>اجزای اصلی محیط گرافیکی را بشناسی.</li>
+    <li>تفاوت Display System، Desktop Environment و Window Manager را بدانی.</li>
+    <li>GNOME و KDE Plasma را به‌عنوان Desktop Environment بشناسی.</li>
+    <li>مفهوم Display Manager را درک کنی.</li>
+    <li>تفاوت X11 و Wayland را در سطح پایه بدانی.</li>
+    <li>یک محیط گرافیکی را نصب کنی.</li>
+    <li>تفاوت <code>multi-user.target</code> و <code>graphical.target</code> را توضیح بدهی.</li>
+    <li>Default Target سیستم را بررسی و تغییر دهی.</li>
+    <li>تفاوت <code>set-default</code> و <code>isolate</code> را بدانی.</li>
 </ol>
 
-<h2>معرفی جلسه</h2>
-<p>تا اینجا تقریباً تمام کارها را از Terminal انجام داده‌ایم:</p>
+<h2>از CLI تا GUI</h2>
+<p>تا اینجا معمولاً با این مدل کار کرده‌ایم:</p>
 <div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">User
  ↓
 Terminal
  ↓
 Shell
  ↓
-Command
+Commands
  ↓
 Linux</div></div>
-<p>اما Linux فقط محیط متنی نیست. می‌توانیم یک محیط گرافیکی داشته باشیم:</p>
-<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">User
- ↓
-GUI
- ↓
-Desktop Environment
- ↓
-Display System
- ↓
-Linux</div></div>
-<p>در این فصل قرار است یاد بگیریم:</p>
-<ul>
-    <li>GUI چیست؟</li>
-    <li>Linux چگونه تصویر را روی صفحه نمایش می‌دهد؟</li>
-    <li>Desktop Environment چیست؟</li>
-    <li>چگونه GUI را نصب و فعال کنیم؟</li>
-    <li>چگونه از راه دور به محیط گرافیکی دسترسی پیدا کنیم؟</li>
-    <li>Accessibility چه کمکی به کاربران می‌کند؟</li>
-    <li>زمان و Printer در محیط Linux چگونه مدیریت می‌شوند؟</li>
-</ul>
-
-<h2>CLI در برابر GUI ⭐⭐⭐</h2>
-
-<h3>CLI</h3>
-<p>در CLI با Command کار می‌کنیم:</p>
-<div class="code-container"><span class="code-label">CLI</span><div class="code-block">ls
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">ls
 cd /etc
 systemctl status sshd</div></div>
-<p>مزیت مهم CLI:</p>
-<blockquote>سریع، قابل اسکریپت‌نویسی و مناسب مدیریت Server.</blockquote>
+<p>این روش را <strong>CLI</strong> می‌نامیم.</p>
 
-<h3>GUI</h3>
-<p>در GUI با عناصر گرافیکی کار می‌کنیم:</p>
+<h3>CLI چیست؟</h3>
+<p>CLI مخفف <strong>Command Line Interface</strong> است. یعنی کاربر با تایپ Command با سیستم ارتباط برقرار می‌کند.</p>
+<p><strong>مزایای CLI:</strong></p>
+<ul>
+    <li>سریع</li>
+    <li>سبک</li>
+    <li>مناسب Server</li>
+    <li>مناسب Automation</li>
+    <li>مناسب Shell Script</li>
+    <li>مناسب مدیریت از راه دور</li>
+</ul>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl status sshd</div></div>
+<p>بدون نیاز به محیط گرافیکی وضعیت یک Service را بررسی می‌کنیم.</p>
+
+<h2>GUI چیست؟</h2>
+<p>GUI مخفف <strong>Graphical User Interface</strong> است. در GUI به‌جای وارد کردن همه دستورات، با عناصر گرافیکی کار می‌کنیم. مثلاً:</p>
 <ul>
     <li>Window</li>
     <li>Menu</li>
@@ -30132,325 +30128,24 @@ systemctl status sshd</div></div>
     <li>Mouse</li>
     <li>Desktop</li>
 </ul>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">نمایش</span><div class="code-block no-prompt">┌──────────────────────────────┐
-│ Applications       🔊  🔋    │
+<p>تصور ساده:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">┌──────────────────────────────┐
+│ Applications        🔊  🔋   │
 ├──────────────────────────────┤
 │                              │
-│       Desktop                │
+│          Desktop             │
 │                              │
-│   📁       🌐       🗑️       │
+│     📁       🌐       🗑️     │
 │                              │
 └──────────────────────────────┘</div></div>
-<p>GUI برای کارهای تعاملی و Desktop بسیار مناسب است.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">CLI → تعامل متنی با Linux
+GUI → تعامل گرافیکی با Linux</div></div>
 
-<h2>مدل ذهنی GUI در Linux ⭐⭐⭐</h2>
-<p>یکی از اشتباهات رایج این است که فکر کنیم:</p>
-<blockquote>«GUI = GNOME»</blockquote>
-<p>در حالی که GUI از چند لایه تشکیل می‌شود. مدل ساده:</p>
-<div class="code-container"><span class="code-label">لایه‌های GUI</span><div class="code-block no-prompt">                 User
-                  ↓
-          Applications
-                  ↓
-      Desktop Environment
-                  ↓
-         Window Manager
-                  ↓
-      Display Server/Protocol
-                  ↓
-             Kernel
-                  ↓
-            Hardware</div></div>
-<p>البته معماری مدرن Linux می‌تواند با <strong>Wayland</strong> کمی متفاوت باشد، اما این مدل برای فهم پایه بسیار مفید است.</p>
-
-<h2>Display Server چیست؟ ⭐⭐⭐</h2>
-<p>سیستم گرافیکی باید بداند:</p>
-<ul>
-    <li>چه چیزی روی صفحه نمایش داده شود؟</li>
-    <li>Mouse کجا قرار دارد؟</li>
-    <li>Keyboard input به کدام برنامه برسد؟</li>
-    <li>Windowها چگونه نمایش داده شوند؟</li>
-</ul>
-<p>این کار در معماری‌های سنتی با <strong>Display Server</strong> انجام می‌شد. دو نام مهم:</p>
-<div class="code-container"><span class="code-label">Display Server</span><div class="code-block no-prompt">X.Org / X11
-Wayland</div></div>
-
-<h2>X Window System / X11 ⭐⭐⭐</h2>
-<p><strong>X Window System</strong> یک سیستم استاندارد برای مدیریت نمایش گرافیکی در Unix/Linux است. معمولاً با نام:</p>
-<div class="code-container"><span class="code-label">نام‌ها</span><div class="code-block no-prompt">X11
-X Window System</div></div>
-<p>آن را می‌بینی. یک نکته مهم:</p>
-<blockquote>X11 خودش Desktop Environment نیست.</blockquote>
-<p>یعنی:</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">X11 ≠ GNOME
-X11 ≠ KDE</div></div>
-<p>X11 زیرساخت نمایش گرافیکی است.</p>
-
-<h2>Wayland ⭐⭐⭐</h2>
-<p>Wayland نسل جدیدتری از معماری گرافیکی Linux است. در بسیاری از Desktopهای مدرن، Wayland جایگزین معماری X11 شده است.</p>
-<p>مدل ساده:</p>
-<div class="code-container"><span class="code-label">Wayland</span><div class="code-block no-prompt">Application
-     ↓
-Desktop / Compositor
-     ↓
-Wayland
-     ↓
-Graphics Hardware</div></div>
-<p>در Wayland معمولاً <strong>Compositor</strong> نقش مهمی دارد. برای LPIC-1 لازم نیست وارد جزئیات داخلی Protocol شویم. فقط این را بدان:</p>
-<div class="table-wrap">
-<table>
-<thead><tr><th>X11</th><th>Wayland</th></tr></thead>
-<tbody>
-<tr><td>معماری قدیمی‌تر</td><td>معماری جدیدتر</td></tr>
-<tr><td>X Server</td><td>Wayland Protocol</td></tr>
-<tr><td>X Window System</td><td>Compositor-based architecture</td></tr>
-<tr><td>هنوز قابل استفاده</td><td>در Desktopهای مدرن بسیار رایج</td></tr>
-</tbody>
-</table>
-</div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
-<p>اگر سؤال بپرسد:</p>
-<blockquote>GNOME چیست؟</blockquote>
-<p>جواب: <strong>Desktop Environment</strong></p>
-<p>اگر بپرسد:</p>
-<blockquote>X11 چیست؟</blockquote>
-<p>جواب: <strong>سیستم/معماری نمایش گرافیکی</strong></p>
-<p>اگر بپرسد:</p>
-<blockquote>Wayland چیست؟</blockquote>
-<p>جواب: <strong>Protocol/معماری مدرن برای ارتباط اجزای گرافیکی</strong></p>
-</div></div>
-
-<h2>Desktop Environment چیست؟ ⭐⭐⭐</h2>
-<p>حالا به لایه مهم‌تری می‌رسیم. <strong>Desktop Environment (DE)</strong> مجموعه‌ای از ابزارها و اجزای آماده برای فراهم کردن یک محیط Desktop کامل است. مثلاً:</p>
-<ul>
-    <li>Desktop</li>
-    <li>Panel</li>
-    <li>Settings</li>
-    <li>File Manager</li>
-    <li>Application Launcher</li>
-    <li>Window Management</li>
-    <li>Utilities</li>
-</ul>
-<p>دو نمونه بسیار مهم:</p>
-
-<h3>GNOME</h3>
-<p>در بسیاری از توزیع‌های Linux، مخصوصاً خانواده Red Hat، بسیار رایج است.</p>
-
-<h3>KDE Plasma</h3>
-<p>یکی دیگر از Desktop Environmentهای معروف Linux است.</p>
-
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">Desktop Environment</span><div class="code-block no-prompt">Desktop Environment
-│
-├── Desktop
-├── Panel
-├── Settings
-├── File Manager
-├── Applications
-└── Window Management</div></div>
-
-<h2>Window Manager چیست؟ ⭐⭐</h2>
-<p>Window Manager مسئول مدیریت Windowهاست. مثلاً:</p>
-<div class="code-container"><span class="code-label">Window</span><div class="code-block no-prompt">┌──────────────┐
-│ Terminal   X │
-├──────────────┤
-│              │
-│              │
-└──────────────┘</div></div>
-<p>Window Manager می‌تواند مسئول کارهایی مثل:</p>
-<ul>
-    <li>جابه‌جایی Window</li>
-    <li>تغییر اندازه</li>
-    <li>Minimize</li>
-    <li>Maximize</li>
-    <li>قرارگیری Windowها</li>
-</ul>
-<p>باشد. پس:</p>
-<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Window Manager
-      ↓
-مدیریت Windowها</div></div>
-
-<h3>تفاوت با Desktop Environment</h3>
-<p>Desktop Environment بزرگ‌تر است.</p>
-<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">DE
-├── Window Manager / Compositor
-├── File Manager
-├── Settings
-├── Panel
-└── Utilities</div></div>
-
-<h2>GNOME و KDE Plasma ⭐⭐⭐</h2>
-<p>در سطح LPIC-1 این دو را بشناس:</p>
-<div class="table-wrap">
-<table>
-<thead><tr><th>GNOME</th><th>KDE Plasma</th></tr></thead>
-<tbody>
-<tr><td>Desktop Environment</td><td>Desktop Environment</td></tr>
-<tr><td>رابط مدرن و ساده</td><td>رابط بسیار قابل شخصی‌سازی</td></tr>
-<tr><td>رایج در بسیاری از توزیع‌ها</td><td>بسیار رایج در Linux</td></tr>
-<tr><td>ابزارها و تنظیمات یکپارچه</td><td>ابزارها و تنظیمات یکپارچه</td></tr>
-</tbody>
-</table>
-</div>
-<p>نکته:</p>
-<blockquote>هیچ‌کدام «Linux» نیستند. Linux Kernel می‌تواند بدون این‌ها هم اجرا شود.</blockquote>
-
-<h2>Login Manager / Display Manager ⭐⭐⭐</h2>
-<p>وقتی Linux را Boot می‌کنی و به صفحه‌ای مثل این می‌رسی:</p>
-<div class="code-container"><span class="code-label">Login</span><div class="code-block no-prompt">┌────────────────────────┐
-│                        │
-│       Login            │
-│                        │
-│ Username: ______       │
-│ Password: ______       │
-│                        │
-└────────────────────────┘</div></div>
-<p>یک <strong>Display Manager</strong> معمولاً مسئول این مرحله است. نمونه‌های معروف:</p>
-<ul>
-    <li>GDM → معمولاً مرتبط با GNOME</li>
-    <li>SDDM → معمولاً مرتبط با KDE Plasma</li>
-    <li>LightDM → گزینه‌ای سبک و عمومی</li>
-</ul>
-<p>وظایف اصلی:</p>
-<div class="code-container"><span class="code-label">Display Manager</span><div class="code-block no-prompt">Display Manager
-      ↓
-Login
-      ↓
-Start Desktop Session</div></div>
-
-<h2>کل معماری را یک‌جا ببین</h2>
-<p>حالا قطعات را کنار هم بگذاریم:</p>
-<div class="code-container"><span class="code-label">معماری کامل</span><div class="code-block no-prompt">                  User
-                   │
-                   ↓
-              Login Screen
-                   │
-            Display Manager
-             (GDM / SDDM)
-                   │
-                   ↓
-          Desktop Environment
-          (GNOME / KDE Plasma)
-                   │
-          ┌────────┴────────┐
-          ↓                 ↓
-   Window Manager       Applications
-    / Compositor
-          │
-          ↓
-     X11 / Wayland
-          │
-          ↓
-        Linux
-          │
-          ↓
-       Hardware</div></div>
-<p>این مدل ذهنی برای کل فصل بسیار مهم است.</p>
-
-<h2>GUI روی Server؛ آیا لازم است؟ ⭐⭐⭐</h2>
-<p>در Linux Server معمولاً GUI ضروری نیست. مثلاً یک Web Server می‌تواند کاملاً با CLI مدیریت شود:</p>
-<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">SSH
- ↓
-Shell
- ↓
-systemctl
- ↓
-Web Server</div></div>
-<p>GUI منابع بیشتری مصرف می‌کند. بنابراین:</p>
-<blockquote>Serverهای Production معمولاً تا حد امکان بدون GUI اجرا می‌شوند، مگر اینکه نیاز مشخصی وجود داشته باشد.</blockquote>
-<p>اما برای:</p>
-<ul>
-    <li>Desktop</li>
-    <li>Workstation</li>
-    <li>آموزش</li>
-    <li>برخی ابزارهای مدیریتی</li>
-</ul>
-<p>GUI می‌تواند مفید باشد.</p>
-
-<h2>نصب GUI در Linux</h2>
-<p>روش نصب بسته‌ها به Distribution بستگی دارد. ما در دوره با خانواده‌هایی مثل <strong>AlmaLinux</strong> و <strong>Debian</strong> کار می‌کنیم. پس باید تفاوت Package Managerها را بشناسیم.</p>
-<div class="code-container"><span class="code-label">Package Manager</span><div class="code-block no-prompt">AlmaLinux
-    ↓
-   DNF
-
-Debian
-    ↓
-   APT</div></div>
-
-<h2>نصب GUI در AlmaLinux ⭐⭐⭐</h2>
-<p>در AlmaLinux 9/10، گروه‌های نرم‌افزاری برای نصب مجموعه‌ای از Packageها استفاده می‌شوند. ابتدا می‌توانی گروه‌های موجود را ببینی:</p>
-<div class="code-container"><span class="code-label">گروه‌ها</span><div class="code-block">sudo dnf group list</div></div>
-<p>برای نصب محیط گرافیکی GNOME، در سیستم‌هایی که گروه مربوطه ارائه شده، می‌توان از گروه مناسب GNOME استفاده کرد؛ نام دقیق گروه ممکن است بسته به نسخه و Repositoryها متفاوت باشد. در محیط‌های Enterprise Linux معمولاً یکی از گروه‌های Desktop Environment نصب می‌شود. بعد از نصب باید Target مناسب را فعال کنیم.</p>
-
-<h2>Target گرافیکی ⭐⭐⭐</h2>
-<p>این قسمت به جلسه‌های قبلی وصل می‌شود. در systemd دو Target مهم:</p>
-<div class="code-container"><span class="code-label">Targetها</span><div class="code-block no-prompt">multi-user.target
-graphical.target</div></div>
-
-<h3>multi-user.target</h3>
-<p>سیستم چندکاربره بدون GUI:</p>
-<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">CLI</div></div>
-
-<h3>graphical.target</h3>
-<p>سیستم چندکاربره با GUI:</p>
-<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI</div></div>
-
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">                 systemd
-                    │
-          ┌─────────┴─────────┐
-          ↓                   ↓
- multi-user.target      graphical.target
-          ↓                   ↓
-         CLI                  GUI</div></div>
-
-<h2>تغییر Default Target ⭐⭐⭐</h2>
-<p>اگر GUI نصب شده ولی سیستم هنگام Boot وارد محیط گرافیکی نمی‌شود، می‌توان Default Target را بررسی کرد:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
-<p>اگر بخواهیم به graphical target تغییر کنیم:</p>
-<div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
-<p>برای برگشت:</p>
-<div class="code-container"><span class="code-label">برگشت</span><div class="code-block">sudo systemctl set-default multi-user.target</div></div>
-
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
-<p>این دو را خوب حفظ کن:</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl get-default</div></div>
-<p>→ Default Target فعلی</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl set-default graphical.target</div></div>
-<p>→ تعیین GUI به‌عنوان Target پیش‌فرض</p>
-</div></div>
-
-<h2>تغییر Target بدون Reboot ⭐⭐</h2>
-<p>اگر بخواهی همین الان وارد Graphical Target شوی:</p>
-<div class="code-container"><span class="code-label">ایزوله</span><div class="code-block">sudo systemctl isolate graphical.target</div></div>
-<p>و برای CLI:</p>
-<div class="code-container"><span class="code-label">ایزوله</span><div class="code-block">sudo systemctl isolate multi-user.target</div></div>
-<p>اما دقت کن:</p>
-<blockquote><code>isolate</code> وضعیت فعلی سیستم را تغییر می‌دهد؛ <code>set-default</code> تنظیم Bootهای بعدی را تغییر می‌دهد.</blockquote>
-<p>این تفاوت مهم است.</p>
-
-<h2>نصب GUI در Debian ⭐⭐⭐</h2>
-<p>در Debian نیز می‌توان Desktop Environment نصب کرد. ابتدا Repositoryها و Packageها را در اختیار APT داریم.</p>
-<p>برای نصب GNOME:</p>
-<div class="code-container"><span class="code-label">نصب GNOME</span><div class="code-block">sudo apt update
-sudo apt install task-gnome-desktop</div></div>
-<p>در بعضی نصب‌ها می‌توان Desktop Environmentهای دیگری را نیز انتخاب کرد. برای مثال KDE Plasma:</p>
-<div class="code-container"><span class="code-label">نصب KDE</span><div class="code-block">sudo apt install task-kde-desktop</div></div>
-<p>نام دقیق Package/Task می‌تواند بسته به نسخه Debian متفاوت باشد، بنابراین بهتر است قبل از نصب آن را با APT بررسی کنی.</p>
-
-<h2>بررسی وضعیت GUI</h2>
-<p>بعد از نصب می‌توانیم بررسی کنیم Default Target چیست:</p>
-<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
-<p>و وضعیت Display Manager را نیز بررسی کنیم. مثلاً در سیستمی که GDM دارد:</p>
-<div class="code-container"><span class="code-label">GDM</span><div class="code-block">systemctl status gdm</div></div>
-<p>یا اگر SDDM استفاده می‌شود:</p>
-<div class="code-container"><span class="code-label">SDDM</span><div class="code-block">systemctl status sddm</div></div>
-
-<h2>GUI از داخل Terminal</h2>
-<p>حتی وقتی GUI داریم، Terminal همچنان در دسترس است. مثلاً:</p>
+<h2>آیا GUI جای CLI را می‌گیرد؟</h2>
+<p>خیر. این نکته بسیار مهم است:</p>
+<blockquote>GUI و CLI دو روش متفاوت برای تعامل با همان سیستم Linux هستند.</blockquote>
+<p>حتی در یک سیستم دارای محیط گرافیکی نیز می‌توانیم Terminal را باز کنیم:</p>
 <div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI
  │
  ├── Browser
@@ -30459,32 +30154,391 @@ sudo apt install task-gnome-desktop</div></div>
        ↓
       Shell
        ↓
-     Commands</div></div>
-<p>پس GUI جای CLI را کاملاً نمی‌گیرد. بلکه:</p>
-<blockquote>GUI و CLI دو روش تعامل با همان سیستم Linux هستند.</blockquote>
+    Commands</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">Linux</span><div class="code-block no-prompt">Linux
+ ├── CLI
+ └── GUI</div></div>
+<p>هر دو می‌توانند برای کار با سیستم استفاده شوند.</p>
 
-<h2>چرا LPIC-1 باید GUI را بشناسد؟</h2>
-<p>ممکن است بگویی:</p>
-<blockquote>«LPIC-1 بیشتر Command Line است، پس چرا GUI؟»</blockquote>
-<p>چون Administrator باید بتواند:</p>
+<h2>Linux چگونه محیط گرافیکی را ایجاد می‌کند؟</h2>
+<p>یکی از اشتباهات رایج این است که فکر کنیم:</p>
+<blockquote>GUI = GNOME</blockquote>
+<p>اما این درست نیست. محیط گرافیکی Linux از چند بخش تشکیل می‌شود. برای LPIC-1 این مدل ذهنی را به خاطر بسپار:</p>
+<div class="code-container"><span class="code-label">معماری GUI</span><div class="code-block no-prompt">User
+ ↓
+Applications
+ ↓
+Desktop Environment
+ ↓
+Window Manager / Compositor
+ ↓
+Display System
+ ↓
+Linux Kernel
+ ↓
+Hardware</div></div>
+<p>فعلاً لازم نیست وارد جزئیات داخلی هر لایه شویم. فقط باید بدانیم هر بخش چه وظیفه‌ای دارد.</p>
+
+<h2>Display System چیست؟</h2>
+<p>برای داشتن محیط گرافیکی، سیستم باید بتواند:</p>
 <ul>
-    <li>Desktop Linux را مدیریت کند.</li>
-    <li>محیط گرافیکی را نصب کند.</li>
-    <li>Display Manager را بشناسد.</li>
-    <li>مشکلات ورود به GUI را تشخیص دهد.</li>
-    <li>Target مناسب systemd را انتخاب کند.</li>
-    <li>از راه دور به محیط گرافیکی دسترسی پیدا کند.</li>
+    <li>تصویر را روی صفحه نمایش دهد.</li>
+    <li>ورودی Keyboard را دریافت کند.</li>
+    <li>ورودی Mouse را دریافت کند.</li>
+    <li>ارتباط برنامه‌های گرافیکی با سیستم نمایش را مدیریت کند.</li>
 </ul>
-<p>و جلسات بعد دقیقاً همین موضوعات را ادامه می‌دهند.</p>
+<p>دو نام مهم در Linux:</p>
+<div class="code-container"><span class="code-label">Display System</span><div class="code-block no-prompt">X11
+Wayland</div></div>
 
-<h2>سناریوی ترکیبی</h2>
+<h2>X11 چیست؟</h2>
+<p>X11 یا <strong>X Window System</strong> یک سیستم گرافیکی قدیمی‌تر و شناخته‌شده در Unix/Linux است.</p>
+<p>نکته بسیار مهم:</p>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">X11 ≠ GNOME
+X11 ≠ KDE Plasma</div></div>
+<p>X11 یک <strong>Desktop Environment</strong> نیست. بلکه در لایه زیرین سیستم گرافیکی قرار دارد. مدل ساده:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Application
+ ↓
+Desktop Environment
+ ↓
+X11
+ ↓
+Linux</div></div>
 
-<h3>سناریو: AlmaLinux Server بدون GUI</h3>
-<p>فرض کن AlmaLinux را نصب کرده‌ای و سیستم در CLI بالا می‌آید. ابتدا بررسی:</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>
+<p>اگر سؤال بپرسد:</p>
+<blockquote>GNOME چیست؟</blockquote>
+<p>پاسخ: <strong>Desktop Environment</strong></p>
+<p>اگر سؤال بپرسد:</p>
+<blockquote>X11 چیست؟</blockquote>
+<p>پاسخ: <strong>سیستم نمایش گرافیکی</strong></p>
+</div></div>
+
+<h2>Wayland چیست؟</h2>
+<p>Wayland یک معماری/Protocol جدیدتر برای سیستم گرافیکی Linux است. در بسیاری از Desktopهای مدرن استفاده می‌شود. مدل ساده:</p>
+<div class="code-container"><span class="code-label">Wayland</span><div class="code-block no-prompt">Application
+ ↓
+Desktop / Compositor
+ ↓
+Wayland
+ ↓
+Graphics Hardware</div></div>
+<p>برای LPIC-1 لازم نیست وارد جزئیات داخلی Wayland شویم. فقط تفاوت کلی را بدان:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>X11</th><th>Wayland</th></tr></thead>
+<tbody>
+<tr><td>معماری قدیمی‌تر</td><td>معماری جدیدتر</td></tr>
+<tr><td>X Window System</td><td>Protocol مدرن گرافیکی</td></tr>
+<tr><td>هنوز استفاده می‌شود</td><td>در Desktopهای مدرن بسیار رایج است</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Desktop Environment چیست؟</h2>
+<p>حالا به بخشی می‌رسیم که کاربر مستقیماً با آن ارتباط دارد. <strong>Desktop Environment یا DE</strong> مجموعه‌ای از ابزارها و اجزای گرافیکی است که یک محیط Desktop کامل ایجاد می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">Desktop Environment
+│
+├── Desktop
+├── Panel
+├── Settings
+├── File Manager
+├── Application Launcher
+├── Window Management
+└── Utilities</div></div>
+<p>پس وقتی وارد یک Desktop می‌شویم، معمولاً فقط یک برنامه نمی‌بینیم. بلکه مجموعه‌ای از ابزارها با هم کار می‌کنند.</p>
+
+<h2>Desktop Environmentهای معروف</h2>
+<p>در سطح LPIC-1 دو نام مهم را بشناس:</p>
+
+<h3>GNOME</h3>
+<p>GNOME یک <strong>Desktop Environment</strong> است. ویژگی کلی:</p>
+<ul>
+    <li>محیط مدرن</li>
+    <li>رابط ساده</li>
+    <li>ابزارها و تنظیمات یکپارچه</li>
+</ul>
+
+<h3>KDE Plasma</h3>
+<p>KDE Plasma نیز یک <strong>Desktop Environment</strong> است. ویژگی کلی:</p>
+<ul>
+    <li>محیط گرافیکی کامل</li>
+    <li>قابلیت شخصی‌سازی زیاد</li>
+    <li>ابزارها و تنظیمات یکپارچه</li>
+</ul>
+
+<h4>مقایسه ساده</h4>
+<div class="table-wrap">
+<table>
+<thead><tr><th>GNOME</th><th>KDE Plasma</th></tr></thead>
+<tbody>
+<tr><td>Desktop Environment</td><td>Desktop Environment</td></tr>
+<tr><td>رابط مدرن و ساده</td><td>قابلیت شخصی‌سازی زیاد</td></tr>
+<tr><td>بسیار رایج</td><td>بسیار رایج</td></tr>
+<tr><td>مجموعه ابزارهای یکپارچه</td><td>مجموعه ابزارهای یکپارچه</td></tr>
+</tbody>
+</table>
+</div>
+<p>نکته مهم:</p>
+<blockquote>GNOME و KDE خود Linux نیستند. Linux Kernel می‌تواند بدون Desktop Environment نیز اجرا شود.</blockquote>
+
+<h2>Window Manager چیست؟</h2>
+<p>یک Desktop دارای Windowهای مختلف است. مثلاً:</p>
+<div class="code-container"><span class="code-label">Window</span><div class="code-block no-prompt">┌──────────────┐
+│ Terminal   X │
+├──────────────┤
+│              │
+│              │
+└──────────────┘</div></div>
+<p>باید بخشی وجود داشته باشد که Windowها را مدیریت کند. این وظیفه بر عهده <strong>Window Manager</strong> است. وظایف ساده:</p>
+<ul>
+    <li>جابه‌جایی Window</li>
+    <li>تغییر اندازه</li>
+    <li>Minimize</li>
+    <li>Maximize</li>
+    <li>مدیریت محل قرارگیری Windowها</li>
+</ul>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Window Manager
+        ↓
+مدیریت Windowها</div></div>
+
+<h3>تفاوت Window Manager و Desktop Environment</h3>
+<p>Window Manager فقط یکی از اجزای محیط Desktop است. اما Desktop Environment مجموعه بزرگ‌تری است:</p>
+<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">Desktop Environment
+│
+├── Window Manager / Compositor
+├── File Manager
+├── Settings
+├── Panel
+└── Utilities</div></div>
+<p>پس: <strong>Desktop Environment > Window Manager</strong> از نظر مجموعه امکانات.</p>
+
+<h2>Display Manager چیست؟</h2>
+<p>وقتی سیستم Boot می‌شود و صفحه Login گرافیکی را می‌بینیم:</p>
+<div class="code-container"><span class="code-label">Login</span><div class="code-block no-prompt">┌────────────────────────┐
+│                        │
+│        Login           │
+│                        │
+│ Username: ______       │
+│ Password: ______       │
+│                        │
+└────────────────────────┘</div></div>
+<p>معمولاً یک <strong>Display Manager</strong> مسئول این بخش است. وظیفه اصلی:</p>
+<div class="code-container"><span class="code-label">Display Manager</span><div class="code-block no-prompt">Display Manager
+      ↓
+Graphical Login
+      ↓
+Start Desktop Session</div></div>
+
+<h3>نمونه‌های معروف</h3>
+<div class="code-container"><span class="code-label">نمونه‌ها</span><div class="code-block no-prompt">GDM
+SDDM
+LightDM</div></div>
+<p>به‌صورت کلی:</p>
+<ul>
+    <li>GDM → معمولاً مرتبط با GNOME</li>
+    <li>SDDM → معمولاً مرتبط با KDE Plasma</li>
+    <li>LightDM → گزینه‌ای سبک و عمومی</li>
+</ul>
+
+<h2>معماری GUI را یک‌جا ببین</h2>
+<p>حالا تمام قطعات را کنار هم قرار دهیم:</p>
+<div class="code-container"><span class="code-label">معماری کامل</span><div class="code-block no-prompt">User
+ │
+ ↓
+Login Screen
+ │
+ ↓
+Display Manager
+ │
+ ↓
+Desktop Environment
+ │
+ ├── Applications
+ │
+ └── Window Manager / Compositor
+           │
+           ↓
+      X11 / Wayland
+           │
+           ↓
+      Linux Kernel
+           │
+           ↓
+        Hardware</div></div>
+<p>این مدل ذهنی را به خاطر بسپار.</p>
+
+<h2>آیا Server به GUI نیاز دارد؟</h2>
+<p>معمولاً خیر. یک Linux Server می‌تواند کاملاً بدون GUI اجرا شود:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block no-prompt">Administrator
+ ↓
+SSH
+ ↓
+Shell
+ ↓
+Commands
+ ↓
+Linux Server</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">systemctl status sshd</div></div>
+<p>برای اجرای این دستور به GUI نیازی نداریم.</p>
+
+<h3>چرا بسیاری از Serverها GUI ندارند؟</h3>
+<p>چون GUI معمولاً:</p>
+<ul>
+    <li>منابع بیشتری مصرف می‌کند.</li>
+    <li>Packageهای بیشتری نیاز دارد.</li>
+    <li>برای بسیاری از وظایف Server ضروری نیست.</li>
+</ul>
+<p>بنابراین:</p>
+<blockquote>Serverهای Production معمولاً تا حد امکان بدون GUI اجرا می‌شوند، مگر اینکه نیاز مشخصی وجود داشته باشد.</blockquote>
+<p>اما GUI برای موارد زیر مفید است:</p>
+<ul>
+    <li>Desktop</li>
+    <li>Workstation</li>
+    <li>آموزش</li>
+    <li>استفاده‌های تعاملی</li>
+    <li>برخی ابزارهای مدیریتی</li>
+</ul>
+
+<h2>نصب GUI؛ قبل از شروع چه باید بدانیم؟</h2>
+<p>نصب GUI به Distribution بستگی دارد. در این درس دو خانواده را می‌شناسیم:</p>
+<div class="code-container"><span class="code-label">خانواده‌ها</span><div class="code-block no-prompt">AlmaLinux
+   ↓
+  DNF
+
+Debian
+   ↓
+  APT</div></div>
+<p>یعنی روش نصب Packageها در Distributionهای مختلف ممکن است متفاوت باشد.</p>
+
+<h2>نصب GUI در AlmaLinux</h2>
+<p>در AlmaLinux می‌توان از گروه‌های نرم‌افزاری برای نصب مجموعه‌ای از Packageها استفاده کرد. ابتدا گروه‌های موجود را بررسی می‌کنیم:</p>
+<div class="code-container"><span class="code-label">گروه‌ها</span><div class="code-block">sudo dnf group list</div></div>
+<p>برای نصب یک محیط Desktop، بسته به نسخه و Repositoryهای سیستم، می‌توان از گروه مناسب Desktop Environment استفاده کرد. نکته:</p>
+<blockquote>نام دقیق گروه ممکن است بسته به نسخه و Repository متفاوت باشد.</blockquote>
+<p>بنابراین قبل از نصب، گروه‌های موجود را بررسی می‌کنیم.</p>
+
+<h2>نصب GUI کافی نیست</h2>
+<p>این نکته بسیار مهم است. فرض کن Desktop Environment را نصب کرده‌ای. آیا سیستم حتماً بعد از Boot وارد GUI می‌شود؟</p>
+<blockquote>خیر، لزوماً نه.</blockquote>
+<p>اینجا مفهوم <strong>systemd Target</strong> مهم می‌شود.</p>
+
+<h2>Targetهای مهم systemd</h2>
+<p>دو Target مهم:</p>
+<div class="code-container"><span class="code-label">Targetها</span><div class="code-block no-prompt">multi-user.target
+graphical.target</div></div>
+
+<h3>multi-user.target</h3>
+<p>این Target معمولاً سیستم را در محیط متنی چندکاربره اجرا می‌کند:</p>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">Boot
+ ↓
+systemd
+ ↓
+multi-user.target
+ ↓
+CLI</div></div>
+
+<h3>graphical.target</h3>
+<p>این Target برای اجرای محیط گرافیکی استفاده می‌شود:</p>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">Boot
+ ↓
+systemd
+ ↓
+graphical.target
+ ↓
+GUI</div></div>
+
+<h4>مقایسه</h4>
+<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd
+   │
+   ├── multi-user.target
+   │        ↓
+   │       CLI
+   │
+   └── graphical.target
+            ↓
+           GUI</div></div>
+
+<h2>بررسی Default Target</h2>
+<p>برای بررسی Target پیش‌فرض:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>مثلاً خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
+<p>یعنی سیستم به‌صورت پیش‌فرض در Boot به محیط متنی می‌رود.</p>
+
+<h2>تنظیم GUI برای Bootهای بعدی</h2>
+<p>اگر بخواهیم سیستم در Bootهای آینده وارد محیط گرافیکی شود:</p>
+<div class="code-container"><span class="code-label">تنظیم GUI</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
+<p>برای بازگشت به محیط متنی:</p>
+<div class="code-container"><span class="code-label">تنظیم CLI</span><div class="code-block">sudo systemctl set-default multi-user.target</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block no-prompt">set-default
+     ↓
+تغییر Default Target برای Bootهای آینده</div></div>
+
+<h2>تغییر Target فعلی بدون Reboot</h2>
+<p>اگر بخواهیم همین الان Target فعلی را تغییر دهیم:</p>
+<p>برای GUI:</p>
+<div class="code-container"><span class="code-label">isolate GUI</span><div class="code-block">sudo systemctl isolate graphical.target</div></div>
+<p>برای محیط متنی:</p>
+<div class="code-container"><span class="code-label">isolate CLI</span><div class="code-block">sudo systemctl isolate multi-user.target</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">isolate</span><div class="code-block no-prompt">isolate
+   ↓
+تغییر Target فعلی</div></div>
+
+<h2>تفاوت مهم <code>set-default</code> و <code>isolate</code></h2>
+<p>این بخش را حتماً به خاطر بسپار:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>دستور</th><th>وظیفه</th></tr></thead>
+<tbody>
+<tr><td><code>set-default</code></td><td>تنظیم Target پیش‌فرض برای Bootهای آینده</td></tr>
+<tr><td><code>isolate</code></td><td>تغییر Target فعلی سیستم</td></tr>
+</tbody>
+</table>
+</div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block no-prompt">set-default
+     ↓
+Boot بعدی</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">isolate</span><div class="code-block no-prompt">isolate
+     ↓
+همین الان</div></div>
+
+<h2>نصب GNOME در Debian</h2>
+<p>در Debian برای مدیریت Packageها از <strong>APT</strong> استفاده می‌کنیم. ابتدا:</p>
+<div class="code-container"><span class="code-label">update</span><div class="code-block">sudo apt update</div></div>
+<p>سپس برای نصب GNOME:</p>
+<div class="code-container"><span class="code-label">نصب GNOME</span><div class="code-block">sudo apt install task-gnome-desktop</div></div>
+<p>برای KDE Plasma نیز می‌توان از Task مربوطه استفاده کرد:</p>
+<div class="code-container"><span class="code-label">نصب KDE</span><div class="code-block">sudo apt install task-kde-desktop</div></div>
+<p>نکته:</p>
+<blockquote>نام دقیق Package یا Task ممکن است بسته به نسخه Debian متفاوت باشد.</blockquote>
+
+<h2>بررسی وضعیت GUI</h2>
+<p>بعد از نصب، ابتدا بررسی کن Default Target چیست:</p>
+<div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
+<p>اگر سیستم باید با GUI Boot شود، معمولاً انتظار داریم <code>graphical.target</code> را ببینیم.</p>
+
+<h3>بررسی Display Manager</h3>
+<p>اگر GNOME استفاده می‌شود، ممکن است Display Manager مورد استفاده GDM باشد:</p>
+<div class="code-container"><span class="code-label">GDM</span><div class="code-block">systemctl status gdm</div></div>
+<p>اگر KDE استفاده شود، ممکن است SDDM وجود داشته باشد:</p>
+<div class="code-container"><span class="code-label">SDDM</span><div class="code-block">systemctl status sddm</div></div>
+
+<h2>سناریوی کامل</h2>
+
+<h3>AlmaLinux بدون GUI</h3>
+<p>فرض کن سیستم در CLI Boot می‌شود. ابتدا:</p>
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
 <p>خروجی:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
-<p>یعنی:</p>
+<p>مدل:</p>
 <div class="code-container"><span class="code-label">Boot</span><div class="code-block no-prompt">Boot
  ↓
 systemd
@@ -30492,13 +30546,11 @@ systemd
 multi-user.target
  ↓
 CLI</div></div>
-<p>حالا تصمیم می‌گیری GUI نصب کنی. بعد از نصب Desktop Environment، بررسی می‌کنی:</p>
+<p>حالا Desktop Environment را نصب می‌کنیم. بعد از نصب بررسی می‌کنیم:</p>
 <div class="code-container"><span class="code-label">بررسی</span><div class="code-block">systemctl get-default</div></div>
-<p>اگر هنوز:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
-<p>باشد، GUI لزوماً به‌صورت خودکار Default نشده است. آن را تغییر می‌دهی:</p>
+<p>اگر همچنان <code>multi-user.target</code> باشد، می‌توانیم Target پیش‌فرض را تغییر دهیم:</p>
 <div class="code-container"><span class="code-label">تغییر</span><div class="code-block">sudo systemctl set-default graphical.target</div></div>
-<p>حالا:</p>
+<p>حالا مدل Boot:</p>
 <div class="code-container"><span class="code-label">Boot جدید</span><div class="code-block no-prompt">Boot
  ↓
 systemd
@@ -30509,80 +30561,45 @@ Display Manager
  ↓
 Login Screen
  ↓
-GNOME
+Desktop Environment
  ↓
 Desktop</div></div>
-<p>برای اعمال Target فعلی بدون Reboot:</p>
+<p>اگر بخواهیم بدون Reboot Target فعلی را تغییر دهیم:</p>
 <div class="code-container"><span class="code-label">isolate</span><div class="code-block">sudo systemctl isolate graphical.target</div></div>
 
-<h2>یک نکته مهم درباره <code>start</code> و <code>set-default</code></h2>
-<p>این موضوع را از فصل systemd به یاد بیاور:</p>
+<h2>تفاوت <code>start</code> و <code>set-default</code></h2>
+<p>این دو دستور یک کار انجام نمی‌دهند. مثلاً:</p>
 <div class="code-container"><span class="code-label">start</span><div class="code-block">systemctl start gdm</div></div>
-<p>یعنی: همین الان Service را Start کن. اما:</p>
+<p>یعنی: Service مربوطه را همین الان Start کن. اما:</p>
 <div class="code-container"><span class="code-label">set-default</span><div class="code-block">systemctl set-default graphical.target</div></div>
-<p>یعنی: Target پیش‌فرض Boot را تغییر بده. پس این‌ها یک کار انجام نمی‌دهند.</p>
+<p>یعنی: Target پیش‌فرض Boot را تغییر بده. پس:</p>
+<div class="code-container"><span class="code-label">start</span><div class="code-block no-prompt">start
+ ↓
+Service فعلی</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">set-default</span><div class="code-block no-prompt">set-default
+ ↓
+Bootهای آینده</div></div>
 
-<h2>اشتباهات رایج ⚠️</h2>
+<h2>اشتباهات رایج</h2>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>GNOME همان Linux است.<br><strong>❌ خیر.</strong>
-<div class="code-container"><span class="code-label">درست</span><div class="code-block no-prompt">Linux Kernel
-   ↓
-GNOME</div></div>
-<p>GNOME یک Desktop Environment است.</p>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>GNOME همان Linux است.<br><strong>❌ خیر.</strong><br>GNOME یک <strong>Desktop Environment</strong> است.</div></div>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>X11 همان GNOME است.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">X11 → سیستم نمایش گرافیکی
+GNOME → Desktop Environment</div></div>
 </div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>X11 همان GNOME است.<br><strong>❌ خیر.</strong><br>X11 سیستم/معماری نمایش است. GNOME Desktop Environment است.</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>نصب GUI یعنی سیستم حتماً با GUI Boot می‌شود.<br><strong>❌ لزوماً نه.</strong><br>ممکن است Default Target همچنان <code>multi-user.target</code> باشد.</div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>نصب GUI یعنی سیستم حتماً با GUI Boot می‌شود.<br><strong>❌ لزوماً نه.</strong><br>ممکن است Default Target هنوز <code>multi-user.target</code> باشد.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br><code>set-default</code> و <code>isolate</code> یکی هستند.<br><strong>❌ خیر.</strong>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">set-default → تنظیم پیش‌فرض Boot
-isolate     → تغییر Target فعلی</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br><code>set-default</code> و <code>isolate</code> یک کار انجام می‌دهند.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">set-default → Bootهای آینده
+isolate → وضعیت فعلی</div></div>
 </div></div>
 
-<h2>نکات مهم</h2>
-<ul>
-    <li><strong>CLI</strong> → تعامل متنی با سیستم.</li>
-    <li><strong>GUI</strong> → تعامل گرافیکی.</li>
-    <li><strong>GNOME / KDE Plasma</strong> → Desktop Environment.</li>
-    <li><strong>X11</strong> → سیستم/معماری گرافیکی قدیمی‌تر.</li>
-    <li><strong>Wayland</strong> → معماری/Protocol مدرن‌تر گرافیکی.</li>
-    <li><strong>Window Manager</strong> → مدیریت Windowها.</li>
-    <li><strong>Display Manager</strong> → Login گرافیکی و آغاز Session.</li>
-    <li><strong>GDM</strong> → Display Manager مرتبط با GNOME.</li>
-    <li><strong>SDDM</strong> → Display Manager رایج KDE.</li>
-    <li><code>graphical.target</code> → محیط گرافیکی.</li>
-    <li><code>multi-user.target</code> → محیط چندکاربره متنی.</li>
-    <li><code>systemctl get-default</code> → Default Target.</li>
-    <li><code>systemctl set-default graphical.target</code> → GUI برای Bootهای بعدی.</li>
-    <li><code>systemctl isolate graphical.target</code> → تغییر Target فعلی.</li>
-</ul>
-
-<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
-<p>برای فهم GUI در Linux، تصور کن Linux یک ساختمان است.</p>
-
-<h3>Kernel</h3>
-<p>پی ساختمان:</p>
-<div class="code-container"><span class="code-label">Kernel</span><div class="code-block no-prompt">Kernel</div></div>
-<p>کار Hardware را مدیریت می‌کند.</p>
-
-<h3>Display System</h3>
-<p>سیستم نمایش:</p>
-<div class="code-container"><span class="code-label">Display</span><div class="code-block no-prompt">X11 / Wayland</div></div>
-
-<h3>Desktop Environment</h3>
-<p>محیطی است که کاربر با آن کار می‌کند:</p>
-<div class="code-container"><span class="code-label">DE</span><div class="code-block no-prompt">GNOME
-KDE Plasma</div></div>
-
-<h3>Display Manager</h3>
-<p>نگهبان ورودی ساختمان:</p>
-<div class="code-container"><span class="code-label">DM</span><div class="code-block no-prompt">GDM
-SDDM</div></div>
-<p>که Login را مدیریت می‌کند.</p>
-
-<p>پس:</p>
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Hardware
+<h2>نقشه ذهنی نهایی جلسه</h2>
+<p>کل جلسه را در این مدل ببین:</p>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Hardware
    ↓
 Linux Kernel
    ↓
@@ -30593,27 +30610,63 @@ Desktop Environment
 Applications
    ↓
 User</div></div>
-
-<p>و systemd در Boot تصمیم می‌گیرد سیستم به چه Targetای برسد:</p>
+<p>برای ورود کاربر:</p>
+<div class="code-container"><span class="code-label">Display Manager</span><div class="code-block no-prompt">Display Manager
+   ↓
+Login
+   ↓
+Desktop Session</div></div>
+<p>برای انتخاب حالت Boot:</p>
 <div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd
-  │
-  ├── multi-user.target → CLI
-  │
-  └── graphical.target  → GUI</div></div>
-
-<p>اگر این ارتباط را فهمیده باشی، بخش بزرگی از مباحث GUI فصل را گرفته‌ای.</p>
+   │
+   ├── multi-user.target
+   │        ↓
+   │       CLI
+   │
+   └── graphical.target
+            ↓
+           GUI</div></div>
 
 <h2>Cheat Sheet</h2>
 <div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">CLI → محیط متنی
 GUI → محیط گرافیکی
+
 GNOME / KDE Plasma → Desktop Environment
+Window Manager → مدیریت Windowها
+
 X11 → سیستم گرافیکی قدیمی‌تر
-Wayland → معماری/Protocol مدرن گرافیکی
+Wayland → معماری/Protocol گرافیکی جدیدتر
+
 GDM / SDDM → Display Manager
+
+multi-user.target → محیط متنی
+graphical.target → محیط گرافیکی
+
 systemctl get-default → بررسی Default Target
-systemctl set-default graphical.target → GUI در Boot
-systemctl set-default multi-user.target → CLI در Boot
-systemctl isolate graphical.target → GUI همین الان</div></div>
+systemctl set-default graphical.target → GUI در Bootهای آینده
+systemctl set-default multi-user.target → CLI در Bootهای آینده
+systemctl isolate graphical.target → تغییر Target فعلی به GUI</div></div>
+
+<h2>نکات امتحانی LPIC-1</h2>
+<p>این موارد را دقیقاً تشخیص بده:</p>
+
+<h3>GNOME چیست؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">Desktop Environment</div></div>
+
+<h3>KDE Plasma چیست؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">Desktop Environment</div></div>
+
+<h3>X11 چیست؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">سیستم نمایش گرافیکی</div></div>
+
+<h3>Display Manager چه کاری انجام می‌دهد؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">Graphical Login + Start Desktop Session</div></div>
+
+<h3><code>graphical.target</code> چیست؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">Target مربوط به محیط گرافیکی</div></div>
+
+<h3><code>multi-user.target</code> چیست؟</h3>
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">Target چندکاربره بدون محیط گرافیکی</div></div>
 
 <h2>تست پایانی</h2>
 
@@ -30632,7 +30685,7 @@ systemctl isolate graphical.target → GUI همین الان</div></div>
 <p>وظیفه اصلی Display Manager چیست؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) مدیریت Partition</button>
-    <button onclick="selectOption(this)">B) مدیریت Login گرافیکی و آغاز Desktop Session</button>
+    <button onclick="selectOption(this)">B) مدیریت Login گرافیکی و شروع Desktop Session</button>
     <button onclick="selectOption(this)">C) مدیریت Packageها</button>
     <button onclick="selectOption(this)">D) مدیریت فایل‌های <code>/etc</code></button>
 </div>
@@ -30662,61 +30715,49 @@ systemctl isolate graphical.target → GUI همین الان</div></div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>Administrator می‌خواهد GUI برای Bootهای آینده Default باشد. کدام دستور مناسب‌تر است؟</p>
+<p>Administrator می‌خواهد سیستم در Bootهای آینده وارد GUI شود. کدام دستور مناسب است؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) <code>systemctl start graphical.target</code></button>
-    <button onclick="selectOption(this)">B) <code>systemctl isolate graphical.target</code></button>
-    <button onclick="selectOption(this)">C) <code>systemctl set-default graphical.target</code></button>
+    <button onclick="selectOption(this)">A) <code>systemctl isolate graphical.target</code></button>
+    <button onclick="selectOption(this)">B) <code>systemctl set-default graphical.target</code></button>
+    <button onclick="selectOption(this)">C) <code>systemctl start graphical.target</code></button>
     <button onclick="selectOption(this)">D) <code>systemctl enable graphical.target.service</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — <code>systemctl set-default graphical.target</code></strong><br>چون هدف سؤال <strong>Default Boot Target</strong> است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — <code>systemctl set-default graphical.target</code></strong><br>چون هدف سؤال <strong>Default Boot Target</strong> است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۶</p>
-<p>کدام گزینه تفاوت <code>set-default</code> و <code>isolate</code> را درست بیان می‌کند؟</p>
+<p>تفاوت صحیح <code>set-default</code> و <code>isolate</code> چیست؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) هر دو دقیقاً یک کار انجام می‌دهند.</button>
-    <button onclick="selectOption(this)">B) <code>set-default</code> وضعیت فعلی را تغییر می‌دهد و <code>isolate</code> Boot بعدی را.</button>
-    <button onclick="selectOption(this)">C) <code>set-default</code> Default Target را تنظیم می‌کند و <code>isolate</code> Target فعلی را تغییر می‌دهد.</button>
+    <button onclick="selectOption(this)">B) <code>set-default</code> وضعیت فعلی و <code>isolate</code> Boot بعدی را تغییر می‌دهد.</button>
+    <button onclick="selectOption(this)">C) <code>set-default</code> Target پیش‌فرض را تغییر می‌دهد و <code>isolate</code> Target فعلی را.</button>
     <button onclick="selectOption(this)">D) هر دو فقط برای Serviceها هستند.</button>
 </div>
 <div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>این یکی از نکات مهم systemd است: <code>set-default → آینده / Boot</code> و <code>isolate → همین الان</code></div>
 </div>
 
-<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
-<p>یک Administrator روی AlmaLinux محیط GNOME را نصب کرده است. بعد از Reboot سیستم همچنان وارد CLI می‌شود. <code>systemctl get-default</code> خروجی زیر را نشان می‌دهد:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">multi-user.target</div></div>
-<p>مناسب‌ترین اقدام چیست؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) حذف GNOME</button>
-    <button onclick="selectOption(this)">B) تغییر Default Target به <code>graphical.target</code></button>
-    <button onclick="selectOption(this)">C) حذف systemd</button>
-    <button onclick="selectOption(this)">D) اجرای <code>docker start gnome</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>مثلاً: <code>sudo systemctl set-default graphical.target</code>. بعد از آن، در Boot بعدی سیستم باید به Graphical Target برود؛ البته سالم بودن Desktop و Display Manager نیز باید برقرار باشد.</div>
-</div>
-
 <div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
-<p>اگر فقط این زنجیره را به خاطر بسپاری:</p>
-<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Linux Kernel
-     ↓
-X11 / Wayland
-     ↓
-GNOME / KDE Plasma
-     ↓
-Desktop Applications</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">systemd</span><div class="code-block no-prompt">systemd
+<p>اگر فقط این چند نکته را از جلسه به خاطر بسپاری:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">CLI → محیط متنی
+GUI → محیط گرافیکی
+
+GNOME / KDE Plasma → Desktop Environment
+X11 / Wayland → سیستم نمایش گرافیکی
+Display Manager → Login گرافیکی
+
+systemd
    ↓
 multi-user.target → CLI
-graphical.target  → GUI</div></div>
-<p>و برای مدیریت Boot:</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">systemctl get-default
+graphical.target  → GUI
+
+systemctl get-default
 systemctl set-default graphical.target
 systemctl isolate graphical.target</div></div>
-<p>جلسه بعد می‌رویم سراغ <strong>GUI + Accessibility</strong> و می‌بینیم Linux چگونه محیط گرافیکی را برای کاربران با نیازهای دسترسی متفاوت قابل استفاده‌تر می‌کند.</p>
+<p>پس پایه اصلی جلسه اول فصل ششم را یاد گرفته‌ای.</p>
+<p><strong>مسیر جلسه بعد:</strong> در جلسه بعد وارد موضوع <strong>GUI + Accessibility</strong> می‌شویم و بررسی می‌کنیم که محیط گرافیکی Linux چگونه برای کاربران مختلف قابل استفاده‌تر می‌شود.</p>
 </div></div>
-` ,
+`
+,
 "ch6-2": `
 <div class="section-header">
     <div class="section-badge">۶</div>
@@ -30729,540 +30770,442 @@ systemctl isolate graphical.target</div></div>
 <h2>اهداف یادگیری</h2>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-    <li>اجزای اصلی یک Desktop Environment را بهتر درک کنی.</li>
-    <li>مفهوم <strong>Accessibility</strong> در Linux را توضیح بدهی.</li>
-    <li>ابزارهای مهم دسترسی‌پذیری مثل <strong>Screen Reader، Magnification و On-Screen Keyboard</strong> را بشناسی.</li>
-    <li>تفاوت Accessibility با تنظیمات معمول GUI را تشخیص بدهی.</li>
-    <li>قابلیت‌های Accessibility در محیط‌هایی مثل GNOME را در حد LPIC-1 مدیریت کنی.</li>
+    <li>مفهوم Accessibility را توضیح بدهی.</li>
+    <li>تفاوت Accessibility با تنظیمات معمول GUI را درک کنی.</li>
+    <li>ابزارهای مهم Accessibility را بشناسی.</li>
+    <li>کاربرد Orca را بدانی.</li>
+    <li>تفاوت Large Text و Magnification را بدانی.</li>
+    <li>کاربرد Sticky Keys را توضیح بدهی.</li>
+    <li>On-Screen Keyboard و Mouse Keys را بشناسی.</li>
+    <li>تنظیمات Accessibility را در Desktop Environment پیدا کنی.</li>
 </ol>
 
 <h2>معرفی جلسه</h2>
-<p>در جلسه قبل یاد گرفتیم که GUI فقط یک «صفحه زیبا» نیست.</p>
-<div class="code-container"><span class="code-label">مرور</span><div class="code-block no-prompt">Linux
-  ↓
-Display System
-  ↓
-Desktop Environment
-  ↓
+<p>در جلسه قبل یاد گرفتیم که محیط گرافیکی Linux از بخش‌های مختلفی تشکیل می‌شود:</p>
+<div class="code-container"><span class="code-label">معماری GUI</span><div class="code-block no-prompt">User
+ ↓
 Applications
-  ↓
-User</div></div>
-<p>اما همه کاربران به یک شکل با کامپیوتر کار نمی‌کنند. ممکن است کاربری:</p>
+ ↓
+Desktop Environment
+ ↓
+Display System
+ ↓
+Linux</div></div>
+<p>اما همه کاربران به یک شکل با محیط گرافیکی کار نمی‌کنند. ممکن است یک کاربر:</p>
 <ul>
-    <li>مشکل بینایی داشته باشد.</li>
+    <li>در دیدن متن مشکل داشته باشد.</li>
     <li>نتواند به‌راحتی از Mouse استفاده کند.</li>
-    <li>به Keyboard بزرگ‌نمایی‌شده یا مجازی نیاز داشته باشد.</li>
-    <li>به Screen Reader نیاز داشته باشد.</li>
-    <li>به کنتراست یا اندازه متن متفاوت نیاز داشته باشد.</li>
+    <li>نتواند چند کلید را همزمان فشار دهد.</li>
+    <li>به Keyboard مجازی نیاز داشته باشد.</li>
+    <li>برای استفاده از سیستم به Screen Reader نیاز داشته باشد.</li>
 </ul>
-<p>اینجاست که <strong>Accessibility</strong> مطرح می‌شود.</p>
-<blockquote>Accessibility یعنی طراحی سیستم به‌گونه‌ای که افراد با نیازهای متفاوت نیز بتوانند از آن استفاده کنند.</blockquote>
+<p>اینجاست که مفهوم <strong>Accessibility</strong> مطرح می‌شود.</p>
 
-<h2>Accessibility چیست؟ ⭐⭐⭐</h2>
-<p>در Linux، Accessibility مجموعه‌ای از قابلیت‌ها و تنظیمات است که استفاده از سیستم را برای کاربران مختلف آسان‌تر می‌کند.</p>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">                 GUI
-                  │
-          Accessibility
-                  │
-       ┌──────────┼──────────┐
-       ↓          ↓          ↓
-   Vision      Mobility     Input
-       │          │          │
- Screen Reader  Mouse       On-Screen
- Magnification  Keys        Keyboard</div></div>
-<p>هدف:</p>
-<blockquote><strong>تغییر روش تعامل کاربر با سیستم، بدون تغییر عملکرد اصلی سیستم.</strong></blockquote>
+<h2>Accessibility چیست؟</h2>
+<p>Accessibility یعنی:</p>
+<blockquote><strong>قابل‌دسترس‌تر کردن سیستم برای کاربرانی با نیازهای متفاوت.</strong></blockquote>
+<p>هدف Accessibility این نیست که عملکرد اصلی Linux را تغییر دهد. بلکه:</p>
+<blockquote><strong>روش تعامل کاربر با سیستم را آسان‌تر و مناسب‌تر می‌کند.</strong></blockquote>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">User
+ ↓
+Different Needs
+ ↓
+Accessibility Features
+ ↓
+Easier Interaction with GUI</div></div>
 
-<h2>Accessibility در GNOME</h2>
-<p>در GNOME معمولاً تنظیمات Accessibility را از بخش:</p>
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Settings → Accessibility</div></div>
-<p>پیدا می‌کنی. بسته به نسخه GNOME، گزینه‌ها ممکن است کمی متفاوت باشند.</p>
-<p>دسته‌های مهم معمولاً شامل:</p>
-<ul>
-    <li>Seeing</li>
-    <li>Hearing</li>
-    <li>Typing</li>
-    <li>Pointing &amp; Clicking</li>
-</ul>
-<p>هستند.</p>
+<h2>دسته‌بندی اصلی Accessibility</h2>
+<p>برای یادگیری بهتر، قابلیت‌های Accessibility را در چهار گروه قرار می‌دهیم:</p>
+<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Accessibility
+│
+├── Vision
+├── Hearing
+├── Keyboard / Typing
+└── Mouse / Pointing</div></div>
+<p>یعنی ابتدا مشکل یا نیاز کاربر را تشخیص می‌دهیم، سپس ابزار مناسب را انتخاب می‌کنیم.</p>
 
-<h2>Seeing — دسترسی برای کاربران دارای مشکل بینایی ⭐⭐⭐</h2>
-<p>یکی از مهم‌ترین بخش‌های Accessibility مربوط به نمایش اطلاعات است.</p>
+<h2>Accessibility برای مشکلات بینایی</h2>
+<p>یکی از مهم‌ترین دسته‌ها مربوط به کاربران دارای مشکلات بینایی است. ابزارهای مهم:</p>
+<div class="code-container"><span class="code-label">Vision</span><div class="code-block no-prompt">Vision
+│
+├── Screen Reader
+├── Magnification
+├── Large Text
+└── High Contrast</div></div>
 
-<h3>Screen Reader</h3>
-<p><strong>Screen Reader</strong> محتوای روی صفحه را به صورت صوتی برای کاربر می‌خواند. در GNOME ابزار معروف:</p>
-<blockquote><strong>Orca</strong></blockquote>
-<p>است.</p>
-<p>مدل:</p>
+<h3>Screen Reader چیست؟ ⭐⭐⭐</h3>
+<p>Screen Reader اطلاعات موجود در محیط گرافیکی را به‌صورت صوتی برای کاربر ارائه می‌دهد. مدل:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Application
-     ↓
-Text / UI
-     ↓
+ ↓
+Text / GUI Element
+ ↓
 Screen Reader
-     ↓
+ ↓
 Speech
-     ↓
+ ↓
 User</div></div>
-<p>یعنی کاربر لازم نیست حتماً متن را ببیند تا بتواند با سیستم کار کند.</p>
+<p>مثلاً اگر Focus روی یک Button باشد:</p>
+<div class="code-container"><span class="code-label">Button</span><div class="code-block no-prompt">┌───────────────┐
+│      OK       │
+└───────────────┘</div></div>
+<p>Screen Reader می‌تواند اطلاعات مربوط به آن عنصر را برای کاربر بخواند.</p>
 
 <h3>Orca ⭐⭐⭐</h3>
-<p>Orca یک Screen Reader برای محیط‌های گرافیکی Linux است. کار اصلی:</p>
-<blockquote>خواندن عناصر GUI و اطلاعات صفحه برای کاربر.</blockquote>
-<p>مثلاً وقتی Focus روی یک Button قرار می‌گیرد:</p>
-<div class="code-container"><span class="code-label">دکمه</span><div class="code-block no-prompt">┌───────────────┐
-│    OK         │
-└───────────────┘</div></div>
-<p>Screen Reader می‌تواند به کاربر اطلاع دهد که:</p>
-<blockquote>این عنصر یک Button با نام OK است.</blockquote>
+<p>یکی از Screen Readerهای معروف Linux:</p>
+<div class="code-container"><span class="code-label">Orca</span><div class="code-block no-prompt">Orca</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نقش</span><div class="code-block no-prompt">Orca
+ ↓
+Screen Reader
+ ↓
+خواندن اطلاعات GUI برای کاربر</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>اگر سؤال پرسید: ابزار Screen Reader معروف در GNOME چیست؟ پاسخ: <strong>Orca</strong></div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی LPIC-1</strong><br>اگر سؤال پرسید: <strong>Orca چیست؟</strong><br>پاسخ: <strong>Screen Reader</strong></div></div>
 
-<h3>Magnification ⭐⭐⭐</h3>
-<p>گاهی کاربر می‌تواند صفحه را ببیند، اما متن یا عناصر GUI برایش کوچک هستند. در این حالت <strong>Magnification</strong> استفاده می‌شود.</p>
+<h3>Large Text و Magnification</h3>
+<p>گاهی کاربر می‌تواند صفحه را ببیند، اما اندازه متن یا عناصر برای او مناسب نیست. در این حالت دو مفهوم مهم داریم.</p>
+
+<h4>Large Text</h4>
+<p>Large Text یعنی:</p>
+<div class="code-container"><span class="code-label">Large Text</span><div class="code-block no-prompt">Text
+ ↓
+Larger Text</div></div>
+<p>یعنی اندازه متن افزایش پیدا می‌کند. برای مثال:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Small Text
+↓
+LARGE TEXT</div></div>
+
+<h4>Magnification</h4>
+<p>Magnification یعنی:</p>
+<blockquote>بزرگ‌نمایی بخشی از صفحه یا محتوای نمایش داده‌شده.</blockquote>
 <p>مدل:</p>
-<div class="code-container"><span class="code-label">بزرگ‌نمایی</span><div class="code-block no-prompt">Normal
-┌────────────────┐
-│ Small Text     │
-└────────────────┘
-
-       ↓ Magnify
-
-┌──────────────────────────┐
-│        Large Text        │
-└──────────────────────────┘</div></div>
-<p>Magnifier اندازه قسمت‌هایی از صفحه را بزرگ می‌کند. در GNOME قابلیت بزرگ‌نمایی در تنظیمات Accessibility وجود دارد.</p>
-
-<h3>High Contrast ⭐⭐</h3>
-<p>اگر رنگ‌های معمولی برای کاربر مناسب نباشند، <strong>High Contrast</strong> می‌تواند خوانایی عناصر را افزایش دهد.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">کنتراست</span><div class="code-block no-prompt">Normal Contrast
-Text ───── background
-
-High Contrast
-TEXT █████████</div></div>
-<p>هدف: افزایش تفاوت بصری بین Foreground و Background.</p>
-
-<h3>Large Text ⭐⭐</h3>
-<p>یکی دیگر از تنظیمات ساده Accessibility: افزایش اندازه متن. این قابلیت برای کاربرانی مفید است که متن معمولی برایشان کوچک است.</p>
-<p>تفاوت آن با Magnification:</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text
-→ متن بزرگ‌تر می‌شود.
-
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Normal Screen
+     ↓
 Magnification
-→ قسمت‌هایی از صفحه بزرگ‌نمایی می‌شوند.</div></div>
+     ↓
+Zoomed View</div></div>
 
-<h2>Hearing — دسترسی برای مشکلات شنوایی ⭐⭐</h2>
-<p>Accessibility فقط مربوط به بینایی نیست. فرض کن برنامه‌ای یک Alert صوتی ایجاد می‌کند. کاربر ممکن است صدا را نشنود. در این حالت می‌توان از <strong>Visual Alerts</strong> استفاده کرد.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">هشدار بصری</span><div class="code-block no-prompt">Audio Alert
-    ↓
+<h4>تفاوت مهم</h4>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text → اندازه متن بزرگ‌تر می‌شود.
+Magnification → بخشی از صفحه یا محتوا بزرگ‌نمایی می‌شود.</div></div>
+<p>این تفاوت را به خاطر بسپار.</p>
+
+<h3>High Contrast</h3>
+<p>High Contrast باعث افزایش تفاوت بین عناصر صفحه می‌شود. هدف:</p>
+<blockquote>افزایش خوانایی و تشخیص بهتر عناصر گرافیکی.</blockquote>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">High Contrast</span><div class="code-block no-prompt">Text
+ ↓
+More Contrast
+ ↓
+Better Visibility</div></div>
+
+<h2>Accessibility برای مشکلات شنوایی</h2>
+<p>Accessibility فقط مربوط به بینایی نیست. برای برخی کاربران ممکن است Alertهای صوتی مناسب نباشند. در چنین شرایطی می‌توان از:</p>
+<div class="code-container"><span class="code-label">Visual Alerts</span><div class="code-block no-prompt">Visual Alerts</div></div>
+<p>استفاده کرد. مدل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Audio Event
+ ↓
 Visual Feedback
-    ↓
-Screen / UI</div></div>
-<p>یعنی به جای اتکا به صدا، یک نشانه بصری نیز نمایش داده شود.</p>
+ ↓
+User</div></div>
+<p>یعنی اطلاعاتی که ممکن است فقط با صدا ارائه شوند، می‌توانند به شکل بصری نیز نمایش داده شوند.</p>
 
-<h2>Typing — دسترسی برای Keyboard ⭐⭐⭐</h2>
-<p>برخی کاربران نمی‌توانند به‌راحتی کلیدها را سریع و همزمان فشار دهند. Linux قابلیت‌هایی برای کمک به این کاربران دارد. مهم‌ترین مفاهیم:</p>
+<h2>Accessibility برای Keyboard ⭐⭐⭐</h2>
+<p>برخی کاربران ممکن است در استفاده از Keyboard مشکل داشته باشند. برای مثال:</p>
 <ul>
-    <li>Sticky Keys</li>
-    <li>Slow Keys</li>
-    <li>Bounce Keys</li>
-    <li>On-Screen Keyboard</li>
+    <li>فشار دادن چند کلید همزمان دشوار باشد.</li>
+    <li>کلیدها ناخواسته ثبت شوند.</li>
+    <li>یک کلید چند بار ثبت شود.</li>
+    <li>Keyboard فیزیکی قابل استفاده نباشد.</li>
 </ul>
+<p>ابزارهای مهم:</p>
+<div class="code-container"><span class="code-label">Keyboard Accessibility</span><div class="code-block no-prompt">Keyboard Accessibility
+│
+├── Sticky Keys
+├── Slow Keys
+├── Bounce Keys
+└── On-Screen Keyboard</div></div>
 
 <h3>Sticky Keys ⭐⭐⭐</h3>
-<p>فرض کن باید این کلیدها را همزمان فشار دهی:</p>
-<div class="code-container"><span class="code-label">میانبر</span><div class="code-block no-prompt">Ctrl + Alt + T</div></div>
-<p>برای بعضی کاربران فشار دادن چند کلید همزمان دشوار است. <strong>Sticky Keys</strong> اجازه می‌دهد کلیدهای Modifier مثل:</p>
+<p>فرض کن می‌خواهیم این Shortcut را اجرا کنیم:</p>
+<div class="code-container"><span class="code-label">Shortcut</span><div class="code-block no-prompt">Ctrl + Alt + T</div></div>
+<p>برای بعضی کاربران فشار دادن چند کلید به‌صورت همزمان دشوار است. Sticky Keys کمک می‌کند Modifier Keyها مانند:</p>
 <div class="code-container"><span class="code-label">Modifierها</span><div class="code-block no-prompt">Ctrl
 Alt
-Shift
-Super</div></div>
-<p>به‌صورت مرحله‌ای استفاده شوند.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block no-prompt">Ctrl
+Shift</div></div>
+<p>به‌صورت مرحله‌ای استفاده شوند. مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Ctrl
  ↓
 Alt
  ↓
 T</div></div>
-<p>به‌جای:</p>
+<p>به جای:</p>
 <div class="code-container"><span class="code-label">همزمان</span><div class="code-block no-prompt">Ctrl + Alt + T</div></div>
 
-<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته امتحانی</strong><br>Sticky Keys: برای کاربرانی مفید است که فشار دادن چند کلید به‌صورت همزمان برایشان دشوار است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته مهم</strong><br>Sticky Keys برای <strong>کاربرانی که فشار دادن چند کلید همزمان برایشان دشوار است</strong>.</div></div>
 
-<h3>Slow Keys ⭐⭐</h3>
-<p>Slow Keys برای جلوگیری از ثبت ناخواسته فشارهای کوتاه روی Keyboard طراحی شده است. یعنی سیستم می‌تواند لازم بداند که کلید برای مدت مشخصی نگه داشته شود تا ثبت شود.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">Slow</span><div class="code-block no-prompt">Key Press
-    ↓
-Hold
-    ↓
-Accepted</div></div>
-<p>کاربرد: کاهش ثبت تصادفی کلیدها.</p>
-
-<h3>Bounce Keys ⭐⭐</h3>
-<p>گاهی یک بار فشردن کلید ممکن است به دلیل مشکل فیزیکی یا حرکتی چند بار ثبت شود. مثلاً:</p>
-<div class="code-container"><span class="code-label">ناخواسته</span><div class="code-block no-prompt">a</div></div>
-<p>ناخواسته تبدیل شود به:</p>
-<div class="code-container"><span class="code-label">تکراری</span><div class="code-block no-prompt">aaaa</div></div>
-<p>Bounce Keys می‌تواند بین فشارهای متوالی خیلی سریع محدودیت ایجاد کند.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">فیلتر</span><div class="code-block no-prompt">Key
+<h3>Slow Keys</h3>
+<p>Slow Keys برای جلوگیری از ثبت ناخواسته فشارهای کوتاه روی Keyboard استفاده می‌شود. مدل ساده:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Key Press
  ↓
-Rapid Repeated Presses
+Hold
+ ↓
+Accepted</div></div>
+<p>هدف:</p>
+<blockquote>کاهش ثبت تصادفی کلیدها.</blockquote>
+
+<h3>Bounce Keys</h3>
+<p>گاهی ممکن است یک کلید ناخواسته چند بار ثبت شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">a</div></div>
+<p>ممکن است تبدیل شود به:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">aaaa</div></div>
+<p>Bounce Keys برای کنترل فشارهای تکراری و سریع استفاده می‌شود. مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Repeated Key Press
  ↓
 Filter
  ↓
-Single / Controlled Input</div></div>
+Controlled Input</div></div>
 
 <h3>On-Screen Keyboard ⭐⭐⭐</h3>
-<p><strong>On-Screen Keyboard (OSK)</strong> یک Keyboard مجازی روی صفحه نمایش است.</p>
-<div class="code-container"><span class="code-label">کیبورد مجازی</span><div class="code-block no-prompt">┌──────────────────────────┐
-│        Application       │
-│                          │
-├──────────────────────────┤
+<p>On-Screen Keyboard یک Keyboard مجازی است که روی صفحه نمایش داده می‌شود.</p>
+<div class="code-container"><span class="code-label">Keyboard مجازی</span><div class="code-block no-prompt">┌──────────────────────────┐
 │ Q W E R T Y U I O P      │
 │ A S D F G H J K L        │
 │ Z X C V B N M            │
 └──────────────────────────┘</div></div>
-<p>کاربر می‌تواند با Mouse یا روش‌های ورودی دیگر روی کلیدها کلیک کند. پس:</p>
-<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">Physical Keyboard
-       یا
-On-Screen Keyboard</div></div>
+<p>کاربر می‌تواند به‌جای Keyboard فیزیکی از آن استفاده کند. پس:</p>
+<div class="code-container"><span class="code-label">Keyboard Input</span><div class="code-block no-prompt">Keyboard Input
+│
+├── Physical Keyboard
+│
+└── On-Screen Keyboard</div></div>
 
-<h2>Pointing &amp; Clicking ⭐⭐⭐</h2>
-<p>Accessibility برای Mouse و Pointing Device نیز امکاناتی دارد. مثلاً:</p>
+<h2>Accessibility برای Mouse و Pointer</h2>
+<p>برخی کاربران ممکن است استفاده از Mouse را دشوار بدانند. قابلیت‌های مهم:</p>
 <ul>
-    <li>کنترل سرعت Pointer</li>
-    <li>تنظیم اندازه Pointer</li>
-    <li>قابلیت‌های مربوط به Click</li>
-    <li>کنترل Mouse با Keyboard</li>
+    <li>تغییر اندازه Pointer</li>
+    <li>تنظیم Pointer</li>
+    <li>کنترل Pointer با Keyboard</li>
 </ul>
-<p>هدف: ساده‌تر کردن کنترل Pointer برای کاربر.</p>
 
-<h3>Mouse Keys ⭐⭐</h3>
-<p><strong>Mouse Keys</strong> اجازه می‌دهد Pointer Mouse را با Keyboard کنترل کنیم.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">کنترل</span><div class="code-block no-prompt">Keyboard
-    ↓
+<h3>Mouse Keys</h3>
+<p>Mouse Keys اجازه می‌دهد Pointer Mouse با Keyboard کنترل شود. مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Keyboard
+ ↓
 Mouse Keys
-    ↓
+ ↓
 Pointer</div></div>
-<p>برای کاربری که استفاده از Mouse برایش دشوار است می‌تواند مفید باشد.</p>
 
-<h3>Pointer Size ⭐⭐</h3>
-<p>گاهی پیدا کردن Pointer روی صفحه دشوار است. افزایش اندازه Pointer می‌تواند آن را قابل مشاهده‌تر کند. این قابلیت ساده است، اما مثال خوبی از Accessibility است:</p>
-<blockquote>سیستم همان Mouse را نگه می‌دارد، فقط روش نمایش آن را برای کاربر مناسب‌تر می‌کند.</blockquote>
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ نکته مهم</strong><br>Mouse Keys یعنی: <strong>کنترل Pointer با استفاده از Keyboard</strong>.</div></div>
 
-<h2>Accessibility و Input</h2>
-<p>حالا سه مفهوم را کنار هم بگذار:</p>
-<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Physical Limitation
-       ↓
-┌──────┼─────────┐
-↓      ↓         ↓
-Keyboard Mouse   Vision
-↓      ↓         ↓
-Sticky  Mouse    Orca
-Keys    Keys     Magnifier</div></div>
-<p>هدف همه این‌ها یکی است:</p>
-<blockquote>ایجاد یک مسیر جایگزین برای تعامل با سیستم.</blockquote>
-
-<h2>Keyboard Shortcuts و Accessibility</h2>
-<p>یکی از مزیت‌های مهم GUI این است که بسیاری از کارها را می‌توان با Keyboard انجام داد. مثلاً:</p>
-<div class="code-container"><span class="code-label">Tab</span><div class="code-block no-prompt">Tab</div></div>
-<p>برای حرکت بین عناصر GUI بسیار مهم است.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">حرکت</span><div class="code-block no-prompt">Tab
+<h2>Accessibility را چگونه مدیریت کنیم؟</h2>
+<p>در محیط‌هایی مانند GNOME معمولاً تنظیمات Accessibility از مسیر زیر قابل دسترسی هستند:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Settings
  ↓
-Button 1
- ↓
-Button 2
- ↓
-Input
- ↓
-Menu</div></div>
-<p>این موضوع برای Accessibility اهمیت زیادی دارد، چون کاربر همیشه نمی‌تواند یا نمی‌خواهد از Mouse استفاده کند.</p>
-
-<h2>Accessibility در Linux فقط GUI نیست</h2>
-<p>این نکته مفهومی مهم است. Accessibility یک Feature صرفاً مربوط به GNOME نیست. ممکن است قابلیت‌های Accessibility در:</p>
-<ul>
-    <li>Desktop Environment</li>
-    <li>Applications</li>
-    <li>Display System</li>
-    <li>Input System</li>
-</ul>
-<p>وجود داشته باشند.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">معماری</span><div class="code-block no-prompt">Linux
-  │
-  ├── Desktop
-  │
-  ├── Applications
-  │
-  └── Accessibility
-       ├── Vision
-       ├── Hearing
-       ├── Keyboard
-       └── Pointer</div></div>
-
-<h2>یک نگاه عملی به GNOME</h2>
-<p>در GNOME معمولاً می‌توانی وارد:</p>
-<div class="code-container"><span class="code-label">تنظیمات</span><div class="code-block no-prompt">Settings
-   ↓
 Accessibility</div></div>
-<p>شوی. در آنجا تنظیمات را بر اساس نیاز فعال می‌کنی.</p>
+<p>بسته به نسخه Desktop Environment، نام و محل دقیق بعضی گزینه‌ها ممکن است متفاوت باشد. اما مفهوم اصلی ثابت است:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">User Need
+ ↓
+Accessibility Settings
+ ↓
+Enable Appropriate Feature</div></div>
+
+<h2>چگونه ابزار مناسب را انتخاب کنیم؟</h2>
+<p>بهترین روش این است که ابتدا نیاز کاربر را مشخص کنیم.</p>
+<div class="code-container"><span class="code-label">روش</span><div class="code-block no-prompt">Problem
+ ↓
+Choose Accessibility Feature</div></div>
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">Seeing
-├── High Contrast
-├── Large Text
-├── Screen Reader
-└── Magnification
+<div class="table-wrap">
+<table>
+<thead><tr><th>نیاز کاربر</th><th>قابلیت مناسب</th></tr></thead>
+<tbody>
+<tr><td>مشکل در خواندن صفحه</td><td>Orca</td></tr>
+<tr><td>متن کوچک</td><td>Large Text</td></tr>
+<tr><td>نیاز به بزرگ‌نمایی</td><td>Magnification</td></tr>
+<tr><td>فشار دادن چند کلید همزمان دشوار است</td><td>Sticky Keys</td></tr>
+<tr><td>فشارهای کوتاه ناخواسته ثبت می‌شوند</td><td>Slow Keys</td></tr>
+<tr><td>کلیدها ناخواسته تکرار می‌شوند</td><td>Bounce Keys</td></tr>
+<tr><td>نیاز به Keyboard مجازی</td><td>On-Screen Keyboard</td></tr>
+<tr><td>مشکل در استفاده از Mouse</td><td>Mouse Keys</td></tr>
+</tbody>
+</table>
+</div>
+<p>این جدول یکی از بهترین روش‌ها برای مرور جلسه است.</p>
 
-Hearing
-└── Visual Alerts
-
-Typing
-├── Sticky Keys
-├── Slow Keys
-├── Bounce Keys
-└── On-Screen Keyboard
-
-Pointing & Clicking
-├── Mouse Keys
-└── Pointer settings</div></div>
-<p>نام و جای دقیق بعضی گزینه‌ها ممکن است بین نسخه‌های GNOME تفاوت داشته باشد.</p>
-
-<h2>Accessibility و Administrator</h2>
-<p>برای LPIC-1 لازم نیست برنامه‌نویسی Accessibility بلد باشی. چیزی که Administrator باید بداند:</p>
-<ol>
-    <li>Accessibility چیست؟</li>
-    <li>چه مشکلاتی را حل می‌کند؟</li>
-    <li>Screen Reader چیست؟</li>
-    <li>Magnification چیست؟</li>
-    <li>Sticky Keys چیست؟</li>
-    <li>On-Screen Keyboard چیست؟</li>
-    <li>تنظیمات Accessibility در Desktop Environment کجا قرار دارند؟</li>
-</ol>
-
-<h2>سناریوی ترکیبی</h2>
-<h3>سناریو: سیستم برای کاربری با نیازهای Accessibility</h3>
-<p>فرض کن یک سیستم AlmaLinux با GNOME داری. کاربر:</p>
+<h2>سناریوی عملی</h2>
+<p>فرض کن کاربری از GNOME استفاده می‌کند. مشکلات کاربر:</p>
 <ul>
-    <li>متن کوچک را سخت می‌بیند.</li>
-    <li>گاهی نمی‌تواند چند کلید را همزمان فشار دهد.</li>
-    <li>ترجیح می‌دهد از Keyboard مجازی نیز استفاده کند.</li>
+    <li>متن کوچک است.</li>
+    <li>فشار دادن چند کلید همزمان دشوار است.</li>
+    <li>به Keyboard مجازی نیاز دارد.</li>
 </ul>
-
-<h4>مرحله ۱ — ورود به تنظیمات</h4>
-<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block no-prompt">Settings
-   ↓
+<p>ابتدا وارد:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Settings
+ ↓
 Accessibility</div></div>
+<p>می‌شویم. سپس:</p>
 
-<h4>مرحله ۲ — بزرگ کردن متن</h4>
-<p>فعال کردن:</p>
-<div class="code-container"><span class="code-label">Large Text</span><div class="code-block no-prompt">Large Text</div></div>
-<p>برای خوانایی بیشتر.</p>
+<h4>مشکل اول: متن کوچک</h4>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block no-prompt">Large Text</div></div>
+<p>یا در صورت نیاز:</p>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block no-prompt">Magnification</div></div>
 
-<h4>مرحله ۳ — فعال کردن Magnification</h4>
-<p>اگر Large Text کافی نبود:</p>
-<div class="code-container"><span class="code-label">Magnification</span><div class="code-block no-prompt">Magnification</div></div>
-<p>را فعال می‌کنیم.</p>
+<h4>مشکل دوم: Shortcutهای چندکلیدی</h4>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block no-prompt">Sticky Keys</div></div>
 
-<h4>مرحله ۴ — فعال کردن Sticky Keys</h4>
-<p>برای Shortcutهایی که چند Modifier دارند:</p>
-<div class="code-container"><span class="code-label">Sticky Keys</span><div class="code-block no-prompt">Sticky Keys</div></div>
-<p>را فعال می‌کنیم.</p>
+<h4>مشکل سوم: Keyboard فیزیکی</h4>
+<div class="code-container"><span class="code-label">راه‌حل</span><div class="code-block no-prompt">On-Screen Keyboard</div></div>
 
-<h4>مرحله ۵ — Keyboard مجازی</h4>
-<p>در صورت نیاز:</p>
-<div class="code-container"><span class="code-label">On-Screen Keyboard</span><div class="code-block no-prompt">On-Screen Keyboard</div></div>
-<p>را فعال می‌کنیم.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">User Needs
+│
+├── Small Text
+│     ↓
+│   Large Text
+│
+├── Difficult Key Combination
+│     ↓
+│   Sticky Keys
+│
+└── No Physical Keyboard
+      ↓
+   On-Screen Keyboard</div></div>
 
-<h4>نتیجه</h4>
-<div class="code-container"><span class="code-label">نهایی</span><div class="code-block no-prompt">User
- │
- ├── Large Text
- ├── Magnification
- ├── Sticky Keys
- └── On-Screen Keyboard
-          ↓
-       GNOME GUI</div></div>
-<p>یعنی به جای تغییر Application، <strong>روش تعامل کاربر با GUI را مناسب‌تر کرده‌ایم.</strong></p>
+<h2>اشتباهات رایج</h2>
 
-<h2>اشتباهات رایج ⚠️</h2>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>Accessibility یعنی فقط Screen Reader.<br><strong>❌ خیر.</strong><br>Accessibility شامل قابلیت‌هایی برای: Vision، Hearing، Keyboard و Mouse است.</div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۱</strong><br>Accessibility یعنی فقط Screen Reader.<br><strong>❌ خیر.</strong> Accessibility شامل موارد مختلفی برای Vision، Hearing، Keyboard و Mouse است.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>Magnification و Large Text یکی هستند.<br><strong>❌ نه دقیقاً.</strong>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text
-→ اندازه متن را افزایش می‌دهد.
-
-Magnification
-→ بخش‌هایی از صفحه را بزرگ می‌کند.</div></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۲</strong><br>Large Text و Magnification یکسان هستند.<br><strong>❌ خیر.</strong>
+<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Large Text → بزرگ کردن متن
+Magnification → بزرگ‌نمایی محتوا یا بخشی از صفحه</div></div>
 </div></div>
 
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>Sticky Keys باعث سریع‌تر شدن Keyboard می‌شود.<br><strong>❌</strong> هدف آن این نیست. Sticky Keys برای کاربری است که فشار دادن چند کلید همزمان برایش دشوار است.</div></div>
-
-<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>Orca یک Desktop Environment است.<br><strong>❌ خیر.</strong>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۳</strong><br>Orca یک Desktop Environment است.<br><strong>❌ خیر.</strong>
 <div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">Orca → Screen Reader
 GNOME → Desktop Environment</div></div>
 </div></div>
 
-<h2>نکات مهم</h2>
-<ul>
-    <li>Accessibility = آسان‌تر کردن استفاده از سیستم برای کاربران با نیازهای متفاوت.</li>
-    <li><strong>Orca</strong> = Screen Reader.</li>
-    <li><strong>Magnification</strong> = بزرگ‌نمایی صفحه.</li>
-    <li><strong>Large Text</strong> = افزایش اندازه متن.</li>
-    <li><strong>High Contrast</strong> = افزایش خوانایی با کنتراست بیشتر.</li>
-    <li><strong>Sticky Keys</strong> = امکان استفاده مرحله‌ای از Modifier Keys.</li>
-    <li><strong>Slow Keys</strong> = کاهش ثبت ناخواسته فشارهای سریع.</li>
-    <li><strong>Bounce Keys</strong> = کنترل تکرار سریع ناخواسته کلید.</li>
-    <li><strong>On-Screen Keyboard</strong> = Keyboard مجازی.</li>
-    <li><strong>Mouse Keys</strong> = کنترل Pointer با Keyboard.</li>
-    <li>تنظیمات Accessibility در GNOME معمولاً در <code>Settings → Accessibility</code> قرار دارند.</li>
-</ul>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>⚠️ اشتباه ۴</strong><br>Sticky Keys باعث سریع‌تر شدن Keyboard می‌شود.<br><strong>❌ خیر.</strong><br>Sticky Keys برای <strong>ساده‌تر کردن استفاده از ترکیب چند کلید</strong> است.</div></div>
 
-<h2>جمع‌بندی مفهومی — به سبک فاینمن</h2>
-<p>فرض کن کامپیوتر یک در است. برای بعضی افراد، در معمولی کاملاً قابل استفاده است. اما برای بعضی‌ها باید روش باز کردن در را تغییر دهیم. Accessibility دقیقاً همین کار را می‌کند.</p>
-<p>اگر کاربر خوب نمی‌بیند:</p>
-<div class="code-container"><span class="code-label">بینایی</span><div class="code-block no-prompt">Screen Reader
-Magnification
-Large Text
-High Contrast</div></div>
-<p>اگر کاربر با Keyboard مشکل دارد:</p>
-<div class="code-container"><span class="code-label">کیبورد</span><div class="code-block no-prompt">Sticky Keys
-Slow Keys
-Bounce Keys
-On-Screen Keyboard</div></div>
-<p>اگر کاربر با Mouse مشکل دارد:</p>
-<div class="code-container"><span class="code-label">ماوس</span><div class="code-block no-prompt">Mouse Keys
-Pointer Settings</div></div>
-<p>پس Accessibility قابلیت سیستم را عوض نمی‌کند؛</p>
-<blockquote><strong>راه تعامل کاربر با سیستم را قابل‌دسترس‌تر می‌کند.</strong></blockquote>
+<h2>جمع‌بندی مفهومی</h2>
+<p>کل Accessibility را با این مدل ذهنی به خاطر بسپار:</p>
+<div class="code-container"><span class="code-label">مدل کلی</span><div class="code-block no-prompt">User
+ ↓
+Different Needs
+ ↓
+Accessibility
+ ↓
+Alternative / Easier Interaction</div></div>
+<p>چهار دسته اصلی:</p>
+<div class="code-container"><span class="code-label">دسته‌بندی کامل</span><div class="code-block no-prompt">Accessibility
+│
+├── 👁 Vision
+│    ├── Orca
+│    ├── Large Text
+│    ├── Magnification
+│    └── High Contrast
+│
+├── 👂 Hearing
+│    └── Visual Alerts
+│
+├── ⌨️ Keyboard
+│    ├── Sticky Keys
+│    ├── Slow Keys
+│    ├── Bounce Keys
+│    └── On-Screen Keyboard
+│
+└── 🖱 Mouse
+     └── Mouse Keys</div></div>
 
 <h2>Cheat Sheet</h2>
-<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Accessibility → دسترسی‌پذیر کردن GUI
+<div class="code-container"><span class="code-label">خلاصه سریع</span><div class="code-block no-prompt">Accessibility → آسان‌تر کردن استفاده از سیستم برای کاربران با نیازهای متفاوت
+
 Orca → Screen Reader
-Magnification → بزرگ‌نمایی صفحه
-Large Text → متن بزرگ‌تر
-High Contrast → کنتراست بیشتر
-Sticky Keys → Modifierها به‌صورت مرحله‌ای
-Slow Keys → جلوگیری از ثبت سریع/ناخواسته
-Bounce Keys → کنترل تکرار سریع کلید
+Large Text → افزایش اندازه متن
+Magnification → بزرگ‌نمایی صفحه یا محتوا
+High Contrast → افزایش خوانایی با کنتراست بیشتر
+
+Sticky Keys → استفاده آسان‌تر از ترکیب چند کلید
+Slow Keys → جلوگیری از ثبت ناخواسته فشارهای کوتاه
+Bounce Keys → کنترل تکرار سریع ناخواسته کلید
 On-Screen Keyboard → Keyboard مجازی
 Mouse Keys → کنترل Pointer با Keyboard</div></div>
 
 <h2>تست پایانی</h2>
 
 <div class="quiz-card"><p>❓ سؤال ۱</p>
-<p>Orca در محیط Linux چه کاربردی دارد؟</p>
+<p>Orca چه کاربردی دارد؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) مدیریت Printer</button>
     <button onclick="selectOption(this)">B) Screen Reader</button>
     <button onclick="selectOption(this)">C) مدیریت Package</button>
     <button onclick="selectOption(this)">D) مدیریت Network</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Screen Reader</strong><br>Orca برای خواندن عناصر و محتوای GUI به‌صورت صوتی استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Screen Reader</strong><br>Orca یک Screen Reader معروف در Linux است.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۲</p>
-<p>کاربر نمی‌تواند به‌راحتی <code>Ctrl + Alt + T</code> را با هم فشار دهد. کدام قابلیت می‌تواند کمک کند؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) Magnification</button>
-    <button onclick="selectOption(this)">B) Sticky Keys</button>
-    <button onclick="selectOption(this)">C) High Contrast</button>
-    <button onclick="selectOption(this)">D) Bounce Keys</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Sticky Keys</strong><br>Sticky Keys اجازه می‌دهد Modifierها مانند Ctrl و Alt مرحله‌ای استفاده شوند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ سؤال ۳</p>
-<p>کدام گزینه برای بزرگ‌نمایی قسمت‌های صفحه مناسب است؟</p>
+<p>کاربر نمی‌تواند به‌راحتی <code>Ctrl + Alt + T</code> را همزمان فشار دهد. کدام قابلیت مناسب‌تر است؟</p>
 <div class="quiz-options">
     <button onclick="selectOption(this)">A) Magnification</button>
     <button onclick="selectOption(this)">B) Sticky Keys</button>
     <button onclick="selectOption(this)">C) Orca</button>
     <button onclick="selectOption(this)">D) Mouse Keys</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — Magnification</strong><br>Magnification برای بزرگ‌نمایی محتوای صفحه است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Sticky Keys</strong><br>Sticky Keys امکان استفاده مرحله‌ای از کلیدهای modifier مانند Ctrl، Alt و Shift را فراهم می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ سؤال ۳</p>
+<p>برای بزرگ‌نمایی محتوا یا بخشی از صفحه کدام قابلیت مناسب است؟</p>
+<div class="quiz-options">
+    <button onclick="selectOption(this)">A) Large Text</button>
+    <button onclick="selectOption(this)">B) Magnification</button>
+    <button onclick="selectOption(this)">C) Orca</button>
+    <button onclick="selectOption(this)">D) Bounce Keys</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B — Magnification</strong><br>Magnification برای بزرگ‌نمایی محتوا یا بخشی از صفحه است، در حالی که Large Text فقط اندازه متن را افزایش می‌دهد.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۴</p>
-<p>کدام گزینه تفاوت Large Text و Magnification را درست بیان می‌کند؟</p>
+<p>تفاوت Large Text و Magnification چیست؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) هر دو فقط برای Keyboard هستند.</button>
-    <button onclick="selectOption(this)">B) Large Text اندازه متن را افزایش می‌دهد، Magnification صفحه/بخش‌های آن را بزرگ می‌کند.</button>
-    <button onclick="selectOption(this)">C) Large Text یک Screen Reader است.</button>
-    <button onclick="selectOption(this)">D) Magnification فقط برای Mouse است.</button>
+    <button onclick="selectOption(this)">A) هر دو یک کار انجام می‌دهند.</button>
+    <button onclick="selectOption(this)">B) Large Text متن را بزرگ می‌کند و Magnification محتوا را بزرگ‌نمایی می‌کند.</button>
+    <button onclick="selectOption(this)">C) Large Text برای Mouse است.</button>
+    <button onclick="selectOption(this)">D) Magnification برای Keyboard است.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>Large Text فقط اندازه فونت را بزرگ‌تر می‌کند، در حالی که Magnification کل صفحه یا بخش‌هایی از آن را بزرگ‌نمایی می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>این تفاوت مفهومی مهمی است که باید به خاطر بسپارید.</div>
 </div>
 
 <div class="quiz-card"><p>❓ سؤال ۵</p>
-<p>کاربر می‌خواهد با Keyboard، Pointer Mouse را کنترل کند. کدام قابلیت مناسب‌تر است؟</p>
+<p>کدام قابلیت امکان کنترل Pointer با Keyboard را فراهم می‌کند؟</p>
 <div class="quiz-options">
-    <button onclick="selectOption(this)">A) Mouse Keys</button>
-    <button onclick="selectOption(this)">B) Sticky Keys</button>
-    <button onclick="selectOption(this)">C) Orca</button>
+    <button onclick="selectOption(this)">A) Sticky Keys</button>
+    <button onclick="selectOption(this)">B) Orca</button>
+    <button onclick="selectOption(this)">C) Mouse Keys</button>
     <button onclick="selectOption(this)">D) Visual Alerts</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: A — Mouse Keys</strong><br>Mouse Keys اجازه می‌دهد Pointer را با صفحه‌کلید کنترل کنید: <code>Keyboard → Mouse Keys → Pointer</code></div>
-</div>
-
-<div class="quiz-card"><p>❓ سؤال ۶</p>
-<p>Bounce Keys بیشتر برای چه مشکلی کاربرد دارد؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) بزرگ کردن متن</button>
-    <button onclick="selectOption(this)">B) خواندن متن به صورت صوتی</button>
-    <button onclick="selectOption(this)">C) کنترل ثبت سریع و تکراری ناخواسته کلیدها</button>
-    <button onclick="selectOption(this)">D) اتصال به Printer</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: C</strong><br>Bounce Keys از ثبت چندباره یک کلید در اثر فشارهای ناخواسته و سریع جلوگیری می‌کند.</div>
-</div>
-
-<div class="quiz-card"><p>❓ سؤال ۷ — سناریویی</p>
-<p>کاربری در یک سیستم GNOME:</p>
-<ul>
-    <li>متن کوچک را سخت می‌بیند.</li>
-    <li>نمی‌تواند چند کلید را همزمان فشار دهد.</li>
-    <li>می‌خواهد Keyboard مجازی داشته باشد.</li>
-</ul>
-<p>کدام ترکیب منطقی‌تر است؟</p>
-<div class="quiz-options">
-    <button onclick="selectOption(this)">A) Orca + Mouse Keys + Visual Alerts</button>
-    <button onclick="selectOption(this)">B) Large Text/Magnification + Sticky Keys + On-Screen Keyboard</button>
-    <button onclick="selectOption(this)">C) Bounce Keys + High Contrast + Printer</button>
-    <button onclick="selectOption(this)">D) Wayland + X11 + GDM</button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ صحیح: B</strong><br>چون هر قابلیت یک مشکل مشخص را حل می‌کند: متن کوچک → Large Text / Magnification، فشار همزمان کلیدها → Sticky Keys، Keyboard فیزیکی → On-Screen Keyboard.</div>
+<div class="quiz-answer"><strong>✅ پاسخ صحیح: C — Mouse Keys</strong><br>Mouse Keys اجازه می‌دهد Pointer Mouse با استفاده از Keyboard کنترل شود.</div>
 </div>
 
 <div class="box important"><i class="fas fa-flag-checkered"></i><div><strong>🎯 Recall نهایی</strong><br>
-<p>این چهار دسته را در ذهنت نگه دار:</p>
-<div class="code-container"><span class="code-label">دسته‌بندی</span><div class="code-block no-prompt">Accessibility
-│
-├── 👁 Vision
-│    ├── Orca
-│    ├── Magnification
-│    ├── Large Text
-│    └── High Contrast
-│
-├── 👂 Hearing
-│    └── Visual Alerts
-│
-├── ⌨️ Typing
-│    ├── Sticky Keys
-│    ├── Slow Keys
-│    ├── Bounce Keys
-│    └── On-Screen Keyboard
-│
-└── 🖱 Pointing
-     └── Mouse Keys</div></div>
-<p>جلسه بعد: <strong>Remote Desktop + Local Access</strong>؛ یعنی بعد از اینکه GUI را شناختیم، یاد می‌گیریم چگونه به یک Linux Desktop از راه دور یا به Sessionهای محلی دسترسی پیدا کنیم.</p>
+<p>اگر فقط این چهار ارتباط را به خاطر بسپاری:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">مشکل دیدن → Orca / Large Text / Magnification
+
+مشکل Keyboard → Sticky Keys / Slow Keys / Bounce Keys
+
+نیاز به Keyboard مجازی → On-Screen Keyboard
+
+مشکل Mouse → Mouse Keys</div></div>
+<p>مفهوم اصلی جلسه را یاد گرفته‌ای:</p>
+<blockquote><strong>Accessibility عملکرد Linux را تغییر نمی‌دهد؛ بلکه استفاده از سیستم را برای کاربران با نیازهای متفاوت آسان‌تر می‌کند.</strong></blockquote>
+<p><strong>مسیر جلسه بعد:</strong> در جلسه بعد وارد موضوع <strong>Remote Desktop + Local Access</strong> می‌شویم و بررسی می‌کنیم چگونه می‌توان به محیط Linux و Sessionهای آن به‌صورت محلی یا از راه دور دسترسی داشت.</p>
 </div></div>
-` ,
+`
+,
 "ch6-3": `
 <div class="section-header">
     <div class="section-badge">۶</div>
