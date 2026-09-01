@@ -27,7 +27,11 @@
             --radius-sm: 14px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
@@ -39,7 +43,7 @@
             justify-content: center;
             align-items: center;
             background-image: radial-gradient(ellipse at 30% 20%, rgba(224, 124, 74, 0.06), transparent 60%),
-                              radial-gradient(ellipse at 80% 80%, rgba(224, 124, 74, 0.04), transparent 50%);
+                radial-gradient(ellipse at 80% 80%, rgba(224, 124, 74, 0.04), transparent 50%);
         }
 
         .container {
@@ -107,7 +111,9 @@
             box-shadow: var(--shadow-glow), 0 0 0 1px var(--border-hover);
         }
 
-        .chapter.active::before { opacity: 1; }
+        .chapter.active::before {
+            opacity: 1;
+        }
 
         .chapter.locked {
             opacity: 0.5;
@@ -233,8 +239,8 @@
             display: grid;
             grid-template-rows: 0fr;
             transition: grid-template-rows 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        margin 0.3s ease,
-                        padding 0.3s ease;
+                margin 0.3s ease,
+                padding 0.3s ease;
             margin-top: 0;
             padding-top: 0;
             border-top: 1px solid transparent;
@@ -275,16 +281,24 @@
             transform: translateY(0);
         }
 
-        .chapter.open .sub-item:nth-child(1) { transition-delay: 0.05s; }
-        .chapter.open .sub-item:nth-child(2) { transition-delay: 0.10s; }
-        .chapter.open .sub-item:nth-child(3) { transition-delay: 0.15s; }
-        .chapter.open .sub-item:nth-child(4) { transition-delay: 0.20s; }
+        .chapter.open .sub-item:nth-child(1) {
+            transition-delay: 0.05s;
+        }
+        .chapter.open .sub-item:nth-child(2) {
+            transition-delay: 0.10s;
+        }
+        .chapter.open .sub-item:nth-child(3) {
+            transition-delay: 0.15s;
+        }
+        .chapter.open .sub-item:nth-child(4) {
+            transition-delay: 0.20s;
+        }
 
         .sub-item:hover {
             background: var(--primary-soft);
             border-color: var(--border-hover);
             transform: translateX(-4px) scale(1.01);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .sub-icon {
@@ -420,170 +434,192 @@
         }
 
         @media (max-width: 400px) {
-            .chapter { padding: 14px 14px 12px; }
-            .title { font-size: 0.98rem; }
-            .desc { font-size: 0.75rem; padding-right: 38px; }
-            .sub-item { padding: 10px 12px; }
-            .sub-title { font-size: 0.82rem; }
-            .page-title { font-size: 1.3rem; }
+            .chapter {
+                padding: 14px 14px 12px;
+            }
+            .title {
+                font-size: 0.98rem;
+            }
+            .desc {
+                font-size: 0.75rem;
+                padding-right: 38px;
+            }
+            .sub-item {
+                padding: 10px 12px;
+            }
+            .sub-title {
+                font-size: 0.82rem;
+            }
+            .page-title {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
+    <div class="container">
 
-    <h1 class="page-title">نقشه راه امنیت سایبری</h1>
+        <h1 class="page-title">نقشه راه امنیت سایبری</h1>
 
-    <div class="roadmap glass">
-        
-        <!-- 1 – Network+ -->
-        <div class="chapter active" id="network-plus">
-            <div class="chapter-header" onclick="toggleChapter('network-plus')">
-                <div class="chapter-left">
-                    <div class="num">۱</div>
-                    <span class="title">Network+</span>
+        <div class="roadmap glass">
+
+            <!-- 1 – Network+ -->
+            <div class="chapter active" id="network-plus">
+                <div class="chapter-header" onclick="toggleChapter('network-plus')">
+                    <div class="chapter-left">
+                        <div class="num">۱</div>
+                        <span class="title">Network+</span>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge badge-on">در دسترس</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="header-right">
-                    <span class="badge badge-on">در دسترس</span>
-                    <div class="chevron">
-                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                <div class="desc">دوره شبکه‌های کامپیوتری شامل ۲۲ فصل جامع</div>
+
+                <div class="sub-list">
+                    <div class="sub-list-inner">
+                        <a href="network-plus.html" class="sub-item primary">
+                            <div class="sub-icon">📖</div>
+                            <div class="sub-content">
+                                <div class="sub-title">درسنامه</div>
+                                <div class="sub-desc">22 فصل کامل و جامع</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <a href="network-plus-exercises.html" class="sub-item">
+                            <div class="sub-icon">✏️</div>
+                            <div class="sub-content">
+                                <div class="sub-title">تمرین‌ها</div>
+                                <div class="sub-desc">تمرین 1 و 2 به همراه پاسخ</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <a href="network-plus-protocols.html" class="sub-item">
+                            <div class="sub-icon">🔗</div>
+                            <div class="sub-content">
+                                <div class="sub-title">پروتکل‌ها</div>
+                                <div class="sub-desc">شامل 6 جلسه</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="desc">دوره شبکه‌های کامپیوتری شامل ۲۲ فصل جامع</div>
 
-            <div class="sub-list">
-                <div class="sub-list-inner">
-                    <a href="network-plus.html" class="sub-item primary">
-                        <div class="sub-icon">📖</div>
-                        <div class="sub-content">
-                            <div class="sub-title">درسنامه</div>
-                            <div class="sub-desc">22 فصل کامل و جامع</div>
+            <!-- 2 – LPIC-1 -->
+            <div class="chapter active" id="lpic-1">
+                <div class="chapter-header" onclick="toggleChapter('lpic-1')">
+                    <div class="chapter-left">
+                        <div class="num">۲</div>
+                        <span class="title">LPIC-1</span>
+                    </div>
+                    <div class="header-right">
+                        <span class="badge badge-on">در دسترس</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
                         </div>
-                        <div class="sub-arrow">←</div>
-                    </a>
-                    <a href="network-plus-exercises.html" class="sub-item">
-                        <div class="sub-icon">✏️</div>
-                        <div class="sub-content">
-                            <div class="sub-title">تمرین‌ها</div>
-                            <div class="sub-desc">تمرین 1 و 2 به همراه پاسخ</div>
-                        </div>
-                        <div class="sub-arrow">←</div>
-                    </a>
-                    <a href="network-plus-protocols.html" class="sub-item">
-                        <div class="sub-icon">🔗</div>
-                        <div class="sub-content">
-                            <div class="sub-title">پروتکل‌ها</div>
-                            <div class="sub-desc">شامل 6 جلسه</div>
-                        </div>
-                        <div class="sub-arrow">←</div>
-                    </a> 
+                    </div>
                 </div>
-            </div>
-        </div>
+                <div class="desc">مدیریت، خط فرمان و کاربری سیستم‌عامل لینوکس</div>
 
-        <!-- 2 – LPIC-1 -->
-        <div class="chapter active" id="lpic-1">
-            <div class="chapter-header" onclick="toggleChapter('lpic-1')">
-                <div class="chapter-left">
-                    <div class="num">۲</div>
-                    <span class="title">LPIC-1</span>
-                </div>
-                <div class="header-right">
-                    <span class="badge badge-on">در دسترس</span>
-                    <div class="chevron">
-                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                <div class="sub-list">
+                    <div class="sub-list-inner">
+                        <a href="lpic-1.html" class="sub-item primary">
+                            <div class="sub-icon">📖</div>
+                            <div class="sub-content">
+                                <div class="sub-title">درسنامه</div>
+                                <div class="sub-desc">10 فصل کامل و جامع</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <a href="lpic-1-exercises.html" class="sub-item">
+                            <div class="sub-icon">✏️</div>
+                            <div class="sub-content">
+                                <div class="sub-title">تمرین‌ها</div>
+                                <div class="sub-desc">تمرین 1 تا 4 به همراه پاسخ</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <!-- خلاصه و مرور جدید -->
+                        <a href="lpic-1-review.html" class="sub-item">
+                            <div class="sub-icon">📝</div>
+                            <div class="sub-content">
+                                <div class="sub-title">خلاصه و مرور</div>
+                                <div class="sub-desc">مرور سریع مفاهیم کلیدی</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="desc">مدیریت، خط فرمان و کاربری سیستم‌عامل لینوکس</div>
 
-            <div class="sub-list">
-                <div class="sub-list-inner">
-                    <a href="lpic-1.html" class="sub-item primary">
-                        <div class="sub-icon">📖</div>
-                        <div class="sub-content">
-                            <div class="sub-title">درسنامه</div>
-                            <div class="sub-desc">10 فصل کامل و جامع</div>
-                        </div>
-                        <div class="sub-arrow">←</div>
-                    </a>
-                    <a href="lpic-1-exercises.html" class="sub-item">
-                        <div class="sub-icon">✏️</div>
-                        <div class="sub-content">
-                            <div class="sub-title">تمرین‌ها</div>
-                            <div class="sub-desc">تمرین  1 تا 4  به همراه پاسخ</div>
-                        </div>
-                        <div class="sub-arrow">←</div>
-                    </a>
+            <!-- 3 – Python -->
+            <a href="python.html" class="card locked">
+                <div class="card-top">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="num">۳</div>
+                        <span class="title">Python</span>
+                    </div>
+                    <span class="badge badge-off">به زودی</span>
                 </div>
-            </div>
+                <div class="desc">برنامه‌نویسی پایتون با رویکرد توسعه ابزارهای امنیت.</div>
+            </a>
+
+            <!-- 4 – MCSA -->
+            <a href="mcsa.html" class="card locked">
+                <div class="card-top">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="num">۴</div>
+                        <span class="title">MCSA</span>
+                    </div>
+                    <span class="badge badge-off">به زودی</span>
+                </div>
+                <div class="desc">مدیریت سرورهای مایکروسافت و سرویس‌های زیرساخت.</div>
+            </a>
+
+            <!-- 5 – CEH -->
+            <a href="ceh.html" class="card locked">
+                <div class="card-top">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="num">۵</div>
+                        <span class="title">CEH</span>
+                    </div>
+                    <span class="badge badge-off">به زودی</span>
+                </div>
+                <div class="desc">هکر قانون‌مند و آشنایی با تکنیک‌های تست نفوذ.</div>
+            </a>
+
+            <!-- 6 – SANS -->
+            <a href="sans.html" class="card locked">
+                <div class="card-top">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="num">۶</div>
+                        <span class="title">SANS</span>
+                    </div>
+                    <span class="badge badge-off">به زودی</span>
+                </div>
+                <div class="desc">دوره‌های تخصصی، پیشرفته و عملیاتی امنیت سایبری.</div>
+            </a>
+
         </div>
 
-        <!-- 3 – Python -->
-        <a href="python.html" class="card locked">
-            <div class="card-top">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <div class="num">۳</div>
-                    <span class="title">Python</span>
-                </div>
-                <span class="badge badge-off">به زودی</span>
-            </div>
-            <div class="desc">برنامه‌نویسی پایتون با رویکرد توسعه ابزارهای امنیت.</div>
-        </a>
-
-        <!-- 4 – MCSA -->
-        <a href="mcsa.html" class="card locked">
-            <div class="card-top">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <div class="num">۴</div>
-                    <span class="title">MCSA</span>
-                </div>
-                <span class="badge badge-off">به زودی</span>
-            </div>
-            <div class="desc">مدیریت سرورهای مایکروسافت و سرویس‌های زیرساخت.</div>
-        </a>
-
-        <!-- 5 – CEH -->
-        <a href="ceh.html" class="card locked">
-            <div class="card-top">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <div class="num">۵</div>
-                    <span class="title">CEH</span>
-                </div>
-                <span class="badge badge-off">به زودی</span>
-            </div>
-            <div class="desc">هکر قانون‌مند و آشنایی با تکنیک‌های تست نفوذ.</div>
-        </a>
-
-        <!-- 6 – SANS -->
-        <a href="sans.html" class="card locked">
-            <div class="card-top">
-                <div style="display:flex;align-items:center;gap:12px">
-                    <div class="num">۶</div>
-                    <span class="title">SANS</span>
-                </div>
-                <span class="badge badge-off">به زودی</span>
-            </div>
-            <div class="desc">دوره‌های تخصصی، پیشرفته و عملیاتی امنیت سایبری.</div>
-        </a>
-
+        <div class="footer">
+            <a href="https://t.me/ZeroDay_Ch" target="_blank" class="tg-btn">
+                <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                ZeroDay
+            </a>
+            <div class="sub-footer">تمامی حقوق برای navidyar.ir محفوظ است.</div>
+        </div>
     </div>
 
-    <div class="footer">
-        <a href="https://t.me/ZeroDay_Ch" target="_blank" class="tg-btn">
-            <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            ZeroDay
-        </a>
-        <div class="sub-footer">تمامی حقوق برای navidyar.ir محفوظ است.</div>
-    </div>
-</div>
-
-<script>
-    function toggleChapter(id) {
-        const chapter = document.getElementById(id);
-        chapter.classList.toggle('open');
-    }
-</script>
+    <script>
+        function toggleChapter(id) {
+            const chapter = document.getElementById(id);
+            chapter.classList.toggle('open');
+        }
+    </script>
 </body>
 </html>
