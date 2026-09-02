@@ -4247,56 +4247,79 @@
 <blockquote><strong>🎯 هدف جلسه:</strong> یاد بگیریم کاربران و Groupها در Linux چگونه مدیریت می‌شوند، تفاوت <code>su</code> و <code>sudo</code> چیست، Logها کجا و چگونه ثبت می‌شوند، زمان سیستم و NTP چگونه مدیریت می‌شود و در انتها با GUI، Printer و Remote Desktop آشنا شویم.</blockquote>
 
 <h2>قبل از شروع...</h2>
-<p>فرض کنید یک Linux Server دارید که چند کاربر روی آن کار می‌کنند. ممکن است بخواهید:</p>
+<p>فرض کن یک Linux Server داری که چند کاربر روی آن کار می‌کنند. ممکن است بخواهی:</p>
 <ul>
-<li>User جدید بسازید.</li>
-<li>User را عضو یک Group کنید.</li>
-<li>رمز عبور User را تغییر دهید.</li>
-<li>برای انجام یک دستور خاص دسترسی مدیریتی بدهید.</li>
-<li>بفهمید چه اتفاقی در سیستم افتاده است.</li>
-<li>ساعت سیستم را تنظیم و همگام کنید.</li>
-<li>Printer را مدیریت کنید.</li>
-<li>از راه دور به Server وصل شوید.</li>
-<li>در صورت نیاز محیط گرافیکی داشته باشید.</li>
+<li>User جدید بسازی.</li>
+<li>User را عضو یک Group کنی.</li>
+<li>رمز عبور User را تغییر دهی.</li>
+<li>برای انجام یک دستور خاص دسترسی مدیریتی بدهی.</li>
+<li>بفهمی چه اتفاقی در سیستم افتاده است.</li>
+<li>ساعت سیستم را تنظیم و همگام کنی.</li>
+<li>Printer را مدیریت کنی.</li>
+<li>از راه دور به Server وصل شوی.</li>
+<li>در صورت نیاز محیط گرافیکی داشته باشی.</li>
 </ul>
 <p>تمام این موضوعات، هسته‌ی جلسه‌ی هفتم هستند.</p>
 
 <h2>بخش اول — User و Group</h2>
 
 <h3>۱. User چیست؟</h3>
-<p>در Linux تقریباً هر کاری توسط یک <strong>User</strong> انجام می‌شود. سیستم بر اساس User مشخص می‌کند که این کاربر اجازه انجام چه کاری را دارد یا نه.</p>
+<p>در Linux تقریباً هر کاری توسط یک <strong>User</strong> انجام می‌شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">User\n ↓\nRun Command\n ↓\nAccess File\n ↓\nRun Process</div></div>
+<p>سیستم بر اساس User مشخص می‌کند:</p>
+<blockquote>این کاربر اجازه انجام این کار را دارد یا نه؟</blockquote>
 
 <h3>۲. Root چیست؟</h3>
-<p><code>root</code> کاربر مدیریتی Linux است. به‌صورت ساده: User معمولی → دسترسی محدودتر؛ <code>root</code> → دسترسی مدیریتی بسیار گسترده. Root می‌تواند کارهایی انجام دهد که User معمولی اجازه انجام آن‌ها را ندارد.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>root</code> → UID 0. شناسه‌ی کاربر root معمولاً <code>UID = 0</code> است.</div></div>
+<p><code>root</code> کاربر مدیریتی Linux است. به‌صورت ساده:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Normal User\n→ دسترسی محدودتر\n\nroot\n→ دسترسی مدیریتی بسیار گسترده</div></div>
+<p>Root می‌تواند کارهایی انجام دهد که User معمولی اجازه انجام آن‌ها را ندارد؛ مانند:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">useradd ...</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl restart ...</div></div>
+<p>در بسیاری از سیستم‌ها برای انجام کارهای مدیریتی از <code>sudo</code> استفاده می‌شود تا لازم نباشد مستقیماً با حساب root کار کنیم.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> شناسه‌ی کاربر <code>root</code> معمولاً <code>UID = 0</code> است.</div></div>
 
 <h3>۳. UID چیست؟</h3>
-<p>هر User در Linux یک شناسه‌ی عددی دارد: <strong>UID = User ID</strong>. مثال: <code>ali → UID 1000</code>، <code>sara → UID 1001</code>. برای root: <code>root → UID 0</code>. سیستم در سطح داخلی بیشتر با UID کار می‌کند تا فقط نام User.</p>
+<p>هر User در Linux یک شناسه‌ی عددی دارد: <strong>UID = User ID</strong>. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">ali → UID 1000\nsara → UID 1001</div></div>
+<p>برای root:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">root → UID 0</div></div>
+<p>سیستم در سطح داخلی بیشتر با UID کار می‌کند تا فقط نام User.</p>
 
 <h3>۴. مشاهده Userها</h3>
-<p>اطلاعات Userها در <code>/etc/passwd</code> نگهداری می‌شود.</p>
+<p>اطلاعات Userها در:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/etc/passwd</div></div>
+<p>نگهداری می‌شود. مشاهده:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat /etc/passwd</div></div>
-<p>یک Entry نمونه: <code>ali:x:1000:1000:Ali:/home/ali:/bin/bash</code></p>
-<p>به‌صورت مفهومی: <code>username → password placeholder → UID → GID → home → shell</code></p>
+<p>مثلاً یک Entry می‌تواند شبیه این باشد:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block">ali:x:1000:1000:Ali:/home/ali:/bin/bash</div></div>
+<p>به‌صورت مفهومی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">username\n   ↓\npassword placeholder\n   ↓\nUID\n   ↓\nGID\n   ↓\nhome\n   ↓\nshell</div></div>
 
 <h3>۵. <code>/etc/passwd</code></h3>
 <p>فایل <code>/etc/passwd</code> اطلاعات پایه‌ی Accountهای User را نگهداری می‌کند.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> در سیستم‌های مدرن، Password واقعی User معمولاً داخل <code>/etc/passwd</code> ذخیره نمی‌شود. مقادیر Hash شده‌ی Password معمولاً در <code>/etc/shadow</code> قرار دارند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> در سیستم‌های مدرن، Password واقعی User معمولاً داخل <code>/etc/passwd</code> ذخیره نمی‌شود. مقادیر Hash شده‌ی Password معمولاً در <code>/etc/shadow</code> قرار دارند.</div></div>
 
 <h3>۶. <code>/etc/shadow</code></h3>
 <p>این فایل اطلاعات حساس مربوط به Passwordهای User را نگهداری می‌کند.</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">/etc/passwd → اطلاعات Account\n/etc/shadow → اطلاعات Password / Authentication</div></div>
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block no-prompt">/etc/passwd\n→ اطلاعات Account</div></div>
+<div class="code-container"><span class="code-label">shadow</span><div class="code-block no-prompt">/etc/shadow\n→ اطلاعات Password / Authentication</div></div>
 <p>دسترسی به <code>/etc/shadow</code> معمولاً محدودتر است.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>passwd</code> → User Account information؛ <code>shadow</code> → Password information.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>passwd</code> → User Account information؛ <code>shadow</code> → Password information.</div></div>
 
 <h3>۷. Group چیست؟</h3>
-<p>Group مجموعه‌ای از Userهاست که می‌توانند یک سطح دسترسی یا نقش مشترک داشته باشند. به جای اینکه Permission را برای تک‌تک Userها تنظیم کنیم، می‌توانیم آن را برای Group تنظیم کنیم.</p>
+<p>Group مجموعه‌ای از Userهاست که می‌توانند یک سطح دسترسی یا نقش مشترک داشته باشند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">developers\n│\n├── ali\n├── sara\n└── reza</div></div>
+<p>به جای اینکه Permission را برای تک‌تک Userها تنظیم کنیم، می‌توانیم آن را برای Group تنظیم کنیم.</p>
 
 <h3>۸. GID چیست؟</h3>
-<p>هر Group نیز یک شناسه عددی دارد: <strong>GID = Group ID</strong>. مثال: <code>developers → GID 1002</code>.</p>
+<p>هر Group نیز یک شناسه عددی دارد: <strong>GID = Group ID</strong>. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">developers → GID 1002</div></div>
 
 <h3>۹. <code>/etc/group</code></h3>
-<p>اطلاعات Groupها معمولاً در <code>/etc/group</code> قرار دارد.</p>
+<p>اطلاعات Groupها معمولاً در:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/etc/group</div></div>
+<p>قرار دارد. مشاهده:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat /etc/group</div></div>
 
 <h2>بخش دوم — ساخت و مدیریت User</h2>
@@ -4304,28 +4327,34 @@
 <h3>۱۰. <code>useradd</code></h3>
 <p>برای ایجاد User:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo useradd ali</div></div>
-<p>برای ساخت User همراه با Home Directory:</p>
+<p>اما این دستور به‌تنهایی ممکن است تمام تنظیمات مورد انتظار یک User معمولی، مانند Home Directory، را ایجاد نکند؛ بسته به گزینه‌ها و Distribution. برای ساخت User همراه با Home Directory معمولاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo useradd -m ali</div></div>
-<p><code>-m</code> → Create Home Directory.</p>
+<p>استفاده می‌شود.</p>
+<div class="code-container"><span class="code-label">گزینه</span><div class="code-block no-prompt">-m\n↓\nCreate Home Directory</div></div>
 
 <h3>۱۱. <code>passwd</code></h3>
 <p>برای تعیین یا تغییر Password:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo passwd ali</div></div>
-<p>برای تغییر Password User فعلی:</p>
+<p>سپس Password جدید را وارد می‌کنیم. برای تغییر Password User فعلی:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">passwd</div></div>
 
 <h3>۱۲. <code>usermod</code></h3>
-<p>برای تغییر ویژگی‌های User. مثال اضافه کردن User به یک Group:</p>
+<p>برای تغییر ویژگی‌های User:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo usermod ...</div></div>
+<p>مثلاً اضافه کردن User به یک Group:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo usermod -aG developers ali</div></div>
-<p><code>-a</code> → append، <code>-G</code> → supplementary groups. یعنی Group <code>developers</code> را به Groupهای supplementary کاربر <code>ali</code> اضافه کن.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>usermod -G developers ali</code> می‌تواند Groupهای supplementary قبلی را جایگزین کند، اما <code>usermod -aG developers ali</code> عضویت جدید را <strong>اضافه</strong> می‌کند. پس <code>-aG</code> → Add to supplementary group یکی از نکات مهم امتحانی است.</div></div>
+<p>معنی:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-a → append\n-G → supplementary groups</div></div>
+<p>یعنی:</p>
+<blockquote>Group <code>developers</code> را به Groupهای supplementary کاربر <code>ali</code> اضافه کن.</blockquote>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> دقت کن: <code>usermod -G developers ali</code> می‌تواند Groupهای supplementary قبلی را جایگزین کند. اما <code>usermod -aG developers ali</code> عضویت جدید را <strong>اضافه</strong> می‌کند. پس <code>-aG</code> → Add to supplementary group، یکی از نکات مهم امتحانی است.</div></div>
 
 <h3>۱۳. <code>userdel</code></h3>
 <p>برای حذف User:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo userdel ali</div></div>
 <p>اگر بخواهیم Home Directory نیز حذف شود:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo userdel -r ali</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار</strong> <code>-r</code> می‌تواند Home Directory و Mail Spool مربوط به User را نیز حذف کند. <code>userdel</code> → حذف Account؛ <code>userdel -r</code> → حذف Account + داده‌های مرتبط مشخص.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار</strong> <code>-r</code> می‌تواند Home Directory و Mail Spool مربوط به User را نیز حذف کند. پس <code>userdel</code> → حذف Account؛ <code>userdel -r</code> → حذف Account + داده‌های مرتبط مشخص.</div></div>
 
 <h2>بخش سوم — مدیریت Group</h2>
 
@@ -4339,8 +4368,12 @@
 
 <h3>۱۶. مشاهده عضویت Group</h3>
 <p>برای دیدن Groupهای User:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">groups ali\nid ali</div></div>
-<p><code>id</code> اطلاعاتی مانند UID، GID و Groups را نشان می‌دهد.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">groups ali</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">id ali</div></div>
+<p><code>id</code> اطلاعاتی مانند:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">UID\nGID\nGroups</div></div>
+<p>را نشان می‌دهد.</p>
 
 <h3>جدول طلایی User و Group</h3>
 <table>
@@ -4357,162 +4390,276 @@
 </tbody>
 </table>
 
-<h2>بخش چهارم — su</h2>
+<h2>بخش چهارم — <code>su</code></h2>
 
 <h3>۱۷. <code>su</code> چیست؟</h3>
-<p><code>su</code> مخفف <strong>Switch User</strong> است. با آن می‌توانیم Shell را با User دیگری اجرا کنیم.</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">su ali\nsu -</div></div>
+<p><code>su</code> مخفف <strong>Switch User</strong> است. با آن می‌توانیم Shell را با User دیگری اجرا کنیم. مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">su ali</div></div>
+<p>یا برای گرفتن Shell به‌عنوان root:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">su -</div></div>
 
 <h3>۱۸. چرا <code>su -</code> مهم است؟</h3>
-<p>وقتی <code>su -</code> می‌نویسیم، یک Login Shell برای User مقصد ایجاد می‌شود. در نتیجه محیط آن User، از جمله Environment و مسیر Home، نیز مطابق User مقصد تنظیم می‌شود.</p>
+<p>وقتی می‌نویسیم <code>su -</code>، یک Login Shell برای User مقصد ایجاد می‌شود. در نتیجه محیط آن User، از جمله Environment و مسیر Home، نیز مطابق User مقصد تنظیم می‌شود. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Current User\n      ↓\n    su -\n      ↓\nLogin Shell\n      ↓\n   root</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>su</code> → Switch User؛ <code>su -</code> → Login Shell as target User.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>su</code> → Switch User؛ <code>su -</code> → Login Shell as target User.</div></div>
 
-<h2>بخش پنجم — sudo</h2>
+<h2>بخش پنجم — <code>sudo</code></h2>
 
 <h3>۱۹. <code>sudo</code> چیست؟</h3>
-<p><code>sudo</code> یعنی <strong>اجرای یک Command با مجوز User دیگر، معمولاً root</strong>.</p>
+<p><code>sudo</code> یعنی:</p>
+<blockquote>اجرای یک Command با مجوز User دیگر، معمولاً root.</blockquote>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo systemctl restart ssh</div></div>
+<p>در اینجا User معمولی دستور مدیریتی را با مجوز مناسب اجرا می‌کند.</p>
 
 <h3>۲۰. <code>su</code> vs <code>sudo</code></h3>
 <p>این تفاوت بسیار مهم است.</p>
-<ul>
-<li><code>su</code> → Switch User → Shell</li>
-<li><code>sudo</code> → Run one command with elevated privileges</li>
-</ul>
+<div class="code-container"><span class="code-label">su</span><div class="code-block no-prompt">su\n↓\nSwitch User\n↓\nShell</div></div>
+<div class="code-container"><span class="code-label">sudo</span><div class="code-block no-prompt">sudo\n↓\nRun one command\n↓\nwith elevated privileges</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo apt update</div></div>
+<p>فقط همان Command را با مجوز لازم اجرا می‌کنیم.</p>
 
-<h3>۲۱. چرا <code>sudo</code> بهتر از Login مستقیم به root می‌تواند باشد؟</h3>
+<h3>۲۱. چرا sudo بهتر از Login مستقیم به root می‌تواند باشد؟</h3>
 <p>استفاده از <code>sudo</code> معمولاً امکان می‌دهد:</p>
 <ul>
 <li>دسترسی مدیریتی محدودتر باشد.</li>
 <li>مشخص باشد چه Userای چه Commandی اجرا کرده است.</li>
 <li>نیاز به استفاده دائمی از Shell root کاهش یابد.</li>
 </ul>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Normal User\n     │\n     ├── Normal Commands\n     │\n     └── sudo\n          ↓\n     Administrative Command</div></div>
 
 <h3>۲۲. <code>sudoers</code></h3>
-<p>قواعد <code>sudo</code> در <code>/etc/sudoers</code> و فایل‌های مرتبط در <code>/etc/sudoers.d/</code> قرار می‌گیرند. برای ویرایش فایل اصلی بهتر است از <code>visudo</code> استفاده شود، چون Syntax را بررسی می‌کند و از خراب شدن Configuration جلوگیری می‌کند.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>sudo</code> → اجرای Command با Privilege بالاتر؛ <code>sudoers</code> → تعریف اینکه چه کسی چه دسترسی‌ای داشته باشد؛ <code>visudo</code> → ویرایش امن Configuration مربوط به sudo.</div></div>
+<p>قواعد <code>sudo</code> در:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/etc/sudoers</div></div>
+<p>و فایل‌های مرتبط در:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block">/etc/sudoers.d/</div></div>
+<p>قرار می‌گیرند. برای ویرایش فایل اصلی بهتر است از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">visudo</div></div>
+<p>استفاده شود. چرا؟ چون Syntax را بررسی می‌کند و از خراب شدن Configuration جلوگیری می‌کند.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>sudo</code> → اجرای Command با Privilege بالاتر؛ <code>sudoers</code> → تعریف اینکه چه کسی چه دسترسی‌ای داشته باشد؛ <code>visudo</code> → ویرایش امن Configuration مربوط به sudo.</div></div>
 
 <h2>بخش ششم — Logs</h2>
 
 <h3>۲۳. Log چیست؟</h3>
-<p>Log گزارشی از اتفاقات سیستم است: Login، Error، Service Start، Service Stop، Authentication، Kernel Event و ... .</p>
+<p>Log گزارشی از اتفاقات سیستم است. مثلاً:</p>
+<div class="code-container"><span class="code-label">نمونه‌ها</span><div class="code-block no-prompt">Login\nError\nService Start\nService Stop\nAuthentication\nKernel Event</div></div>
+<p>ممکن است در Log ثبت شوند. مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Event\n  ↓\nLogging System\n  ↓\nLog\n  ↓\nTroubleshooting</div></div>
 
 <h3>۲۴. چرا Log مهم است؟</h3>
-<p>به جای حدس زدن، به Log مراجعه می‌کنیم. <strong>Log → Evidence → Troubleshooting</strong>.</p>
+<p>فرض کن SSH کار نمی‌کند. به جای حدس زدن:</p>
+<div class="code-container"><span class="code-label">حدس‌ها</span><div class="code-block no-prompt">SSH مشکل دارد؟\nNetwork مشکل دارد؟\nAuthentication مشکل دارد؟\nConfiguration مشکل دارد؟</div></div>
+<p>به Log مراجعه می‌کنیم. پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">Log\n→ Evidence\n→ Troubleshooting</div></div>
 
 <h3>۲۵. <code>/var/log</code></h3>
-<p>در بسیاری از Linuxها فایل‌های Log در <code>/var/log/</code> قرار دارند. مثال‌ها: <code>/var/log/auth.log</code> در Debian-basedها یا <code>/var/log/secure</code> در برخی Red Hat-basedها.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> نام دقیق فایل‌های Log بین Distributionها یکسان نیست، اما <code>/var/log</code> یک مسیر مهم و شناخته‌شده برای Logs است.</div></div>
+<p>در بسیاری از Linuxها فایل‌های Log در:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block">/var/log/</div></div>
+<p>قرار دارند. مثلاً ممکن است فایل‌هایی مانند:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/var/log/auth.log</div></div>
+<p>در Debian-basedها یا:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/var/log/secure</div></div>
+<p>در برخی Red Hat-basedها وجود داشته باشند.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> نام دقیق فایل‌های Log بین Distributionها یکسان نیست. اما <code>/var/log</code> یک مسیر مهم و شناخته‌شده برای Logs است.</div></div>
 
 <h3>۲۶. systemd Journal</h3>
 <p>در سیستم‌های systemd-based، Logها می‌توانند توسط <strong>systemd-journald</strong> جمع‌آوری شوند. برای مشاهده:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl -b</div></div>
+<p>یعنی:</p>
+<blockquote>Logهای مربوط به Boot فعلی.</blockquote>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl -u ssh</div></div>
+<p>برای مشاهده Logهای یک Service مشخص.</p>
 
 <h3>۲۷. <code>journalctl</code></h3>
 <p>چند دستور مهم:</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">journalctl          # همه Journalهای قابل دسترس\njournalctl -b       # Logهای Boot فعلی\njournalctl -u nginx # Logهای Service مشخص\njournalctl -f       # مشاهده‌ی زنده‌ی Logها</div></div>
-<p><code>-b</code> → Boot، <code>-u</code> → Unit/Service، <code>-f</code> → Follow.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال درباره‌ی Logهای systemd باشد، <code>journalctl</code> یکی از مهم‌ترین دستورات است.</div></div>
+<div class="code-container"><span class="code-label">همه</span><div class="code-block">journalctl</div></div>
+<p>همه Journalهای قابل دسترس.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl -b</div></div>
+<p>Logهای Boot فعلی.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl -u nginx</div></div>
+<p>Logهای Service مشخص.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">journalctl -f</div></div>
+<p>مشاهده‌ی زنده‌ی Logها. مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">journalctl\n│\n├── -b → Boot\n├── -u → Unit/Service\n└── -f → Follow</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> اگر سؤال درباره‌ی Logهای systemd باشد، <code>journalctl</code> یکی از مهم‌ترین دستورات است.</div></div>
 
 <h2>بخش هفتم — Time در Linux</h2>
 
 <h3>۲۸. چرا Time مهم است؟</h3>
-<p>زمان درست برای مواردی مانند Logها، Authentication، Certificateها، Cron، Troubleshooting و Distributed Systems مهم است. اگر ساعت اشتباه باشد، ممکن است ترتیب واقعی اتفاقات را اشتباه تحلیل کنیم.</p>
+<p>زمان درست فقط برای نمایش ساعت نیست. در Linux زمان برای مواردی مانند:</p>
+<ul>
+<li>Logها</li>
+<li>Authentication</li>
+<li>Certificateها</li>
+<li>Cron</li>
+<li>Troubleshooting</li>
+<li>Distributed Systems</li>
+</ul>
+<p>مهم است. مثلاً اگر ساعت اشتباه باشد:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Log A → 10:00\nLog B → 08:00</div></div>
+<p>ممکن است ترتیب واقعی اتفاقات را اشتباه تحلیل کنیم.</p>
 
 <h3>۲۹. مشاهده زمان</h3>
+<p>دستور:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">date</div></div>
+<p>زمان فعلی سیستم را نشان می‌دهد.</p>
 
 <h3>۳۰. <code>timedatectl</code></h3>
 <p>در سیستم‌های systemd-based:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl\ntimedatectl status</div></div>
-<p>اطلاعاتی درباره‌ی Local Time، Universal Time، RTC Time، Time Zone و NTP نشان می‌دهد.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl</div></div>
+<p>برای مشاهده و مدیریت تنظیمات زمان استفاده می‌شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl status</div></div>
+<p>اطلاعاتی درباره‌ی:</p>
+<div class="code-container"><span class="code-label">اطلاعات</span><div class="code-block no-prompt">Local Time\nUniversal Time\nRTC Time\nTime Zone\nNTP</div></div>
+<p>نشان می‌دهد.</p>
 
 <h3>۳۱. Time Zone</h3>
-<p>Time Zone مشخص می‌کند ساعت محلی سیستم چگونه نسبت به UTC نمایش داده شود. مثال‌ها: <code>UTC</code>، <code>Europe/Paris</code>، <code>Asia/Tehran</code>.</p>
-<p>برای تنظیم Time Zone:</p>
+<p>Time Zone مشخص می‌کند ساعت محلی سیستم چگونه نسبت به UTC نمایش داده شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">UTC\nEurope/Paris\nAsia/Tehran</div></div>
+<p>برای مشاهده:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl</div></div>
+<p>برای تنظیم Time Zone می‌توان از:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo timedatectl set-timezone Europe/Paris</div></div>
+<p>استفاده کرد.</p>
 
 <h3>۳۲. UTC چیست؟</h3>
-<p><strong>UTC</strong> یک استاندارد جهانی برای زمان است. در سیستم‌های مختلف ممکن است زمان محلی متفاوت باشد، اما UTC یک مرجع مشترک فراهم می‌کند.</p>
+<p><strong>UTC</strong> یک استاندارد جهانی برای زمان است. در سیستم‌های مختلف ممکن است زمان محلی متفاوت باشد، اما UTC یک مرجع مشترک فراهم می‌کند. مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">UTC\n ↓\nTime Zone\n ↓\nLocal Time</div></div>
 
 <h2>بخش هشتم — NTP</h2>
 
 <h3>۳۳. NTP چیست؟</h3>
-<p><strong>NTP = Network Time Protocol</strong> پروتکلی برای همگام‌سازی ساعت سیستم با Time Serverها است.</p>
+<p><strong>NTP = Network Time Protocol</strong>، پروتکلی برای همگام‌سازی ساعت سیستم با Time Serverها است. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Time Server\n     ↓\n    NTP\n     ↓\nLinux System\n     ↓\nCorrect Time</div></div>
 
 <h3>۳۴. چرا NTP مهم است؟</h3>
-<p>اختلاف زمان بین Serverها می‌تواند در Log Analysis، Authentication، Distributed Systems و Security مشکل ایجاد کند. NTP کمک می‌کند زمان سیستم‌ها هماهنگ بماند.</p>
+<p>فرض کن چند Server داریم:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">Server A → 10:00:02\nServer B → 09:59:40\nServer C → 10:00:05</div></div>
+<p>این اختلاف می‌تواند در:</p>
+<ul>
+<li>Log Analysis</li>
+<li>Authentication</li>
+<li>Distributed Systems</li>
+<li>Security</li>
+</ul>
+<p>مشکل ایجاد کند. NTP کمک می‌کند زمان سیستم‌ها هماهنگ بماند.</p>
 
 <h3>۳۵. NTP در systemd</h3>
-<p>در بسیاری از systemd-based systems می‌توان وضعیت NTP را با <code>timedatectl</code> دید. در بعضی سیستم‌ها سرویس‌هایی مانند <code>chronyd</code> و <code>systemd-timesyncd</code> برای Time Synchronization استفاده می‌شوند.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> مهم‌ترین مفهوم: <code>NTP</code> → Network Time Synchronization. لازم نیست نام تمام پیاده‌سازی‌ها را حفظ کنیم.</div></div>
+<p>در بسیاری از systemd-based systems می‌توان وضعیت NTP را با:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl</div></div>
+<p>دید. مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">System clock synchronized: yes\nNTP service: active</div></div>
+<p>در بعضی سیستم‌ها سرویس‌هایی مانند:</p>
+<div class="code-container"><span class="code-label">سرویس‌ها</span><div class="code-block no-prompt">chronyd\nsystemd-timesyncd</div></div>
+<p>برای Time Synchronization استفاده می‌شوند.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> مهم‌ترین مفهوم: <code>NTP</code> → Network Time Synchronization. لازم نیست نام تمام پیاده‌سازی‌ها را حفظ کنیم.</div></div>
 
 <h2>بخش نهم — Printer Management</h2>
 
 <h3>۳۶. Printer در Linux</h3>
-<p>یکی از سیستم‌های رایج <strong>CUPS</strong> است. CUPS مخفف <strong>Common UNIX Printing System</strong> است.</p>
+<p>Linux می‌تواند Printerها را مدیریت کند. یکی از سیستم‌های رایج <strong>CUPS</strong> است. CUPS مخفف <strong>Common UNIX Printing System</strong> است.</p>
 
 <h3>۳۷. CUPS چیست؟</h3>
-<p>CUPS یک سیستم Printing است که مدیریت Printer و Print Jobها را فراهم می‌کند.</p>
+<p>CUPS یک سیستم Printing است که مدیریت Printer و Print Jobها را فراهم می‌کند. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Application\n    ↓\nPrint Job\n    ↓\nCUPS\n    ↓\nPrinter</div></div>
 
 <h3>۳۸. Printer Queue</h3>
-<p>Print Jobها در Queue قرار می‌گیرند و CUPS آن‌ها را مدیریت می‌کند.</p>
+<p>فرض کن سه فایل برای چاپ داریم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">job1\njob2\njob3</div></div>
+<p>آن‌ها در Queue قرار می‌گیرند:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Print Queue\n│\n├── job1\n├── job2\n└── job3</div></div>
+<p>CUPS این Jobها را مدیریت می‌کند.</p>
 
 <h3>۳۹. دستورهای مهم Printing</h3>
-<p>در محیط‌های CUPS می‌توان از ابزارهایی مانند <code>lp</code> و <code>lpstat</code> استفاده کرد.</p>
-<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">lp report.pdf           # ارسال فایل برای چاپ\nlpstat -p               # مشاهده وضعیت</div></div>
+<p>در محیط‌های CUPS می‌توان از ابزارهایی مانند <code>lp</code> و <code>lpstat</code> استفاده کرد. مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lp report.pdf</div></div>
+<p>ارسال فایل برای چاپ. مشاهده وضعیت:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">lpstat -p</div></div>
 
 <h3>۴۰. CUPS Service</h3>
-<p>در بسیاری از سیستم‌ها Service مربوط به CUPS <code>cups</code> است.</p>
+<p>در بسیاری از سیستم‌ها Service مربوط به CUPS:</p>
+<div class="code-container"><span class="code-label">Service</span><div class="code-block">cups</div></div>
+<p>است. می‌توان وضعیت آن را بررسی کرد:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">systemctl status cups</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>CUPS</code> → Printing System؛ <code>lp</code> → Send Print Job؛ <code>lpstat</code> → Printer / Queue Status.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>CUPS</code> → Printing System؛ <code>lp</code> → Send Print Job؛ <code>lpstat</code> → Printer / Queue Status.</div></div>
 
 <h2>بخش دهم — GUI</h2>
 
 <h3>۴۱. GUI چیست؟</h3>
-<p><strong>GUI = Graphical User Interface</strong> یعنی محیطی که کاربر به جای فقط Command Line، با عناصر گرافیکی مانند Windows، Menus، Buttons، Icons و Mouse کار می‌کند.</p>
+<p><strong>GUI = Graphical User Interface</strong>، یعنی محیطی که کاربر به جای فقط Command Line، با عناصر گرافیکی مانند:</p>
+<div class="code-container"><span class="code-label">عناصر</span><div class="code-block no-prompt">Windows\nMenus\nButtons\nIcons\nMouse</div></div>
+<p>کار می‌کند.</p>
 
 <h3>۴۲. CLI vs GUI</h3>
-<p>CLI: <code>Command → Shell → Output</code>. GUI: <code>Mouse / Keyboard → Graphical Application → System</code>.</p>
+<h4>CLI</h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Command\n ↓\nShell\n ↓\nOutput</div></div>
+<h4>GUI</h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Mouse / Keyboard\n       ↓\nGraphical Application\n       ↓\nSystem</div></div>
 
 <h3>۴۳. آیا GUI همان Linux است؟</h3>
-<p>خیر. <strong>Linux → Kernel</strong>؛ GUI → Graphical Environment. Linux می‌تواند بدون GUI نیز اجرا شود. مثلاً یک Server ممکن است فقط CLI داشته باشد.</p>
+<p>خیر. این نکته مهم است.</p>
+<div class="code-container"><span class="code-label">Linux</span><div class="code-block no-prompt">Linux\n→ Kernel</div></div>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI\n→ Graphical Environment</div></div>
+<p>یعنی Linux می‌تواند بدون GUI نیز اجرا شود. مثلاً یک Server ممکن است فقط:</p>
+<div class="code-container"><span class="code-label">محیط</span><div class="code-block">CLI</div></div>
+<p>داشته باشد.</p>
 
 <h3>۴۴. Display Server</h3>
-<p>در Linux سنتی <strong>X Window System</strong> بسیار رایج بوده است. در سیستم‌های مدرن <strong>Wayland</strong> نیز بسیار رایج است.</p>
+<p>برای محیط گرافیکی یک لایه‌ی مهم وجود دارد که ارتباط Applicationها با Display/Input را مدیریت می‌کند. در Linux سنتی:</p>
+<div class="code-container"><span class="code-label">سیستم</span><div class="code-block">X Window System</div></div>
+<p>بسیار رایج بوده است. در سیستم‌های مدرن:</p>
+<div class="code-container"><span class="code-label">سیستم</span><div class="code-block">Wayland</div></div>
+<p>نیز بسیار رایج است. مدل ساده:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">GUI Application\n      ↓\nDisplay System\n   ┌──┴──┐\n   ↓     ↓\n   X   Wayland</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> برای LPIC-1 بدانید: <code>X</code> → قدیمی‌تر و بسیار رایج؛ <code>Wayland</code> → معماری مدرن‌تر.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> برای LPIC-1 بدان: <code>X</code> → قدیمی‌تر و بسیار رایج؛ <code>Wayland</code> → معماری مدرن‌تر. لازم نیست وارد جزئیات پیاده‌سازی آن‌ها شویم.</div></div>
 
 <h3>۴۵. Desktop Environment</h3>
-<p>Desktop Environment مجموعه‌ای از اجزای گرافیکی است که یک محیط کامل Desktop فراهم می‌کند. نمونه‌ها: <code>GNOME</code>، <code>KDE Plasma</code>، <code>XFCE</code>.</p>
+<p>Desktop Environment مجموعه‌ای از اجزای گرافیکی است که یک محیط کامل Desktop فراهم می‌کند. نمونه‌ها:</p>
+<div class="code-container"><span class="code-label">نمونه‌ها</span><div class="code-block no-prompt">GNOME\nKDE Plasma\nXFCE</div></div>
+<p>مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Linux\n ↓\nDisplay System\n ↓\nDesktop Environment\n ↓\nGUI Applications</div></div>
 
 <h3>۴۶. Window Manager</h3>
-<p>Window Manager مسئول مدیریت Windowها (Move, Resize, Minimize, Maximize) است. در Desktop Environmentهای کامل، Window Management بخشی از معماری Desktop است.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> Desktop Environment و Window Manager را یکی ندانید. Desktop Environment → محیط کامل Desktop؛ Window Manager → مدیریت Windowها.</div></div>
+<p>Window Manager مسئول مدیریت Windowها است. مثلاً:</p>
+<div class="code-container"><span class="code-label">وظایف</span><div class="code-block no-prompt">Window\nMove\nResize\nMinimize\nMaximize</div></div>
+<p>را مدیریت می‌کند. در Desktop Environmentهای کامل، Window Management بخشی از معماری Desktop است.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> Desktop Environment و Window Manager را یکی ندان. <code>Desktop Environment</code> → محیط کامل Desktop؛ <code>Window Manager</code> → مدیریت Windowها.</div></div>
 
 <h2>بخش یازدهم — Remote Desktop</h2>
 
 <h3>۴۷. Remote Access چیست؟</h3>
+<p>گاهی می‌خواهیم از یک سیستم دیگر به Linux وصل شویم. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Your PC\n    │\n    │ Network\n    ↓\nLinux Server</div></div>
 <p>اگر فقط Shell لازم داشته باشیم، معمولاً <strong>SSH</strong> راه‌حل اصلی است. اما اگر GUI کامل بخواهیم، به Remote Desktop Technology نیاز داریم.</p>
 
 <h3>۴۸. Remote Desktop</h3>
-<p>Remote Desktop یعنی مشاهده و کنترل محیط Desktop یک سیستم از طریق شبکه.</p>
+<p>Remote Desktop یعنی:</p>
+<blockquote>مشاهده و کنترل محیط Desktop یک سیستم از طریق شبکه.</blockquote>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Client\n   │\n   │ Network\n   ↓\nLinux Server\n   │\n   ↓\nDesktop Session</div></div>
 
 <h3>۴۹. SSH vs Remote Desktop</h3>
-<ul>
-<li><strong>SSH:</strong> Remote Command Line. مثال: <code>ssh ali@server</code></li>
-<li><strong>Remote Desktop:</strong> Remote Graphical Session. مثال: <code>VNC</code>، <code>RDP</code></li>
-</ul>
+<h4>SSH</h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">SSH\n→ Remote Command Line</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ssh ali@server</div></div>
+<h4>Remote Desktop</h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Remote Desktop\n→ Remote Graphical Session</div></div>
+<p>برای مثال می‌توان از فناوری‌هایی مانند:</p>
+<div class="code-container"><span class="code-label">فناوری‌ها</span><div class="code-block no-prompt">VNC\nRDP</div></div>
+<p>استفاده کرد.</p>
 
 <h3>۵۰. VNC</h3>
-<p><strong>VNC = Virtual Network Computing</strong> یک فناوری برای دسترسی Remote به محیط گرافیکی است.</p>
+<p><strong>VNC = Virtual Network Computing</strong>، یک فناوری برای دسترسی Remote به محیط گرافیکی است. مدل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">VNC Client\n    ↓\n Network\n    ↓\nVNC Server\n    ↓\nGUI</div></div>
 
 <h3>۵۱. RDP</h3>
-<p><strong>RDP = Remote Desktop Protocol</strong> پروتکلی برای Remote Desktop که بیشتر با دنیای Microsoft شناخته می‌شود، اما Linux نیز می‌تواند در نقش Client یا Server از راهکارهای سازگار با RDP استفاده کند.</p>
+<p><strong>RDP = Remote Desktop Protocol</strong>، پروتکلی برای Remote Desktop است که بیشتر با دنیای Microsoft شناخته می‌شود، اما Linux نیز می‌تواند در نقش Client یا Server از راهکارهای سازگار با RDP استفاده کند.</p>
 
 <h3>۵۲. SSH vs VNC/RDP</h3>
 <table>
@@ -4525,10 +4672,12 @@
 <tr><td>مصرف منابع</td><td>معمولاً کمتر</td><td>معمولاً بیشتر</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>SSH</code> → Remote CLI؛ <code>VNC / RDP</code> → Remote GUI.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>SSH</code> → Remote CLI؛ <code>VNC / RDP</code> → Remote GUI.</div></div>
 
 <h2>یک سناریوی واقعی 🎯</h2>
-<p>فرض کنید یک Server به نام <code>server01</code> داریم.</p>
+<p>فرض کن یک Server به نام:</p>
+<div class="code-container"><span class="code-label">Server</span><div class="code-block">server01</div></div>
+<p>داریم.</p>
 <h3>مرحله ۱ — ساخت User</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo useradd -m ali</div></div>
 <h3>مرحله ۲ — تنظیم Password</h3>
@@ -4547,10 +4696,14 @@
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl</div></div>
 <h3>مرحله ۹ — بررسی NTP</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">timedatectl</div></div>
+<p>و وضعیت Synchronization را بررسی می‌کنیم.</p>
 <h3>مرحله ۱۰ — چاپ</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lp report.pdf</div></div>
 <h3>مرحله ۱۱ — اتصال Remote</h3>
-<p>برای CLI: <code>ssh ali@server01</code>؛ برای GUI: VNC / RDP.</p>
+<p>برای CLI:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ssh ali@server01</div></div>
+<p>برای GUI:</p>
+<div class="code-container"><span class="code-label">فناوری</span><div class="code-block">VNC / RDP</div></div>
 
 <h2>جدول طلایی User و Access</h2>
 <table>
@@ -4608,86 +4761,176 @@
 
 <h2>مقایسه‌های طلایی LPIC-1</h2>
 <h3><code>/etc/passwd</code> vs <code>/etc/shadow</code></h3>
-<p><code>/etc/passwd</code> → Account Information؛ <code>/etc/shadow</code> → Password Information.</p>
+<div class="code-container"><span class="code-label">passwd</span><div class="code-block no-prompt">/etc/passwd\n→ Account Information</div></div>
+<div class="code-container"><span class="code-label">shadow</span><div class="code-block no-prompt">/etc/shadow\n→ Password Information</div></div>
+
 <h3>User vs Group</h3>
-<p>User → یک Account؛ Group → مجموعه‌ای از Userها.</p>
+<div class="code-container"><span class="code-label">User</span><div class="code-block no-prompt">User\n→ یک Account</div></div>
+<div class="code-container"><span class="code-label">Group</span><div class="code-block no-prompt">Group\n→ مجموعه‌ای از Userها</div></div>
+
 <h3><code>su</code> vs <code>sudo</code></h3>
-<p><code>su</code> → Switch User → Shell؛ <code>sudo</code> → Run Command with Elevated Privileges.</p>
+<div class="code-container"><span class="code-label">su</span><div class="code-block no-prompt">su\n→ Switch User\n→ Shell</div></div>
+<div class="code-container"><span class="code-label">sudo</span><div class="code-block no-prompt">sudo\n→ Run Command\n→ Elevated Privileges</div></div>
+
 <h3><code>su</code> vs <code>su -</code></h3>
-<p><code>su</code> → Switch User؛ <code>su -</code> → Login Shell → Environment User مقصد.</p>
+<div class="code-container"><span class="code-label">su</span><div class="code-block no-prompt">su\n→ Switch User</div></div>
+<div class="code-container"><span class="code-label">su -</span><div class="code-block no-prompt">su -\n→ Login Shell\n→ Environment User مقصد</div></div>
+
 <h3><code>chmod</code> vs <code>sudo</code></h3>
-<p><code>chmod</code> → Permission فایل/Directory؛ <code>sudo</code> → اجرای Command با Privilege بالاتر.</p>
+<p>این دو را با هم اشتباه نکن:</p>
+<div class="code-container"><span class="code-label">chmod</span><div class="code-block no-prompt">chmod\n→ Permission فایل/Directory</div></div>
+<div class="code-container"><span class="code-label">sudo</span><div class="code-block no-prompt">sudo\n→ اجرای Command با Privilege بالاتر</div></div>
+
 <h3>Log File vs Journal</h3>
-<p><code>/var/log</code> → محل رایج Logهای متنی؛ <code>journalctl</code> → مشاهده Journal مربوط به systemd.</p>
+<div class="code-container"><span class="code-label">Log File</span><div class="code-block no-prompt">/var/log\n→ محل رایج Logهای متنی</div></div>
+<div class="code-container"><span class="code-label">Journal</span><div class="code-block no-prompt">journalctl\n→ مشاهده Journal مربوط به systemd</div></div>
+
 <h3><code>date</code> vs <code>timedatectl</code></h3>
-<p><code>date</code> → مشاهده زمان؛ <code>timedatectl</code> → مدیریت Time / Time Zone / NTP.</p>
+<div class="code-container"><span class="code-label">date</span><div class="code-block no-prompt">date\n→ مشاهده زمان</div></div>
+<div class="code-container"><span class="code-label">timedatectl</span><div class="code-block no-prompt">timedatectl\n→ مدیریت Time / Time Zone / NTP</div></div>
+
 <h3>GUI vs CLI</h3>
-<p>CLI → Command → Shell؛ GUI → Windows → Menus → Mouse.</p>
+<div class="code-container"><span class="code-label">CLI</span><div class="code-block no-prompt">CLI\n→ Command\n→ Shell</div></div>
+<div class="code-container"><span class="code-label">GUI</span><div class="code-block no-prompt">GUI\n→ Windows\n→ Menus\n→ Mouse</div></div>
+
 <h3>SSH vs VNC/RDP</h3>
-<p>SSH → Remote CLI؛ VNC / RDP → Remote GUI.</p>
+<div class="code-container"><span class="code-label">SSH</span><div class="code-block no-prompt">SSH\n→ Remote CLI</div></div>
+<div class="code-container"><span class="code-label">VNC / RDP</span><div class="code-block no-prompt">VNC / RDP\n→ Remote GUI</div></div>
 
 <h2>دام‌های امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> Password واقعی User در <code>/etc/passwd</code> قرار دارد؟ ❌ خیر؛ معمولاً اطلاعات Password در <code>/etc/shadow</code> قرار دارد.</li>
-<li><strong>دام ۲:</strong> <code>usermod -G</code> همیشه Group قبلی را حفظ می‌کند؟ ❌ خیر؛ برای اضافه کردن بدون حذف supplementary groupهای قبلی معمولاً <code>usermod -aG group user</code> استفاده می‌کنیم.</li>
-<li><strong>دام ۳:</strong> <code>su</code> و <code>sudo</code> یکی هستند؟ ❌ خیر؛ <code>su</code> → Switch User / Shell؛ <code>sudo</code> → Execute Command with elevated privileges.</li>
-<li><strong>دام ۴:</strong> <code>sudo</code> یعنی تبدیل شدن دائمی به root؟ ❌ خیر؛ <code>sudo</code> معمولاً یک Command را با Privilege مناسب اجرا می‌کند.</li>
-<li><strong>دام ۵:</strong> برای ویرایش <code>/etc/sudoers</code> بهتر است با Editor معمولی آن را تغییر دهیم؟ ❌ خیر؛ <code>visudo</code> انتخاب مناسب‌تری است چون Syntax را بررسی می‌کند.</li>
-<li><strong>دام ۶:</strong> تمام Linuxها Logهای خود را دقیقاً در یک فایل مشخص ذخیره می‌کنند؟ ❌ خیر؛ ساختار Log بین Distributionها متفاوت است، اما <code>/var/log</code> مسیر مهمی است.</li>
-<li><strong>دام ۷:</strong> <code>journalctl</code> فقط برای Kernel Log است؟ ❌ خیر؛ Journal می‌تواند Logهای مختلف سیستم و Serviceهای systemd را در خود داشته باشد.</li>
-<li><strong>دام ۸:</strong> <code>date</code> مسئول NTP است؟ ❌ خیر؛ <code>date</code> برای مشاهده/کار با زمان است؛ همگام‌سازی شبکه‌ای زمان با NTP انجام می‌شود.</li>
-<li><strong>دام ۹:</strong> GUI همان Linux است؟ ❌ خیر؛ Linux Kernel می‌تواند کاملاً بدون GUI اجرا شود.</li>
-<li><strong>دام ۱۰:</strong> Desktop Environment همان Window Manager است؟ ❌ خیر؛ Desktop Environment مجموعه‌ی بزرگ‌تری از اجزای محیط Desktop است.</li>
-<li><strong>دام ۱۱:</strong> SSH برای Remote Desktop گرافیکی طراحی شده است؟ ❌ خیر؛ SSH عمدتاً برای Remote Command Line استفاده می‌شود.</li>
-<li><strong>دام ۱۲:</strong> VNC و SSH دقیقاً یک کار انجام می‌دهند؟ ❌ خیر؛ SSH → Remote CLI، VNC → Remote GUI.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> ❌ Password واقعی User در <code>/etc/passwd</code> قرار دارد. ✅ معمولاً اطلاعات Password در <code>/etc/shadow</code> قرار دارد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> ❌ <code>usermod -G</code> همیشه Group قبلی را حفظ می‌کند. ✅ برای اضافه کردن بدون حذف supplementary groupهای قبلی معمولاً <code>usermod -aG group user</code> استفاده می‌کنیم.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> ❌ <code>su</code> و <code>sudo</code> یکی هستند. ✅ <code>su</code> → Switch User / Shell؛ <code>sudo</code> → Execute Command with elevated privileges.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> ❌ <code>sudo</code> یعنی تبدیل شدن دائمی به root. ✅ <code>sudo</code> معمولاً یک Command را با Privilege مناسب اجرا می‌کند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> ❌ برای ویرایش <code>/etc/sudoers</code> بهتر است با Editor معمولی آن را تغییر دهیم. ✅ <code>visudo</code> انتخاب مناسب‌تری است چون Syntax را بررسی می‌کند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> ❌ تمام Linuxها Logهای خود را دقیقاً در یک فایل مشخص ذخیره می‌کنند. ✅ ساختار Log بین Distributionها متفاوت است، اما <code>/var/log</code> مسیر مهمی است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> ❌ <code>journalctl</code> فقط برای Kernel Log است. ✅ Journal می‌تواند Logهای مختلف سیستم و Serviceهای systemd را در خود داشته باشد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> ❌ <code>date</code> مسئول NTP است. ✅ <code>date</code> برای مشاهده/کار با زمان است؛ همگام‌سازی شبکه‌ای زمان با NTP انجام می‌شود و ابزارهایی مانند <code>timedatectl</code> وضعیت آن را مدیریت/نشان می‌دهند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> ❌ GUI همان Linux است. ✅ Linux Kernel می‌تواند کاملاً بدون GUI اجرا شود.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱۰</strong> ❌ Desktop Environment همان Window Manager است. ✅ Desktop Environment مجموعه‌ی بزرگ‌تری از اجزای محیط Desktop است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱۱</strong> ❌ SSH برای Remote Desktop گرافیکی طراحی شده است. ✅ SSH عمدتاً برای Remote Command Line استفاده می‌شود.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱۲</strong> ❌ VNC و SSH دقیقاً یک کار انجام می‌دهند. ✅ <code>SSH</code> → Remote CLI؛ <code>VNC</code> → Remote GUI.</div></div>
 
-<h2>🧠 نقشه ذهنی جلسه</h2>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Users / Services / Time\n│\n├── Users\n│    ├── User\n│    ├── UID\n│    ├── /etc/passwd\n│    ├── /etc/shadow\n│    └── useradd / usermod / userdel\n│\n├── Groups\n│    ├── GID\n│    ├── /etc/group\n│    ├── groupadd\n│    └── groupdel\n│\n├── Privileges\n│    ├── su\n│    ├── sudo\n│    └── visudo\n│\n├── Logs\n│    ├── /var/log\n│    ├── journald\n│    └── journalctl\n│\n├── Time\n│    ├── date\n│    ├── timedatectl\n│    ├── Time Zone\n│    └── NTP\n│\n├── Printer\n│    ├── CUPS\n│    ├── lp\n│    └── lpstat\n│\n└── GUI / Remote\n     ├── GUI\n     ├── X\n     ├── Wayland\n     ├── Desktop Environment\n     ├── SSH\n     ├── VNC\n     └── RDP</div></div>
+<h2>نقشه ذهنی جلسه</h2>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Users / Services / Time\n│\n├── Users\n│    ├── User\n│    ├── UID\n│    ├── /etc/passwd\n│    ├── /etc/shadow\n│    └── useradd / usermod / userdel\n│\n├── Groups\n│    ├── GID\n│    ├── /etc/group\n│    ├── groupadd\n│    └── groupdel\n│\n├── Privileges\n│    ├── su\n│    ├── sudo\n│    └── visudo\n│\n├── Logs\n│    ├── /var/log\n│    ├── journald\n│    └── journalctl\n│\n├── Time\n│    ├── date\n│    ├── timedatectl\n│    ├── Time Zone\n│    └── NTP\n│\n├── Printer\n│    ├── CUPS\n│    ├── lp\n│    └── lpstat\n│\n└── GUI / Remote\n     ├── GUI\n     ├── X\n     ├── Wayland\n     ├── Desktop Environment\n     ├── SSH\n     ├── VNC\n     └── RDP</div></div>
 
 <h2>ارتباط جلسه ۶ و ۷ 🔗</h2>
-<p>جلسه‌ی ۶ توضیح داد: سیستم چگونه Boot می‌شود؟ جلسه‌ی ۷ توضیح می‌دهد: بعد از Boot، کاربران و سرویس‌ها و زمان و دسترسی Remote را چگونه مدیریت کنیم؟</p>
-<div class="code-container"><span class="code-label">ادامه</span><div class="code-block no-prompt">systemd\n   │\n   ├── Services\n   │\n   ├── Users / Sessions\n   │\n   ├── Logs\n   │\n   └── Time-related Services</div></div>
+<p>جلسه‌ی قبلی را به یاد بیاور:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">BIOS/UEFI\n ↓\nGRUB\n ↓\nKernel\n ↓\ninitramfs\n ↓\nsystemd\n ↓\nServices</div></div>
+<p>حالا جلسه‌ی هفتم ادامه‌ی همان داستان است:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">systemd\n   │\n   ├── Services\n   │\n   ├── Users / Sessions\n   │\n   ├── Logs\n   │\n   └── Time-related Services</div></div>
+<p>یعنی جلسه‌ی ۶ توضیح داد:</p>
+<blockquote>سیستم چگونه Boot می‌شود؟</blockquote>
+<p>و جلسه‌ی ۷ توضیح می‌دهد:</p>
+<blockquote>بعد از Boot، کاربران و سرویس‌ها و زمان و دسترسی Remote را چگونه مدیریت کنیم؟</blockquote>
 
-<h2>⚡ حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
+<h2>چک‌لیست مرور ۲ دقیقه‌ای ✅</h2>
+<p>قبل از رفتن به جلسه‌ی بعد باید بتوانی به این سؤال‌ها جواب بدهی:</p>
+<ul>
+<li>User چیست؟</li>
+<li>UID چیست؟</li>
+<li>چرا root ویژه است؟</li>
+<li>UID مربوط به root چیست؟</li>
+<li><code>/etc/passwd</code> چه اطلاعاتی دارد؟</li>
+<li><code>/etc/shadow</code> چه چیزی را نگهداری می‌کند؟</li>
+<li>Group چیست؟</li>
+<li>GID چیست؟</li>
+<li><code>/etc/group</code> چیست؟</li>
+<li><code>useradd</code> چه می‌کند؟</li>
+<li><code>passwd</code> چه می‌کند؟</li>
+<li><code>usermod -aG</code> چه کاربردی دارد؟</li>
+<li>تفاوت <code>userdel</code> و <code>userdel -r</code> چیست؟</li>
+<li><code>groupadd</code> چه می‌کند؟</li>
+<li><code>id</code> چه اطلاعاتی نشان می‌دهد؟</li>
+<li><code>su</code> چیست؟</li>
+<li><code>su -</code> چه تفاوتی با <code>su</code> دارد؟</li>
+<li><code>sudo</code> چیست؟</li>
+<li>تفاوت <code>su</code> و <code>sudo</code> چیست؟</li>
+<li><code>/etc/sudoers</code> چیست؟</li>
+<li>چرا <code>visudo</code> استفاده می‌کنیم؟</li>
+<li>Log چیست و چرا مهم است؟</li>
+<li><code>/var/log</code> چیست؟</li>
+<li><code>journalctl</code> چیست؟</li>
+<li><code>journalctl -b</code> چه می‌کند؟</li>
+<li><code>journalctl -u</code> چه می‌کند؟</li>
+<li><code>date</code> چه می‌کند؟</li>
+<li><code>timedatectl</code> چه می‌کند؟</li>
+<li>Time Zone چیست؟</li>
+<li>UTC چیست؟</li>
+<li>NTP چیست؟</li>
+<li>چرا Time Synchronization مهم است؟</li>
+<li>CUPS چیست؟</li>
+<li><code>lp</code> چه می‌کند؟</li>
+<li><code>lpstat</code> چه می‌کند؟</li>
+<li>GUI چیست؟</li>
+<li>CLI و GUI چه تفاوتی دارند؟</li>
+<li>X و Wayland چه هستند؟</li>
+<li>Desktop Environment چیست؟</li>
+<li>SSH چه نوع Remote Accessی فراهم می‌کند؟</li>
+<li>VNC و RDP چه کاربردی دارند؟</li>
+<li>تفاوت Remote CLI و Remote GUI چیست؟</li>
+</ul>
+
+<h2>🧠 حفظی‌های همان جلسه</h2>
 <h3>User</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">root → UID 0\n/etc/passwd → Account Information\n/etc/shadow → Password Information</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">root → UID 0</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/etc/passwd\n→ Account Information</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/etc/shadow\n→ Password Information</div></div>
 <h3>Group</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/etc/group → Group Information\nid → UID + GID + Groups</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/etc/group\n→ Group Information</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">id\n→ UID + GID + Groups</div></div>
 <h3>User Management</h3>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">useradd → Create\npasswd → Password\nusermod → Modify\nuserdel → Delete</div></div>
 <h3>Group Management</h3>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">groupadd → Create\ngroupdel → Delete</div></div>
 <h3>Privilege</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">su → Switch User\nsu - → Login Shell\nsudo → Elevated Command\nvisudo → Safe sudoers Edit</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">su\n→ Switch User</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">su -\n→ Login Shell</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">sudo\n→ Elevated Command</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">visudo\n→ Safe sudoers Edit</div></div>
 <h3>Logs</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/var/log → Logs\njournalctl → systemd Journal\njournalctl -b → Current Boot\njournalctl -u service → Service Logs</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/var/log\n→ Logs</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">journalctl\n→ systemd Journal</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">journalctl -b\n→ Current Boot</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">journalctl -u service\n→ Service Logs</div></div>
 <h3>Time</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">date → Time\ntimedatectl → Time / Time Zone / NTP Status\nNTP → Network Time Synchronization</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">date\n→ Time</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">timedatectl\n→ Time / Time Zone / NTP Status</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">NTP\n→ Network Time Synchronization</div></div>
 <h3>Printer</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">CUPS → Printing System\nlp → Print\nlpstat → Printer Status</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">CUPS\n→ Printing System</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lp\n→ Print</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lpstat\n→ Printer Status</div></div>
 <h3>GUI</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">GUI → Graphical Interface\nX / Wayland → Display Systems\nGNOME / KDE / XFCE → Desktop Environments</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">GUI\n→ Graphical Interface</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">X / Wayland\n→ Display Systems</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">GNOME / KDE / XFCE\n→ Desktop Environments</div></div>
 <h3>Remote</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">SSH → Remote CLI\nVNC / RDP → Remote GUI</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">SSH\n→ Remote CLI</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">VNC / RDP\n→ Remote GUI</div></div>
 
 <h2>⭐ سؤال طلایی جلسه</h2>
-<p>فرض کنید یک Linux Server داریم و می‌خواهیم یک User جدید برای تیم توسعه بسازیم.</p>
-<div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">Create User\n    ↓\nuseradd\n    ↓\npasswd\n    ↓\nCreate Group\n    ↓\ngroupadd\n    ↓\nAdd User\n    ↓\nusermod -aG\n    ↓\nCheck\n    ↓\nid</div></div>
-<p>حالا اگر User نیاز به اجرای یک دستور مدیریتی داشته باشد: <code>User → sudo → Administrative Command</code>.</p>
-<p>اگر مشکلی ایجاد شد: <code>Problem → journalctl → Logs → Troubleshooting</code>.</p>
-<p>اگر ساعت Server اشتباه بود: <code>timedatectl → NTP → Time Synchronization</code>.</p>
-<p>و اگر بخواهیم از کامپیوتر خودمان به Server وصل شویم: <code>CLI → SSH</code>؛ <code>GUI → VNC / RDP</code>.</p>
+<p>فرض کن یک Linux Server داریم و می‌خواهیم یک User جدید برای تیم توسعه بسازیم. مسیر ذهنی:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Create User\n    ↓\nuseradd\n    ↓\npasswd\n    ↓\nCreate Group\n    ↓\ngroupadd\n    ↓\nAdd User\n    ↓\nusermod -aG\n    ↓\nCheck\n    ↓\nid</div></div>
+<p>حالا اگر User نیاز به اجرای یک دستور مدیریتی داشته باشد:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">User\n ↓\nsudo\n ↓\nAdministrative Command</div></div>
+<p>اگر مشکلی ایجاد شد:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Problem\n ↓\njournalctl\n ↓\nLogs\n ↓\nTroubleshooting</div></div>
+<p>اگر ساعت Server اشتباه بود:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">timedatectl\n ↓\nNTP\n ↓\nTime Synchronization</div></div>
+<p>و اگر بخواهیم از کامپیوتر خودمان به Server وصل شویم:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">CLI\n→ SSH\n\nGUI\n→ VNC / RDP</div></div>
 
 <h2>جمع‌بندی نهایی جلسه</h2>
-<p>در این جلسه دیدیم که بعد از Boot شدن Linux، مدیریت سیستم فقط به Serviceها محدود نمی‌شود. ما باید بتوانیم Users، Groups، Permissions/Privileges، Services، Logs، Time، Printer، GUI و Remote Access را مدیریت کنیم.</p>
-<p>اگر بخواهیم کل جلسه را در یک جمله خلاصه کنیم:</p>
-<blockquote><strong>در Linux کاربران و Groupها با ابزارهای User/Group Management مدیریت می‌شوند، <code>su</code> و <code>sudo</code> برای تغییر یا افزایش سطح دسترسی استفاده می‌شوند، Logها برای Troubleshooting حیاتی‌اند، <code>timedatectl</code> و NTP برای مدیریت و همگام‌سازی زمان به کار می‌روند، CUPS سیستم چاپ را مدیریت می‌کند و برای کار با سیستم از راه دور می‌توان از SSH برای CLI و فناوری‌هایی مانند VNC/RDP برای GUI استفاده کرد.</strong></blockquote>
+<p>در این جلسه دیدیم که بعد از Boot شدن Linux، مدیریت سیستم فقط به Serviceها محدود نمی‌شود. ما باید بتوانیم:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Users\n   ↓\nGroups\n   ↓\nPermissions / Privileges\n   ↓\nServices\n   ↓\nLogs\n   ↓\nTime\n   ↓\nPrinter\n   ↓\nGUI\n   ↓\nRemote Access</div></div>
+<p>را مدیریت کنیم. اگر بخواهیم کل جلسه را در یک جمله خلاصه کنیم:</p>
+<blockquote>در Linux کاربران و Groupها با ابزارهای User/Group Management مدیریت می‌شوند، <code>su</code> و <code>sudo</code> برای تغییر یا افزایش سطح دسترسی استفاده می‌شوند، Logها برای Troubleshooting حیاتی‌اند، <code>timedatectl</code> و NTP برای مدیریت و همگام‌سازی زمان به کار می‌روند، CUPS سیستم چاپ را مدیریت می‌کند و برای کار با سیستم از راه دور می‌توان از SSH برای CLI و فناوری‌هایی مانند VNC/RDP برای GUI استفاده کرد.</blockquote>
+<p>با این جلسه، بخش مهمی از <strong>System Administration</strong> را پوشش دادیم.</p>
 
-<div class="box important"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong>
-با این جلسه، بخش مهمی از <strong>System Administration</strong> را پوشش دادیم. در جلسه‌ی بعد وارد <strong>شبکه در Linux</strong> می‌شویم؛ یعنی IP، DNS، Interfaceها، <code>ip</code>، <code>ping</code>، <code>ss</code>، <code>hostname</code>، <code>dig</code>، <code>host</code>، <code>curl</code> و <code>wget</code> و تمام این‌ها را به یک مسیر مفهومی واحد وصل می‌کنیم.
-</div></div>
+<div class="box note"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong> در جلسه‌ی بعد وارد <strong>شبکه در Linux</strong> می‌شویم؛ یعنی IP، DNS، Interfaceها، <code>ip</code>، <code>ping</code>، <code>ss</code>، <code>hostname</code>، <code>dig</code>، <code>host</code>، <code>curl</code> و <code>wget</code> و تمام این‌ها را به یک مسیر مفهومی واحد وصل می‌کنیم.</div></div>
 ` ,
+
 "s8": `
 <div class="section-header">
     <div class="section-badge">۸</div>
