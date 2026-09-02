@@ -3286,22 +3286,25 @@
 <blockquote><strong>🎯 هدف جلسه:</strong> یاد بگیریم فایل‌ها و Directoryها را مدیریت کنیم، آن‌ها را Archive و Compress کنیم، با <code>dd</code> آشنا شویم، تفاوت Hard Link و Symbolic Link را بفهمیم، Permission و Ownership را به‌صورت مفهومی درک کنیم و فایل‌ها را جستجو کنیم.</blockquote>
 
 <h2>قبل از شروع...</h2>
-<p>فرض کنید روی یک Server فایل مهمی دارید: <code>report.txt</code>. ممکن است بخواهید:</p>
+<p>فرض کن روی یک Server فایل مهمی داری:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">report.txt</div></div>
+<p>حالا ممکن است بخواهی:</p>
 <ul>
-<li>از آن یک Copy بسازید.</li>
-<li>آن را جابه‌جا یا Rename کنید.</li>
-<li>چند فایل را داخل یک Archive قرار دهید.</li>
-<li>حجم Archive را کاهش دهید.</li>
-<li>از اطلاعات Image تهیه کنید.</li>
-<li>دسترسی کاربران را محدود کنید.</li>
-<li>یک Link به فایل بسازید.</li>
-<li>فایل را بعداً پیدا کنید.</li>
+<li>از آن یک Copy بسازی.</li>
+<li>آن را جابه‌جا یا Rename کنی.</li>
+<li>چند فایل را داخل یک Archive قرار دهی.</li>
+<li>حجم Archive را کاهش دهی.</li>
+<li>از اطلاعات Image تهیه کنی.</li>
+<li>دسترسی کاربران را محدود کنی.</li>
+<li>یک Link به فایل بسازی.</li>
+<li>فایل را بعداً پیدا کنی.</li>
 </ul>
 <p>تمام این موضوعات هسته‌ی جلسه‌ی پنجم هستند.</p>
 
 <h2>بخش اول — مدیریت فایل و Directory</h2>
 
 <h3>۱. دستورات پایه</h3>
+<p>مهم‌ترین دستورات:</p>
 <table>
 <thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -3316,18 +3319,20 @@
 <h3>۲. <code>cp</code></h3>
 <p>برای Copy کردن:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp file1.txt file2.txt</div></div>
-<p>یعنی <code>file1.txt</code> را Copy کرده و <code>file2.txt</code> ایجاد می‌کند.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">file1.txt\n    ↓\nCopy\n    ↓\nfile2.txt</div></div>
 <p>برای Copy کردن Directory به همراه محتویات:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">cp -r dir1 dir2</div></div>
-<p><code>-r</code> یعنی <strong>Recursive</strong> (وارد زیرDirectoryها نیز می‌شود).</p>
+<p><code>-r</code> یعنی <strong>Recursive</strong>؛ یعنی وارد زیرDirectoryها نیز شود.</p>
 
 <h3>۳. <code>mv</code></h3>
-<p><code>mv</code> دو کاربرد اصلی دارد:</p>
-<ul>
-<li><strong>جابه‌جایی:</strong> <code>mv file.txt /home/user/</code></li>
-<li><strong>تغییر نام:</strong> <code>mv old.txt new.txt</code></li>
-</ul>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>cp</code> → Copy؛ <code>mv</code> → Move / Rename.</div></div>
+<p><code>mv</code> دو کاربرد اصلی دارد.</p>
+<h4>جابه‌جایی</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv file.txt /home/user/</div></div>
+<h4>تغییر نام</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mv old.txt new.txt</div></div>
+<p>در لینوکس Rename کردن در واقع یکی از کاربردهای <code>mv</code> است.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>cp</code> → Copy؛ <code>mv</code> → Move / Rename.</div></div>
 
 <h3>۴. <code>rm</code></h3>
 <p>حذف فایل:</p>
@@ -3336,93 +3341,136 @@
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -r test/</div></div>
 <p>گزینه‌ی <code>-f</code> باعث می‌شود حذف بدون درخواست تأیید انجام شود:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">rm -rf test/</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار</strong> <code>rm</code> معمولاً فایل را به Recycle Bin منتقل نمی‌کند. بنابراین <code>rm file.txt</code> را نباید با «انتقال به سطل زباله» اشتباه بگیرید.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار</strong> <code>rm</code> معمولاً فایل را به Recycle Bin منتقل نمی‌کند. بنابراین <code>rm file.txt</code> را نباید با «انتقال به سطل زباله» اشتباه بگیری.</div></div>
 
 <h2>بخش دوم — Archive و Compression</h2>
 
 <h3>۵. Archive چیست؟</h3>
-<p>Archive یعنی <strong>چند فایل و Directory را در یک مجموعه/فایل واحد قرار دهیم.</strong></p>
-<p>مثال: فایل‌های <code>file1.txt</code>، <code>file2.txt</code>، <code>image.jpg</code> و <code>report.pdf</code> را در یک فایل <code>backup.tar</code> قرار می‌دهیم.</p>
+<p>فرض کن این فایل‌ها را داریم:</p>
+<div class="code-container"><span class="code-label">فایل‌ها</span><div class="code-block no-prompt">file1.txt\nfile2.txt\nimage.jpg\nreport.pdf</div></div>
+<p>می‌توانیم آن‌ها را در یک فایل واحد قرار دهیم:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">┌─────────────┐\n│ file1.txt   │\n│ file2.txt   │\n│ image.jpg   │\n│ report.pdf  │\n└─────────────┘\n       ↓\n   backup.tar</div></div>
+<p>این کار <strong>Archive</strong> نام دارد.</p>
+<blockquote>Archive یعنی چند فایل و Directory را در یک مجموعه/فایل واحد قرار دهیم.</blockquote>
 
 <h3>۶. Compression چیست؟</h3>
-<p>Compression یعنی <strong>کاهش حجم داده</strong>. هدف: اشغال فضای کمتر یا انتقال سریع‌تر داده.</p>
+<p>Compression یعنی کاهش حجم داده. مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">100 MB\n  ↓\nCompression\n  ↓\n70 MB</div></div>
+<blockquote>هدف: اشغال فضای کمتر یا انتقال سریع‌تر داده.</blockquote>
 
 <h3>۷. Archive با Compression یکی نیست</h3>
 <p>این نکته بسیار مهم است.</p>
-<div class="code-container"><span class="code-label">تفاوت</span><div class="code-block no-prompt">tar\n↓\nArchive\n\nگزینه‌های مختلف tar: -c (create), -x (extract), -f (file), -z (gzip), -j (bzip2), -J (xz)</div></div>
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong> <code>tar</code> به‌تنهایی لزوماً فایل را کوچک نمی‌کند. کار اصلی آن <strong>Archive کردن</strong> است.</div></div>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">tar\n↓\nArchive</div></div>
+<p>در حالت معمول <code>tar</code> خودش Compression انجام نمی‌دهد. در مقابل:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">gzip\n↓\nCompression</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">tar ≠ gzip</div></div>
 
 <h3>۸. <code>tar</code></h3>
 <p>ساخت یک Archive:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf backup.tar mydir/</div></div>
 <p>معنی گزینه‌ها:</p>
-<ul>
-<li><code>-c</code> → create (ساخت)</li>
-<li><code>-f</code> → file (نام فایل)</li>
-</ul>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-c → create\n-f → file</div></div>
 <p>استخراج:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xf backup.tar</div></div>
-<p><code>-x</code> → extract (استخراج)</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-x → extract\n-f → file</div></div>
 
 <h3>۹. <code>gzip</code></h3>
 <p>برای فشرده‌سازی یک فایل:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip file.txt</div></div>
-<p>نتیجه: <code>file.txt.gz</code></p>
+<p>معمولاً نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">file.txt.gz</div></div>
 <p>برای باز کردن Compression:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">gunzip file.txt.gz</div></div>
 
 <h3>۱۰. <code>tar</code> + <code>gzip</code></h3>
 <p>در دنیای لینوکس بسیار رایج است:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf backup.tar.gz mydir/</div></div>
-<p>گزینه‌ی <code>-z</code> یعنی استفاده از gzip.</p>
-<p>استخراج:</p>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">tar\n ↓\nArchive\n\ngzip\n ↓\nCompression</div></div>
+<p>و در یک دستور انجام می‌شود. گزینه‌ی <code>-z</code> یعنی استفاده از gzip.</p>
+<h4>استخراج</h4>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -xzf backup.tar.gz</div></div>
-<p><code>-x</code> → Extract، <code>-z</code> → gzip، <code>-f</code> → File.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">-x → Extract\n-z → gzip\n-f → File</div></div>
 
-<h3>۱۱. <code>.tar.gz</code> یعنی چه؟</h3>
+<h3>۱۱. <code>tar.gz</code> یعنی چه؟</h3>
+<p>وقتی می‌بینی:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">backup.tar.gz</div></div>
+<p>ذهنمان باید این را ببیند:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Files / Directories\n       ↓\n      tar\n       ↓\n    Archive\n       ↓\n     gzip\n       ↓\nCompressed Archive</div></div>
-<p><code>.tar</code> → Archive، <code>.gz</code> → gzip Compression.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>tar</code> به‌تنهایی لزوماً فایل را کوچک نمی‌کند. کار اصلی آن Archive کردن است.</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">.tar\n→ Archive\n\n.gz\n→ gzip Compression</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> <code>tar</code> به‌تنهایی لزوماً فایل را کوچک نمی‌کند. کار اصلی آن <strong>Archive کردن</strong> است.</div></div>
 
 <h2>بخش سوم — Backup و <code>dd</code></h2>
 
 <h3>۱۲. Backup چیست؟</h3>
-<p>Backup یعنی <strong>یک Copy قابل استفاده از داده برای بازیابی در صورت خرابی یا از دست رفتن داده</strong>.</p>
+<p>Backup یعنی:</p>
+<blockquote>یک Copy قابل استفاده از داده برای بازیابی در صورت خرابی یا از دست رفتن داده.</blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Original Data\n      │\n      ├────→ Backup 1\n      └────→ Backup 2</div></div>
+<p>هدف Backup: <strong>Recovery</strong> است.</p>
 
 <h3>۱۳. <code>dd</code></h3>
-<p><code>dd</code> یک ابزار بسیار مهم برای Copy کردن داده در سطح پایین است.</p>
+<p><code>dd</code> یک ابزار بسیار مهم برای Copy کردن داده در سطح پایین است. مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sda of=disk.img</div></div>
-<p><code>if</code> → Input File (منبع)، <code>of</code> → Output File (مقصد). هرچند اسمشان File است، اما می‌توانند Device نیز باشند.</p>
+<p>یعنی داده را از:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block">if=/dev/sda</div></div>
+<p>بخوان و در:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block">of=disk.img</div></div>
+<p>بنویس.</p>
+<h4><code>if</code> و <code>of</code></h4>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">if\n↓\nInput File</div></div>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">of\n↓\nOutput File</div></div>
+<p>هرچند اسمشان File است، اما می‌توانند Device نیز باشند. در لینوکس بسیاری از Deviceها از طریق Fileهای موجود در <code>/dev</code> در اختیار ابزارها قرار می‌گیرند.</p>
 
 <h3>۱۴. Disk Image</h3>
-<p>دستور بالا می‌تواند یک Image از Disk ایجاد کند. برعکس:</p>
+<p>دستور:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sda of=disk.img</div></div>
+<p>می‌تواند یک Image از Disk ایجاد کند. برعکس:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=disk.img of=/dev/sdb</div></div>
 <p>Image را روی Device مقصد می‌نویسد.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار بسیار مهم</strong> <code>dd</code> ابزار قدرتمندی است و اشتباه در <code>of=</code> می‌تواند باعث <strong>Overwrite شدن داده‌ها</strong> شود.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>⚠️ هشدار بسیار مهم</strong> <code>dd</code> ابزار قدرتمندی است و اشتباه در <code>of=</code> می‌تواند باعث <strong>Overwrite شدن داده‌ها</strong> شود. مثلاً:</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=image.img of=/dev/sdb</div></div>
+<p>مقصد <code>/dev/sdb</code> است؛ بنابراین باید قبل از اجرای آن Device را با دقت بررسی کرد.</p>
 
 <h3>۱۵. آیا <code>dd</code> همان Backup است؟</h3>
-<p>نه دقیقاً. <code>dd</code> یک ابزار <strong>Low-Level Copy</strong> است. می‌توان از آن برای ایجاد Image یا بعضی روش‌های Backup استفاده کرد، اما <code>dd</code> ≠ Backup System.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال درباره‌ی Copy کردن Blockها یا ساخت Image از Disk/Partition باشد، <code>dd</code> یکی از ابزارهای مهم است.</div></div>
+<p>نه دقیقاً. <code>dd</code> یک ابزار <strong>Low-Level Copy</strong> است. می‌توان از آن برای ایجاد Image یا بعضی روش‌های Backup استفاده کرد، اما:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block no-prompt">dd ≠ Backup System</div></div>
+<p>مثلاً Backup یک Directory می‌تواند با ابزارهایی مثل <code>tar</code> یا ابزارهای تخصصی Backup انجام شود.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> اگر سؤال درباره‌ی Copy کردن Blockها یا ساخت Image از Disk/Partition باشد، <code>dd</code> یکی از ابزارهای مهم است.</div></div>
 
 <h2>بخش چهارم — Links</h2>
 
 <h3>۱۶. Link چیست؟</h3>
-<p>گاهی نمی‌خواهیم یک فایل را دوباره Copy کنیم. می‌خواهیم یک نام/Reference دیگر برای همان داده داشته باشیم. دو نوع مهم: <strong>Hard Link</strong> و <strong>Symbolic Link</strong>.</p>
+<p>گاهی نمی‌خواهیم یک فایل را دوباره Copy کنیم. می‌خواهیم یک نام/Reference دیگر برای همان داده داشته باشیم. اینجا Linkها وارد می‌شوند. دو نوع مهم:</p>
+<div class="code-container"><span class="code-label">انواع</span><div class="code-block no-prompt">Hard Link\nSymbolic Link</div></div>
 
 <h3>۱۷. Symbolic Link</h3>
-<p>Symbolic Link یا Symlink مثل یک Reference به یک Path است.</p>
+<p>Symbolic Link یا <strong>Symlink</strong> مثل یک Reference به یک Path است.</p>
+<p>ساخت:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ln -s report.txt shortcut.txt</div></div>
-<p>مدل ذهنی: <code>shortcut.txt → report.txt</code>. اگر <code>report.txt</code> حذف شود، Symlink <strong>Broken</strong> می‌شود.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">shortcut.txt\n      │\n      ↓\n  report.txt</div></div>
+<p>اگر <code>report.txt</code> حذف شود:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">shortcut.txt\n      ↓\n   ❌ Broken</div></div>
+<p>چون Symlink به Path اشاره می‌کند.</p>
 
 <h3>۱۸. Hard Link</h3>
+<p>Hard Link متفاوت است. مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ln report.txt hardlink.txt</div></div>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">report.txt ──┐\n             ↓\n          inode\n             ↓\n           Data\n             ↑\nhardlink.txt ┘</div></div>
-<p>هر دو نام به همان inode اشاره می‌کنند. اگر <code>report.txt</code> را حذف کنیم، <code>hardlink.txt</code> هنوز می‌تواند به داده دسترسی داشته باشد.</p>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">report.txt ──┐\n             ↓\n          File Data\n             ↑\nhardlink.txt ┘</div></div>
+<p>هر دو نام به همان File/Filesystem Object اشاره می‌کنند. بنابراین اگر <code>report.txt</code> را حذف کنیم، <code>hardlink.txt</code> هنوز می‌تواند به داده دسترسی داشته باشد، تا زمانی که حداقل یک Link به آن داده باقی مانده باشد.</p>
 
 <h3>۱۹. چرا Hard Link بعد از حذف فایل اصلی کار می‌کند؟</h3>
-<p>در واقع چیزی به نام «فایل اصلی» از نظر Filesystem به آن معنای ساده وجود ندارد. هر دو نام <strong>Directory Entries</strong> هستند که به یک inode اشاره می‌کنند. داده تا زمانی که حداقل یک Link به آن باقی مانده باشد، باقی می‌ماند.</p>
+<p>در واقع چیزی به نام «فایل اصلی» از نظر Filesystem به آن معنای ساده وجود ندارد. هر دو نام، <strong>Directory Entries</strong> هستند که به یک inode اشاره می‌کنند. مدل دقیق‌تر:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">report.txt ──┐\n             ↓\n          inode\n             ↓\n           Data\n             ↑\nhardlink.txt ┘</div></div>
+<p>وقتی یکی از نام‌ها حذف شود، inode و داده تا زمانی که Link دیگری وجود داشته باشد باقی می‌مانند. برای LPIC-1 همین مفهوم کافی است.</p>
 
 <h3>۲۰. محدودیت‌های Hard Link</h3>
+<p>به طور معمول Hard Link:</p>
 <ul>
 <li>نمی‌تواند به Directory معمولی ساخته شود.</li>
 <li>نمی‌تواند بین Filesystemهای مختلف باشد.</li>
@@ -3446,14 +3494,18 @@
 <tr><td>inode مشترک با Target</td><td>✅</td><td>❌</td></tr>
 </tbody>
 </table>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> Hard Link یک Copy از فایل نیست. Hard Link یک نام/Directory Entry دیگر برای همان File است و داده را Duplicate نمی‌کند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> نگو «Hard Link یک Copy از فایل است» — ❌ اشتباه. Hard Link یک نام/Directory Entry دیگر برای همان File است و داده را Duplicate نمی‌کند.</div></div>
 
 <h2>بخش پنجم — Permissions</h2>
 
 <h3>۲۱. چرا Permission مهم است؟</h3>
-<p>در لینوکس هر کاربر نباید بتواند هر فایل و Directory را تغییر دهد. Linux برای کنترل دسترسی از <strong>Permissions</strong> استفاده می‌کند.</p>
+<p>در لینوکس هر کاربر نباید بتواند هر فایل و Directory را تغییر دهد. مثلاً:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">/etc/passwd</div></div>
+<p>نباید توسط هر کاربری به شکل دلخواه تغییر کند. Linux برای کنترل دسترسی از <strong>Permissions</strong> استفاده می‌کند.</p>
 
 <h3>۲۲. سه دسته اصلی Permission</h3>
+<p>برای یک File معمولاً سه دسته‌ی اصلی داریم:</p>
+<div class="code-container"><span class="code-label">دسته‌ها</span><div class="code-block no-prompt">Owner\nGroup\nOthers</div></div>
 <ul>
 <li><strong>Owner:</strong> مالک فایل.</li>
 <li><strong>Group:</strong> کاربرانی که عضو Group مربوط به فایل هستند.</li>
@@ -3461,6 +3513,8 @@
 </ul>
 
 <h3>۲۳. سه Permission اصلی</h3>
+<p>سه Permission پایه:</p>
+<div class="code-container"><span class="code-label">دسته‌ها</span><div class="code-block no-prompt">r\nw\nx</div></div>
 <ul>
 <li><strong><code>r</code> — Read:</strong> اجازه‌ی خواندن.</li>
 <li><strong><code>w</code> — Write:</strong> اجازه‌ی تغییر محتوا.</li>
@@ -3468,24 +3522,51 @@
 </ul>
 
 <h3>۲۴. مشاهده Permission</h3>
-<p>با <code>ls -l</code>:</p>
+<p>با:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">خروجی</span><div class="code-block">-rwxr-xr--</div></div>
-<p>تقسیم‌بندی: <code>- | rwx | r-x | r--</code></p>
+<p>آن را به بخش‌های زیر تقسیم می‌کنیم:</p>
+<div class="code-container"><span class="code-label">تقسیم‌بندی</span><div class="code-block no-prompt">-\nrwx\nr-x\nr--</div></div>
 
 <h3>۲۵. اولین کاراکتر چیست؟</h3>
-<p>نوع File را نشان می‌دهد: <code>-</code> → Regular File، <code>d</code> → Directory.</p>
+<p>در:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rwxr-xr--\n^</div></div>
+<p>اولین کاراکتر نوع File را نشان می‌دهد. مثلاً <code>-</code> یعنی Regular File، و <code>d</code> یعنی Directory. پس:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block">drwxr-xr-x</div></div>
+<p>یک Directory است.</p>
 
 <h3>۲۶. Owner / Group / Others</h3>
-<p>در <code>-rwxr-xr--</code>: Owner → <code>rwx</code>، Group → <code>r-x</code>، Others → <code>r--</code>.</p>
+<p>در:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block">-rwxr-xr--</div></div>
+<p>داریم:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">- | rwx | r-x | r--\n    │      │      │\n Owner    Group  Others</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner  → rwx\nGroup  → r-x\nOthers → r--</div></div>
 
 <h3>۲۷. Permission عددی</h3>
-<p><code>r = 4</code>، <code>w = 2</code>، <code>x = 1</code>. مثال: <code>rwx = 4+2+1 = 7</code>، <code>rw- = 4+2 = 6</code>، <code>r-x = 4+1 = 5</code>.</p>
+<p>سه Permission پایه مقادیر زیر را دارند:</p>
+<div class="code-container"><span class="code-label">مقادیر</span><div class="code-block no-prompt">r = 4\nw = 2\nx = 1</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">rwx\n4+2+1\n= 7</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">rw-\n4+2\n= 6</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">r-x\n4+1\n= 5</div></div>
 
 <h3>۲۸. مثال 755</h3>
-<p><code>755</code> → Owner: <code>7</code> (rwx)، Group: <code>5</code> (r-x)، Others: <code>5</code> (r-x).</p>
+<div class="code-container"><span class="code-label">عدد</span><div class="code-block">755</div></div>
+<p>به سه بخش تقسیم می‌شود:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">7 | 5 | 5\n│   │   │\nU   G   O</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner  → 7 → rwx\nGroup  → 5 → r-x\nOthers → 5 → r-x</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner  → Read + Write + Execute\nGroup  → Read + Execute\nOthers → Read + Execute</div></div>
 
 <h3>۲۹. مثال 644</h3>
-<p><code>644</code> → Owner: <code>6</code> (rw-)، Group: <code>4</code> (r--)، Others: <code>4</code> (r--).</p>
+<div class="code-container"><span class="code-label">عدد</span><div class="code-block">644</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner  → 6 → rw-\nGroup  → 4 → r--\nOthers → 4 → r--</div></div>
+<p>در نتیجه:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner  → Read + Write\nGroup  → Read\nOthers → Read</div></div>
 
 <h3>۳۰. Permissionهای پرکاربرد</h3>
 <table>
@@ -3497,30 +3578,46 @@
 <tr><td><code>700</code></td><td>فقط Owner <code>rwx</code></td></tr>
 </tbody>
 </table>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته امنیتی ⚠️</strong> <code>777</code> را صرفاً به این دلیل که «کار می‌کند» استفاده نکنید. دادن Write به همه کاربران یک ریسک امنیتی جدی است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته امنیتی ⚠️</strong> <code>777</code> را صرفاً به این دلیل که «کار می‌کند» استفاده نکن. دادن Write به همه کاربران می‌تواند یک ریسک امنیتی جدی باشد.</div></div>
 
 <h3>۳۱. <code>chmod</code></h3>
-<p>تغییر Permission:</p>
-<ul>
-<li><strong>Numeric:</strong> <code>chmod 755 script.sh</code></li>
-<li><strong>Symbolic:</strong> <code>chmod u+x script.sh</code></li>
-</ul>
-<p><code>u</code> → User/Owner، <code>g</code> → Group، <code>o</code> → Others، <code>a</code> → All.</p>
-<p>مثال‌ها: <code>chmod g-w file.txt</code> (Write را از Group حذف کن)، <code>chmod o+r file.txt</code> (Read را برای Others اضافه کن).</p>
+<p>برای تغییر Permission:</p>
+<h4>Numeric</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod 755 script.sh</div></div>
+<h4>Symbolic</h4>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod u+x script.sh</div></div>
+<p>معنی:</p>
+<div class="code-container"><span class="code-label">حروف</span><div class="code-block no-prompt">u → User / Owner\ng → Group\no → Others\na → All</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod g-w file.txt</div></div>
+<p>یعنی Write را از Group حذف کن. یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod o+r file.txt</div></div>
+<p>یعنی Read را برای Others اضافه کن.</p>
 
 <h3>۳۲. Permission روی Directory</h3>
-<p>این قسمت بسیار مهم است. Permission روی Directory دقیقاً همان معنایی را که روی File دارد، ندارد.</p>
+<p>این قسمت بسیار مهم است. Permission روی Directory دقیقاً همان معنایی را که روی File دارد، ندارد. برای Directory:</p>
 <ul>
 <li><strong><code>r</code>:</strong> امکان مشاهده‌ی نام Entryهای داخل Directory.</li>
-<li><strong><code>w</code>:</strong> امکان ایجاد، حذف و Rename کردن Entryها.</li>
-<li><strong><code>x</code>:</strong> امکان <strong>Traverse</strong> کردن Directory (عبور/دسترسی به آن و دسترسی به Entryهای داخل آن).</li>
+<li><strong><code>w</code>:</strong> امکان ایجاد، حذف و Rename کردن Entryها، البته در کنار Permissionهای لازم دیگر.</li>
+<li><strong><code>x</code>:</strong> امکان <strong>Traverse</strong> کردن Directory؛ یعنی عبور/دسترسی به آن و دسترسی به Entryهای داخل آن در صورت داشتن مجوزهای لازم.</li>
 </ul>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>x</code> روی Directory را با «اجرای Directory» اشتباه نکنید. Directory اجرا نمی‌شود. <code>x</code> روی Directory یعنی اجازه‌ی Traverse/Search.</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Directory\n│\n├── r → دیدن نام‌ها\n├── w → ایجاد/حذف/تغییر نام\n└── x → عبور و دسترسی</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> <code>x</code> روی Directory را با «اجرای Directory» اشتباه نکن. Directory اجرا نمی‌شود. <code>x</code> روی Directory یعنی اجازه‌ی Traverse/Search.</div></div>
 
 <h2>بخش ششم — Ownership</h2>
 
 <h3>۳۳. Owner و Group</h3>
-<p>هر File/Directory یک <code>Owner</code> و یک <code>Group</code> دارد. با <code>ls -l</code> قابل مشاهده است. مثال: <code>-rw-r--r-- 1 ali developers 1200 report.txt</code> → Owner: <code>ali</code>، Group: <code>developers</code>.</p>
+<p>هر File/Directory یک:</p>
+<div class="code-container"><span class="code-label">مفهوم</span><div class="code-block">Owner</div></div>
+<p>و یک:</p>
+<div class="code-container"><span class="code-label">مفهوم</span><div class="code-block">Group</div></div>
+<p>دارد. با:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
+<p>می‌توان آن‌ها را مشاهده کرد. مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block">-rw-r--r-- 1 ali developers 1200 report.txt</div></div>
+<p>در اینجا:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Owner → ali\nGroup → developers</div></div>
 
 <h3>۳۴. <code>chown</code></h3>
 <p>برای تغییر Owner:</p>
@@ -3531,58 +3628,79 @@
 <h3>۳۵. <code>chgrp</code></h3>
 <p>برای تغییر Group:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo chgrp developers report.txt</div></div>
-<p><code>chown</code> → Owner (می‌تواند Group را نیز تنظیم کند)، <code>chgrp</code> → Group.</p>
+<p>مقایسه:</p>
+<div class="code-container"><span class="code-label">chown</span><div class="code-block no-prompt">chown\n→ Owner\n→ می‌تواند Group را نیز تنظیم کند</div></div>
+<div class="code-container"><span class="code-label">chgrp</span><div class="code-block no-prompt">chgrp\n→ Group</div></div>
 
 <h2>بخش هفتم — ACL</h2>
 
 <h3>۳۶. مشکل Permission معمولی</h3>
-<p>Permission سنتی سه دسته دارد: Owner، Group، Others. اما اگر بخواهید کاربر خاصی مانند Sara دسترسی Read داشته باشد بدون تغییر Group اصلی، Permission معمولی محدود است. اینجا <strong>ACL</strong> به کار می‌آید.</p>
+<p>Permission سنتی سه دسته دارد:</p>
+<div class="code-container"><span class="code-label">دسته‌ها</span><div class="code-block no-prompt">Owner\nGroup\nOthers</div></div>
+<p>اما فرض کن:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block">report.txt</div></div>
+<p>این Permission را دارد:</p>
+<div class="code-container"><span class="code-label">Permission</span><div class="code-block">-rw-r-----</div></div>
+<p>و می‌خواهی:</p>
+<div class="code-container"><span class="code-label">هدف</span><div class="code-block no-prompt">Ali → دسترسی نداشته باشد\nSara → Read داشته باشد</div></div>
+<p>بدون اینکه Group اصلی را تغییر دهی. Permission معمولی برای چنین سناریوهایی محدود است. اینجا <strong>ACL</strong> به کار می‌آید.</p>
 
 <h3>۳۷. ACL چیست؟</h3>
-<p>ACL مخفف <strong>Access Control List</strong> است. امکان تعریف Ruleهای دقیق‌تر برای کاربران و Groupهای مشخص را فراهم می‌کند.</p>
+<p>ACL مخفف <strong>Access Control List</strong> است. ACL امکان تعریف Ruleهای دقیق‌تر برای کاربران و Groupهای مشخص را فراهم می‌کند. مثلاً:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">File\n│\n├── Owner\n├── Group\n├── Others\n│\n└── ACL\n      ├── Sara → Read\n      └── Ali  → Read/Write</div></div>
 
 <h3>۳۸. <code>setfacl</code></h3>
 <p>برای تنظیم ACL:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">setfacl -m u:sara:r report.txt</div></div>
 <p>یعنی برای کاربر <code>sara</code> مجوز Read ایجاد/تنظیم کن.</p>
-<p>مشاهده ACL:</p>
+<p>مشاهده:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">getfacl report.txt</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>chmod</code> → Permissionهای پایه؛ <code>setfacl</code> → تنظیم ACL؛ <code>getfacl</code> → مشاهده ACL.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> <code>chmod</code> → Permissionهای پایه؛ <code>setfacl</code> → ACL؛ <code>getfacl</code> → مشاهده ACL.</div></div>
 
 <h2>بخش هشتم — Search</h2>
 
 <h3>۳۹. <code>find</code></h3>
-<p><code>find</code> برای جستجوی File و Directory در یک مسیر و بر اساس معیارهای مختلف استفاده می‌شود.</p>
+<p><code>find</code> برای جستجوی File و Directory در یک مسیر و بر اساس معیارهای مختلف استفاده می‌شود. مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /home -name "*.txt"</div></div>
-<p>یعنی در <code>/home</code> فایل‌هایی با الگوی <code>*.txt</code> پیدا کن.</p>
-<p>معیارهای دیگر: Name، Type، Size، User، Permission، Time.</p>
-<p>مثال: <code>find /var -type f -name "*.log"</code></p>
+<p>یعنی: در <code>/home</code> فایل‌هایی با الگوی <code>*.txt</code> پیدا کن.</p>
+<p>می‌توان معیارهای دیگری نیز داشت، مثل:</p>
+<ul>
+<li>Name</li>
+<li>Type</li>
+<li>Size</li>
+<li>User</li>
+<li>Permission</li>
+<li>Time</li>
+</ul>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /var -type f -name "*.log"</div></div>
 
 <h3>۴۰. <code>locate</code></h3>
-<p><code>locate</code> از یک <strong>Database از مسیر فایل‌ها</strong> استفاده می‌کند.</p>
+<p><code>locate</code> روش متفاوتی دارد. به جای اینکه هر بار کل مسیر را از ابتدا جستجو کند، معمولاً از یک <strong>Database از مسیر فایل‌ها</strong> استفاده می‌کند. مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">locate report.txt</div></div>
-<p>بسیار سریع است، اما اگر Database به‌روز نباشد، ممکن است نتیجه‌ی جدیدترین وضعیت Filesystem را نشان ندهد. برای به‌روزرسانی: <code>sudo updatedb</code>.</p>
+<p>به همین دلیل می‌تواند بسیار سریع باشد. اما:</p>
+<blockquote>اگر Database به‌روز نباشد، ممکن است نتیجه‌ی جدیدترین وضعیت Filesystem را نشان ندهد.</blockquote>
+<p>برای به‌روزرسانی Database در سیستم‌هایی که <code>updatedb</code> در دسترس است:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo updatedb</div></div>
 
 <h3>۴۱. <code>find</code> vs <code>locate</code></h3>
-<table>
-<thead><tr><th><code>find</code></th><th><code>locate</code></th></tr></thead>
-<tbody>
-<tr><td>جستجوی Filesystem</td><td>جستجو در Database</td></tr>
-<tr><td>انعطاف‌پذیر</td><td>سریع</td></tr>
-</tbody>
-</table>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>locate</code> الزاماً «بهتر» از <code>find</code> نیست. دقت و معیارهای متنوع → <code>find</code>؛ پیدا کردن سریع Path → <code>locate</code>.</div></div>
+<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find\n↓\nجستجوی Filesystem\n↓\nانعطاف‌پذیر</div></div>
+<div class="code-container"><span class="code-label">locate</span><div class="code-block no-prompt">locate\n↓\nجستجو در Database\n↓\nسریع</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> <code>locate</code> الزاماً «بهتر» از <code>find</code> نیست. انتخاب آن‌ها به نیاز بستگی دارد: دقت و معیارهای متنوع → <code>find</code>؛ پیدا کردن سریع Path → <code>locate</code>.</div></div>
 
 <h2>یک سناریوی واقعی 🎯</h2>
-<p>فرض کنید یک پروژه دارید: <code>Project/</code> با <code>report.txt</code>، <code>data.txt</code> و <code>images/</code>.</p>
+<p>فرض کن یک پروژه داری:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Project/\n├── report.txt\n├── data.txt\n└── images/</div></div>
 <h3>مرحله ۱ — Archive</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -cf project.tar Project/</div></div>
 <h3>مرحله ۲ — Compression</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">gzip project.tar</div></div>
-<p>نتیجه: <code>project.tar.gz</code> یا همه یکجا: <code>tar -czf project.tar.gz Project/</code></p>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">نتیجه</span><div class="code-block">project.tar.gz</div></div>
+<p>یا همه را یکجا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf project.tar.gz Project/</div></div>
 <h3>مرحله ۳ — Permission</h3>
-<p><code>report.txt</code> باید فقط توسط Owner قابل ویرایش باشد:</p>
+<p>فرض کن <code>report.txt</code> باید فقط توسط Owner قابل ویرایش باشد:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod 644 report.txt</div></div>
 <h3>مرحله ۴ — تغییر Owner</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo chown ali report.txt</div></div>
@@ -3591,6 +3709,7 @@
 <h3>مرحله ۶ — پیدا کردن فایل</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">find /home -name report.txt</div></div>
 <h3>مرحله ۷ — ساخت Image</h3>
+<p>اگر نیاز به Image از یک Disk داشته باشیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">dd if=/dev/sdb of=disk.img</div></div>
 
 <h2>جدول طلایی دستورات</h2>
@@ -3620,72 +3739,116 @@
 
 <h2>مقایسه‌های طلایی LPIC-1</h2>
 <h3><code>tar</code> vs <code>gzip</code></h3>
-<p><code>tar</code> → Archive؛ <code>gzip</code> → Compression.</p>
+<div class="code-container"><span class="code-label">tar</span><div class="code-block no-prompt">tar\n→ Archive</div></div>
+<div class="code-container"><span class="code-label">gzip</span><div class="code-block no-prompt">gzip\n→ Compression</div></div>
+
 <h3><code>cp</code> vs <code>mv</code></h3>
-<p><code>cp</code> → Copy؛ <code>mv</code> → Move / Rename.</p>
+<div class="code-container"><span class="code-label">cp</span><div class="code-block no-prompt">cp\n→ Copy</div></div>
+<div class="code-container"><span class="code-label">mv</span><div class="code-block no-prompt">mv\n→ Move / Rename</div></div>
+
 <h3>Hard Link vs Symbolic Link</h3>
-<p>Hard Link → همان inode، بین Filesystemها نمی‌رود، حذف یک نام داده را لزوماً حذف نمی‌کند. Symbolic Link → Path، می‌تواند بین Filesystemها باشد، با حذف Target ممکن است Broken شود.</p>
+<div class="code-container"><span class="code-label">Hard Link</span><div class="code-block no-prompt">Hard Link\n→ همان inode\n→ بین Filesystemها نمی‌رود\n→ حذف یک نام، داده را لزوماً حذف نمی‌کند</div></div>
+<div class="code-container"><span class="code-label">Symbolic Link</span><div class="code-block no-prompt">Symbolic Link\n→ Path\n→ می‌تواند بین Filesystemها باشد\n→ با حذف Target ممکن است Broken شود</div></div>
+
 <h3><code>chmod</code> vs <code>chown</code> vs <code>chgrp</code></h3>
-<p><code>chmod</code> → Permission؛ <code>chown</code> → Owner؛ <code>chgrp</code> → Group.</p>
+<div class="code-container"><span class="code-label">chmod</span><div class="code-block no-prompt">chmod\n→ Permission</div></div>
+<div class="code-container"><span class="code-label">chown</span><div class="code-block no-prompt">chown\n→ Owner</div></div>
+<div class="code-container"><span class="code-label">chgrp</span><div class="code-block no-prompt">chgrp\n→ Group</div></div>
+
 <h3>Permission vs ACL</h3>
-<p>Permission → Owner / Group / Others؛ ACL → دسترسی دقیق‌تر برای User/Groupهای مشخص.</p>
+<div class="code-container"><span class="code-label">Permission</span><div class="code-block no-prompt">Permission\n→ Owner / Group / Others</div></div>
+<div class="code-container"><span class="code-label">ACL</span><div class="code-block no-prompt">ACL\n→ دسترسی دقیق‌تر برای User/Groupهای مشخص</div></div>
+
 <h3><code>find</code> vs <code>locate</code></h3>
-<p><code>find</code> → جستجوی Filesystem؛ <code>locate</code> → جستجو در Database.</p>
+<div class="code-container"><span class="code-label">find</span><div class="code-block no-prompt">find\n→ جستجوی Filesystem</div></div>
+<div class="code-container"><span class="code-label">locate</span><div class="code-block no-prompt">locate\n→ جستجو در Database</div></div>
 
 <h2>دام‌های امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> <code>tar</code> فایل‌ها را فشرده می‌کند؟ ❌ خیر؛ <code>tar</code> وظیفه‌ی اصلی Archive کردن را دارد.</li>
-<li><strong>دام ۲:</strong> <code>.tar.gz</code> یعنی gzip به تنهایی؟ ❌ خیر؛ معمولاً یعنی <code>tar</code> Archive + <code>gzip</code> Compression.</li>
-<li><strong>دام ۳:</strong> <code>dd</code> یک Backup Manager کامل است؟ ❌ خیر؛ <code>dd</code> ابزار Low-Level Copy است.</li>
-<li><strong>دام ۴:</strong> Hard Link یک Copy واقعی از فایل است؟ ❌ خیر؛ Hard Link یک Directory Entry دیگر برای همان inode است.</li>
-<li><strong>دام ۵:</strong> حذف نام فایل همیشه داده را حذف می‌کند؟ ❌ خیر؛ داده تا زمانی باقی می‌ماند که حداقل یک Link به آن باقی باشد.</li>
-<li><strong>دام ۶:</strong> <code>x</code> روی Directory یعنی اجرای Directory؟ ❌ خیر؛ <code>x</code> روی Directory یعنی Traverse/Search.</li>
-<li><strong>دام ۷:</strong> <code>644</code> یعنی همه می‌توانند فایل را ویرایش کنند؟ ❌ خیر؛ فقط Owner مجوز Write دارد.</li>
-<li><strong>دام ۸:</strong> ACL همان Permission معمولی است؟ ❌ خیر؛ ACL یک لایه‌ی دقیق‌تر برای کنترل دسترسی فراهم می‌کند.</li>
-<li><strong>دام ۹:</strong> <code>locate</code> همیشه نتیجه‌ی دقیق‌تر و جدیدتری از <code>find</code> دارد؟ ❌ خیر؛ <code>locate</code> به Database وابسته است و ممکن است Database به‌روز نباشد.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> ❌ <code>tar</code> فایل‌ها را فشرده می‌کند. ✅ <code>tar</code> وظیفه‌ی اصلی Archive کردن را دارد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> ❌ <code>.tar.gz</code> یعنی gzip به تنهایی. ✅ معمولاً یعنی <code>tar</code> Archive + <code>gzip</code> Compression.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> ❌ <code>dd</code> یک Backup Manager کامل است. ✅ <code>dd</code> ابزار Low-Level Copy است و می‌تواند برای Image/Backupهای خاص استفاده شود.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> ❌ Hard Link یک Copy واقعی از فایل است. ✅ Hard Link یک Directory Entry دیگر برای همان inode است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> ❌ حذف نام فایل همیشه داده را حذف می‌کند. ✅ داده تا زمانی باقی می‌ماند که حداقل یک Link به آن باقی باشد و Processی نیز آن را باز نگه نداشته باشد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> ❌ <code>x</code> روی Directory یعنی اجرای Directory. ✅ <code>x</code> روی Directory یعنی Traverse/Search.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> ❌ <code>644</code> یعنی همه می‌توانند فایل را ویرایش کنند. ✅ فقط Owner مجوز Write دارد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> ❌ ACL همان Permission معمولی است. ✅ ACL یک لایه‌ی دقیق‌تر برای کنترل دسترسی فراهم می‌کند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> ❌ <code>locate</code> همیشه نتیجه‌ی دقیق‌تر و جدیدتری از <code>find</code> دارد. ✅ <code>locate</code> به Database وابسته است و ممکن است Database به‌روز نباشد.</div></div>
 
-<h2>🧠 نقشه ذهنی جلسه</h2>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Files\n│\n├── Management\n│     ├── cp\n│     ├── mv\n│     ├── rm\n│     └── mkdir\n│\n├── Archive\n│     └── tar\n│\n├── Compression\n│     └── gzip\n│\n├── Image / Low-Level Copy\n│     └── dd\n│\n├── Links\n│     ├── Hard Link\n│     └── Symbolic Link\n│\n├── Access Control\n│     ├── Permission\n│     │     ├── r\n│     │     ├── w\n│     │     └── x\n│     │\n│     ├── chmod\n│     ├── chown\n│     ├── chgrp\n│     └── ACL\n│           ├── setfacl\n│           └── getfacl\n│\n└── Search\n      ├── find\n      └── locate</div></div>
+<h2>نقشه ذهنی جلسه</h2>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Files\n│\n├── Management\n│     ├── cp\n│     ├── mv\n│     ├── rm\n│     └── mkdir\n│\n├── Archive\n│     └── tar\n│\n├── Compression\n│     └── gzip\n│\n├── Image / Low-Level Copy\n│     └── dd\n│\n├── Links\n│     ├── Hard Link\n│     └── Symbolic Link\n│\n├── Access Control\n│     ├── Permission\n│     │     ├── r\n│     │     ├── w\n│     │     └── x\n│     │\n│     ├── chmod\n│     ├── chown\n│     ├── chgrp\n│     └── ACL\n│           ├── setfacl\n│           └── getfacl\n│\n└── Search\n      ├── find\n      └── locate</div></div>
 
-<h2>⚡ حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
+<h2>چک‌لیست مرور ۲ دقیقه‌ای ✅</h2>
+<p>قبل از رفتن به جلسه‌ی بعد باید بتوانی به این سؤال‌ها جواب بدهی:</p>
+<ul>
+<li>تفاوت <code>cp</code> و <code>mv</code> چیست؟</li>
+<li><code>rm -r</code> چه کاری انجام می‌دهد؟</li>
+<li>تفاوت Archive و Compression چیست؟</li>
+<li><code>tar</code> چه کاری انجام می‌دهد؟</li>
+<li><code>gzip</code> چه کاری انجام می‌دهد؟</li>
+<li><code>.tar.gz</code> به چه معناست؟</li>
+<li><code>dd</code> چه نوع Copyای انجام می‌دهد؟</li>
+<li><code>if</code> و <code>of</code> در <code>dd</code> چه هستند؟</li>
+<li>Hard Link و Symbolic Link چه تفاوتی دارند؟</li>
+<li>چرا Hard Link با حذف یک نام می‌تواند همچنان کار کند؟</li>
+<li><code>r</code>، <code>w</code> و <code>x</code> چه معنایی دارند؟</li>
+<li>تفاوت Permission روی File و Directory چیست؟</li>
+<li><code>755</code> و <code>644</code> را چگونه تفسیر می‌کنی؟</li>
+<li><code>chmod</code> چه کاری انجام می‌دهد؟</li>
+<li><code>chown</code> و <code>chgrp</code> چه تفاوتی دارند؟</li>
+<li>ACL چه مشکلی را حل می‌کند؟</li>
+<li><code>setfacl</code> و <code>getfacl</code> چه هستند؟</li>
+<li>تفاوت <code>find</code> و <code>locate</code> چیست؟</li>
+<li>چرا <code>locate</code> ممکن است نتیجه‌ی قدیمی نشان دهد؟</li>
+<li>چرا RAID جایگزین Backup نیست؟</li>
+</ul>
+
+<h2>🧠 حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
 <h3>File Management</h3>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">cp → Copy\nmv → Move / Rename\nrm → Delete\nmkdir → Create Directory</div></div>
 <h3>Archive / Compression</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">tar   → Archive\ngzip  → Compression\ntar -czf file.tar.gz dir/</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">tar   → Archive\ngzip  → Compression</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tar -czf file.tar.gz dir/</div></div>
 <h3>dd</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">if → Input\nof → Output\ndd → Low-Level Copy / Image</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">if → Input\nof → Output</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">dd → Low-Level Copy / Image</div></div>
 <h3>Links</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Hard Link → inode، همان Filesystem\nSymbolic Link → Path، می‌تواند بین Filesystemها باشد</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Hard Link\n→ inode\n→ همان Filesystem</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Symbolic Link\n→ Path\n→ می‌تواند بین Filesystemها باشد</div></div>
 <h3>Permissions</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">r = 4\nw = 2\nx = 1\n755 → rwx r-x r-x\n644 → rw- r-- r--</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">r = 4\nw = 2\nx = 1</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">755\n→ rwx r-x r-x</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">644\n→ rw- r-- r--</div></div>
 <h3>Ownership</h3>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">chmod → Permission\nchown → Owner\nchgrp → Group</div></div>
 <h3>ACL</h3>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">setfacl → Set ACL\ngetfacl → Get/View ACL</div></div>
 <h3>Search</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">find → Filesystem Search\nlocate → Database Search</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">find\n→ Filesystem Search</div></div>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">locate\n→ Database Search</div></div>
 
 <h2>⭐ سؤال طلایی جلسه</h2>
-<p>فرض کنید <code>Project/</code> با <code>report.txt</code> دارید. می‌خواهید:</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Project/\n└── report.txt</div></div>
+<p>می‌خواهی:</p>
 <ol>
-<li>Project را Archive کنید.</li>
-<li>آن را Compress کنید.</li>
-<li>Permission فایل را تنظیم کنید.</li>
-<li>برای یک User خاص دسترسی تعریف کنید.</li>
-<li>بعداً فایل را پیدا کنید.</li>
+<li>Project را Archive کنی.</li>
+<li>آن را Compress کنی.</li>
+<li>Permission فایل را تنظیم کنی.</li>
+<li>برای یک User خاص دسترسی تعریف کنی.</li>
+<li>بعداً فایل را پیدا کنی.</li>
 </ol>
-<div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">Project\n   ↓\ntar\n   ↓\nArchive\n   ↓\ngzip\n   ↓\nCompressed Archive\n\nreport.txt\n   ↓\nchmod\n   ↓\nPermission\n\nreport.txt\n   ↓\nsetfacl\n   ↓\nUser-specific Access\n\n/home\n   ↓\nfind\n   ↓\nreport.txt</div></div>
-<p>و اگر به جای Archive معمولی به <strong>Disk Image</strong> نیاز داشته باشیم: <code>Disk → dd → Image</code>.</p>
+<p>مسیر ذهنی:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Project\n   ↓\ntar\n   ↓\nArchive\n   ↓\ngzip\n   ↓\nCompressed Archive\n\nreport.txt\n   ↓\nchmod\n   ↓\nPermission\n\nreport.txt\n   ↓\nsetfacl\n   ↓\nUser-specific Access\n\n/home\n   ↓\nfind\n   ↓\nreport.txt</div></div>
+<p>و اگر به جای Archive معمولی به <strong>Disk Image</strong> نیاز داشته باشیم:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Disk\n ↓\ndd\n ↓\nImage</div></div>
 
 <h2>جمع‌بندی نهایی جلسه</h2>
 <p>در این جلسه چند موضوع ظاهراً جدا را یاد گرفتیم، اما همه‌ی آن‌ها بخشی از <strong>File Management و Access Management</strong> هستند:</p>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Files\n │\n ├── Manage\n │    ├── cp\n │    ├── mv\n │    └── rm\n │\n ├── Package Together\n │    └── tar\n │\n ├── Reduce Size\n │    └── gzip\n │\n ├── Create Image\n │    └── dd\n │\n ├── Create Alternative Names\n │    ├── Hard Link\n │    └── Symbolic Link\n │\n ├── Control Access\n │    ├── chmod\n │    ├── chown\n │    ├── chgrp\n │    └── ACL\n │\n └── Find\n      ├── find\n      └── locate</div></div>
-<p>اگر یک جمله بخواهیم از کل جلسه حفظ کنیم: <strong>فایل را مدیریت می‌کنیم، در صورت نیاز Archive و Compress می‌کنیم، برای Image از <code>dd</code> استفاده می‌کنیم، با Linkها نام‌های دیگری برای داده ایجاد می‌کنیم، با Permission و ACL دسترسی را کنترل می‌کنیم و با <code>find</code> و <code>locate</code> فایل‌ها را پیدا می‌کنیم.</strong></p>
+<p>اگر یک جمله بخواهیم از کل جلسه حفظ کنیم:</p>
+<blockquote>فایل را مدیریت می‌کنیم، در صورت نیاز Archive و Compress می‌کنیم، برای Image از <code>dd</code> استفاده می‌کنیم، با Linkها نام‌های دیگری برای داده ایجاد می‌کنیم، با Permission و ACL دسترسی را کنترل می‌کنیم و با <code>find</code> و <code>locate</code> فایل‌ها را پیدا می‌کنیم.</blockquote>
 
-<div class="box important"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong>
-در جلسه‌ی بعد از خود <strong>File</strong> عبور می‌کنیم و وارد بخش مهم <strong>Boot و System</strong> می‌شویم؛ یعنی اینکه وقتی سیستم روشن می‌شود، از BIOS/UEFI تا GRUB و Kernel و <code>systemd</code> چه اتفاقی می‌افتد.
-</div></div>
+<div class="box note"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong> در جلسه‌ی بعد از خود <strong>File</strong> عبور می‌کنیم و وارد بخش مهم <strong>Boot و System</strong> می‌شویم؛ یعنی اینکه وقتی سیستم روشن می‌شود، از BIOS/UEFI تا GRUB و Kernel و <code>systemd</code> چه اتفاقی می‌افتد.</div></div>
 ` ,
 "s6": `
 <div class="section-header">
