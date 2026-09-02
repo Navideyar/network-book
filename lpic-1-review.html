@@ -1158,6 +1158,7 @@
         // ۲۶-۲ – محتوای غنی (Rich Content) — فقط جلسه ۱ آماده است
         // ============================================================
         const richContent = {
+
 "s1": `
 <div class="section-header">
     <div class="section-badge">۱</div>
@@ -1167,41 +1168,75 @@
     </div>
 </div>
 
-<blockquote><strong>🎯 هدف جلسه:</strong> پایه‌ای‌ترین مفاهیم کار با لینوکس را یاد بگیریم: Linux و Kernel، تفاوت Shell و Terminal، نحوه اجرای Command، ساختار فایل‌ها، Path، دستورات pwd، cd، ls، ساخت فایل و پوشه، مشاهده محتویات فایل، Variable و PATH، History و روش‌های گرفتن Help. هدف اصلی این است که بعد از این جلسه بدانید «کجا هستید»، «چطور حرکت کنید»، «چطور فایل‌ها را ببینید و بسازید» و «اگر دستوری را بلد نیستید، چطور راهنمای آن را پیدا کنید».</blockquote>
+<blockquote>
+<strong>🎯 هدف جلسه:</strong> در این جلسه قرار است پایه‌ای‌ترین مفاهیم کار با لینوکس را یاد بگیریم:
+<ul>
+<li>Linux و Kernel چیست؟</li>
+<li>Shell و Terminal چه تفاوتی دارند؟</li>
+<li>Command چگونه اجرا می‌شود؟</li>
+<li>فایل‌ها در لینوکس چگونه سازمان‌دهی شده‌اند؟</li>
+<li>Path چیست و Absolute و Relative چه تفاوتی دارند؟</li>
+<li><code>pwd</code>، <code>cd</code> و <code>ls</code></li>
+<li>ساخت فایل و پوشه</li>
+<li>مشاهده محتویات فایل</li>
+<li>Variable و <code>PATH</code></li>
+<li>History</li>
+<li>روش‌های گرفتن Help</li>
+</ul>
+<strong>هدف اصلی:</strong> بعد از این جلسه وقتی وارد یک Terminal لینوکس شدی، بدانی «کجا هستی»، «چطور حرکت کنی»، «چطور فایل‌ها را ببینی و بسازی» و «اگر دستوری را بلد نبودی، چطور راهنمای آن را پیدا کنی».
+</blockquote>
 
 <h2>۱. قبل از شروع...</h2>
-<p>فرض کنید داخل Terminal این دستور را می‌نویسید:</p>
+<p>فرض کن داخل Terminal این دستور را می‌نویسی:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls</div></div>
 <p>و فایل‌ها و پوشه‌ها نمایش داده می‌شوند. در ظاهر اتفاق ساده‌ای است؛ اما پشت صحنه تقریباً این مسیر را داریم:</p>
 <div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">User\n  │\n  ▼\nTerminal\n  │\n  ▼\nShell\n  │\n  ▼\nCommand / Program\n  │\n  ▼\nKernel\n  │\n  ▼\nHardware</div></div>
-<p>البته این یک مدل ساده‌شده است؛ هدف آن درک ارتباط اجزاست، نه نشان دادن تمام جزئیات فنی.</p>
+<p>البته این شکل یک <strong>مدل ساده‌شده</strong> است؛ هدف آن درک ارتباط اجزاست، نه نشان دادن تمام جزئیات فنی.</p>
 
 <h2>۲. Linux چیست؟</h2>
 <p>در صحبت روزمره وقتی می‌گوییم «Linux»، معمولاً منظورمان کل محیط سیستم‌عامل لینوکسی است. اما از نظر فنی:</p>
 <blockquote><strong>Linux نام Kernel است.</strong></blockquote>
-<p>یک سیستم لینوکسی معمولاً از Kernel به همراه ابزارها، کتابخانه‌ها، برنامه‌ها و محیط‌های مختلف تشکیل می‌شود. به مجموعه‌ای که این اجزا را در کنار هم ارائه می‌کند، معمولاً <strong>Distribution یا Distro</strong> می‌گوییم. مثال‌ها: Ubuntu، Debian، Fedora، Rocky Linux. همگی از <strong>Linux Kernel</strong> استفاده می‌کنند، اما مجموعه نرم‌افزاری متفاوتی دارند.</p>
+<p>یک سیستم لینوکسی معمولاً از Kernel به همراه ابزارها، کتابخانه‌ها، برنامه‌ها و محیط‌های مختلف تشکیل می‌شود. به مجموعه‌ای که این اجزا را در کنار هم ارائه می‌کند، معمولاً <strong>Distribution یا Distro</strong> می‌گوییم. مثلاً:</p>
+<div class="code-container"><span class="code-label">توزیع‌ها</span><div class="code-block no-prompt">Ubuntu\nDebian\nFedora\nRocky Linux</div></div>
+<p>همگی از <strong>Linux Kernel</strong> استفاده می‌کنند، اما مجموعه نرم‌افزاری متفاوتی دارند.</p>
 <h3>تصویر ذهنی</h3>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Linux Distribution\n│\n├── Linux Kernel\n├── System Libraries\n├── System Utilities\n├── Shell\n├── Applications\n└── GUI / Desktop</div></div>
+<div class="code-container"><span class="code-label">ساختار توزیع</span><div class="code-block no-prompt">Linux Distribution\n│\n├── Linux Kernel\n├── System Libraries\n├── System Utilities\n├── Shell\n├── Applications\n└── GUI / Desktop</div></div>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> Linux به‌طور دقیق نام Kernel است، نه نام تمام نرم‌افزارهای یک Distribution.</div></div>
 
 <h2>۳. Kernel چیست؟</h2>
-<p>Kernel هسته اصلی سیستم است. Kernel بین نرم‌افزارها و سخت‌افزار قرار دارد و منابع سیستم را مدیریت می‌کند: CPU، RAM، Disk، Network، Devices، Processها و ... . برنامه‌ها معمولاً برای انجام عملیات سطح پایین، از طریق <strong>System Call</strong> با Kernel درخواست ارتباط می‌کنند.</p>
+<p>Kernel هسته اصلی سیستم است. Kernel بین نرم‌افزارها و سخت‌افزار قرار دارد و منابع سیستم را مدیریت می‌کند. مثلاً:</p>
+<ul>
+<li>CPU</li>
+<li>RAM</li>
+<li>Disk</li>
+<li>Network</li>
+<li>Devices</li>
+<li>Processها</li>
+</ul>
+<p>برنامه‌ها معمولاً برای انجام عملیات سطح پایین، از طریق <strong>System Call</strong> با Kernel درخواست ارتباط می‌کنند.</p>
 <h3>مثال</h3>
-<p>وقتی می‌نویسیم <code>cat file.txt</code>، برنامه <code>cat</code> برای دسترسی به فایل از امکانات سیستم‌عامل/Kernel استفاده می‌کند.</p>
+<p>وقتی می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">cat file.txt</div></div>
+<p>برنامه <code>cat</code> برای دسترسی به فایل از امکانات سیستم‌عامل/Kernel استفاده می‌کند. به زبان ساده:</p>
 <div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">cat\n ↓\nKernel\n ↓\nFilesystem / Disk\n ↓\nfile.txt</div></div>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> Kernel مسئول کارهایی مثل <strong>Process + Memory + Device + Filesystem + Networking</strong> است.</div></div>
 
 <h2>۴. Shell چیست؟</h2>
-<p>Shell برنامه‌ای است که به عنوان <strong>Command Interpreter</strong> عمل می‌کند. یعنی دستوری که کاربر وارد می‌کند را دریافت و تفسیر می‌کند و در صورت نیاز برنامه یا عملیات مناسب را اجرا می‌کند.</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir test</div></div>
+<p>Shell برنامه‌ای است که به عنوان <strong>Command Interpreter</strong> عمل می‌کند. یعنی دستوری که کاربر وارد می‌کند را دریافت و تفسیر می‌کند و در صورت نیاز برنامه یا عملیات مناسب را اجرا می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mkdir test</div></div>
 <p>Shell متوجه می‌شود که باید دستور <code>mkdir</code> اجرا شود.</p>
-<p>Shellهای معروف: <code>sh</code>، <code>bash</code>، <code>zsh</code>، <code>fish</code>. در LPIC-1، <strong>Bash</strong> اهمیت زیادی دارد.</p>
+<h3>Shellهای معروف</h3>
+<div class="code-container"><span class="code-label">نمونه</span><div class="code-block no-prompt">sh\nbash\nzsh\nfish</div></div>
+<p>در LPIC-1، <strong>Bash</strong> اهمیت زیادی دارد.</p>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> Shell = Command Interpreter. Shell خودش Kernel نیست.</div></div>
 
 <h2>۵. Terminal چیست؟</h2>
-<p>Terminal محیطی است که از طریق آن با Shell تعامل می‌کنیم. در محیط گرافیکی، Terminal معمولاً به شکل یک پنجره دیده می‌شود. داخل این Terminal ممکن است Shellای مثل Bash اجرا شود.</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">Terminal\n   │\n   └── Bash\n          │\n          └── Commands</div></div>
+<p>Terminal محیطی است که از طریق آن با Shell تعامل می‌کنیم. در محیط گرافیکی، Terminal معمولاً به شکل یک پنجره دیده می‌شود:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block no-prompt">┌─────────────────────────────┐\n│ Terminal                    │\n│                             │\n│ $ ls                        │\n│ file.txt  test/             │\n│                             │\n└─────────────────────────────┘</div></div>
+<p>داخل این Terminal ممکن است Shellای مثل Bash اجرا شود. پس:</p>
+<div class="code-container"><span class="code-label">سلسله‌مراتب</span><div class="code-block no-prompt">Terminal\n   │\n   └── Bash\n          │\n          └── Commands</div></div>
 <h3>تفاوت خیلی مهم</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>مفهوم</th><th>وظیفه</th></tr></thead>
 <tbody>
@@ -1211,18 +1246,24 @@
 <tr><td>Command</td><td>دستور یا برنامه‌ای که اجرا می‌شود</td></tr>
 </tbody>
 </table>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> Terminal ≠ Shell. Terminal محل تعامل است؛ Shell مفسر دستورات است.</div></div>
+</div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> این دو را یکی ندان: <code>Terminal ≠ Shell</code>. Terminal محل تعامل است؛ Shell مفسر دستورات است.</div></div>
 
 <h2>۶. Command چیست؟</h2>
-<p>Command یعنی دستوری که به Shell می‌دهیم تا یک عملیات انجام شود. مثال‌ها: <code>pwd</code>، <code>ls</code>، <code>mkdir test</code>. یک Command ممکن است یک برنامه مستقل باشد یا یک قابلیت داخلی Shell باشد. مثلاً <code>cd</code> در Bash یک <strong>Shell Builtin</strong> است، اما <code>ls</code> معمولاً یک برنامه مستقل است.</p>
+<p>Command یعنی دستوری که به Shell می‌دهیم تا یک عملیات انجام شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">pwd</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir test</div></div>
+<p>یک Command ممکن است یک برنامه مستقل باشد یا یک قابلیت داخلی Shell باشد. مثلاً <code>cd</code> در Bash یک <strong>Shell Builtin</strong> است، اما <code>ls</code> معمولاً یک برنامه مستقل است.</p>
 <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong> همه Commandها الزاماً فایل اجرایی مستقل نیستند. این موضوع در LPIC-1 مهم است، مخصوصاً هنگام کار با <code>type</code> و <code>which</code>.</div></div>
 
 <h2>۷. ساختار فایل‌ها در لینوکس</h2>
-<p>یکی از تفاوت‌های مهم لینوکس و ویندوز این است که در لینوکس یک درخت فایل داریم که ریشه آن <code>/</code> (Root Directory) است.</p>
+<p>یکی از تفاوت‌های مهم لینوکس و ویندوز این است که در لینوکس یک درخت فایل داریم که ریشه آن <code>/</code> است. به آن <strong>Root Directory</strong> می‌گوییم. ساختار ساده:</p>
 <div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">/\n├── home\n├── etc\n├── var\n├── usr\n├── boot\n├── tmp\n└── dev</div></div>
 <p>همه مسیرها در نهایت از <code>/</code> منشعب می‌شوند.</p>
 
 <h2>۸. چند Directory مهم</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Directory</th><th>کاربرد کلی</th></tr></thead>
 <tbody>
@@ -1237,18 +1278,33 @@
 <tr><td><code>/usr</code></td><td>بخش بزرگی از برنامه‌ها و فایل‌های سیستم</td></tr>
 </tbody>
 </table>
-<p>لازم نیست فعلاً تمام جزئیات این پوشه‌ها را حفظ کنید؛ کاربرد کلی آنها مهم است.</p>
+</div>
+<p>لازم نیست فعلاً تمام جزئیات این پوشه‌ها را حفظ کنی؛ کاربرد کلی آنها مهم است.</p>
 
 <h2>۹. Path چیست؟</h2>
-<p>Path یعنی <strong>آدرس یک فایل یا Directory</strong>. مانند <code>/home/ali/Documents/file.txt</code>. یعنی:</p>
+<p>Path یعنی <strong>آدرس یک فایل یا Directory</strong>. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال مسیر</span><div class="code-block no-prompt">/home/ali/Documents/file.txt</div></div>
+<p>یعنی:</p>
 <div class="code-container"><span class="code-label">درخت</span><div class="code-block no-prompt">/\n└── home\n    └── ali\n        └── Documents\n            └── file.txt</div></div>
+<p>مثل آدرس یک خانه است.</p>
 
 <h2>۱۰. Absolute Path</h2>
-<p>مسیر کامل که از Root شروع می‌شود. مثال: <code>/home/ali/Documents/file.txt</code>. از <code>/</code> شروع شده است. پس Absolute Path = مسیر کامل از Root.</p>
+<p>مسیر کامل که از Root شروع می‌شود. مثلاً:</p>
+<div class="code-container"><span class="code-label">مطلق</span><div class="code-block no-prompt">/home/ali/Documents/file.txt</div></div>
+<p>از <code>/</code> شروع شده است. پس <strong>Absolute Path = مسیر کامل از Root</strong></p>
 
 <h2>۱۱. Relative Path</h2>
-<p>مسیر نسبی نسبت به <strong>Directory فعلی</strong> است. فرض کنید <code>pwd</code> خروجی <code>/home/ali</code> است. اگر فایلی در <code>/home/ali/Documents/file.txt</code> داشته باشیم، می‌توانیم آن را به صورت Relative بنویسیم: <code>Documents/file.txt</code>.</p>
+<p>مسیر نسبی نسبت به <strong>Directory فعلی</strong> است. فرض کن:</p>
+<div class="code-container"><span class="code-label">مسیر فعلی</span><div class="code-block">pwd</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/ali</div></div>
+<p>حالا اگر فایلی داشته باشیم:</p>
+<div class="code-container"><span class="code-label">فایل</span><div class="code-block no-prompt">/home/ali/Documents/file.txt</div></div>
+<p>می‌توانیم آن را به صورت Relative بنویسیم:</p>
+<div class="code-container"><span class="code-label">نسبی</span><div class="code-block no-prompt">Documents/file.txt</div></div>
+<p>چون مسیر از محل فعلی شروع شده است.</p>
 <h3>مقایسه</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Absolute</th><th>Relative</th></tr></thead>
 <tbody>
@@ -1257,71 +1313,113 @@
 <tr><td>مستقل از Directory فعلی</td><td>وابسته به Directory فعلی</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>/</code> → Root، <code>~</code> → Home کاربر فعلی، <code>.</code> → Directory فعلی، <code>..</code> → Directory والد.</div></div>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong>
+<ul>
+<li><code>/</code> → Root</li>
+<li><code>~</code> → Home کاربر فعلی</li>
+<li><code>.</code> → Directory فعلی</li>
+<li><code>..</code> → Directory والد</li>
+</ul>
+</div></div>
 
 <h2>۱۲. <code>pwd</code></h2>
-<p>مخفف <strong>Print Working Directory</strong>؛ یعنی الان داخل کدام Directory هستم؟</p>
+<p>مخفف <strong>Print Working Directory</strong> یعنی «الان داخل کدام Directory هستم؟»</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">pwd</div></div>
-<p>خروجی نمونه: <code>/home/ali</code></p>
+<p>خروجی نمونه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/home/ali</div></div>
 
 <h2>۱۳. <code>cd</code></h2>
-<p>مخفف <strong>Change Directory</strong> برای تغییر Directory.</p>
+<p>مخفف <strong>Change Directory</strong> برای تغییر Directory استفاده می‌شود.</p>
 <h3>رفتن به یک Directory</h3>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd Documents</div></div>
 <h3>رفتن به Root</h3>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd /</div></div>
 <h3>رفتن به Home</h3>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd\ncd ~</div></div>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd</div></div>
+<p>یا</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd ~</div></div>
 <h3>رفتن به Directory والد</h3>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd ..</div></div>
 <h3>رفتن به مسیر قبلی</h3>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cd -</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>cd ..</code> یعنی یک سطح بالاتر برو، اما <code>cd -</code> یعنی به Directory قبلی که در آن بودی برگرد. این دو را با هم اشتباه نکن.</div></div>
+
+<h3><code>cd ..</code> در برابر <code>cd -</code></h3>
+<p><code>cd ..</code> یعنی یک سطح بالاتر برو. مثلاً از <code>/home/ali/Documents</code> با <code>cd ..</code> می‌شویم <code>/home/ali</code>.</p>
+<p><code>cd -</code> یعنی به Directory قبلی که در آن بودم برگرد.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> این دو را با هم اشتباه نکن: <code>cd ..</code> ≠ <code>cd -</code></div></div>
 
 <h2>۱۴. <code>ls</code></h2>
 <p>برای مشاهده محتویات Directory استفاده می‌شود.</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls</div></div>
-<h3>گزینه‌های مهم</h3>
-<table>
-<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
-<tbody>
-<tr><td><code>ls -l</code></td><td>نمایش جزئیات (Permission، Owner، Group، Size، Time، Name)</td></tr>
-<tr><td><code>ls -a</code></td><td>نمایش فایل‌های مخفی (نام‌هایی که با <code>.</code> شروع می‌شوند)</td></tr>
-<tr><td><code>ls -lh</code></td><td>حجم خواناتر (مثلاً 4.0K)</td></tr>
-<tr><td><code>ls -R</code></td><td>نمایش بازگشتی محتویات Directoryها و زیرDirectoryها</td></tr>
-</tbody>
-</table>
-<p>ترکیب گزینه‌ها: <code>ls -lah</code> یعنی <code>-l</code> جزئیات، <code>-a</code> Hidden، <code>-h</code> حجم خواناتر.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Documents\nDownloads\nfile.txt\ntest</div></div>
+<h3>گزینه‌های مهم <code>ls</code></h3>
+<ul>
+<li><strong>نمایش جزئیات:</strong> <code>ls -l</code> اطلاعاتی مانند Permission، Owner، Group، Size، Time، Name را نمایش می‌دهد.</li>
+<li><strong>نمایش فایل‌های مخفی:</strong> <code>ls -a</code> فایل‌هایی که نامشان با <code>.</code> شروع می‌شود (مانند <code>.bashrc</code>) را نشان می‌دهد.</li>
+<li><strong>حجم خواناتر:</strong> <code>ls -lh</code> اندازه را به صورت <code>4.0K</code> نمایش می‌دهد.</li>
+<li><strong>ترکیب گزینه‌ها:</strong> <code>ls -lah</code> ترکیبی از <code>-l</code>، <code>-a</code> و <code>-h</code>.</li>
+<li><strong>نمایش بازگشتی:</strong> <code>ls -R</code> محتویات Directoryها و زیرDirectoryها را به صورت Recursive نمایش می‌دهد.</li>
+</ul>
 
 <h2>۱۵. فایل‌های مخفی</h2>
-<p>در لینوکس فایل مخفی معمولاً فایلی است که نام آن با <code>.</code> شروع شود. مثال‌ها: <code>.bashrc</code>، <code>.config</code>، <code>.profile</code>. برای مشاهده آنها: <code>ls -a</code>.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> Hidden بودن به معنی «امن یا رمزگذاری‌شده» نیست؛ فقط یک ویژگی نام‌گذاری/نمایش است.</div></div>
+<p>در لینوکس فایل مخفی معمولاً فایلی است که نام آن با <code>.</code> شروع شود. مثلاً <code>.bashrc</code>، <code>.config</code>، <code>.profile</code>. برای مشاهده آنها:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -a</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> Hidden بودن به معنی «امن یا رمزگذاری‌شده» نیست. فقط یک ویژگی نام‌گذاری/نمایش است.</div></div>
 
 <h2>۱۶. <code>.</code> و <code>..</code></h2>
-<p><code>.</code> → Current Directory، <code>..</code> → Parent Directory. مثلاً <code>cd .</code> یعنی در همان Directory بمان؛ <code>cd ..</code> یعنی یک سطح بالاتر برو.</p>
+<ul>
+<li><code>.</code> → Current Directory</li>
+<li><code>..</code> → Parent Directory</li>
+</ul>
+<p>مثلاً <code>cd .</code> یعنی در همان Directory بمان و <code>cd ..</code> یعنی یک سطح بالاتر برو.</p>
 
 <h2>۱۷. ساخت Directory با <code>mkdir</code></h2>
-<p>ساخت Directory: <code>mkdir test</code>. ساخت چند Directory: <code>mkdir dir1 dir2 dir3</code>.</p>
+<p>برای ساخت Directory:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir test</div></div>
+<p>ساخت چند Directory:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir dir1 dir2 dir3</div></div>
 <h3><code>mkdir -p</code></h3>
-<p>اگر مسیر <code>a/b/c</code> را بخواهید بسازید و <code>a</code> و <code>b</code> وجود نداشته باشند، <code>mkdir -p a/b/c</code> همه مسیر لازم را ایجاد می‌کند.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>mkdir</code> → ساخت Directory؛ <code>mkdir -p</code> → ساخت مسیرهای والد در صورت نیاز.</div></div>
+<p>فرض کن می‌خواهیم مسیر <code>a/b/c</code> را بسازیم. اگر <code>a</code> و <code>b</code> وجود نداشته باشند، با <code>-p</code> همه مسیر لازم ایجاد می‌شود:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">mkdir -p a/b/c</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>mkdir</code> ساخت Directory، <code>mkdir -p</code> ساخت مسیرهای والد در صورت نیاز.</div></div>
 
 <h2>۱۸. ساخت فایل با <code>touch</code></h2>
-<p><code>touch file.txt</code> اگر فایل وجود نداشته باشد، یک فایل خالی ایجاد می‌کند. اگر فایل از قبل وجود داشته باشد، <code>touch</code> معمولاً Timestampهای آن را به‌روزرسانی می‌کند.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">touch file.txt</div></div>
+<p>اگر فایل وجود نداشته باشد، یک فایل خالی ایجاد می‌شود. اگر فایل از قبل وجود داشته باشد، <code>touch</code> معمولاً Timestampهای آن را به‌روزرسانی می‌کند.</p>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>touch</code> ابزار اصلی برای نوشتن محتویات فایل نیست؛ فقط فایل خالی ایجاد می‌کند یا Timestamp را به‌روز می‌کند.</div></div>
 
 <h2>۱۹. <code>cat</code></h2>
-<p>برای نمایش محتویات فایل: <code>cat file.txt</code>. همچنین <code>cat</code> می‌تواند برای اتصال چند فایل هم استفاده شود، اما کاربرد اصلی در این جلسه نمایش سریع محتویات فایل است.</p>
+<p>برای نمایش محتویات فایل:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat file.txt</div></div>
+<p>خروجی نمونه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Hello\nLinux\nLPIC-1</div></div>
+<p><code>cat</code> می‌تواند برای اتصال چند فایل هم استفاده شود، اما کاربرد اصلی فعلی نمایش سریع محتویات فایل است.</p>
 
 <h2>۲۰. <code>head</code></h2>
-<p>برای مشاهده ابتدای فایل: <code>head file.txt</code> (به صورت پیش‌فرض چند خط اول را نمایش می‌دهد). مثال: <code>head -n 5 file.txt</code> یعنی ۵ خط اول را نمایش بده.</p>
+<p>برای مشاهده ابتدای فایل:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">head file.txt</div></div>
+<p>به صورت پیش‌فرض چند خط اول را نمایش می‌دهد. مثلاً برای ۵ خط اول:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">head -n 5 file.txt</div></div>
 
 <h2>۲۱. <code>tail</code></h2>
-<p>برای مشاهده انتهای فایل: <code>tail file.txt</code>. مثال: <code>tail -n 5 file.txt</code> یعنی ۵ خط آخر را نمایش بده.</p>
+<p>برای مشاهده انتهای فایل:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tail file.txt</div></div>
+<p>مثلاً ۵ خط آخر:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">tail -n 5 file.txt</div></div>
 
 <h2>۲۲. <code>less</code></h2>
-<p>برای مشاهده فایل‌های طولانی به صورت صفحه‌به‌صفحه: <code>less file.txt</code>. در فایل‌های بزرگ، <code>less</code> معمولاً مناسب‌تر از <code>cat</code> است. حرکت در <code>less</code>: <code>↑ ↓</code> حرکت، <code>Space</code> صفحه بعد، <code>q</code> خروج.</p>
+<p>برای مشاهده فایل‌های طولانی به صورت صفحه‌به‌صفحه:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">less file.txt</div></div>
+<p>در فایل‌های بزرگ، <code>less</code> مناسب‌تر از <code>cat</code> است. حرکت در <code>less</code>:</p>
+<ul>
+<li><code>↑</code> <code>↓</code> حرکت</li>
+<li><code>Space</code> صفحه بعد</li>
+<li><code>q</code> خروج</li>
+</ul>
 <h3>مقایسه سریع</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Command</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -1331,43 +1429,84 @@
 <tr><td><code>less</code></td><td>مشاهده صفحه‌به‌صفحه</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر فایل خیلی بزرگ است و فقط می‌خواهید آن را بررسی کنید، <code>less file.txt</code> انتخاب مناسبی است.</div></div>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر فایل خیلی بزرگ است و فقط می‌خواهی آن را بررسی کنی، <code>less file.txt</code> انتخاب مناسبی است.</div></div>
 
 <h2>۲۳. Variable چیست؟</h2>
-<p>Variable یعنی یک نام برای نگهداری یک مقدار. مثال: <code>name=Ali</code>. برای دسترسی به مقدار Variable از علامت <code>$</code> استفاده می‌شود: <code>echo $name</code> خروجی <code>Ali</code>.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> در Bash معمولاً نباید اطراف <code>=</code> فاصله بگذاریم. درست: <code>name=Ali</code>، غلط: <code>name = Ali</code>.</div></div>
+<p>Variable یعنی یک نام برای نگهداری یک مقدار. مثلاً:</p>
+<div class="code-container"><span class="code-label">تعریف</span><div class="code-block">name=Ali</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">echo $name</div></div>
+<p>خروجی <code>Ali</code>. علامت <code>$</code> برای دسترسی به مقدار Variable استفاده می‌شود.</p>
+<h3>یک نکته مهم در Assignment</h3>
+<p>در Bash معمولاً نباید اطراف <code>=</code> فاصله بگذاریم:</p>
+<p>درست: <code>name=Ali</code></p>
+<p>غلط: <code>name = Ali</code></p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> در Bash <code>name=Ali</code> درست است اما <code>name = Ali</code> به عنوان Assignment معتبر نیست.</div></div>
 
 <h2>۲۴. <code>echo</code></h2>
-<p>برای نمایش مقدار یا متن: <code>echo Hello</code> خروجی <code>Hello</code>؛ برای Variable: <code>echo $name</code> خروجی <code>Ali</code>.</p>
+<p>برای نمایش مقدار یا متن استفاده می‌شود.</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo Hello</div></div>
+<p>خروجی <code>Hello</code>. برای Variable:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">echo $name</div></div>
+<p>خروجی <code>Ali</code>.</p>
 
 <h2>۲۵. <code>PATH</code></h2>
-<p>یکی از مهم‌ترین Environment Variableهاست. برای Shell مشخص می‌کند هنگام اجرای یک Command، در چه Directoryهایی به دنبال برنامه بگردد. مشاهده: <code>echo $PATH</code>. خروجی نمونه: <code>/usr/local/bin:/usr/bin:/bin</code>. هر مسیر با <code>:</code> از مسیر بعدی جدا شده است.</p>
+<p>یکی از مهم‌ترین Environment Variableها <code>PATH</code> است. برای Shell مشخص می‌کند هنگام اجرای یک Command، در چه Directoryهایی به دنبال برنامه بگردد. مشاهده:</p>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">echo $PATH</div></div>
+<p>خروجی نمونه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">/usr/local/bin:/usr/bin:/bin</div></div>
+<p>هر مسیر با <code>:</code> از مسیر بعدی جدا شده است.</p>
 <h3>مثال مفهومی</h3>
-<p>وقتی می‌نویسید <code>ls</code>، Shell باید بفهمد برنامه <code>ls</code> کجاست. PATH به آن می‌گوید که اینجاها را جستجو کن.</p>
+<p>وقتی می‌نویسی <code>ls</code>، Shell باید بفهمد برنامه <code>ls</code> کجاست. PATH به آن می‌گوید: «اینجاها را جستجو کن.»</p>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> PATH = محل‌های جستجوی Commandها.</div></div>
 
 <h2>۲۶. <code>env</code></h2>
-<p>برای مشاهده Environment Variableها: <code>env</code>. ممکن است خروجی شامل <code>USER=ali</code>، <code>HOME=/home/ali</code>، <code>PATH=/usr/bin:/bin</code>، <code>SHELL=/bin/bash</code> و ... باشد.</p>
+<p>برای مشاهده Environment Variableها:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">env</div></div>
+<p>خروجی نمونه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">USER=ali\nHOME=/home/ali\nPATH=/usr/bin:/bin\nSHELL=/bin/bash</div></div>
 
 <h2>۲۷. History</h2>
-<p>Shell معمولاً دستورات قبلی را در History نگه می‌دارد. نمایش History: <code>history</code>. اجرای آخرین Command: <code>!!</code>. اجرای Command شماره مشخص: مثلاً <code>!15</code> یعنی Command شماره ۱۵ در History را اجرا کن.</p>
+<p>Shell معمولاً دستورات قبلی را در History نگه می‌دارد. نمایش History:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">history</div></div>
+<p>خروجی نمونه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">  1  pwd\n  2  ls\n  3  cd Documents\n  4  cat file.txt</div></div>
+<h3>اجرای آخرین Command</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">!!</div></div>
+<p>مثلاً اگر آخرین دستور <code>ls</code> بوده باشد، <code>!!</code> دوباره <code>ls</code> را اجرا می‌کند.</p>
+<h3>اجرای Command شماره مشخص</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">!15</div></div>
+<p>یعنی Command شماره ۱۵ در History را اجرا کن.</p>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>history</code> فقط برای دیدن دستورات نیست؛ می‌توان از History برای اجرای دوباره دستورات نیز استفاده کرد.</div></div>
 
 <h2>۲۸. گرفتن Help</h2>
-<p>در لینوکس لازم نیست همه Commandها را حفظ کنید. اگر دستوری را بلد نیستید، اول از خودش کمک بگیرید. سه روش مهم:</p>
+<p>در لینوکس لازم نیست همه Commandها را حفظ کنیم. اگر دستوری را بلد نیستی، اول از خودش کمک بگیر. سه روش مهم:</p>
 <div class="code-container"><span class="code-label">روش‌ها</span><div class="code-block">command --help\nman command\ninfo command</div></div>
 
 <h2>۲۹. <code>--help</code></h2>
-<p>برای راهنمای سریع Command: <code>ls --help</code>. معمولاً گزینه‌های مهم و Syntax را نشان می‌دهد. مناسب برای یادآوری سریع.</p>
+<p>برای راهنمای سریع Command:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls --help</div></div>
+<p>معمولاً گزینه‌های مهم و Syntax را نشان می‌دهد. مناسب برای یادآوری سریع.</p>
 
 <h2>۳۰. <code>man</code></h2>
-<p>مخفف <strong>Manual</strong>. مثال: <code>man ls</code> صفحه Manual مربوط به <code>ls</code> را باز می‌کند. در <code>man</code> معمولاً اطلاعاتی مثل Name، Synopsis، Description، Options وجود دارد. خروج با <code>q</code>.</p>
+<p>مخفف <strong>Manual</strong>. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">man ls</div></div>
+<p>صفحه Manual مربوط به <code>ls</code> را باز می‌کند. در <code>man</code> معمولاً اطلاعاتی مثل Name، Synopsis، Description، Options وجود دارد. خروج با <code>q</code>.</p>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال بپرسد «برای مشاهده Manual یک Command از چه چیزی استفاده می‌کنیم؟» جواب <code>man</code> است.</div></div>
 
 <h2>۳۱. <code>info</code></h2>
-<p><code>info</code> نیز برای مشاهده Documentation استفاده می‌شود: <code>info ls</code>. در بعضی پروژه‌ها و ابزارهای GNU، مستندات Info ساختاریافته‌تر و مفصل‌تر از Manual معمولی هستند. اما برای مرور LPIC-1: <code>--help</code> سریع، <code>man</code> Manual، <code>info</code> Documentation ساختاریافته را به خاطر بسپارید.</p>
+<p><code>info</code> نیز برای مشاهده Documentation استفاده می‌شود:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">info ls</div></div>
+<p>در بعضی پروژه‌ها و ابزارهای GNU، مستندات Info ساختاریافته‌تر و مفصل‌تر از Manual معمولی هستند. اما برای مرور LPIC-1:</p>
+<ul>
+<li><code>--help</code> → سریع</li>
+<li><code>man</code> → Manual</li>
+<li><code>info</code> → Documentation ساختاریافته</li>
+</ul>
 
 <h2>۳۲. مقایسه Helpها</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>روش</th><th>کاربرد اصلی</th></tr></thead>
 <tbody>
@@ -1376,12 +1515,26 @@
 <tr><td><code>info command</code></td><td>Documentation ساختاریافته، مخصوصاً ابزارهای GNU</td></tr>
 </tbody>
 </table>
-<p><strong>پیشنهاد عملی:</strong> اگر Command را نمی‌شناسید: <code>command --help</code>؛ اگر توضیح کامل‌تر می‌خواهید: <code>man command</code>.</p>
+</div>
+<h3>پیشنهاد عملی</h3>
+<p>اگر Command را نمی‌شناسی: <code>command --help</code> و اگر توضیح کامل‌تر می‌خواهی: <code>man command</code>.</p>
 
 <h2>۳۳. یک سناریوی واقعی</h2>
-<p>فرض کنید تازه وارد سیستم شده‌اید و می‌خواهید یک فایل را پیدا و مشاهده کنید. اول <code>pwd</code> تا بدانید کجا هستید، بعد <code>ls</code> تا محتویات را ببینید، وارد Directory موردنظر شوید با <code>cd Documents</code>، دوباره <code>pwd</code> برای اطمینان از مسیر، سپس <code>ls -l</code> برای دیدن جزئیات. اگر فایل متنی باشد، <code>less file.txt</code> و اگر دستور <code>less</code> را یادتان نباشد، <code>man less</code>. این دقیقاً همان چیزی است که باید از خط فرمان یاد بگیرید: بدانید کجا هستید → محتویات را ببینید → حرکت کنید → فایل را پیدا کنید → فایل را مشاهده کنید → اگر دستوری را بلد نیستید → Help.</p>
+<p>فرض کن تازه وارد سیستم شده‌ای و می‌خواهی یک فایل را پیدا و مشاهده کنی.</p>
+<ol>
+<li>اول <code>pwd</code> تا بفهمی کجا هستی.</li>
+<li>بعد <code>ls</code> تا محتویات را ببینی.</li>
+<li>وارد Directory موردنظر: <code>cd Documents</code></li>
+<li>دوباره <code>pwd</code> برای اطمینان از مسیر.</li>
+<li>بعد <code>ls -l</code> برای دیدن جزئیات.</li>
+<li>اگر فایل متنی باشد: <code>less file.txt</code></li>
+<li>و اگر دستور <code>less</code> را یادت نباشد: <code>man less</code></li>
+</ol>
+<p>این دقیقاً همان چیزی است که باید از خط فرمان یاد بگیری:</p>
+<div class="code-container"><span class="code-label">روال</span><div class="code-block no-prompt">بدان کجا هستی\n      ↓\nمحتویات را ببین\n      ↓\nحرکت کن\n      ↓\nفایل را پیدا کن\n      ↓\nفایل را مشاهده کن\n      ↓\nاگر دستوری را بلد نیستی → Help</div></div>
 
 <h2>۳۴. جدول Commandهای جلسه</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Command</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -1402,8 +1555,10 @@
 <tr><td><code>--help</code></td><td>راهنمای سریع</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>۳۵. جدول مفاهیم اصلی</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>مفهوم</th><th>معنی ساده</th></tr></thead>
 <tbody>
@@ -1419,21 +1574,21 @@
 <tr><td><code>PATH</code></td><td>مسیرهای جستجوی Commandها</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>۳۶. دام‌های مهم امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> Linux = فقط یک برنامه؟ خیر. از نظر فنی Linux نام Kernel است؛ یک Distribution مجموعه‌ای از Kernel و اجزای دیگر است.</li>
-<li><strong>دام ۲:</strong> Terminal = Shell؟ خیر. Terminal → محیط تعامل، Shell → Command Interpreter.</li>
-<li><strong>دام ۳:</strong> <code>/</code> = Home؟ خیر. <code>/</code> → Root، <code>~</code> → Home کاربر فعلی.</li>
-<li><strong>دام ۴:</strong> <code>cd ..</code> = مسیر قبلی؟ خیر. <code>cd ..</code> → Parent Directory، <code>cd -</code> → Previous Directory.</li>
-<li><strong>دام ۵:</strong> <code>touch</code> = نوشتن متن در فایل؟ خیر. <code>touch</code> برای ایجاد فایل خالی در صورت نبودن فایل و به‌روزرسانی Timestamp فایل موجود استفاده می‌شود.</li>
-<li><strong>دام ۶:</strong> <code>ls</code> = نمایش فقط فایل‌ها؟ خیر. <code>ls</code> محتویات Directory را نمایش می‌دهد؛ فایل‌ها و Directoryها را.</li>
-<li><strong>دام ۷:</strong> <code>ls</code> = نمایش فایل‌های مخفی؟ به صورت معمول خیر. برای آنها <code>ls -a</code>.</li>
-<li><strong>دام ۸:</strong> <code>PATH</code> = مسیر فعلی؟ خیر. <code>pwd</code> → مسیر فعلی، <code>PATH</code> → مسیرهای جستجوی Commandها.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> Linux = فقط یک برنامه؟ خیر. از نظر فنی Linux نام Kernel است؛ یک Distribution مجموعه‌ای از Kernel و اجزای دیگر است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> Terminal = Shell؟ خیر. Terminal محیط تعامل، Shell Command Interpreter است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> <code>/</code> = Home؟ خیر. <code>/</code> Root، <code>~</code> Home کاربر فعلی.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> <code>cd ..</code> = مسیر قبلی؟ خیر. <code>cd ..</code> Parent Directory، <code>cd -</code> Previous Directory.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> <code>touch</code> = نوشتن متن در فایل؟ خیر. <code>touch</code> برای ایجاد فایل خالی و به‌روزرسانی Timestamp است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> <code>ls</code> = نمایش فقط فایل‌ها؟ خیر. <code>ls</code> محتویات Directory (فایل‌ها و Directoryها) را نمایش می‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> <code>ls</code> = نمایش فایل‌های مخفی؟ به صورت معمول خیر. برای آنها <code>ls -a</code>.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> <code>PATH</code> = مسیر فعلی؟ خیر. <code>pwd</code> مسیر فعلی، <code>PATH</code> مسیرهای جستجوی Commandها.</div></div>
 
 <h2>۳۷. مقایسه‌های طلایی جلسه</h2>
 <h3><code>pwd</code> در برابر <code>PATH</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>pwd</code></th><th><code>PATH</code></th></tr></thead>
 <tbody>
@@ -1441,7 +1596,9 @@
 <tr><td>Command است</td><td>Environment Variable است</td></tr>
 </tbody>
 </table>
+</div>
 <h3><code>/</code> در برابر <code>~</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>/</code></th><th><code>~</code></th></tr></thead>
 <tbody>
@@ -1449,14 +1606,18 @@
 <tr><td>ابتدای کل Filesystem</td><td>Home همان User</td></tr>
 </tbody>
 </table>
+</div>
 <h3><code>.</code> در برابر <code>..</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>.</code></th><th><code>..</code></th></tr></thead>
 <tbody>
 <tr><td>Current Directory</td><td>Parent Directory</td></tr>
 </tbody>
 </table>
+</div>
 <h3><code>cat</code> در برابر <code>less</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>cat</code></th><th><code>less</code></th></tr></thead>
 <tbody>
@@ -1464,49 +1625,88 @@
 <tr><td>مناسب فایل‌های کوتاه</td><td>مناسب فایل‌های طولانی</td></tr>
 </tbody>
 </table>
+</div>
 <h3><code>head</code> در برابر <code>tail</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>head</code></th><th><code>tail</code></th></tr></thead>
 <tbody>
 <tr><td>ابتدای فایل</td><td>انتهای فایل</td></tr>
 </tbody>
 </table>
+</div>
 <h3><code>mkdir</code> در برابر <code>touch</code></h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>mkdir</code></th><th><code>touch</code></th></tr></thead>
 <tbody>
 <tr><td>Directory می‌سازد</td><td>فایل ایجاد می‌کند / Timestamp را تغییر می‌دهد</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>🧠 نقشه ذهنی جلسه</h2>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Linux\n│\n├── Kernel\n│\n├── Distribution\n│\n├── Shell\n│     └── Command Interpreter\n│\n├── Terminal\n│     └── محیط تعامل با Shell\n│\n├── Filesystem\n│     │\n│     ├── /\n│     ├── ~\n│     ├── .\n│     └── ..\n│\n├── Path\n│     ├── Absolute\n│     └── Relative\n│\n├── Navigation\n│     ├── pwd\n│     ├── cd\n│     └── ls\n│\n├── File / Directory\n│     ├── mkdir\n│     ├── touch\n│     ├── cat\n│     ├── head\n│     ├── tail\n│     └── less\n│\n├── Variables\n│     ├── echo\n│     ├── env\n│     └── PATH\n│\n├── History\n│     └── history / !! / !number\n│\n└── Help\n      ├── --help\n      ├── man\n      └── info</div></div>
 
-<h2>⚡ حفظی‌های جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
-<p>اگر وقت خیلی کمی دارید، فقط این قسمت را مرور کنید:</p>
-<h3>مفاهیم</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Linux → Kernel\nShell → Command Interpreter\nTerminal → محیط تعامل با Shell</div></div>
-<h3>Filesystem</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">/  → Root\n~  → Home کاربر فعلی\n.  → Current Directory\n.. → Parent Directory</div></div>
-<h3>Path</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Absolute → از / شروع می‌شود\nRelative → نسبت به محل فعلی</div></div>
-<h3>Navigation</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">pwd      # کجا هستم؟\ncd       # تغییر مسیر\ncd ..    # یک سطح بالا\ncd -     # مسیر قبلی\ncd ~     # Home\ncd /     # Root\nls       # محتویات</div></div>
-<h3>ساخت</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">mkdir test\ntouch file.txt\n# mkdir → Directory\n# touch → File / Timestamp</div></div>
-<h3>مشاهده فایل</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">cat file.txt\nhead file.txt\ntail file.txt\nless file.txt\n# cat  → کل/سریع\n# head → اول\n# tail → آخر\n# less → صفحه‌ای</div></div>
-<h3>Variable</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">name=Ali\necho $name\n# $ → دسترسی به مقدار Variable</div></div>
-<h3>PATH</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">echo $PATH\n# PATH → محل‌های جستجوی Commandها</div></div>
-<h3>History</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">history\n!!\n!15</div></div>
-<h3>Help</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">ls --help\nman ls\ninfo ls\n# --help → سریع\n# man     → Manual\n# info    → Documentation ساختاریافته</div></div>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>⚡ حفظی‌های جلسه — مرور ۲ تا ۳ دقیقه‌ای</strong>
+اگر وقت خیلی کمی داشتی، فقط این قسمت را مرور کن:
+<h4>مفاهیم</h4>
+<ul>
+<li><code>Linux</code> → Kernel</li>
+<li><code>Shell</code> → Command Interpreter</li>
+<li><code>Terminal</code> → محیط تعامل با Shell</li>
+</ul>
+<h4>Filesystem</h4>
+<ul>
+<li><code>/</code> → Root</li>
+<li><code>~</code> → Home کاربر فعلی</li>
+<li><code>.</code> → Current Directory</li>
+<li><code>..</code> → Parent Directory</li>
+</ul>
+<h4>Path</h4>
+<ul>
+<li>Absolute → از <code>/</code> شروع می‌شود</li>
+<li>Relative → نسبت به محل فعلی</li>
+</ul>
+<h4>Navigation</h4>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">pwd      # کجا هستم؟\ncd       # تغییر مسیر\ncd ..    # یک سطح بالا\ncd -     # مسیر قبلی\ncd ~     # Home\ncd /     # Root\nls       # محتویات</div></div>
+<h4>ساخت</h4>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">mkdir test\ntouch file.txt</div></div>
+<ul>
+<li><code>mkdir</code> → Directory</li>
+<li><code>touch</code> → File / Timestamp</li>
+</ul>
+<h4>مشاهده فایل</h4>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">cat file.txt\nhead file.txt\ntail file.txt\nless file.txt</div></div>
+<ul>
+<li><code>cat</code> → کل/سریع</li>
+<li><code>head</code> → اول</li>
+<li><code>tail</code> → آخر</li>
+<li><code>less</code> → صفحه‌ای</li>
+</ul>
+<h4>Variable</h4>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">name=Ali\necho $name</div></div>
+<ul>
+<li><code>$</code> → دسترسی به مقدار Variable</li>
+</ul>
+<h4>PATH</h4>
+<div class="code-container"><span class="code-label">نمایش</span><div class="code-block">echo $PATH</div></div>
+<ul>
+<li><code>PATH</code> → محل‌های جستجوی Commandها</li>
+</ul>
+<h4>History</h4>
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block">history\n!!\n!15</div></div>
+<h4>Help</h4>
+<div class="code-container"><span class="code-label">روش‌ها</span><div class="code-block">ls --help\nman ls\ninfo ls</div></div>
+<ul>
+<li><code>--help</code> → سریع</li>
+<li><code>man</code> → Manual</li>
+<li><code>info</code> → Documentation ساختاریافته</li>
+</ul>
+</div></div>
 
-<h2>🎯 تست نهایی جلسه</h2>
-<div class="box note"><i class="fas fa-check-circle"></i><div><strong>بدون نگاه کردن به جزوه جواب دهید:</strong>
+<div class="box important"><i class="fas fa-check-circle"></i><div><strong>🎯 تست نهایی جلسه</strong>
+بدون نگاه کردن به جزوه جواب بده:
 <ol>
 <li>Linux از نظر فنی چیست؟</li>
 <li>Kernel چه کاری انجام می‌دهد؟</li>
@@ -1529,13 +1729,15 @@
 <li><code>history</code> چه می‌کند؟</li>
 <li>تفاوت <code>--help</code> و <code>man</code> چیست؟</li>
 </ol>
-<p>اگر بتوانید این ۲۰ سؤال را بدون نگاه کردن جواب دهید، پایه‌های جلسه ۱ را یاد گرفته‌اید.</p>
+<p><strong>اگر بتوانی این ۲۰ سؤال را بدون نگاه کردن جواب بدهی، پایه‌های جلسه ۱ را یاد گرفته‌ای.</strong></p>
 </div></div>
 
-<div class="box important"><i class="fas fa-link"></i><div><strong>🔗 ارتباط با جلسات بعد</strong>
-این جلسه فقط مجموعه‌ای از Commandهای پراکنده نیست. در واقع پایه جلسات بعدی را می‌سازد: Filesystem + Path → File Management → grep / sed → Redirect / Pipe → Process Management → Shell Scripting → System Administration. پس هدف این جلسه این نیست که فقط حفظ کنید <code>pwd</code>، <code>cd</code>، <code>ls</code>، ... بلکه باید <strong>مدل ذهنی کار با Linux CLI</strong> را بسازید: کجا هستم؟ → چه چیزی اینجاست؟ → چگونه حرکت کنم؟ → چگونه فایل بسازم/بخوانم؟ → اگر دستوری را بلد نبودم، کجا راهنمایش را پیدا کنم؟
+<div class="box note"><i class="fas fa-link"></i><div><strong>🔗 ارتباط با جلسات بعد</strong>
+این جلسه فقط مجموعه‌ای از Commandهای پراکنده نیست. در واقع پایه جلسات بعدی را می‌سازد:
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Filesystem + Path\n       ↓\nFile Management\n       ↓\ngrep / sed\n       ↓\nRedirect / Pipe\n       ↓\nProcess Management\n       ↓\nShell Scripting\n       ↓\nSystem Administration</div></div>
+<p>پس هدف این جلسه این نیست که فقط حفظ کنی <code>pwd</code>، <code>cd</code>، <code>ls</code>، ... بلکه باید <strong>مدل ذهنی کار با Linux CLI</strong> را بسازی: «کجا هستم؟ → چه چیزی اینجاست؟ → چگونه حرکت کنم؟ → چگونه فایل بسازم/بخوانم؟ → اگر دستوری را بلد نبودم، کجا راهنمایش را پیدا کنم؟»</p>
 </div></div>
-` ,
+`,
 "s2": `
 <div class="section-header">
     <div class="section-badge">۲</div>
@@ -1545,20 +1747,40 @@
     </div>
 </div>
 
-<blockquote><strong>🎯 هدف جلسه:</strong> یاد بگیریم چگونه خروجی یک Command را بگیریم، فیلتر کنیم، به Command دیگری بدهیم، تغییر دهیم یا داخل فایل ذخیره کنیم. مفاهیم اصلی: <code>grep</code>، Redirect، <code>|</code>، <code>sed</code>، <code>xargs</code>، <code>md5sum</code>، <code>sha256sum</code>، ترکیب Commandها و دام‌های رایج خط فرمان.</blockquote>
+<blockquote>
+<strong>🎯 هدف جلسه:</strong> در جلسه قبل یاد گرفتیم چگونه با فایل‌ها و Commandها کار کنیم. حالا می‌خواهیم یاد بگیریم <strong>چطور خروجی یک Command را بگیریم، فیلتر کنیم، به Command دیگری بدهیم، تغییر دهیم یا داخل فایل ذخیره کنیم.</strong>
+<br><br>
+مفاهیم اصلی این جلسه:
+<ul>
+<li><code>grep</code></li>
+<li>Redirect</li>
+<li><code>|</code></li>
+<li><code>sed</code></li>
+<li><code>xargs</code></li>
+<li><code>md5sum</code></li>
+<li><code>sha256sum</code></li>
+<li>ترکیب Commandها</li>
+<li>دام‌های رایج خط فرمان</li>
+</ul>
+</blockquote>
 
 <h2>۱. قبل از شروع...</h2>
-<p>فرض کنید این دستور را اجرا می‌کنیم:</p>
+<p>فرض کن این دستور را اجرا می‌کنیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
-<p>و خروجی زیادی دریافت می‌کنیم. اما فقط فایل‌های PDF را می‌خواهیم. به جای اینکه خروجی را دستی بررسی کنیم، می‌توانیم آن را <strong>فیلتر</strong> کنیم. اینجا ابزارهایی مثل <code>grep</code>، <code>|</code>، <code>></code>، <code>sed</code> و <code>xargs</code> وارد می‌شوند.</p>
+<p>و خروجی زیادی دریافت می‌کنیم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- file1.txt\n-rw-r--r-- file2.txt\ndrwxr-xr-x test\n-rw-r--r-- report.pdf\n-rw-r--r-- image.jpg</div></div>
+<p>اما فقط فایل‌های PDF را می‌خواهیم. به جای اینکه خروجی را دستی بررسی کنیم، می‌توانیم آن را <strong>فیلتر</strong> کنیم. اینجا ابزارهایی مثل <code>grep</code>، <code>|</code>، <code>&gt;</code>، <code>sed</code> و <code>xargs</code> وارد می‌شوند.</p>
 
 <h2>۲. مدل ذهنی این جلسه</h2>
 <p>تقریباً تمام جلسه را می‌توان با این زنجیره فهمید:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Command\n   │\n   ▼\nOutput\n   │\n   ├── grep → Filter\n   │\n   ├── sed → Transform\n   │\n   ├── | → Send to another Command\n   │\n   └── > → Save to File</div></div>
-<p>و گاهی: <code>Command 1 → Output → xargs → Command 2</code>. اگر این مدل را بفهمید، لازم نیست Commandها را جدا و بی‌ارتباط حفظ کنید.</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Command\n   │\n   ▼\nOutput\n   │\n   ├── grep → Filter\n   │\n   ├── sed → Transform\n   │\n   ├── | → Send to another Command\n   │\n   └── > → Save to File</div></div>
+<p>و گاهی:</p>
+<div class="code-container"><span class="code-label">xargs</span><div class="code-block no-prompt">Command 1\n   │\n   ▼\nOutput\n   │\n xargs\n   │\n   ▼\nCommand 2</div></div>
+<p>اگر این مدل را بفهمی، لازم نیست Commandها را جدا و بی‌ارتباط حفظ کنی.</p>
 
 <h2>۳. Standard Streams</h2>
 <p>قبل از Pipe و Redirect باید یک مفهوم مهم را بشناسیم. هر Process به طور معمول سه <strong>Standard Stream</strong> دارد:</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Stream</th><th>شماره</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -1567,193 +1789,247 @@
 <tr><td><code>stderr</code></td><td><code>2</code></td><td>پیام خطا</td></tr>
 </tbody>
 </table>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">             ┌─────────────┐\nstdin  ────► │   Process   │ ────► stdout\n             │             │\n             └─────────────┘\n                    │\n                    └────────► stderr</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> شماره‌های مهم: <code>0 → stdin</code>، <code>1 → stdout</code>، <code>2 → stderr</code>. این سه شماره را حتماً بلد باشید.</div></div>
+</div>
+<p>به صورت ساده:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">             ┌─────────────┐\nstdin  ────► │   Process   │ ────► stdout\n             │             │\n             └─────────────┘\n                    │\n                    └────────► stderr</div></div>
+<p>مثلاً وقتی Command اجرا می‌کنی <code>ls</code>، خروجی معمولی به <code>stdout</code> می‌رود. اگر Command خطایی ایجاد کند، پیام خطا به <code>stderr</code> می‌رود.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> شماره‌های مهم: <code>0 → stdin</code>، <code>1 → stdout</code>، <code>2 → stderr</code>. این سه شماره را حتماً بلد باش.</div></div>
 
-<h2>۴. <code>grep</code></h2>
-<p>یکی از مهم‌ترین ابزارهای پردازش متن در Linux: <code>grep</code>. وظیفه ساده آن: <strong>پیدا کردن الگو یا متن در خطوط ورودی</strong>.</p>
-<p>مثال: فایل <code>users.txt</code> با محتوای:</p>
+<h2>۴. grep</h2>
+<p>یکی از مهم‌ترین ابزارهای پردازش متن در Linux: <code>grep</code>. وظیفه ساده آن: <strong>پیدا کردن الگو یا متن در خطوط ورودی</strong>. مثلاً فایل <code>users.txt</code> داریم:</p>
 <div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Ali\nSara\nReza\nAmir</div></div>
 <p>اگر فقط <code>Amir</code> را بخواهیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep Amir users.txt</div></div>
 <p>خروجی: <code>Amir</code></p>
 
-<h2>۵. <code>grep</code> روی خروجی Command</h2>
-<p><code>grep</code> فقط روی فایل کار نمی‌کند. می‌توانیم خروجی یک Command را نیز به آن بدهیم. مثال:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">history | grep ssh</div></div>
-<p>اینجا خروجی <code>history</code> به <code>grep ssh</code> داده می‌شود و فقط خطوط دارای <code>ssh</code> نمایش داده می‌شوند.</p>
+<h2>۵. grep روی خروجی Command</h2>
+<p><code>grep</code> فقط روی فایل کار نمی‌کند. می‌توانیم خروجی یک Command را نیز به آن بدهیم. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
+<p>اینجا: <code>history</code> → خروجی History → <code>grep ssh</code> → فقط خطوط دارای ssh. این یکی از مهم‌ترین کاربردهای Pipe است که کمی جلوتر می‌بینیم.</p>
 
 <h2>۶. <code>grep -i</code></h2>
-<p>به صورت عادی، <code>grep</code> به بزرگی و کوچکی حروف حساس است. اما <code>grep -i</code> به Case حساس نیست و می‌تواند مواردی مثل <code>linux</code>، <code>Linux</code>، <code>LINUX</code> و <code>LiNuX</code> را پیدا کند.</p>
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>حفظی</strong> <code>-i</code> → Ignore Case</div></div>
+<p>به صورت عادی، <code>grep</code> به بزرگی و کوچکی حروف حساس است. مثلاً <code>grep linux file.txt</code> ممکن است فقط <code>linux</code> را پیدا کند. اما:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep -i linux file.txt</div></div>
+<p>به Case حساس نیست و می‌تواند مواردی مثل <code>linux</code>، <code>Linux</code>، <code>LINUX</code>، <code>LiNuX</code> را پیدا کند.</p>
+<p><strong>حفظی:</strong> <code>-i → Ignore Case</code></p>
 
 <h2>۷. <code>grep -v</code></h2>
-<p>گزینه <code>-v</code> نتیجه را معکوس می‌کند. مثال:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep -v root /etc/passwd</div></div>
+<p>گزینه <code>-v</code> نتیجه را معکوس می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep -v root /etc/passwd</div></div>
 <p>یعنی خطوطی را نشان بده که شامل الگوی <code>root</code> نیستند.</p>
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>حفظی</strong> <code>-v</code> → Invert Match</div></div>
+<p><strong>حفظی:</strong> <code>-v → Invert Match</code></p>
 
-<h2>۸. <code>^</code> و <code>$</code> در <code>grep</code></h2>
-<p><code>^</code> یعنی ابتدای خط. مثال: <code>grep "^root" file.txt</code> فقط خطوطی که با <code>root</code> شروع می‌شوند.</p>
-<p><code>$</code> یعنی انتهای خط. مثال: <code>grep "bash$" /etc/passwd</code> خطوطی را پیدا می‌کند که به <code>bash</code> ختم می‌شوند.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>^text</code> → text در ابتدای خط؛ <code>text$</code> → text در انتهای خط.</div></div>
+<h2>۸. <code>^</code> و <code>$</code> در grep</h2>
+<p>اینجا وارد Regex ساده می‌شویم.</p>
+<ul>
+<li><code>^</code> یعنی ابتدای خط. مثال: <code>grep "^root" file.txt</code> فقط خطوطی که با <code>root</code> شروع می‌شوند.</li>
+<li><code>$</code> یعنی انتهای خط. مثال: <code>grep "bash$" /etc/passwd</code> خطوطی را پیدا می‌کند که به <code>bash</code> ختم می‌شوند.</li>
+</ul>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>^text</code> → text در ابتدای خط، <code>text$</code> → text در انتهای خط.</div></div>
 
-<h2>۹. چند گزینه مهم دیگر <code>grep</code></h2>
-<table>
-<thead><tr><th>گزینه</th><th>کاربرد</th></tr></thead>
-<tbody>
-<tr><td><code>-n</code></td><td>نمایش شماره خط (line number)</td></tr>
-<tr><td><code>-r</code></td><td>جستجوی بازگشتی (recursive) در فایل‌های داخل Directory</td></tr>
-</tbody>
-</table>
+<h2>۹. چند گزینه مهم دیگر grep</h2>
+<ul>
+<li><strong>شماره خط:</strong> <code>grep -n root file.txt</code> شماره خط را نیز نمایش می‌دهد. (<code>-n → line number</code>)</li>
+<li><strong>جستجوی بازگشتی:</strong> <code>grep -r "Linux" directory/</code> در فایل‌های داخل Directory نیز جستجو می‌کند. (<code>-r → recursive</code>)</li>
+</ul>
+<p>فعلاً لازم نیست تمام گزینه‌های <code>grep</code> را حفظ کنی. گزینه‌های مهم برای این دوره را بشناس و در صورت نیاز با <code>man grep</code> بقیه را پیدا کن.</p>
 
-<h2>۱۰. <code>grep</code> در برابر <code>find</code></h2>
+<h2>۱۰. grep در برابر find</h2>
 <p>یکی از مهم‌ترین تفاوت‌های آزمون:</p>
 <ul>
-<li><code>grep</code> داخل <strong>محتوای فایل‌ها</strong> دنبال Pattern می‌گردد. مثال: <code>grep "error" log.txt</code></li>
-<li><code>find</code> خود <strong>File/Directory</strong>ها را بر اساس ویژگی‌هایی مثل نام، نوع و ... پیدا می‌کند. مثال: <code>find /var -name "*.log"</code></li>
+<li><strong><code>grep</code></strong> داخل <strong>محتوای فایل‌ها</strong> دنبال Pattern می‌گردد. مثال: <code>grep "error" log.txt</code> یعنی داخل فایل دنبال <code>error</code> بگرد.</li>
+<li><strong><code>find</code></strong> خود <strong>File/Directory</strong>ها را بر اساس ویژگی‌هایی مثل نام، نوع و... پیدا می‌کند. مثال: <code>find /var -name "*.log"</code> یعنی فایل‌هایی با نام مناسب را پیدا کن.</li>
 </ul>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> اگر سؤال گفت «فایلی که اسمش <code>report.txt</code> است را پیدا کن» → به <code>find</code> فکر کنید. اگر گفت «داخل فایل‌ها دنبال کلمه <code>error</code> بگرد» → به <code>grep</code> فکر کنید.</div></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th><code>grep</code></th><th><code>find</code></th></tr></thead>
+<tbody>
+<tr><td>جستجوی محتوا/Pattern</td><td>پیدا کردن File/Directory</td></tr>
+<tr><td>روی متن خطوط کار می‌کند</td><td>روی File System جستجو می‌کند</td></tr>
+<tr><td><code>grep "error" log.txt</code></td><td><code>find . -name "*.log"</code></td></tr>
+</tbody>
+</table>
+</div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> اگر سؤال گفت «فایلی که اسمش <code>report.txt</code> است را پیدا کن» به <code>find</code> فکر کن. اگر گفت «داخل فایل‌ها دنبال کلمه <code>error</code> بگرد» به <code>grep</code> فکر کن.</div></div>
 
 <h2>۱۱. Redirect چیست؟</h2>
-<p>به طور معمول خروجی را روی Terminal می‌بینیم. اما می‌توانیم مسیر خروجی را تغییر دهیم. به این کار <strong>Redirection</strong> می‌گوییم.</p>
+<p>به طور معمول <code>ls</code> خروجی را روی Terminal می‌بینیم. اما می‌توانیم مسیر خروجی را تغییر دهیم. به این کار <strong>Redirection</strong> می‌گوییم. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls > files.txt</div></div>
-<p>یعنی خروجی <code>ls</code> به جای Terminal داخل <code>files.txt</code> می‌رود.</p>
+<p>یعنی: <code>ls</code> → <code>stdout</code> → <code>files.txt</code>. پس به جای Terminal، خروجی داخل فایل می‌رود.</p>
 
-<h2>۱۲. <code>></code></h2>
-<p>علامت <code>></code> برای Redirect کردن <code>stdout</code> استفاده می‌شود. مثال:</p>
+<h2>۱۲. <code>&gt;</code></h2>
+<p>علامت <code>&gt;</code> برای Redirect کردن <code>stdout</code> استفاده می‌شود. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">date > date.txt</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته بسیار مهم</strong> اگر فایل از قبل وجود داشته باشد، محتوای قبلی <strong>Overwrite</strong> می‌شود. پس <code>></code> → Overwrite، نه Append.</div></div>
+<p>خروجی <code>date</code> داخل <code>date.txt</code> ذخیره می‌شود.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته بسیار مهم</strong> اگر فایل از قبل وجود داشته باشد، <code>date > date.txt</code> محتوای قبلی فایل را <strong>Overwrite</strong> می‌کند. یعنی محتوای قبلی حذف/جایگزین می‌شود. پس <code>&gt;</code> → Overwrite، نه Append.</div></div>
 
-<h2>۱۳. <code>>></code></h2>
+<h2>۱۳. <code>&gt;&gt;</code></h2>
 <p>برای اضافه کردن خروجی به انتهای فایل:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">date >> date.txt</div></div>
 <p>اگر فایل وجود داشته باشد، محتوای قبلی باقی می‌ماند و خروجی جدید به انتهای آن اضافه می‌شود.</p>
-<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>حفظی</strong> <code>></code> → Overwrite، <code>>></code> → Append.</div></div>
+<p><strong>حفظی:</strong> <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append</p>
 
 <h2>۱۴. Redirect کردن Error</h2>
-<p>پیام خطا در <code>stderr</code> (شماره <code>2</code>) قرار می‌گیرد. پس:</p>
+<p>پیام خطا در <code>stderr</code> قرار می‌گیرد. شماره آن <code>2</code> است. پس:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls /abc 2> error.txt</div></div>
-<p>یعنی خطای Command را داخل <code>error.txt</code> ذخیره کن.</p>
+<p>یعنی خطای Command را داخل <code>error.txt</code> ذخیره کن. مدل ذهنی: <code>stdout → 1</code>، <code>stderr → 2</code>. بنابراین <code>command > output.txt</code> خروجی معمولی را Redirect می‌کند، ولی <code>command 2> error.txt</code> خطا را Redirect می‌کند.</p>
 
-<h2>۱۵. <code>2>></code></h2>
+<h2>۱۵. <code>2&gt;&gt;</code></h2>
 <p>برای Append کردن Error:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">command 2>> error.txt</div></div>
+<p>یعنی خطاهای جدید را به انتهای فایل اضافه کن.</p>
 
-<h2>۱۶. Redirect ورودی با <code><</code></h2>
-<p>می‌توانیم ورودی یک Command را نیز از فایل بگیریم:</p>
+<h2>۱۶. Redirect ورودی با <code>&lt;</code></h2>
+<p>Redirect فقط برای خروجی نیست. می‌توانیم ورودی یک Command را نیز از فایل بگیریم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">command < file.txt</div></div>
-<p>یعنی محتوای <code>file.txt</code> را به عنوان <code>stdin</code> به Command بده.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار مورد را بشناسید: <code><</code> → stdin، <code>></code> → stdout، <code>>></code> → stdout + append، <code>2></code> → stderr.</div></div>
+<p>یعنی محتوای <code>file.txt</code> را به عنوان <code>stdin</code> به Command بده. مدل کلی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">&lt;   → stdin\n&gt;   → stdout\n&gt;&gt;  → stdout + append\n2&gt;  → stderr</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار مورد را بشناس: <code>&lt;</code> → stdin، <code>&gt;</code> → stdout، <code>&gt;&gt;</code> → stdout + append، <code>2&gt;</code> → stderr.</div></div>
 
 <h2>۱۷. Pipe چیست؟</h2>
-<p>علامت Pipe (<code>|</code>) خروجی یک Command را به ورودی Command بعدی متصل می‌کند.</p>
-<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Command 1\n   │\n stdout\n   │\n   ▼\n  Pipe\n   │\n stdin\n   │\n   ▼\nCommand 2</div></div>
+<p>علامت Pipe: <code>|</code>. Pipe خروجی یک Command را به ورودی Command بعدی متصل می‌کند. یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Command 1\n   │\n stdout\n   │\n   ▼\n  Pipe\n   │\n stdin\n   │\n   ▼\nCommand 2</div></div>
 
 <h2>۱۸. مثال ساده Pipe</h2>
+<p>فرض کن:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat users.txt | grep Amir</div></div>
-<p><code>cat users.txt</code> خروجی فایل را می‌دهد، Pipe آن را به <code>grep Amir</code> می‌دهد و فقط خطوط مربوط به Amir نمایش داده می‌شوند. Pipe فایل نمی‌سازد؛ فقط <strong>stdout یک Command را به stdin Command بعدی وصل می‌کند.</strong></p>
+<p>چه اتفاقی می‌افتد؟ <code>cat users.txt</code> → خروجی فایل → <code>|</code> → <code>grep Amir</code> → فقط خطوط مربوط به Amir. پس Pipe فایل نمی‌سازد. فقط <strong>stdout یک Command را به stdin Command بعدی وصل می‌کند.</strong></p>
 
 <h2>۱۹. یک مثال واقعی</h2>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
-<p>این یکی از مهم‌ترین الگوهای خط فرمان است.</p>
+<p>یعنی: <code>history</code> → تمام History → <code>grep ssh</code> → فقط خطوطی که ssh دارند. این یکی از مهم‌ترین الگوهای خط فرمان است.</p>
 
 <h2>۲۰. Pipe در برابر Redirect</h2>
+<p>این دو را هرگز یکی ندان.</p>
+<ul>
+<li><strong>Pipe:</strong> <code>command1 | command2</code> خروجی را به <strong>Command بعدی</strong> می‌دهد.</li>
+<li><strong>Redirect:</strong> <code>command > file</code> خروجی را به <strong>File</strong> می‌دهد.</li>
+</ul>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Pipe</th><th>Redirect</th></tr></thead>
 <tbody>
-<tr><td><code>|</code></td><td><code>></code>، <code>>></code>، <code>2></code></td></tr>
+<tr><td><code>|</code></td><td><code>&gt;</code></td></tr>
 <tr><td>خروجی → Command بعدی</td><td>خروجی → File</td></tr>
 <tr><td>برای زنجیره Commandها</td><td>برای ذخیره/تغییر مقصد جریان</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>حفظی طلایی ⭐</strong> <code>|</code> → Command، <code>></code> → File.</div></div>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>حفظی طلایی ⭐</strong> <code>|</code> → Command، <code>&gt;</code> → File.</div></div>
 
 <h2>۲۱. ترکیب Pipe و Redirect</h2>
+<p>می‌توان آنها را با هم ترکیب کرد:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh > ssh_commands.txt</div></div>
-<p>مراحل: <code>history</code> → <code>grep ssh</code> → <code>ssh_commands.txt</code>. یعنی History را بگیر، فقط خطوط دارای <code>ssh</code> را نگه دار، نتیجه را داخل فایل ذخیره کن.</p>
+<p>مراحل: <code>history</code> → <code>grep ssh</code> → <code>ssh_commands.txt</code>. یعنی History را بگیر، فقط خطوط دارای <code>ssh</code> را نگه دار، نتیجه را داخل فایل ذخیره کن. این دقیقاً همان چیزی است که در خط فرمان Linux بسیار زیاد انجام می‌دهیم.</p>
 
 <h2>۲۲. ترتیب Commandها مهم است</h2>
-<p><code>command1 | command2 > result.txt</code> یعنی خروجی <code>command1</code> به <code>command2</code> داده می‌شود و نتیجه نهایی در فایل ذخیره می‌شود. ترتیب جریان داده را مشخص می‌کند.</p>
+<p>به این دو توجه کن:</p>
+<div class="code-container"><span class="code-label">ترتیب</span><div class="code-block">command1 | command2 > result.txt</div></div>
+<p>یعنی: <code>command1</code> → <code>command2</code> → <code>result.txt</code>. اما اگر جای آنها را عوض کنیم، مفهوم Commandها نیز تغییر می‌کند. پس Pipe و Redirect فقط علامت‌های تزئینی نیستند؛ <strong>جریان داده را مشخص می‌کنند.</strong></p>
 
-<h2>۲۳. <code>sed</code></h2>
-<p><code>sed</code> یک <strong>Stream Editor</strong> است که می‌تواند متن ورودی را پردازش و تغییر دهد. یکی از رایج‌ترین کاربردهای آن جایگزینی متن است.</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
-<p>اگر ورودی <code>Linux is powerful.</code> باشد، خروجی <code>LPIC is powerful.</code> می‌شود.</p>
+<h2>۲۳. sed</h2>
+<p><code>sed</code> یک <strong>Stream Editor</strong> است. یعنی می‌تواند متن ورودی را پردازش و تغییر دهد. یکی از رایج‌ترین کاربردهای آن: <strong>جایگزینی متن</strong>. فرض کن:</p>
+<div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Linux is powerful.\nLinux is popular.</div></div>
+<p>می‌خواهیم <code>Linux</code> را به <code>LPIC</code> تبدیل کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
+<p>خروجی: <code>LPIC is powerful.</code> و <code>LPIC is popular.</code></p>
 
 <h2>۲۴. ساختار <code>s</code></h2>
-<p><code>sed 's/old/new/' file.txt</code> یعنی <code>s</code> → substitute، <code>old</code> → متن قدیمی، <code>new</code> → متن جدید.</p>
+<p>این قسمت مهم است:</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">sed 's/old/new/' file.txt</div></div>
+<p>یعنی: <code>s</code> → substitute، <code>old</code> → متن قدیمی، <code>new</code> → متن جدید. پس <code>sed 's/Linux/LPIC/' file.txt</code> یعنی <code>Linux</code> را با <code>LPIC</code> جایگزین کن.</p>
 
-<h2>۲۵. گزینه <code>g</code> در <code>sed</code></h2>
-<p>به طور معمول در هر خط، اولین مورد جایگزین می‌شود. اگر بخواهیم <strong>تمام موارد موجود در هر خط</strong> جایگزین شوند:</p>
+<h2>۲۵. گزینه <code>g</code> در sed</h2>
+<p>به طور معمول <code>sed 's/Linux/LPIC/' file.txt</code> در هر خط، اولین مورد را جایگزین می‌کند. اگر بخواهیم <strong>تمام موارد موجود در هر خط</strong> جایگزین شوند:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt</div></div>
-<p><code>g</code> → global. ورودی <code>Linux Linux Linux</code> با <code>g</code> تبدیل به <code>LPIC LPIC LPIC</code> می‌شود.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> در LPIC-1: <code>s</code> → substitute، <code>g</code> → global را به خوبی بشناسید.</div></div>
+<p>اینجا <code>g</code> → global. مثال: ورودی <code>Linux Linux Linux</code> بدون <code>g</code> → <code>LPIC Linux Linux</code>، با <code>g</code> → <code>LPIC LPIC LPIC</code>.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> در LPIC-1: <code>s</code> → substitute، <code>g</code> → global را به خوبی بشناس.</div></div>
 
-<h2>۲۶. آیا <code>sed</code> فایل اصلی را تغییر می‌دهد؟</h2>
-<p>به طور پیش‌فرض خیر؛ فقط نتیجه پردازش را روی <code>stdout</code> نمایش می‌دهد. برای ذخیره نتیجه:</p>
+<h2>۲۶. آیا sed فایل اصلی را تغییر می‌دهد؟</h2>
+<p>به طور پیش‌فرض <code>sed 's/Linux/LPIC/' file.txt</code> فایل اصلی را تغییر نمی‌دهد. فقط نتیجه پردازش را روی <code>stdout</code> نمایش می‌دهد. اگر بخواهی نتیجه را در فایل دیگری ذخیره کنی:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt > new.txt</div></div>
+<p>حالا <code>file.txt</code> اصلی و <code>new.txt</code> نتیجه جدید است.</p>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>sed</code> به صورت پیش‌فرض فایل اصلی را تغییر نمی‌دهد.</div></div>
 
-<h2>۲۷. <code>xargs</code></h2>
-<p><code>xargs</code> ورودی را به <strong>Argument</strong> برای یک Command تبدیل می‌کند. مثال:</p>
+<h2>۲۷. xargs</h2>
+<p><code>xargs</code> در ابتدا ممکن است کمی عجیب باشد، اما ایده آن ساده است: <strong>ورودی را به Argument برای یک Command تبدیل می‌کند.</strong> مثلاً فرض کن این خروجی را داریم: <code>file1.txt file2.txt file3.txt</code> و می‌خواهیم آنها را به یک Command بدهیم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">printf '%s\\n' file1.txt file2.txt file3.txt | xargs echo</div></div>
-<p>تقریباً به این مفهوم است: <code>echo file1.txt file2.txt file3.txt</code></p>
+<p>تقریباً به این مفهوم است: <code>echo file1.txt file2.txt file3.txt</code>. پس: Input → xargs → Arguments → Command.</p>
 
-<h2>۲۸. <code>xargs</code> در برابر Pipe</h2>
-<p>این تفاوت بسیار مهم است:</p>
+<h2>۲۸. xargs در برابر Pipe</h2>
+<p>این تفاوت بسیار مهم است.</p>
 <ul>
-<li>Pipe: <code>command1 | command2</code> → خروجی <code>command1</code> به <strong>stdin</strong> دستور دوم می‌رود.</li>
-<li>xargs: <code>command1 | xargs command2</code> → خروجی <code>command1</code> به <strong>Argument</strong>های <code>command2</code> تبدیل می‌شود.</li>
+<li><strong>Pipe:</strong> <code>command1 | command2</code> خروجی <code>command1</code> را به <strong>stdin</strong> دستور دوم می‌دهد.</li>
+<li><strong>xargs:</strong> <code>command1 | xargs command2</code> خروجی <code>command1</code> را به <strong>Argument</strong>های <code>command2</code> تبدیل می‌کند.</li>
 </ul>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر Command دوم انتظار دارد اطلاعات را از <strong>stdin</strong> بگیرد → <code>|</code>. اگر لازم است خروجی Command اول به شکل <strong>Argument</strong> به Command دوم داده شود → <code>xargs</code>.</div></div>
+<p>پس: Pipe → stdin، xargs → arguments.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر Command دوم انتظار دارد اطلاعات را از <strong>stdin</strong> بگیرد: <code>|</code>. اگر لازم است خروجی Command اول به شکل <strong>Argument</strong> به Command دوم داده شود: <code>xargs</code> ممکن است مناسب باشد.</div></div>
 
-<h2>۲۹. مثال معروف <code>xargs</code></h2>
+<h2>۲۹. مثال معروف xargs</h2>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.tmp" -print0 | xargs -0 rm</div></div>
-<p>یعنی نام فایل‌های tmp پیدا شده به عنوان Argument به <code>rm</code> داده می‌شوند. استفاده از <code>-print0</code> و <code>-0</code> برای انتقال امن‌تر نام فایل‌ها (به دلیل وجود فاصله یا کاراکترهای خاص) مناسب‌تر است.</p>
+<p>مفهوم: <code>find</code> → فایل‌های tmp → <code>xargs</code> → <code>rm file1.tmp file2.tmp ...</code>. یعنی نام فایل‌های پیدا شده به عنوان Argument به <code>rm</code> داده می‌شوند.</p>
+<p><strong>چرا <code>-print0</code> و <code>-0</code>؟</strong> چون نام فایل ممکن است شامل فاصله یا بعضی کاراکترهای خاص باشد. روش ساده <code>find . -name "*.tmp" | xargs rm</code> ممکن است در بعضی نام فایل‌ها مشکل ایجاد کند. روش <code>-print0</code> و <code>xargs -0</code> برای انتقال امن‌تر نام فایل‌ها مناسب‌تر است. برای LPIC-1 مهم است مفهوم <code>xargs</code> را بفهمی؛ لازم نیست تمام جزئیات Parsing آن را حفظ کنی.</p>
 
-<h2>۳۰. دام مهم <code>xargs</code> ⚠️</h2>
-<p><code>xargs</code> همان Pipe نیست. <code>|</code> → stdin، <code>xargs</code> → arguments. این یکی از تفاوت‌های مفهومی مهم این جلسه است.</p>
+<h2>۳۰. دام مهم xargs ⚠️</h2>
+<p>این تصور اشتباه است: <code>xargs = Pipe</code>. خیر. <code>|</code> → stdin، <code>xargs</code> → arguments. این یکی از تفاوت‌های مفهومی مهم این جلسه است.</p>
 
 <h2>۳۱. Checksum چیست؟</h2>
-<p>Checksum مانند یک <strong>اثر انگشت دیجیتال فایل</strong> است. برای بررسی اینکه فایل در مسیر دانلود خراب یا تغییر نکرده، از Checksum استفاده می‌شود.</p>
+<p>فرض کن یک فایل ISO چند گیگابایتی دانلود کرده‌ای. از کجا بفهمی فایل در مسیر دانلود خراب یا تغییر نکرده؟ اینجا <strong>Checksum</strong> به کار می‌آید. Checksum را می‌توان مثل یک <strong>اثر انگشت دیجیتال فایل</strong> در نظر گرفت.</p>
 
-<h2>۳۲. <code>md5sum</code></h2>
+<h2>۳۲. md5sum</h2>
+<p>برای تولید MD5:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">md5sum file.iso</div></div>
-<p>خروجی نمونه: <code>d41d8cd98f00b204e9800998ecf8427e  file.iso</code></p>
+<p>خروجی چیزی شبیه <code>d41d8cd98f00b204e9800998ecf8427e  file.iso</code>. اگر Checksum فایل دانلودشده را با مقدار رسمی مقایسه کنیم، می‌توانیم متوجه اختلاف شویم.</p>
 
-<h2>۳۳. <code>sha256sum</code></h2>
+<h2>۳۳. sha256sum</h2>
+<p>برای SHA-256:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">sha256sum file.iso</div></div>
 <p>SHA-256 امروزه انتخاب بسیار مناسب‌تری برای بررسی Integrity نسبت به MD5 است.</p>
+<p><strong>نکته مهم:</strong> Checksum را می‌توان برای بررسی این موضوع استفاده کرد که <strong>آیا فایل با داده مورد انتظار مطابقت دارد یا خیر؟</strong> اما اگر هدف <strong>امنیت رمزنگاری یا جلوگیری از جعل</strong> باشد، صرفاً داشتن یک Hash کافی نیست؛ باید به منبع و روش اعتبارسنجی نیز اعتماد داشت. برای سطح LPIC-1 همین تفاوت مفهومی کافی است.</p>
 
 <h2>۳۴. MD5 در برابر SHA-256</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>MD5</th><th>SHA-256</th></tr></thead>
 <tbody>
-<tr><td>قدیمی‌تر، 128-bit</td><td>جدیدتر، 256-bit</td></tr>
+<tr><td>قدیمی‌تر</td><td>جدیدتر</td></tr>
+<tr><td>128-bit</td><td>256-bit</td></tr>
 <tr><td>امروزه برای امنیت رمزنگاری مناسب نیست</td><td>بسیار قوی‌تر</td></tr>
 <tr><td>برای برخی بررسی‌های ساده Integrity دیده می‌شود</td><td>انتخاب رایج‌تر برای Integrity</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> کدام‌یک برای امنیت مدرن مناسب‌تر است؟ <code>SHA-256</code>.</div></div>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال پرسید کدام‌یک از این دو برای امنیت مدرن مناسب‌تر است؟ <code>SHA-256</code>.</div></div>
 
 <h2>۳۵. ترکیب ابزارها</h2>
-<p>قدرت واقعی Linux زمانی مشخص می‌شود که Commandها را با هم ترکیب کنیم.</p>
+<p>قدرت واقعی Linux زمانی مشخص می‌شود که Commandها را با هم ترکیب کنیم. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
+<p>یعنی: History → Filter. حالا اگر بخواهیم ذخیره کنیم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh > ssh.txt</div></div>
-<p>یعنی History → grep → File.</p>
+<p>یعنی: History → grep → File. یا:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat file.txt | sed 's/Linux/LPIC/g'</div></div>
-<p>یعنی File → cat → sed → Modified Output.</p>
+<p>یعنی: File → cat → sed → Modified Output.</p>
 
 <h2>۳۶. یک سناریوی واقعی</h2>
-<p>فرض کنید یک فایل Log بزرگ داریم و فقط خطاها را می‌خواهیم:</p>
-<div class="code-container"><span class="code-label">مراحل</span><div class="code-block">grep "ERROR" server.log > errors.txt\ngrep "ERROR" server.log | grep ssh > ssh_errors.txt</div></div>
-<p>مدل ذهنی: <code>server.log → grep ERROR → grep ssh → ssh_errors.txt</code>. این فلسفه اصلی خط فرمان است: یک ابزار کار مشخصی انجام می‌دهد؛ سپس خروجی آن را به ابزار بعدی می‌دهیم.</p>
+<p>فرض کن یک فایل Log بزرگ داریم <code>server.log</code> و فقط خطاها را می‌خواهیم:</p>
+<div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">grep "ERROR" server.log</div></div>
+<p>حالا می‌خواهیم نتیجه را ذخیره کنیم:</p>
+<div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">grep "ERROR" server.log > errors.txt</div></div>
+<p>حالا می‌خواهیم فقط خطاهای مربوط به SSH را بگیریم:</p>
+<div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">grep "ERROR" server.log | grep ssh</div></div>
+<p>و در نهایت ذخیره کنیم:</p>
+<div class="code-container"><span class="code-label">مرحله ۴</span><div class="code-block">grep "ERROR" server.log | grep ssh > ssh_errors.txt</div></div>
+<p>مدل ذهنی: <code>server.log</code> → <code>grep ERROR</code> → <code>grep ssh</code> → <code>ssh_errors.txt</code>. این همان فلسفه اصلی خط فرمان است: <strong>یک ابزار کار مشخصی انجام می‌دهد؛ سپس خروجی آن را به ابزار بعدی می‌دهیم.</strong></p>
 
-<h2>۳۷. یک سناریوی دیگر با <code>sed</code></h2>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt > new.txt</div></div>
-<p>جریان: <code>file.txt → sed → Replace → new.txt</code>. فایل اصلی دست‌نخورده باقی می‌ماند.</p>
+<h2>۳۷. یک سناریوی دیگر با sed</h2>
+<p>فرض کن <code>file.txt</code> شامل:</p>
+<div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Linux is great.\nLinux is powerful.</div></div>
+<p>می‌خواهیم <code>Linux</code> به <code>LPIC</code> تبدیل شود و نتیجه در فایل جدید ذخیره شود:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt > new.txt</div></div>
+<p>جریان: <code>file.txt</code> → <code>sed</code> → Replace → <code>new.txt</code>. فایل اصلی دست‌نخورده باقی می‌ماند.</p>
 
 <h2>۳۸. جدول طلایی Commandهای جلسه</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>ابزار</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -1762,10 +2038,10 @@
 <tr><td><code>grep -v</code></td><td>معکوس کردن Match</td></tr>
 <tr><td><code>grep -n</code></td><td>نمایش شماره خط</td></tr>
 <tr><td><code>grep -r</code></td><td>جستجوی Recursive</td></tr>
-<tr><td><code>></code></td><td>Redirect و Overwrite</td></tr>
-<tr><td><code>>></code></td><td>Redirect و Append</td></tr>
-<tr><td><code>2></code></td><td>Redirect کردن stderr</td></tr>
-<tr><td><code><</code></td><td>Redirect کردن stdin</td></tr>
+<tr><td><code>&gt;</code></td><td>Redirect و Overwrite</td></tr>
+<tr><td><code>&gt;&gt;</code></td><td>Redirect و Append</td></tr>
+<tr><td><code>2&gt;</code></td><td>Redirect کردن stderr</td></tr>
+<tr><td><code>&lt;</code></td><td>Redirect کردن stdin</td></tr>
 <tr><td><code>|</code></td><td>انتقال stdout به stdin</td></tr>
 <tr><td><code>sed</code></td><td>پردازش/تغییر متن</td></tr>
 <tr><td><code>s</code></td><td>Substitute در sed</td></tr>
@@ -1775,8 +2051,10 @@
 <tr><td><code>sha256sum</code></td><td>تولید SHA-256</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>۳۹. جدول Standard Streams</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>شماره</th><th>نام</th><th>معنی</th></tr></thead>
 <tbody>
@@ -1785,55 +2063,83 @@
 <tr><td><code>2</code></td><td><code>stderr</code></td><td>خطا</td></tr>
 </tbody>
 </table>
+</div>
+<p>حفظ کن: <code>0 → in</code>، <code>1 → out</code>، <code>2 → error</code>.</p>
 
 <h2>۴۰. مقایسه‌های طلایی جلسه</h2>
-<h3><code>grep</code> در برابر <code>find</code></h3>
-<p><code>grep</code> → داخل محتوا، <code>find</code> → پیدا کردن File/Directory.</p>
-<h3>Pipe در برابر Redirect</h3>
-<p><code>|</code> → Command، <code>></code> → File.</p>
-<h3><code>></code> در برابر <code>>></code></h3>
-<p><code>></code> → Overwrite، <code>>></code> → Append.</p>
-<h3>Pipe در برابر <code>xargs</code></h3>
-<p><code>|</code> → stdout → stdin، <code>xargs</code> → stdout → arguments.</p>
-<h3><code>sed</code> در برابر <code>grep</code></h3>
-<p><code>grep</code> → پیدا کن، <code>sed</code> → تغییر/پردازش کن.</p>
-<h3><code>md5sum</code> در برابر <code>sha256sum</code></h3>
-<p>MD5 قدیمی‌تر و ضعیف‌تر، SHA256 قوی‌تر و مناسب‌تر برای Integrity مدرن.</p>
+<ul>
+<li><strong>grep در برابر find:</strong> <code>grep</code> → داخل محتوا، <code>find</code> → پیدا کردن File/Directory.</li>
+<li><strong>Pipe در برابر Redirect:</strong> <code>|</code> → Command، <code>&gt;</code> → File.</li>
+<li><strong><code>&gt;</code> در برابر <code>&gt;&gt;</code>:</strong> <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append.</li>
+<li><strong>Pipe در برابر xargs:</strong> <code>|</code> → stdout → stdin، <code>xargs</code> → stdout → arguments.</li>
+<li><strong>sed در برابر grep:</strong> <code>grep</code> → پیدا کن، <code>sed</code> → تغییر/پردازش کن.</li>
+<li><strong>md5sum در برابر sha256sum:</strong> MD5 قدیمی‌تر و ضعیف‌تر، SHA256 قوی‌تر و مناسب‌تر برای Integrity مدرن.</li>
+</ul>
 
 <h2>۴۱. دام‌های مهم امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> <code>></code> فایل را Append می‌کند؟ خیر. <code>></code> Overwrite، <code>>></code> Append.</li>
-<li><strong>دام ۲:</strong> Pipe خروجی را داخل فایل می‌ریزد؟ خیر. <code>|</code> → Command بعدی، <code>></code> → File.</li>
-<li><strong>دام ۳:</strong> <code>2></code> خروجی معمولی را Redirect می‌کند؟ خیر. <code>2></code> → stderr.</li>
-<li><strong>دام ۴:</strong> <code>grep</code> نام فایل را جستجو می‌کند؟ خیر. <code>grep</code> برای جستجوی Pattern در محتوای متن است. برای پیدا کردن File/Directory بر اساس نام، <code>find</code> ابزار مناسب‌تری است.</li>
-<li><strong>دام ۵:</strong> <code>sed</code> همیشه فایل اصلی را تغییر می‌دهد؟ خیر. به طور پیش‌فرض خروجی را تولید می‌کند و فایل اصلی را تغییر نمی‌دهد.</li>
-<li><strong>دام ۶:</strong> <code>g</code> یعنی فقط یک بار؟ خیر. <code>g</code> → Global، یعنی جایگزینی تمام Matchهای مناسب در هر خط.</li>
-<li><strong>دام ۷:</strong> <code>xargs</code> همان Pipe است؟ خیر. Pipe → stdin، xargs → arguments.</li>
-<li><strong>دام ۸:</strong> MD5 امن است؟ برای کاربردهای امنیت رمزنگاری مدرن، MD5 امن محسوب نمی‌شود. SHA-256 انتخاب بسیار مناسب‌تری است.</li>
-<li><strong>دام ۹:</strong> هر خروجی Command الزاماً stdout است؟ خیر. پیام‌های خطا معمولاً به <code>stderr</code> می‌روند.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> — <code>&gt;</code> فایل را Append می‌کند؟ خیر. <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> — Pipe خروجی را داخل فایل می‌ریزد؟ خیر. <code>|</code> → Command بعدی، <code>&gt;</code> → File.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> — <code>2&gt;</code> خروجی معمولی را Redirect می‌کند؟ خیر. <code>2&gt;</code> → stderr.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> — <code>grep</code> نام فایل را جستجو می‌کند؟ به طور معمول <code>grep</code> برای جستجوی Pattern در محتوای متن است. برای پیدا کردن File/Directory بر اساس نام، <code>find</code> ابزار مناسب‌تری است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> — <code>sed</code> همیشه فایل اصلی را تغییر می‌دهد؟ خیر. به طور پیش‌فرض خروجی را تولید می‌کند و فایل اصلی را تغییر نمی‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> — <code>g</code> یعنی فقط یک بار؟ خیر. <code>g</code> → Global یعنی جایگزینی تمام Matchهای مناسب در هر خط.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> — xargs همان Pipe است؟ خیر. <code>|</code> → stdin، <code>xargs</code> → arguments.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> — MD5 امن است؟ برای کاربردهای امنیت رمزنگاری مدرن، MD5 امن محسوب نمی‌شود. در مقایسه با MD5، SHA-256 انتخاب بسیار مناسب‌تری است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> — هر خروجی Command الزاماً stdout است؟ خیر. پیام‌های خطا معمولاً به <code>stderr</code> می‌روند. به همین دلیل <code>command > output.txt</code> ممکن است خروجی معمولی را ذخیره کند ولی خطا همچنان روی Terminal دیده شود.</div></div>
 
 <h2>🧠 نقشه ذهنی جلسه</h2>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Command Output\n│\n├── Standard Streams\n│     ├── stdin  → 0\n│     ├── stdout → 1\n│     └── stderr → 2\n│\n├── grep\n│     ├── -i\n│     ├── -v\n│     ├── -n\n│     ├── -r\n│     ├── ^\n│     └── $\n│\n├── Redirect\n│     ├── <   → stdin\n│     ├── >   → stdout / Overwrite\n│     ├── >>  → stdout / Append\n│     └── 2>  → stderr\n│\n├── Pipe\n│     └── stdout → stdin\n│\n├── sed\n│     ├── s → substitute\n│     └── g → global\n│\n├── xargs\n│     └── input → arguments\n│\n└── Checksum\n      ├── md5sum\n      └── sha256sum</div></div>
 
-<h2>⚡ حفظی‌های جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
-<h3>Standard Streams</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">0 → stdin\n1 → stdout\n2 → stderr</div></div>
-<h3>grep</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">grep       → جستجوی Pattern\n-i         → Ignore Case\n-v         → Invert\n-n         → شماره خط\n-r         → Recursive\n^          → ابتدای خط\n$          → انتهای خط</div></div>
-<h3>Redirect</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt"><   → stdin\n>   → stdout + Overwrite\n>>  → stdout + Append\n2>  → stderr</div></div>
-<h3>Pipe</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">| → stdout یک Command → stdin Command بعدی</div></div>
-<h3>sed</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">s → substitute\ng → global\nsed 's/old/new/g' file\n# به صورت پیش‌فرض فایل اصلی را تغییر نمی‌دهد</div></div>
-<h3>xargs</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">xargs → تبدیل Input به Arguments\n|     → stdin\nxargs → arguments</div></div>
-<h3>Checksum</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">md5sum    → MD5\nsha256sum → SHA-256\n# SHA-256 → قوی‌تر و مناسب‌تر از MD5</div></div>
+<h2>🔗 جریان اصلی جلسه</h2>
+<p>اگر بخواهیم تمام جلسه را در یک تصویر ذهنی خلاصه کنیم:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">             Command\n                │\n                ▼\n              Output\n                │\n        ┌───────┼────────┐\n        │       │        │\n        ▼       ▼        ▼\n      grep     sed       >\n    Filter    Modify    File\n        │       │\n        └───┬───┘\n            │\n            ▼\n           |\n            │\n            ▼\n      Another Command\n            │\n            ▼\n          xargs\n            │\n            ▼\n        Arguments</div></div>
 
-<h2>🎯 تست نهایی جلسه</h2>
-<div class="box note"><i class="fas fa-check-circle"></i><div><strong>بدون نگاه کردن به جزوه جواب دهید:</strong>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>⚡ حفظی‌های جلسه — مرور ۲ تا ۳ دقیقه‌ای</strong>
+اگر فقط چند دقیقه وقت داری، این قسمت را بخوان:
+<h4>Standard Streams</h4>
+<code>0 → stdin</code>، <code>1 → stdout</code>، <code>2 → stderr</code>
+<h4>grep</h4>
+<ul>
+<li><code>grep</code> → جستجوی Pattern</li>
+<li><code>-i</code> → Ignore Case</li>
+<li><code>-v</code> → Invert</li>
+<li><code>-n</code> → شماره خط</li>
+<li><code>-r</code> → Recursive</li>
+<li><code>^</code> → ابتدای خط</li>
+<li><code>$</code> → انتهای خط</li>
+</ul>
+<h4>Redirect</h4>
+<ul>
+<li><code>&lt;</code> → stdin</li>
+<li><code>&gt;</code> → stdout + Overwrite</li>
+<li><code>&gt;&gt;</code> → stdout + Append</li>
+<li><code>2&gt;</code> → stderr</li>
+</ul>
+<h4>Pipe</h4>
+<code>|</code> → stdout یک Command → stdin Command بعدی
+<h4>sed</h4>
+<ul>
+<li><code>s</code> → substitute</li>
+<li><code>g</code> → global</li>
+<li><code>sed 's/old/new/g' file</code></li>
+<li>به صورت پیش‌فرض <code>sed</code> فایل اصلی را تغییر نمی‌دهد</li>
+</ul>
+<h4>xargs</h4>
+<code>xargs</code> → تبدیل Input به Arguments. پس <code>|</code> → stdin، <code>xargs</code> → arguments.
+<h4>Checksum</h4>
+<code>md5sum</code> → MD5، <code>sha256sum</code> → SHA-256. SHA-256 قوی‌تر و مناسب‌تر از MD5.
+<h4>مقایسه‌های خیلی مهم</h4>
+<ul>
+<li><code>grep</code> → داخل محتوا، <code>find</code> → پیدا کردن File/Directory</li>
+<li><code>|</code> → Command، <code>&gt;</code> → File</li>
+<li><code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append</li>
+<li><code>grep</code> → Find، <code>sed</code> → Modify</li>
+<li><code>|</code> → stdin، <code>xargs</code> → arguments</li>
+</ul>
+</div></div>
+
+<div class="box important"><i class="fas fa-check-circle"></i><div><strong>🎯 تست نهایی جلسه</strong>
+بدون نگاه کردن به جزوه جواب بده:
 <ol>
 <li><code>grep</code> چه کاری انجام می‌دهد؟</li>
 <li>تفاوت <code>grep</code> و <code>find</code> چیست؟</li>
@@ -1842,9 +2148,9 @@
 <li><code>^</code> و <code>$</code> در <code>grep</code> چه مفهومی دارند؟</li>
 <li><code>stdin</code>، <code>stdout</code> و <code>stderr</code> چه هستند؟</li>
 <li>شماره‌های <code>0</code>، <code>1</code> و <code>2</code> مربوط به چه هستند؟</li>
-<li>تفاوت <code>></code> و <code>>></code> چیست؟</li>
-<li><code>2></code> چه چیزی را Redirect می‌کند؟</li>
-<li><code><</code> چه کاربردی دارد؟</li>
+<li>تفاوت <code>&gt;</code> و <code>&gt;&gt;</code> چیست؟</li>
+<li><code>2&gt;</code> چه چیزی را Redirect می‌کند؟</li>
+<li><code>&lt;</code> چه کاربردی دارد؟</li>
 <li>Pipe چه کاری انجام می‌دهد؟</li>
 <li>تفاوت Pipe و Redirect چیست؟</li>
 <li><code>sed</code> چه کاربردی دارد؟</li>
@@ -1854,19 +2160,25 @@
 <li>تفاوت <code>|</code> و <code>xargs</code> چیست؟</li>
 <li>Checksum چیست؟</li>
 <li>تفاوت MD5 و SHA-256 چیست؟</li>
-<li>در این دستور جریان داده را توضیح دهید: <code>history | grep ssh > ssh.txt</code></li>
+<li>در این دستور جریان داده را توضیح بده: <code>history | grep ssh > ssh.txt</code></li>
 </ol>
 </div></div>
 
-<h2>🏆 یک سؤال طلایی</h2>
-<p>اگر این دستور را ببینید:</p>
+<div class="box important"><i class="fas fa-trophy"></i><div><strong>🏆 یک سؤال طلایی</strong>
+اگر این دستور را ببینی:
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep "ERROR" server.log | sed 's/ERROR/WARNING/g' > result.txt</div></div>
-<p>باید بتوانید بدون حفظ کردن، آن را بخوانید: <code>server.log → grep (فقط خطوط دارای ERROR) → sed (ERROR → WARNING) → > (ذخیره در result.txt)</code>. یعنی <strong>فایل → جستجو → تغییر → ذخیره</strong>. اگر بتوانید جریان داده را این‌طور در ذهنتان ببینید، واقعاً مفهوم جلسه را یاد گرفته‌اید، نه اینکه فقط چند Command را حفظ کرده باشید.</p>
-
-<div class="box important"><i class="fas fa-link"></i><div><strong>🔗 ارتباط با جلسه بعد</strong>
-در این جلسه یاد گرفتیم با خروجی و داده‌های متنی کار کنیم. در جلسه بعد همین مدل را یک مرحله جلوتر می‌بریم و وارد مباحث <strong>Package Management</strong>، <strong>Process</strong>، <code>ps</code>، <code>top</code>، <code>kill</code>، <code>tmux</code>، <code>nohup</code>، <code>jobs</code>، <code>bg</code> و <code>fg</code> می‌شویم. پس چیزی که امروز یاد گرفتید فقط مخصوص <code>grep</code> و <code>sed</code> نیست؛ این همان <strong>فلسفه ترکیب Commandها در Linux</strong> است.
+باید بتوانی بدون حفظ کردن، آن را بخوانی:
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">server.log\n     ↓\ngrep\nفقط خطوط دارای ERROR\n     ↓\nsed\nERROR → WARNING\n     ↓\n>\nذخیره در result.txt</div></div>
+یعنی: <strong>فایل → جستجو → تغییر → ذخیره</strong>. اگر بتوانی جریان داده را این‌طور در ذهنت ببینی، واقعاً مفهوم جلسه را یاد گرفته‌ای، نه اینکه فقط چند Command را حفظ کرده باشی.
 </div></div>
-` ,
+
+<div class="box note"><i class="fas fa-link"></i><div><strong>🔗 ارتباط با جلسه بعد</strong>
+در این جلسه یاد گرفتیم با خروجی و داده‌های متنی کار کنیم. در جلسه بعد همین مدل را یک مرحله جلوتر می‌بریم:
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Command\n   ↓\nOutput\n   ↓\nFilter / Process\n   ↓\nProcess Management</div></div>
+و وارد مباحث <strong>Package Management، Process، ps، top، kill، tmux، nohup، jobs، bg، fg</strong> می‌شویم. پس چیزی که امروز یاد گرفتی فقط مخصوص <code>grep</code> و <code>sed</code> نیست؛ این همان <strong>فلسفه ترکیب Commandها در Linux</strong> است.
+</div></div>
+`
+,
 "s3": `
 <div class="section-header">
     <div class="section-badge">۳</div>
