@@ -2698,38 +2698,53 @@
 <blockquote><strong>🎯 هدف جلسه:</strong> بفهمیم Storage در لینوکس چگونه از سخت‌افزار خام به یک Filesystem قابل استفاده تبدیل می‌شود و چگونه با Partition، Mount، LVM و RAID آن را مدیریت کنیم.</blockquote>
 
 <h2>قبل از شروع...</h2>
-<p>فرض کنید یک SSD جدید به سیستم وصل کرده‌اید. آیا همین الان می‌توانید داخل آن فایل ذخیره کنید؟ معمولاً نه. برای استفاده از آن باید چند مفهوم را پشت سر هم بفهمیم:</p>
+<p>فرض کن یک SSD جدید به سیستم وصل کرده‌ای. آیا همین الان می‌توانی داخل آن فایل ذخیره کنی؟ ❌ معمولاً نه. برای استفاده از آن باید چند مفهوم را پشت سر هم بفهمیم:</p>
 <div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Disk\n  ↓\nPartition\n  ↓\nFilesystem\n  ↓\nMount\n  ↓\nDirectory\n  ↓\nFile</div></div>
-<p>این <strong>مهم‌ترین نقشه‌ی جلسه</strong> است. اما همه‌ی سیستم‌ها الزاماً دقیقاً به این شکل نیستند؛ مثلاً می‌توان Filesystem را مستقیماً روی یک Disk ساخت، یا در LVM/RAID لایه‌های دیگری بین این اجزا قرار داد.</p>
+<p>این <strong>مهم‌ترین نقشه‌ی جلسه</strong> است. اما یک نکته: همه‌ی سیستم‌ها الزاماً دقیقاً به این شکل نیستند؛ مثلاً می‌توان Filesystem را مستقیماً روی یک Disk ساخت، یا در LVM/RAID لایه‌های دیگری بین این اجزا قرار داد.</p>
 
 <h2>بخش اول — Hardware</h2>
 
 <h3>۱. سخت‌افزار چیست؟</h3>
-<p>Hardware یعنی قطعات فیزیکی سیستم: CPU، RAM، HDD/SSD/NVMe، Network Card، GPU، USB Devices. سیستم‌عامل باید بتواند این سخت‌افزارها را شناسایی و کنترل کند.</p>
+<p>Hardware یعنی قطعات فیزیکی سیستم. مثلاً:</p>
+<ul>
+<li>CPU</li>
+<li>RAM</li>
+<li>HDD / SSD / NVMe</li>
+<li>Network Card</li>
+<li>GPU</li>
+<li>USB Devices</li>
+</ul>
+<p>سیستم‌عامل باید بتواند این سخت‌افزارها را شناسایی و کنترل کند.</p>
 
 <h3>۲. Kernel و Hardware</h3>
-<p>در لینوکس، <strong>Kernel</strong> نقش اصلی را در ارتباط با Hardware دارد.</p>
+<p>در لینوکس، <strong>Kernel</strong> نقش اصلی را در ارتباط با Hardware دارد. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Application\n     ↓\nKernel\n     ↓\nHardware</div></div>
-<p>مثلاً یک برنامه می‌خواهد روی Disk داده بنویسد؛ مستقیماً با سخت‌افزار صحبت نمی‌کند؛ درخواست خود را از طریق Kernel انجام می‌دهد.</p>
+<p>مثلاً یک برنامه می‌خواهد روی Disk داده بنویسد. مستقیماً با سخت‌افزار صحبت نمی‌کند؛ درخواست خود را از طریق Kernel انجام می‌دهد.</p>
 
 <h3>۳. <code>lshw</code></h3>
-<p>برای مشاهده‌ی اطلاعات سخت‌افزار:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lshw\nsudo lshw -short</div></div>
+<p>برای مشاهده‌ی اطلاعات سخت‌افزار می‌توان از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lshw</div></div>
+<p>استفاده کرد. برای خروجی خلاصه‌تر:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo lshw -short</div></div>
+
 <h4>ابزارهای کاربردی دیگر</h4>
+<div class="table-wrap">
 <table>
-<thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
+<thead><tr><th>هدف</th><th>دستور</th><th>توضیح</th></tr></thead>
 <tbody>
-<tr><td><code>lscpu</code></td><td>اطلاعات CPU</td></tr>
-<tr><td><code>lsmem</code></td><td>اطلاعات Memory</td></tr>
-<tr><td><code>lsblk</code></td><td>دیسک‌ها و Block Deviceها و Partitionها</td></tr>
+<tr><td>CPU</td><td><code>lscpu</code></td><td>اطلاعات CPU را نمایش می‌دهد</td></tr>
+<tr><td>Memory</td><td><code>lsmem</code></td><td>اطلاعات مربوط به Memory را نمایش می‌دهد</td></tr>
+<tr><td>Storage</td><td><code>lsblk</code></td><td>دیسک‌ها و Block Deviceها و Partitionها را نمایش می‌دهد</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>بخش دوم — Kernel Module</h2>
 
 <h3>۴. Kernel Module چیست؟</h3>
-<p>Kernel برای پشتیبانی از Hardware و قابلیت‌های مختلف از <strong>Module</strong>ها نیز استفاده می‌کند. Kernel Module را می‌توان به صورت ساده یک <strong>قطعه کد قابل بارگذاری در Kernel</strong> در نظر گرفت. مثلاً ممکن است یک Driver به صورت Module در اختیار Kernel قرار گیرد.</p>
+<p>Kernel برای پشتیبانی از Hardware و قابلیت‌های مختلف از <strong>Module</strong>ها نیز استفاده می‌کند. Kernel Module را می‌توان به صورت ساده یک <strong>قطعه کد قابل بارگذاری در Kernel</strong> در نظر گرفت. مثلاً ممکن است یک Driver به صورت Module در اختیار Kernel قرار گیرد. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Hardware\n   ↓\nDriver / Kernel Module\n   ↓\nKernel\n   ↓\nLinux</div></div>
+<div class="box note"><i class="fas fa-circle-info"></i><div><strong>نکته</strong> مثال USB را بیش از حد ساده نکن. وصل کردن فلش لزوماً به این معنی نیست که «یک Module جدید همان لحظه بارگذاری می‌شود». بسیاری از Moduleهای موردنیاز ممکن است از قبل در Kernel یا به صورت Module آماده باشند.</div></div>
 
 <h3>۵. <code>lsmod</code></h3>
 <p>برای مشاهده‌ی Kernel Moduleهای بارگذاری‌شده:</p>
@@ -2738,109 +2753,207 @@
 <h3>۶. <code>modinfo</code></h3>
 <p>برای مشاهده‌ی اطلاعات یک Module:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">modinfo module_name</div></div>
-<p>مثال: <code>modinfo e1000e</code></p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">modinfo e1000e</div></div>
 
 <h3>۷. <code>modprobe</code></h3>
 <p>برای بارگذاری یک Module:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo modprobe module_name</div></div>
-<p>مثال: <code>sudo modprobe dummy</code></p>
-<p><code>modprobe</code> می‌تواند Dependencyهای Module را نیز مدیریت کند. همچنین برای حذف Module: <code>sudo modprobe -r module_name</code></p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>lsmod</code> → Moduleهای Loaded؛ <code>modinfo</code> → اطلاعات Module؛ <code>modprobe</code> → Load / Remove Module + Dependency handling.</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sudo modprobe dummy</div></div>
+<p><code>modprobe</code> می‌تواند Dependencyهای Module را نیز مدیریت کند. همچنین برای حذف Module:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo modprobe -r module_name</div></div>
+<p>استفاده می‌شود.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">lsmod\n→ Moduleهای Loaded\n\nmodinfo\n→ اطلاعات Module\n\nmodprobe\n→ Load / Remove Module + Dependency handling</div></div>
+</div></div>
 
 <h2>بخش سوم — Disk و Partition</h2>
 
 <h3>۸. Disk چیست؟</h3>
-<p>Disk یا Storage Device سخت‌افزار ذخیره‌سازی است: HDD، SATA SSD، NVMe SSD. در لینوکس این دستگاه‌ها معمولاً به صورت <strong>Block Device</strong> دیده می‌شوند. مثال‌ها: <code>/dev/sda</code>، <code>/dev/sdb</code> یا در NVMe: <code>/dev/nvme0n1</code>.</p>
+<p>Disk یا Storage Device سخت‌افزار ذخیره‌سازی است. مثلاً:</p>
+<ul>
+<li>HDD</li>
+<li>SATA SSD</li>
+<li>NVMe SSD</li>
+</ul>
+<p>در لینوکس این دستگاه‌ها معمولاً به صورت <strong>Block Device</strong> دیده می‌شوند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda\n/dev/sdb</div></div>
+<p>یا در NVMe:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/nvme0n1</div></div>
 
 <h3>۹. Partition چیست؟</h3>
-<p>Partition یعنی یک بخش منطقی از یک Disk. مثلاً یک Disk 1TB: Partition 1 → 200 GB، Partition 2 → 500 GB، Partition 3 → 300 GB. Partition به تنهایی Filesystem نیست؛ فقط مشخص می‌کند یک محدوده از Disk متعلق به یک Partition است.</p>
+<p>Partition یعنی یک بخش منطقی از یک Disk. مثلاً یک Disk یک ترابایتی:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">1 TB Disk\n│\n├── Partition 1 → 200 GB\n├── Partition 2 → 500 GB\n└── Partition 3 → 300 GB</div></div>
+<p>Partition به تنهایی Filesystem نیست. فقط مشخص می‌کند یک محدوده از Disk متعلق به یک Partition است.</p>
 
 <h3>۱۰. چرا Partition می‌سازیم؟</h3>
-<p>دلایل مختلفی وجود دارد: جدا کردن بخش‌های مختلف Storage، نصب سیستم‌عامل‌های مختلف، ایجاد ساختار مناسب برای Storage، قرار دادن Filesystemهای متفاوت در بخش‌های مختلف. مثال: <code>/dev/sda1 → Linux</code>، <code>/dev/sda2 → Data</code>، <code>/dev/sda3 → Swap</code>.</p>
+<p>دلایل مختلفی وجود دارد:</p>
+<ul>
+<li>جدا کردن بخش‌های مختلف Storage</li>
+<li>نصب سیستم‌عامل‌های مختلف</li>
+<li>ایجاد ساختار مناسب برای Storage</li>
+<li>قرار دادن Filesystemهای متفاوت در بخش‌های مختلف</li>
+</ul>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda1 → Linux\n/dev/sda2 → Data\n/dev/sda3 → Swap</div></div>
 
 <h3>۱۱. <code>fdisk</code></h3>
 <p>یکی از ابزارهای معروف برای مدیریت Partitionها:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo fdisk /dev/sda\nsudo fdisk -l</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo fdisk /dev/sda</div></div>
+<p>و برای نمایش جدول Partitionها:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo fdisk -l</div></div>
 <p>با <code>fdisk</code> می‌توان Partitionها را ایجاد، حذف و تغییر داد.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>fdisk</code> برای Partitioning است، نه ساخت Filesystem. <code>fdisk</code> → Partition؛ <code>mkfs</code> → Filesystem.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> <code>fdisk</code> برای <strong>Partitioning</strong> است. برای ساخت Filesystem از آن استفاده نمی‌کنیم.
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">fdisk\n→ Partition\n\nmkfs\n→ Filesystem</div></div>
+</div></div>
 
 <h2>بخش چهارم — Filesystem</h2>
 
 <h3>۱۲. Filesystem چیست؟</h3>
-<p>Filesystem مشخص می‌کند داده‌ها چگونه روی Storage سازماندهی و مدیریت شوند: فایل‌ها کجا قرار بگیرند، Directoryها چگونه مدیریت شوند، Metadata چگونه نگهداری شود و فضای Storage چگونه مدیریت شود.</p>
-<p>Filesystemهای معروف: <code>ext4</code>، <code>XFS</code>، <code>Btrfs</code>، <code>VFAT</code>.</p>
+<p>حالا فرض کن Partition ساخته‌ای. آیا هنوز می‌توانی فایل بسازی؟ معمولاً باید روی آن یک <strong>Filesystem</strong> داشته باشی. Filesystem مشخص می‌کند داده‌ها چگونه روی Storage سازماندهی و مدیریت شوند. مثلاً:</p>
+<ul>
+<li>فایل‌ها کجا قرار بگیرند</li>
+<li>Directoryها چگونه مدیریت شوند</li>
+<li>Metadata چگونه نگهداری شود</li>
+<li>فضای Storage چگونه مدیریت شود</li>
+</ul>
+<h4>مثال</h4>
+<p>Filesystemهای معروف:</p>
+<div class="code-container"><span class="code-label">نمونه‌ها</span><div class="code-block no-prompt">ext4\nXFS\nBtrfs\nVFAT</div></div>
 
 <h3>۱۳. ساخت Filesystem</h3>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mkfs.ext4 /dev/sdb1</div></div>
-<p>یعنی روی <code>/dev/sdb1</code> یک Filesystem از نوع ext4 ایجاد کن.</p>
+<p>یعنی روی <code>/dev/sdb1</code> یک Filesystem از نوع ext4 ایجاد کن. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Disk\n ↓\nPartition\n ↓\nmkfs.ext4\n ↓\next4 Filesystem</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>fdisk</code> → Partition؛ <code>mkfs</code> → Filesystem. این دو را اشتباه نکنید.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> این دو را اشتباه نکن:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">fdisk\n→ Partition</div></div>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">mkfs\n→ Filesystem</div></div>
+</div></div>
 
 <h3>۱۴. Partition و Filesystem چه تفاوتی دارند؟</h3>
-<p>یک تشبیه ساده: Partition = اتاق؛ Filesystem = سیستم قفسه‌بندی و مدیریت وسایل داخل اتاق. Partition می‌گوید «این قسمت از Disk متعلق به این بخش است»؛ Filesystem می‌گوید «داده‌ها را در این قسمت چگونه مدیریت کنیم؟».</p>
+<p>یک تشبیه ساده:</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Partition</th><th>Filesystem</th></tr></thead>
+<tbody>
+<tr><td>اتاق</td><td>سیستم قفسه‌بندی و مدیریت وسایل داخل اتاق</td></tr>
+</tbody>
+</table>
+</div>
+<p>Partition می‌گوید: «این قسمت از Disk متعلق به این بخش است.» Filesystem می‌گوید: «داده‌ها را در این قسمت چگونه مدیریت کنیم؟»</p>
 
 <h2>بخش پنجم — Mount</h2>
 
 <h3>۱۵. Mount چیست؟</h3>
-<p>این قسمت بسیار مهم است. در لینوکس Filesystem باید به یک مسیر در Directory Tree <strong>متصل (Mount)</strong> شود تا بتوان از آن از طریق آن مسیر استفاده کرد.</p>
+<p>این قسمت بسیار مهم است. در لینوکس Filesystem باید به یک مسیر در Directory Tree <strong>متصل (Mount)</strong> شود تا بتوان از آن از طریق آن مسیر استفاده کرد. مثلاً:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/dev/sdb1\n    │\n    │ mount\n    ↓\n/mnt/data</div></div>
-<p>بعد از Mount، <code>/mnt/data/file.txt</code> می‌تواند فایلی روی Filesystem مربوط به <code>/dev/sdb1</code> باشد.</p>
+<p>بعد از Mount:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/mnt/data/file.txt</div></div>
+<p>می‌تواند فایلی روی Filesystem مربوط به <code>/dev/sdb1</code> باشد.</p>
 
 <h3>۱۶. Mount Point چیست؟</h3>
-<p>مسیر مقصدی که Filesystem روی آن Mount می‌شود <strong>Mount Point</strong> نام دارد. مثال: <code>/mnt/data</code> یک Mount Point است.</p>
+<p>مسیر مقصدی که Filesystem روی آن Mount می‌شود <strong>Mount Point</strong> نام دارد. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/mnt/data</div></div>
+<p>یک Mount Point است.</p>
 
 <h3>۱۷. <code>mount</code></h3>
 <p>برای Mount کردن:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mount /dev/sdb1 /mnt/data</div></div>
-<p>برای دیدن اطلاعات Mountها:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mount\nfindmnt</div></div>
-<p><code>findmnt</code> ابزار بسیار مناسبی برای مشاهده‌ی Mountهاست.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Filesystem\n/dev/sdb1\n     ↓\n/mnt/data</div></div>
+<p>برای دیدن اطلاعات Mountها می‌توان از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">mount</div></div>
+<p>استفاده کرد. همچنین:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">findmnt</div></div>
+<p>ابزار بسیار مناسبی برای مشاهده‌ی Mountهاست.</p>
 
 <h3>۱۸. <code>umount</code></h3>
 <p>برای Unmount کردن:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo umount /mnt/data\nsudo umount /dev/sdb1</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo umount /mnt/data</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo umount /dev/sdb1</div></div>
 <p>بعد از Unmount، آن Filesystem دیگر از آن Mount Point در دسترس نیست.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته مهم ⚠️</strong> دستور درست <code>umount</code> است، نه <code>unmount</code>.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته مهم ⚠️</strong> دستور درست:
+<div class="code-container"><span class="code-label">درست</span><div class="code-block">umount</div></div>
+است. نه:
+<div class="code-container"><span class="code-label">نادرست</span><div class="code-block no-prompt">unmount</div></div>
+</div></div>
 
 <h3>۱۹. چرا باید قبل از جدا کردن Storage آن را Unmount کنیم؟</h3>
-<p>ممکن است سیستم هنوز در حال خواندن داده، نوشتن داده یا استفاده از فایل‌های آن Filesystem باشد. Unmount کمک می‌کند Filesystem به شکل صحیح از Directory Tree جدا شود و عملیات‌های لازم به پایان برسند.</p>
-<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong> Unmount کردن به معنی خاموش کردن فیزیکی Disk نیست. <code>umount</code> → جدا کردن Filesystem از مسیر؛ با Power Off / Remove Device → خارج کردن فیزیکی Device یکسان نیست.</div></div>
+<p>ممکن است سیستم هنوز در حال:</p>
+<ul>
+<li>خواندن داده</li>
+<li>نوشتن داده</li>
+<li>استفاده از فایل‌های آن Filesystem</li>
+</ul>
+<p>باشد. Unmount کمک می‌کند Filesystem به شکل صحیح از Directory Tree جدا شود و عملیات‌های لازم به پایان برسند.</p>
+<div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته مهم</strong> Unmount کردن به معنی خاموش کردن فیزیکی Disk نیست. برای مثال:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">umount\n→ جدا کردن Filesystem از مسیر</div></div>
+با:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">Power Off / Remove Device\n→ خارج کردن فیزیکی Device</div></div>
+یکسان نیست.</div></div>
 
 <h2>بخش ششم — <code>lsblk</code> و <code>blkid</code></h2>
 
 <h3>۲۰. <code>lsblk</code></h3>
 <p>یکی از مهم‌ترین دستورات Storage:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsblk</div></div>
-<p>خروجی نمونه:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">NAME        SIZE TYPE MOUNTPOINT\nsda         500G disk\n├─sda1      100G part /\n└─sda2      400G part /home\nsdb           1T disk\n└─sdb1        1T part /data</div></div>
-<p>با <code>lsblk</code> می‌توان ساختار Block Deviceها را دید: Disk، Partition، Size، Type، Mount Point.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی نمونه</span><div class="code-block no-prompt">NAME        SIZE TYPE MOUNTPOINT\nsda         500G disk\n├─sda1      100G part /\n└─sda2      400G part /home\nsdb           1T disk\n└─sdb1        1T part /data</div></div>
+<p>با <code>lsblk</code> می‌توان ساختار Block Deviceها را دید. اطلاعاتی مانند:</p>
+<ul>
+<li>Disk</li>
+<li>Partition</li>
+<li>Size</li>
+<li>Type</li>
+<li>Mount Point</li>
+</ul>
+<p>را می‌توان مشاهده کرد.</p>
 
 <h3>۲۱. <code>blkid</code></h3>
 <p>برای مشاهده‌ی اطلاعات Block Deviceها، مخصوصاً UUID و Filesystem Type:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo blkid</div></div>
-<p>خروجی نمونه: <code>/dev/sdb1: UUID="8b3f..." TYPE="ext4"</code></p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی نمونه</span><div class="code-block no-prompt">/dev/sdb1: UUID="8b3f..." TYPE="ext4"</div></div>
 
 <h3>۲۲. UUID چیست؟</h3>
-<p>UUID مخفف <strong>Universally Unique Identifier</strong> است. Filesystem یا Partition می‌تواند یک شناسه‌ی یکتا داشته باشد. یکی از کاربردهای مهم UUID در <code>/etc/fstab</code> است.</p>
-<p>چرا UUID مفید است؟ نام Deviceها همیشه بهترین گزینه برای شناسایی دائمی نیست (مثلاً <code>/dev/sda</code> و <code>/dev/sdb</code> ممکن است در شرایطی نسبت به ترتیب شناسایی Deviceها تغییر کنند)، اما UUID به عنوان شناسه‌ی پایدارتر برای شناسایی Filesystem بسیار مناسب است.</p>
+<p>UUID مخفف <strong>Universally Unique Identifier</strong> است. Filesystem یا Partition می‌تواند یک شناسه‌ی یکتا داشته باشد. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">UUID=8b3f-1234-....</div></div>
+<p>یکی از کاربردهای مهم UUID در:</p>
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">/etc/fstab</div></div>
+<p>است.</p>
+<h4>چرا UUID مفید است؟</h4>
+<p>نام Deviceها همیشه بهترین گزینه برای شناسایی دائمی نیست. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sda\n/dev/sdb</div></div>
+<p>ممکن است در شرایطی نسبت به ترتیب شناسایی Deviceها تغییر کنند. اما UUID به عنوان شناسه‌ی پایدارتر برای شناسایی Filesystem بسیار مناسب است. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">/dev/sdb1\n     ↓\nFilesystem\n     ↓\nUUID\n     ↓\n/etc/fstab</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال درباره‌ی «شناسه یکتا برای شناسایی Filesystem» باشد، یکی از پاسخ‌های مهم <code>UUID</code> است.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>Exam Tip ⭐</strong> اگر سؤال درباره‌ی «شناسه یکتا برای شناسایی Filesystem» باشد، یکی از پاسخ‌های مهم:
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">UUID</div></div>
+است.</div></div>
 
 <h2>بخش هفتم — <code>df</code> و <code>du</code></h2>
 
 <h3>۲۳. <code>df</code></h3>
 <p><code>df</code> مخفف <strong>Disk Free</strong> است. برای مشاهده‌ی فضای استفاده‌شده و آزاد Filesystemها:</p>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">df\ndf -h</div></div>
-<p>خروجی نمونه: <code>Filesystem   Size   Used   Avail   Use%</code></p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>سؤال امتحانی</strong> اگر بپرسند «چقدر فضای Filesystem آزاد است؟» → <code>df -h</code>.</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">df</div></div>
+<p>برای خوانایی بهتر:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">df -h</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی نمونه</span><div class="code-block no-prompt">Filesystem   Size   Used   Avail   Use%\n/dev/sda1     50G    30G    20G     60%</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>سؤال امتحانی</strong> اگر بپرسند «چقدر فضای Filesystem آزاد است؟» ذهنمان:
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block">df -h</div></div>
+</div></div>
 
 <h3>۲۴. <code>du</code></h3>
-<p><code>du</code> مخفف <strong>Disk Usage</strong> است. برای بررسی حجم مصرف‌شده توسط فایل‌ها و Directoryها:</p>
+<p><code>du</code> مخفف <strong>Disk Usage</strong> است. برای بررسی حجم مصرف‌شده توسط فایل‌ها و Directoryها. مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">du -sh Downloads</div></div>
 <p>یعنی حجم کلی <code>Downloads</code> را به شکل خوانا نشان بده.</p>
 
-<h3>۲۵. <code>df</code> vs <code>du</code></h3>
+<h3>۲۵. <code>df</code> در برابر <code>du</code></h3>
 <p>این یکی از مهم‌ترین مقایسه‌های جلسه است.</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th><code>df</code></th><th><code>du</code></th></tr></thead>
 <tbody>
@@ -2848,7 +2961,12 @@
 <tr><td>فضای Used / Available</td><td>حجم مصرف‌شده</td></tr>
 </tbody>
 </table>
-<p>مثال: اگر می‌پرسید «چقدر فضای <code>/</code> باقی مانده؟» → <code>df -h /</code>. اگر می‌پرسید «پوشه <code>/var/log</code> چقدر فضا گرفته؟» → <code>du -sh /var/log</code>.</p>
+</div>
+<h4>مثال</h4>
+<p>اگر می‌پرسی «چقدر فضای <code>/</code> باقی مانده؟»</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">df -h /</div></div>
+<p>اگر می‌پرسی «پوشه <code>/var/log</code> چقدر فضا گرفته؟»</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">du -sh /var/log</div></div>
 
 <h2>بخش هشتم — LVM</h2>
 
@@ -2856,38 +2974,80 @@
 <p>LVM مخفف <strong>Logical Volume Manager</strong> است. هدف اصلی آن فراهم کردن یک لایه‌ی انعطاف‌پذیر برای مدیریت Storage است. به جای اینکه همیشه مستقیماً با Partitionها کار کنیم، LVM یک لایه‌ی منطقی ایجاد می‌کند.</p>
 
 <h3>۲۷. ساختار LVM</h3>
+<p>مدل اصلی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Physical Disk\n      ↓\nPartition\n      ↓\nPV\n      ↓\nVG\n      ↓\nLV\n      ↓\nFilesystem</div></div>
-<ul>
-<li><strong>PV (Physical Volume):</strong> منبع فیزیکی‌ای که LVM از آن استفاده می‌کند. مثال: <code>/dev/sdb1</code>.</li>
-<li><strong>VG (Volume Group):</strong> مجموعه‌ای از فضای PVها.</li>
-<li><strong>LV (Logical Volume):</strong> فضایی منطقی که از VG ایجاد می‌شود. سپس می‌توان روی LV یک Filesystem ساخت.</li>
-</ul>
+<p>سه مفهوم اصلی:</p>
+<h4>PV — Physical Volume</h4>
+<p>منبع فیزیکی‌ای که LVM از آن استفاده می‌کند. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb1</div></div>
+<p>می‌تواند به عنوان PV استفاده شود.</p>
+<h4>VG — Volume Group</h4>
+<p>مجموعه‌ای از فضای PVها. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">PV1 ─┐\n     ├── VG\nPV2 ─┘</div></div>
+<h4>LV — Logical Volume</h4>
+<p>فضایی منطقی که از VG ایجاد می‌شود.</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">VG\n ↓\nLV</div></div>
+<p>سپس می‌توان روی LV یک Filesystem ساخت.</p>
 
 <h3>۲۸. مزیت LVM</h3>
-<p>مزیت اصلی LVM: <strong>انعطاف‌پذیری در مدیریت فضای Storage</strong>. مثلاً می‌توان Logical Volumeها را در صورت فراهم بودن شرایط، Resize کرد. همچنین یک VG می‌تواند از چند PV تشکیل شود.</p>
+<p>مزیت اصلی LVM: <strong>انعطاف‌پذیری در مدیریت فضای Storage</strong>. مثلاً می‌توان Logical Volumeها را در صورت فراهم بودن شرایط، Resize کرد. همچنین یک VG می‌تواند از چند PV تشکیل شود. مدل ذهنی:</p>
 <div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Several PVs\n     ↓\n    VG\n     ↓\nSeveral LVs\n     ↓\nFilesystems</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> LVM را با RAID یکی نکنید. LVM → مدیریت انعطاف‌پذیر Logical Storage؛ RAID → ترکیب/توزیع داده روی چند Disk برای هدف‌هایی مثل Redundancy یا Performance.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> LVM را با RAID یکی نکن.
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">LVM\n→ مدیریت انعطاف‌پذیر Logical Storage</div></div>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">RAID\n→ ترکیب/توزیع داده روی چند Disk برای هدف‌هایی مثل Redundancy یا Performance</div></div>
+</div></div>
 
 <h2>بخش نهم — RAID</h2>
 
 <h3>۲۹. RAID چیست؟</h3>
-<p>RAID مخفف <strong>Redundant Array of Independent Disks</strong> است. RAID چند Disk را طبق یک روش مشخص برای دستیابی به ویژگی‌هایی مانند Redundancy، Fault Tolerance و Performance ترکیب می‌کند.</p>
+<p>RAID مخفف <strong>Redundant Array of Independent Disks</strong> است. RAID چند Disk را طبق یک روش مشخص برای دستیابی به ویژگی‌هایی مانند:</p>
+<ul>
+<li>Redundancy</li>
+<li>Fault Tolerance</li>
+<li>Performance</li>
+</ul>
+<p>ترکیب می‌کند.</p>
 
 <h3>۳۰. RAID 0</h3>
-<p>RAID 0 از <strong>Striping</strong> استفاده می‌کند. داده‌ها بین چند Disk توزیع می‌شوند. مزیت: Performance بهتر. عیب بسیار مهم: <strong>هیچ Redundancy ندارد</strong>. اگر یکی از Diskها خراب شود، Array از بین می‌رود و داده‌ها قابل بازیابی از خود Array نیستند.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> RAID 0 را «امن» یا «Redundant» تصور نکنید. RAID 0 → Speed، No Fault Tolerance.</div></div>
+<p>RAID 0 از <strong>Striping</strong> استفاده می‌کند. داده‌ها بین چند Disk توزیع می‌شوند.</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Data\n ↓\n┌────────┬────────┐\n│ Disk 1 │ Disk 2 │\n└────────┴────────┘</div></div>
+<h4>مزیت</h4>
+<p>Performance بهتر.</p>
+<h4>عیب بسیار مهم</h4>
+<p><strong>هیچ Redundancy ندارد.</strong> اگر یکی از Diskها خراب شود، Array از بین می‌رود و داده‌ها قابل بازیابی از خود Array نیستند.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">RAID 0\n→ Speed\n→ No Fault Tolerance</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Exam Trap ⚠️</strong> RAID 0 را «امن» یا «Redundant» تصور نکن.</div></div>
 
 <h3>۳۱. RAID 1</h3>
-<p>RAID 1 از <strong>Mirroring</strong> استفاده می‌کند. داده روی Diskهای Mirror نوشته می‌شود. مزیت: اگر یک Disk خراب شود، Copy دیگر باقی می‌ماند.</p>
-<p>RAID 1 → Mirroring، Redundancy.</p>
+<p>RAID 1 از <strong>Mirroring</strong> استفاده می‌کند.</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Data\n ↓\n┌────────┬────────┐\n│ Disk 1 │ Disk 2 │\n│  DATA  │  DATA  │\n└────────┴────────┘</div></div>
+<p>داده روی Diskهای Mirror نوشته می‌شود.</p>
+<h4>مزیت</h4>
+<p>اگر یک Disk خراب شود، Copy دیگر باقی می‌ماند.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">RAID 1\n→ Mirroring\n→ Redundancy</div></div>
 
 <h3>۳۲. RAID 5</h3>
-<p>RAID 5 از <strong>Striping + Distributed Parity</strong> استفاده می‌کند. حداقل به <strong>۳ Disk</strong> نیاز دارد. می‌تواند خرابی <strong>یک Disk</strong> را تحمل کند.</p>
+<p>RAID 5 از <strong>Striping + Distributed Parity</strong> استفاده می‌کند. حداقل به <strong>۳ Disk</strong> نیاز دارد. مدل ساده:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Disk 1   Disk 2   Disk 3\n Data      Data    Parity\n Data    Parity     Data\nParity     Data     Data</div></div>
+<h4>ویژگی مهم</h4>
+<p>می‌تواند خرابی <strong>یک Disk</strong> را تحمل کند.</p>
 
 <h3>۳۳. RAID 10</h3>
-<p>RAID 10 ترکیبی از <strong>RAID 1 + RAID 0</strong> است (Mirroring + Striping). حداقل معمولاً <strong>۴ Disk</strong> نیاز دارد. ویژگی: ترکیبی از Performance و Redundancy.</p>
+<p>RAID 10 ترکیبی از:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">RAID 1\n+\nRAID 0</div></div>
+<p>است. یعنی:</p>
+<div class="code-container"><span class="code-label">مدل</span><div class="code-block no-prompt">Mirroring\n   +\nStriping</div></div>
+<p>حداقل معمولاً <strong>۴ Disk</strong> نیاز دارد.</p>
+<h4>ویژگی</h4>
+<p>ترکیبی از:</p>
+<ul>
+<li>Performance</li>
+<li>Redundancy</li>
+</ul>
+<p>را ارائه می‌دهد.</p>
 
 <h3>جدول طلایی RAID</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>RAID</th><th>تکنیک</th><th>تحمل خرابی</th><th>نکته اصلی</th></tr></thead>
 <tbody>
@@ -2897,34 +3057,60 @@
 <tr><td>RAID 10</td><td>Mirror + Stripe</td><td>✅</td><td>Performance + Redundancy</td></tr>
 </tbody>
 </table>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار کلمه را خوب به خاطر بسپارید: RAID 0 → Striping، RAID 1 → Mirroring، RAID 5 → Parity، RAID 10 → Mirror + Stripe.</div></div>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار کلمه را خوب به خاطر بسپار:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">RAID 0 → Striping\nRAID 1 → Mirroring\nRAID 5 → Parity\nRAID 10 → Mirror + Stripe</div></div>
+</div></div>
 
 <h3>یک نکته بسیار مهم درباره RAID ⚠️</h3>
-<p>RAID را با Backup یکی نکنید. مثلاً RAID 1 یک Copy دیگر از داده ایجاد می‌کند، اما اگر فایل را اشتباهی حذف کنید، Ransomware داده‌ها را رمزگذاری کند، یا اطلاعات خراب شوند، ممکن است همان تغییر روی Copy دیگر نیز اعمال شود. پس <strong>RAID ≠ Backup</strong>. RAID بیشتر برای Availability / Fault Tolerance / Performance استفاده می‌شود.</p>
+<p>RAID را با Backup یکی نکن. مثلاً RAID 1 یک Copy دیگر از داده ایجاد می‌کند، اما اگر:</p>
+<ul>
+<li>فایل را اشتباهی حذف کنی،</li>
+<li>Ransomware داده‌ها را رمزگذاری کند،</li>
+<li>یا اطلاعات خراب شوند،</li>
+</ul>
+<p>ممکن است همان تغییر روی Copy دیگر نیز اعمال شود. پس:</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">RAID ≠ Backup</div></div>
+<p>RAID بیشتر برای <strong>Availability / Fault Tolerance / Performance</strong> استفاده می‌شود.</p>
 
 <h2>سناریوی واقعی — یک Disk جدید</h2>
-<p>فرض کنید <code>/dev/sdb</code> یک Disk جدید است.</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb</div></div>
+<p>یک Disk جدید است.</p>
+
 <h3>مرحله ۱ — بررسی Disk</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsblk</div></div>
+
 <h3>مرحله ۲ — ساخت Partition</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo fdisk /dev/sdb</div></div>
-<p>مثلاً <code>/dev/sdb1</code> ایجاد می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb1</div></div>
+<p>ایجاد می‌شود.</p>
+
 <h3>مرحله ۳ — ساخت Filesystem</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mkfs.ext4 /dev/sdb1</div></div>
+
 <h3>مرحله ۴ — ساخت Mount Point</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mkdir /mnt/data</div></div>
+
 <h3>مرحله ۵ — Mount</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo mount /dev/sdb1 /mnt/data</div></div>
+
 <h3>مرحله ۶ — بررسی</h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">lsblk\ndf -h</div></div>
-<p>حالا <code>/mnt/data</code> به Filesystem جدید متصل است.</p>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/mnt/data</div></div>
+<p>به Filesystem جدید متصل است.</p>
 
-<h2>مسیر کامل Storage 🧠</h2>
-<p>حالا کل مسیر را ببینید:</p>
+<h2>🧠 مسیر کامل Storage</h2>
+<p>حالا کل مسیر را ببین:</p>
 <div class="code-container"><span class="code-label">زنجیره کامل</span><div class="code-block no-prompt">Physical Disk\n      ↓\nPartition\n      ↓\nFilesystem\n      ↓\nMount\n      ↓\nDirectory\n      ↓\nFile</div></div>
-<p>مثلاً: <code>/dev/sdb → /dev/sdb1 → ext4 → /mnt/data → /mnt/data/report.txt</code>. این یکی از مهم‌ترین مدل‌های ذهنی کل فصل Storage است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb\n   ↓\n/dev/sdb1\n   ↓\next4\n   ↓\n/mnt/data\n   ↓\n/mnt/data/report.txt</div></div>
+<p>این یکی از مهم‌ترین مدل‌های ذهنی کل فصل Storage است.</p>
 
 <h2>جدول طلایی دستورات</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -2945,63 +3131,147 @@
 <tr><td><code>du</code></td><td>حجم File/Directory</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>مقایسه‌های طلایی</h2>
-<h3>Disk vs Partition</h3>
-<p>Disk → کل Storage Device؛ Partition → بخشی از Disk.</p>
-<h3>Partition vs Filesystem</h3>
-<p>Partition → محدوده‌ای از Disk؛ Filesystem → ساختار مدیریت داده و فایل.</p>
-<h3>Filesystem vs Mount</h3>
-<p>Filesystem → نحوه مدیریت داده؛ Mount → اتصال Filesystem به Directory Tree.</p>
-<h3><code>lsblk</code> vs <code>blkid</code></h3>
-<p><code>lsblk</code> → ساختار Disk / Partition / Mount؛ <code>blkid</code> → UUID / Filesystem Type.</p>
-<h3><code>df</code> vs <code>du</code></h3>
-<p><code>df</code> → فضای Filesystem؛ <code>du</code> → حجم File / Directory.</p>
-<h3>LVM vs RAID</h3>
-<p>LVM → Flexible Logical Storage Management؛ RAID → Redundancy / Performance.</p>
+
+<h3>Disk در برابر Partition</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Disk</th><th>Partition</th></tr></thead>
+<tbody>
+<tr><td>کل Storage Device</td><td>بخشی از Disk</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Partition در برابر Filesystem</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Partition</th><th>Filesystem</th></tr></thead>
+<tbody>
+<tr><td>محدوده‌ای از Disk</td><td>ساختار مدیریت داده و فایل</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Filesystem در برابر Mount</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Filesystem</th><th>Mount</th></tr></thead>
+<tbody>
+<tr><td>نحوه مدیریت داده</td><td>اتصال Filesystem به Directory Tree</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3><code>lsblk</code> در برابر <code>blkid</code></h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th><code>lsblk</code></th><th><code>blkid</code></th></tr></thead>
+<tbody>
+<tr><td>ساختار Disk / Partition / Mount</td><td>UUID / Filesystem Type</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3><code>df</code> در برابر <code>du</code></h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th><code>df</code></th><th><code>du</code></th></tr></thead>
+<tbody>
+<tr><td>فضای Filesystem</td><td>حجم File / Directory</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>LVM در برابر RAID</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>LVM</th><th>RAID</th></tr></thead>
+<tbody>
+<tr><td>Flexible Logical Storage Management</td><td>Redundancy / Performance</td></tr>
+</tbody>
+</table>
+</div>
 
 <h2>دام‌های امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> <code>fdisk</code> برای ساخت Filesystem است؟ ❌ خیر؛ <code>fdisk</code> برای Partitioning است.</li>
-<li><strong>دام ۲:</strong> Partition همان Filesystem است؟ ❌ خیر؛ Partition یک بخش از Disk است؛ Filesystem ساختار مدیریت داده روی آن است.</li>
-<li><strong>دام ۳:</strong> <code>mount</code> یعنی فایل‌ها را از Disk کپی کن؟ ❌ خیر؛ <code>mount</code> یعنی Filesystem را به یک مسیر در Directory Tree متصل کن.</li>
-<li><strong>دام ۴:</strong> <code>df</code> حجم یک Directory را نشان می‌دهد؟ ❌ خیر؛ <code>df</code> فضای Used/Available Filesystemها را نشان می‌دهد. برای حجم Directory: <code>du -sh directory</code>.</li>
-<li><strong>دام ۵:</strong> <code>lsblk</code> فقط Partitionها را نشان می‌دهد؟ ❌ خیر؛ Block Deviceها، Diskها و Partitionها و Mount Pointها را نشان می‌دهد.</li>
-<li><strong>دام ۶:</strong> UUID فقط نام دیگری برای <code>/dev/sda1</code> است؟ ❌ خیر؛ UUID یک شناسه‌ی یکتا برای شناسایی Storage Object/Filesystem است.</li>
-<li><strong>دام ۷:</strong> RAID 0 امنیت بیشتری دارد؟ ❌ خیر؛ RAID 0 هیچ Redundancy ندارد.</li>
-<li><strong>دام ۸:</strong> RAID 1 یعنی Backup؟ ❌ خیر؛ RAID 1 یعنی Mirroring و Redundancy؛ Backup نیست.</li>
-<li><strong>دام ۹:</strong> LVM و RAID یک کار انجام می‌دهند؟ ❌ خیر؛ LVM روی مدیریت انعطاف‌پذیر Logical Storage تمرکز دارد؛ RAID روی ترکیب Diskها با ویژگی‌هایی مثل Redundancy و Performance.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> ❌ <code>fdisk</code> برای ساخت Filesystem است. ✅ <code>fdisk</code> برای Partitioning است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> ❌ Partition همان Filesystem است. ✅ Partition یک بخش از Disk است؛ Filesystem ساختار مدیریت داده روی آن است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> ❌ <code>mount</code> یعنی فایل‌ها را از Disk کپی کن. ✅ <code>mount</code> یعنی Filesystem را به یک مسیر در Directory Tree متصل کن.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> ❌ <code>df</code> حجم یک Directory را نشان می‌دهد. ✅ <code>df</code> فضای Used/Available Filesystemها را نشان می‌دهد. برای حجم Directory:
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">du -sh directory</div></div>
+</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> ❌ <code>lsblk</code> فقط Partitionها را نشان می‌دهد. ✅ Block Deviceها، Diskها و Partitionها و در صورت درخواست، Mount Pointها را نشان می‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> ❌ UUID فقط نام دیگری برای <code>/dev/sda1</code> است. ✅ UUID یک شناسه‌ی یکتا برای شناسایی Storage Object/Filesystem است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> ❌ RAID 0 امنیت بیشتری دارد. ✅ RAID 0 هیچ Redundancy ندارد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> ❌ RAID 1 یعنی Backup. ✅ RAID 1 یعنی Mirroring و Redundancy؛ Backup نیست.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> ❌ LVM و RAID یک کار انجام می‌دهند. ✅ LVM روی مدیریت انعطاف‌پذیر Logical Storage تمرکز دارد؛ RAID روی ترکیب Diskها با ویژگی‌هایی مثل Redundancy و Performance.</div></div>
 
 <h2>🧠 نقشه ذهنی جلسه</h2>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Hardware\n│\n├── CPU\n├── RAM\n├── Disk\n└── Network\n      │\n      ↓\n    Kernel\n      │\n      └── Kernel Modules\n             ├── lsmod\n             ├── modinfo\n             └── modprobe\n\n\nStorage\n│\n├── Disk\n│\n├── Partition\n│     └── fdisk\n│\n├── Filesystem\n│     └── mkfs\n│\n├── Mount\n│     ├── mount\n│     └── umount\n│\n├── Identification\n│     ├── lsblk\n│     └── blkid\n│\n├── Space\n│     ├── df\n│     └── du\n│\n├── LVM\n│     ├── PV\n│     ├── VG\n│     └── LV\n│\n└── RAID\n      ├── 0 → Stripe\n      ├── 1 → Mirror\n      ├── 5 → Parity\n      └── 10 → Mirror + Stripe</div></div>
 
-<h2>⚡ حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
-<h3>Storage Path</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Disk\n ↓\nPartition\n ↓\nFilesystem\n ↓\nMount\n ↓\nFile</div></div>
-<h3>Partition / Filesystem</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">fdisk → Partition\nmkfs  → Filesystem</div></div>
-<h3>Mount</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">mount   → اتصال\numount  → جدا کردن</div></div>
-<h3>مشاهده Storage</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lsblk → Disk / Partition / Mount\nblkid → UUID / Filesystem Type</div></div>
-<h3>فضای Storage</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">df → Filesystem Space\ndu → File / Directory Usage</div></div>
-<h3>LVM</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">PV → VG → LV → Filesystem</div></div>
-<h3>RAID</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">0  → Stripe\n1  → Mirror\n5  → Parity\n10 → Mirror + Stripe</div></div>
-<h3>Kernel Module</h3>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lsmod   → Loaded Modules\nmodinfo → Module Info\nmodprobe → Load / Remove</div></div>
+<div class="box important"><i class="fas fa-check-circle"></i><div><strong>✅ چک‌لیست مرور ۲ دقیقه‌ای</strong>
+اگر بتوانی این سؤال‌ها را جواب بدهی، جلسه را خوب یاد گرفته‌ای:
+<ul>
+<li>Hardware و Kernel چه ارتباطی دارند؟</li>
+<li>Kernel Module چیست؟</li>
+<li>تفاوت <code>lsmod</code>، <code>modinfo</code> و <code>modprobe</code> چیست؟</li>
+<li>Disk و Partition چه تفاوتی دارند؟</li>
+<li><code>fdisk</code> چه کاری انجام می‌دهد؟</li>
+<li>Filesystem چیست؟</li>
+<li><code>mkfs</code> چه کاری انجام می‌دهد؟</li>
+<li>Mount چیست؟</li>
+<li>Mount Point چیست؟</li>
+<li>تفاوت <code>mount</code> و <code>umount</code> چیست؟</li>
+<li><code>lsblk</code> چه چیزی نشان می‌دهد؟</li>
+<li><code>blkid</code> چه اطلاعاتی می‌دهد؟</li>
+<li>UUID چیست و چرا مفید است؟</li>
+<li>تفاوت <code>df</code> و <code>du</code> چیست؟</li>
+<li>LVM چیست؟</li>
+<li>PV، VG و LV چه هستند؟</li>
+<li>RAID 0 چه ویژگی‌ای دارد؟</li>
+<li>RAID 1 چه ویژگی‌ای دارد؟</li>
+<li>RAID 5 چه ویژگی‌ای دارد؟</li>
+<li>RAID 10 چه ویژگی‌ای دارد؟</li>
+<li>چرا RAID جایگزین Backup نیست؟</li>
+</ul>
+</div></div>
 
-<h2>⭐ سؤال طلایی جلسه</h2>
-<p>فرض کنید یک Disk جدید دارید: <code>/dev/sdb</code> و می‌خواهید آن را برای ذخیره فایل آماده کنید. مسیر معمول:</p>
+<div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>⚡ حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</strong>
+<h4>Storage Path</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Disk\n ↓\nPartition\n ↓\nFilesystem\n ↓\nMount\n ↓\nFile</div></div>
+<h4>Partition / Filesystem</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">fdisk → Partition\nmkfs  → Filesystem</div></div>
+<h4>Mount</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">mount   → اتصال\numount  → جدا کردن</div></div>
+<h4>مشاهده Storage</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lsblk → Disk / Partition / Mount\nblkid → UUID / Filesystem Type</div></div>
+<h4>فضای Storage</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">df → Filesystem Space\ndu → File / Directory Usage</div></div>
+<h4>LVM</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">PV → VG → LV → Filesystem</div></div>
+<h4>RAID</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">0  → Stripe\n1  → Mirror\n5  → Parity\n10 → Mirror + Stripe</div></div>
+<h4>Kernel Module</h4>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">lsmod   → Loaded Modules\nmodinfo → Module Info\nmodprobe → Load / Remove</div></div>
+</div></div>
+
+<div class="box important"><i class="fas fa-star"></i><div><strong>⭐ سؤال طلایی جلسه</strong>
+فرض کن یک Disk جدید داری:
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block no-prompt">/dev/sdb</div></div>
+و می‌خواهی آن را برای ذخیره فایل آماده کنی. مسیر معمول:
 <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">/dev/sdb\n   ↓\nfdisk\n   ↓\n/dev/sdb1\n   ↓\nmkfs.ext4\n   ↓\next4\n   ↓\nmount\n   ↓\n/mnt/data\n   ↓\nfile</div></div>
 <p>یعنی: <strong>اول محدوده را مشخص می‌کنیم → سپس Filesystem می‌سازیم → بعد آن را به Directory Tree متصل می‌کنیم → و در نهایت فایل‌ها را در آن مسیر ذخیره می‌کنیم.</strong></p>
-<p>اگر این منطق را بفهمید، دیگر <code>fdisk</code>، <code>mkfs</code> و <code>mount</code> سه دستور جدا و حفظی نیستند؛ بلکه سه مرحله‌ی پشت‌سرهم از یک فرآیند هستند.</p>
+<p>اگر این منطق را بفهمی، دیگر <code>fdisk</code>، <code>mkfs</code> و <code>mount</code> سه دستور جدا و حفظی نیستند؛ بلکه سه مرحله‌ی پشت‌سرهم از یک فرآیند هستند.</p>
+</div></div>
 
-<div class="box important"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong>
-تا اینجا یاد گرفتیم: Storage → Disk → Partition → Filesystem → Mount. حالا سؤال مهم بعدی: وقتی فایل‌ها روی Filesystem قرار گرفتند، چه کسی اجازه دارد آن‌ها را بخواند، تغییر دهد یا حذف کند؟ اینجاست که وارد یکی از مهم‌ترین بخش‌های Linux Administration می‌شویم: File → Owner → Group → Permissions → ACL → Access Control. در جلسه ۵ این بخش را همراه با File Management، Archive، Compression، Backup، Link، Permission، Ownership، ACL و <code>find</code>/<code>locate</code> یاد می‌گیریم.
+<div class="box note"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong>
+تا اینجا یاد گرفتیم:
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Storage\n   ↓\nDisk\n   ↓\nPartition\n   ↓\nFilesystem\n   ↓\nMount</div></div>
+حالا سؤال مهم بعدی: <strong>وقتی فایل‌ها روی Filesystem قرار گرفتند، چه کسی اجازه دارد آن‌ها را بخواند، تغییر دهد یا حذف کند؟</strong> اینجاست که وارد یکی از مهم‌ترین بخش‌های Linux Administration می‌شویم:
+<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">File\n ↓\nOwner\n ↓\nGroup\n ↓\nPermissions\n ↓\nACL\n ↓\nAccess Control</div></div>
+<p>در جلسه ۵ این بخش را همراه با <strong>File Management، Archive، Compression، Backup، Link، Permission، Ownership، ACL و <code>find</code>/<code>locate</code></strong> یاد می‌گیریم.</p>
 </div></div>
 ` ,
 "s5": `
