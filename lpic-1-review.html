@@ -1750,15 +1750,14 @@
 <blockquote>
 <strong>🎯 هدف جلسه:</strong> در جلسه قبل یاد گرفتیم چگونه با فایل‌ها و Commandها کار کنیم. حالا می‌خواهیم یاد بگیریم <strong>چطور خروجی یک Command را بگیریم، فیلتر کنیم، به Command دیگری بدهیم، تغییر دهیم یا داخل فایل ذخیره کنیم.</strong>
 <br><br>
-مفاهیم اصلی این جلسه:
+مفاهیم اصلی:
 <ul>
 <li><code>grep</code></li>
 <li>Redirect</li>
-<li><code>|</code></li>
+<li><code>|</code> (Pipe)</li>
 <li><code>sed</code></li>
 <li><code>xargs</code></li>
-<li><code>md5sum</code></li>
-<li><code>sha256sum</code></li>
+<li><code>md5sum</code> و <code>sha256sum</code></li>
 <li>ترکیب Commandها</li>
 <li>دام‌های رایج خط فرمان</li>
 </ul>
@@ -1768,14 +1767,14 @@
 <p>فرض کن این دستور را اجرا می‌کنیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ls -l</div></div>
 <p>و خروجی زیادی دریافت می‌کنیم:</p>
-<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">-rw-r--r-- file1.txt\n-rw-r--r-- file2.txt\ndrwxr-xr-x test\n-rw-r--r-- report.pdf\n-rw-r--r-- image.jpg</div></div>
+<div class="code-container"><span class="code-label">خروجی نمونه</span><div class="code-block no-prompt">-rw-r--r-- file1.txt\n-rw-r--r-- file2.txt\ndrwxr-xr-x test\n-rw-r--r-- report.pdf\n-rw-r--r-- image.jpg</div></div>
 <p>اما فقط فایل‌های PDF را می‌خواهیم. به جای اینکه خروجی را دستی بررسی کنیم، می‌توانیم آن را <strong>فیلتر</strong> کنیم. اینجا ابزارهایی مثل <code>grep</code>، <code>|</code>، <code>&gt;</code>، <code>sed</code> و <code>xargs</code> وارد می‌شوند.</p>
 
 <h2>۲. مدل ذهنی این جلسه</h2>
 <p>تقریباً تمام جلسه را می‌توان با این زنجیره فهمید:</p>
 <div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Command\n   │\n   ▼\nOutput\n   │\n   ├── grep → Filter\n   │\n   ├── sed → Transform\n   │\n   ├── | → Send to another Command\n   │\n   └── > → Save to File</div></div>
 <p>و گاهی:</p>
-<div class="code-container"><span class="code-label">xargs</span><div class="code-block no-prompt">Command 1\n   │\n   ▼\nOutput\n   │\n xargs\n   │\n   ▼\nCommand 2</div></div>
+<div class="code-container"><span class="code-label">با xargs</span><div class="code-block no-prompt">Command 1\n   │\n   ▼\nOutput\n   │\n xargs\n   │\n   ▼\nCommand 2</div></div>
 <p>اگر این مدل را بفهمی، لازم نیست Commandها را جدا و بی‌ارتباط حفظ کنی.</p>
 
 <h2>۳. Standard Streams</h2>
@@ -1792,54 +1791,87 @@
 </div>
 <p>به صورت ساده:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">             ┌─────────────┐\nstdin  ────► │   Process   │ ────► stdout\n             │             │\n             └─────────────┘\n                    │\n                    └────────► stderr</div></div>
-<p>مثلاً وقتی Command اجرا می‌کنی <code>ls</code>، خروجی معمولی به <code>stdout</code> می‌رود. اگر Command خطایی ایجاد کند، پیام خطا به <code>stderr</code> می‌رود.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> شماره‌های مهم: <code>0 → stdin</code>، <code>1 → stdout</code>، <code>2 → stderr</code>. این سه شماره را حتماً بلد باش.</div></div>
+<p>مثلاً وقتی Command اجرا می‌کنی:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls</div></div>
+<p>خروجی معمولی به <code>stdout</code> می‌رود. اگر Command خطایی ایجاد کند، پیام خطا به <code>stderr</code> می‌رود.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> شماره‌های مهم را حتماً بلد باش:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">0 → stdin\n1 → stdout\n2 → stderr</div></div>
+</div></div>
 
-<h2>۴. grep</h2>
-<p>یکی از مهم‌ترین ابزارهای پردازش متن در Linux: <code>grep</code>. وظیفه ساده آن: <strong>پیدا کردن الگو یا متن در خطوط ورودی</strong>. مثلاً فایل <code>users.txt</code> داریم:</p>
-<div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Ali\nSara\nReza\nAmir</div></div>
+<h2>۴. <code>grep</code></h2>
+<p>یکی از مهم‌ترین ابزارهای پردازش متن در Linux:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep</div></div>
+<p>وظیفه ساده آن: <strong>پیدا کردن الگو یا متن در خطوط ورودی</strong>.</p>
+<p>مثلاً فایل <code>users.txt</code> داریم:</p>
+<div class="code-container"><span class="code-label">محتوای فایل</span><div class="code-block no-prompt">Ali\nSara\nReza\nAmir</div></div>
 <p>اگر فقط <code>Amir</code> را بخواهیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep Amir users.txt</div></div>
-<p>خروجی: <code>Amir</code></p>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">Amir</div></div>
 
-<h2>۵. grep روی خروجی Command</h2>
+<h2>۵. <code>grep</code> روی خروجی Command</h2>
 <p><code>grep</code> فقط روی فایل کار نمی‌کند. می‌توانیم خروجی یک Command را نیز به آن بدهیم. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
-<p>اینجا: <code>history</code> → خروجی History → <code>grep ssh</code> → فقط خطوط دارای ssh. این یکی از مهم‌ترین کاربردهای Pipe است که کمی جلوتر می‌بینیم.</p>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">history\n   ↓\nخروجی History\n   ↓\ngrep ssh\n   ↓\nفقط خطوط دارای ssh</div></div>
+<p>این یکی از مهم‌ترین کاربردهای Pipe است که کمی جلوتر می‌بینیم.</p>
 
 <h2>۶. <code>grep -i</code></h2>
-<p>به صورت عادی، <code>grep</code> به بزرگی و کوچکی حروف حساس است. مثلاً <code>grep linux file.txt</code> ممکن است فقط <code>linux</code> را پیدا کند. اما:</p>
+<p>به صورت عادی، <code>grep</code> به بزرگی و کوچکی حروف حساس است. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep linux file.txt</div></div>
+<p>ممکن است فقط <code>linux</code> را پیدا کند. اما:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep -i linux file.txt</div></div>
-<p>به Case حساس نیست و می‌تواند مواردی مثل <code>linux</code>، <code>Linux</code>، <code>LINUX</code>، <code>LiNuX</code> را پیدا کند.</p>
-<p><strong>حفظی:</strong> <code>-i → Ignore Case</code></p>
+<p>به Case حساس نیست و می‌تواند مواردی مثل <code>linux</code>، <code>Linux</code>، <code>LINUX</code> و <code>LiNuX</code> را پیدا کند.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">-i → Ignore Case</div></div>
 
 <h2>۷. <code>grep -v</code></h2>
 <p>گزینه <code>-v</code> نتیجه را معکوس می‌کند. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep -v root /etc/passwd</div></div>
 <p>یعنی خطوطی را نشان بده که شامل الگوی <code>root</code> نیستند.</p>
-<p><strong>حفظی:</strong> <code>-v → Invert Match</code></p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">-v → Invert Match</div></div>
 
-<h2>۸. <code>^</code> و <code>$</code> در grep</h2>
+<h2>۸. <code>^</code> و <code>$</code> در <code>grep</code></h2>
 <p>اینجا وارد Regex ساده می‌شویم.</p>
-<ul>
-<li><code>^</code> یعنی ابتدای خط. مثال: <code>grep "^root" file.txt</code> فقط خطوطی که با <code>root</code> شروع می‌شوند.</li>
-<li><code>$</code> یعنی انتهای خط. مثال: <code>grep "bash$" /etc/passwd</code> خطوطی را پیدا می‌کند که به <code>bash</code> ختم می‌شوند.</li>
-</ul>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>^text</code> → text در ابتدای خط، <code>text$</code> → text در انتهای خط.</div></div>
+<h3><code>^</code></h3>
+<p>یعنی ابتدای خط. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep "^root" file.txt</div></div>
+<p>فقط خطوطی که با <code>root</code> شروع می‌شوند.</p>
+<h3><code>$</code></h3>
+<p>یعنی انتهای خط. مثلاً:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep "bash$" /etc/passwd</div></div>
+<p>خطوطی را پیدا می‌کند که به <code>bash</code> ختم می‌شوند.</p>
+<h4>مثال</h4>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">محتوای /etc/passwd</span><div class="code-block no-prompt">root:x:0:0:/root:/bin/bash\nali:x:1000:1000:/home/ali:/bin/bash\ntest:x:1001:1001:/home/test:/bin/sh</div></div>
+<p>دستور:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep "bash$" /etc/passwd</div></div>
+<p>خطوطی را پیدا می‌کند که آخرشان <code>bash</code> است.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">^text → text در ابتدای خط\ntext$ → text در انتهای خط</div></div>
+</div></div>
 
-<h2>۹. چند گزینه مهم دیگر grep</h2>
-<ul>
-<li><strong>شماره خط:</strong> <code>grep -n root file.txt</code> شماره خط را نیز نمایش می‌دهد. (<code>-n → line number</code>)</li>
-<li><strong>جستجوی بازگشتی:</strong> <code>grep -r "Linux" directory/</code> در فایل‌های داخل Directory نیز جستجو می‌کند. (<code>-r → recursive</code>)</li>
-</ul>
+<h2>۹. چند گزینه مهم دیگر <code>grep</code></h2>
+<h3>شماره خط</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep -n root file.txt</div></div>
+<p>شماره خط را نیز نمایش می‌دهد.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">-n → line number</div></div>
+<h3>جستجوی بازگشتی</h3>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep -r "Linux" directory/</div></div>
+<p>در فایل‌های داخل Directory نیز جستجو می‌کند.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">-r → recursive</div></div>
 <p>فعلاً لازم نیست تمام گزینه‌های <code>grep</code> را حفظ کنی. گزینه‌های مهم برای این دوره را بشناس و در صورت نیاز با <code>man grep</code> بقیه را پیدا کن.</p>
 
-<h2>۱۰. grep در برابر find</h2>
+<h2>۱۰. <code>grep</code> در برابر <code>find</code></h2>
 <p>یکی از مهم‌ترین تفاوت‌های آزمون:</p>
-<ul>
-<li><strong><code>grep</code></strong> داخل <strong>محتوای فایل‌ها</strong> دنبال Pattern می‌گردد. مثال: <code>grep "error" log.txt</code> یعنی داخل فایل دنبال <code>error</code> بگرد.</li>
-<li><strong><code>find</code></strong> خود <strong>File/Directory</strong>ها را بر اساس ویژگی‌هایی مثل نام، نوع و... پیدا می‌کند. مثال: <code>find /var -name "*.log"</code> یعنی فایل‌هایی با نام مناسب را پیدا کن.</li>
-</ul>
+<h3><code>grep</code></h3>
+<p>داخل <strong>محتوای فایل‌ها</strong> دنبال Pattern می‌گردد:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">grep "error" log.txt</div></div>
+<p>یعنی داخل فایل دنبال <code>error</code> بگرد.</p>
+<h3><code>find</code></h3>
+<p>خود <strong>File/Directory</strong>ها را بر اساس ویژگی‌هایی مثل نام، نوع و... پیدا می‌کند:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">find /var -name "*.log"</div></div>
+<p>یعنی فایل‌هایی با نام مناسب را پیدا کن.</p>
+<h4>مقایسه</h4>
 <div class="table-wrap">
 <table>
 <thead><tr><th><code>grep</code></th><th><code>find</code></th></tr></thead>
@@ -1853,26 +1885,43 @@
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> اگر سؤال گفت «فایلی که اسمش <code>report.txt</code> است را پیدا کن» به <code>find</code> فکر کن. اگر گفت «داخل فایل‌ها دنبال کلمه <code>error</code> بگرد» به <code>grep</code> فکر کن.</div></div>
 
 <h2>۱۱. Redirect چیست؟</h2>
-<p>به طور معمول <code>ls</code> خروجی را روی Terminal می‌بینیم. اما می‌توانیم مسیر خروجی را تغییر دهیم. به این کار <strong>Redirection</strong> می‌گوییم. مثلاً:</p>
+<p>به طور معمول:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls</div></div>
+<p>خروجی را روی Terminal می‌بینیم. اما می‌توانیم مسیر خروجی را تغییر دهیم. به این کار <strong>Redirection</strong> می‌گوییم. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls > files.txt</div></div>
-<p>یعنی: <code>ls</code> → <code>stdout</code> → <code>files.txt</code>. پس به جای Terminal، خروجی داخل فایل می‌رود.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">ls\n ↓\nstdout\n ↓\nfiles.txt</div></div>
+<p>پس به جای Terminal، خروجی داخل فایل می‌رود.</p>
 
 <h2>۱۲. <code>&gt;</code></h2>
 <p>علامت <code>&gt;</code> برای Redirect کردن <code>stdout</code> استفاده می‌شود. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">date > date.txt</div></div>
 <p>خروجی <code>date</code> داخل <code>date.txt</code> ذخیره می‌شود.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته بسیار مهم</strong> اگر فایل از قبل وجود داشته باشد، <code>date > date.txt</code> محتوای قبلی فایل را <strong>Overwrite</strong> می‌کند. یعنی محتوای قبلی حذف/جایگزین می‌شود. پس <code>&gt;</code> → Overwrite، نه Append.</div></div>
+<h3>نکته بسیار مهم</h3>
+<p>اگر فایل از قبل وجود داشته باشد:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">date > date.txt</div></div>
+<p>محتوای قبلی فایل <strong>Overwrite</strong> می‌شود. یعنی:</p>
+<div class="code-container"><span class="code-label">نحوه کار</span><div class="code-block no-prompt">محتوای قبلی\n     ↓\n   حذف/جایگزین\n     ↓\nخروجی جدید</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">> → Overwrite (نه Append)</div></div>
+</div></div>
 
 <h2>۱۳. <code>&gt;&gt;</code></h2>
 <p>برای اضافه کردن خروجی به انتهای فایل:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">date >> date.txt</div></div>
 <p>اگر فایل وجود داشته باشد، محتوای قبلی باقی می‌ماند و خروجی جدید به انتهای آن اضافه می‌شود.</p>
-<p><strong>حفظی:</strong> <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append</p>
+<div class="code-container"><span class="code-label">نحوه کار</span><div class="code-block no-prompt">محتوای قبلی\n     +\nخروجی جدید</div></div>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">>   → Overwrite\n>>  → Append</div></div>
 
 <h2>۱۴. Redirect کردن Error</h2>
 <p>پیام خطا در <code>stderr</code> قرار می‌گیرد. شماره آن <code>2</code> است. پس:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">ls /abc 2> error.txt</div></div>
-<p>یعنی خطای Command را داخل <code>error.txt</code> ذخیره کن. مدل ذهنی: <code>stdout → 1</code>، <code>stderr → 2</code>. بنابراین <code>command > output.txt</code> خروجی معمولی را Redirect می‌کند، ولی <code>command 2> error.txt</code> خطا را Redirect می‌کند.</p>
+<p>یعنی خطای Command را داخل <code>error.txt</code> ذخیره کن.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">stdout → 1\nstderr → 2</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block">command > output.txt\ncommand 2> error.txt</div></div>
+<p>دستور اول خروجی معمولی را Redirect می‌کند؛ دستور دوم خطا را Redirect می‌کند.</p>
 
 <h2>۱۵. <code>2&gt;&gt;</code></h2>
 <p>برای Append کردن Error:</p>
@@ -1882,29 +1931,38 @@
 <h2>۱۶. Redirect ورودی با <code>&lt;</code></h2>
 <p>Redirect فقط برای خروجی نیست. می‌توانیم ورودی یک Command را نیز از فایل بگیریم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">command < file.txt</div></div>
-<p>یعنی محتوای <code>file.txt</code> را به عنوان <code>stdin</code> به Command بده. مدل کلی:</p>
-<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">&lt;   → stdin\n&gt;   → stdout\n&gt;&gt;  → stdout + append\n2&gt;  → stderr</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار مورد را بشناس: <code>&lt;</code> → stdin، <code>&gt;</code> → stdout، <code>&gt;&gt;</code> → stdout + append، <code>2&gt;</code> → stderr.</div></div>
+<p>یعنی محتوای <code>file.txt</code> را به عنوان <code>stdin</code> به Command بده.</p>
+<p>مدل کلی:</p>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt"><   → stdin\n>   → stdout\n2>  → stderr</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> این چهار مورد را بشناس:
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt"><   → stdin\n>   → stdout\n>>  → stdout + append\n2>  → stderr</div></div>
+</div></div>
 
 <h2>۱۷. Pipe چیست؟</h2>
-<p>علامت Pipe: <code>|</code>. Pipe خروجی یک Command را به ورودی Command بعدی متصل می‌کند. یعنی:</p>
+<p>علامت Pipe <code>|</code> خروجی یک Command را به ورودی Command بعدی متصل می‌کند. یعنی:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Command 1\n   │\n stdout\n   │\n   ▼\n  Pipe\n   │\n stdin\n   │\n   ▼\nCommand 2</div></div>
 
 <h2>۱۸. مثال ساده Pipe</h2>
 <p>فرض کن:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat users.txt | grep Amir</div></div>
-<p>چه اتفاقی می‌افتد؟ <code>cat users.txt</code> → خروجی فایل → <code>|</code> → <code>grep Amir</code> → فقط خطوط مربوط به Amir. پس Pipe فایل نمی‌سازد. فقط <strong>stdout یک Command را به stdin Command بعدی وصل می‌کند.</strong></p>
+<p>چه اتفاقی می‌افتد؟</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">cat users.txt\n      ↓\nخروجی فایل\n      ↓\n      |\n      ↓\ngrep Amir\n      ↓\nفقط خطوط مربوط به Amir</div></div>
+<p>پس Pipe فایل نمی‌سازد. فقط <strong>stdout یک Command را به stdin Command بعدی وصل می‌کند.</strong></p>
 
 <h2>۱۹. یک مثال واقعی</h2>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
-<p>یعنی: <code>history</code> → تمام History → <code>grep ssh</code> → فقط خطوطی که ssh دارند. این یکی از مهم‌ترین الگوهای خط فرمان است.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">history\n   ↓\nتمام History\n   ↓\ngrep ssh\n   ↓\nفقط خطوطی که ssh دارند</div></div>
+<p>این یکی از مهم‌ترین الگوهای خط فرمان است.</p>
 
 <h2>۲۰. Pipe در برابر Redirect</h2>
 <p>این دو را هرگز یکی ندان.</p>
-<ul>
-<li><strong>Pipe:</strong> <code>command1 | command2</code> خروجی را به <strong>Command بعدی</strong> می‌دهد.</li>
-<li><strong>Redirect:</strong> <code>command > file</code> خروجی را به <strong>File</strong> می‌دهد.</li>
-</ul>
+<h3>Pipe</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command1 | command2</div></div>
+<p>خروجی را به <strong>Command بعدی</strong> می‌دهد.</p>
+<h3>Redirect</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command > file</div></div>
+<p>خروجی را به <strong>File</strong> می‌دهد.</p>
 <div class="table-wrap">
 <table>
 <thead><tr><th>Pipe</th><th>Redirect</th></tr></thead>
@@ -1915,77 +1973,131 @@
 </tbody>
 </table>
 </div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>حفظی طلایی ⭐</strong> <code>|</code> → Command، <code>&gt;</code> → File.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>حفظی طلایی ⭐</strong>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">| → Command\n> → File</div></div>
+</div></div>
 
 <h2>۲۱. ترکیب Pipe و Redirect</h2>
 <p>می‌توان آنها را با هم ترکیب کرد:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh > ssh_commands.txt</div></div>
-<p>مراحل: <code>history</code> → <code>grep ssh</code> → <code>ssh_commands.txt</code>. یعنی History را بگیر، فقط خطوط دارای <code>ssh</code> را نگه دار، نتیجه را داخل فایل ذخیره کن. این دقیقاً همان چیزی است که در خط فرمان Linux بسیار زیاد انجام می‌دهیم.</p>
+<p>مراحل:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">history\n   ↓\ngrep ssh\n   ↓\nssh_commands.txt</div></div>
+<p>یعنی:</p>
+<ol>
+<li>History را بگیر.</li>
+<li>فقط خطوط دارای <code>ssh</code> را نگه دار.</li>
+<li>نتیجه را داخل فایل ذخیره کن.</li>
+</ol>
+<p>این دقیقاً همان چیزی است که در خط فرمان Linux بسیار زیاد انجام می‌دهیم.</p>
 
 <h2>۲۲. ترتیب Commandها مهم است</h2>
-<p>به این دو توجه کن:</p>
-<div class="code-container"><span class="code-label">ترتیب</span><div class="code-block">command1 | command2 > result.txt</div></div>
-<p>یعنی: <code>command1</code> → <code>command2</code> → <code>result.txt</code>. اما اگر جای آنها را عوض کنیم، مفهوم Commandها نیز تغییر می‌کند. پس Pipe و Redirect فقط علامت‌های تزئینی نیستند؛ <strong>جریان داده را مشخص می‌کنند.</strong></p>
+<p>به این مثال توجه کن:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command1 | command2 > result.txt</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">command1\n   ↓\ncommand2\n   ↓\nresult.txt</div></div>
+<p>اما اگر جای آنها را عوض کنیم، مفهوم Commandها نیز تغییر می‌کند. پس Pipe و Redirect فقط علامت‌های تزئینی نیستند؛ <strong>جریان داده را مشخص می‌کنند.</strong></p>
 
-<h2>۲۳. sed</h2>
-<p><code>sed</code> یک <strong>Stream Editor</strong> است. یعنی می‌تواند متن ورودی را پردازش و تغییر دهد. یکی از رایج‌ترین کاربردهای آن: <strong>جایگزینی متن</strong>. فرض کن:</p>
-<div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Linux is powerful.\nLinux is popular.</div></div>
-<p>می‌خواهیم <code>Linux</code> را به <code>LPIC</code> تبدیل کنیم:</p>
+<h2>۲۳. <code>sed</code></h2>
+<p><code>sed</code> یک <strong>Stream Editor</strong> است. یعنی می‌تواند متن ورودی را پردازش و تغییر دهد. یکی از رایج‌ترین کاربردهای آن <strong>جایگزینی متن</strong> است.</p>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">Linux is powerful.\nLinux is popular.</div></div>
+<p>می‌خواهیم <code>Linux</code> را به <code>LPIC</code> تبدیل کنیم.</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
-<p>خروجی: <code>LPIC is powerful.</code> و <code>LPIC is popular.</code></p>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">LPIC is powerful.\nLPIC is popular.</div></div>
 
 <h2>۲۴. ساختار <code>s</code></h2>
 <p>این قسمت مهم است:</p>
-<div class="code-container"><span class="code-label">ساختار</span><div class="code-block">sed 's/old/new/' file.txt</div></div>
-<p>یعنی: <code>s</code> → substitute، <code>old</code> → متن قدیمی، <code>new</code> → متن جدید. پس <code>sed 's/Linux/LPIC/' file.txt</code> یعنی <code>Linux</code> را با <code>LPIC</code> جایگزین کن.</p>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">sed 's/old/new/' file.txt</div></div>
+<p>یعنی:</p>
+<ul>
+<li><code>s</code> → substitute</li>
+<li><code>old</code> → متن قدیمی</li>
+<li><code>new</code> → متن جدید</li>
+</ul>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
+<p>یعنی <code>Linux</code> را با <code>LPIC</code> جایگزین کن.</p>
 
-<h2>۲۵. گزینه <code>g</code> در sed</h2>
-<p>به طور معمول <code>sed 's/Linux/LPIC/' file.txt</code> در هر خط، اولین مورد را جایگزین می‌کند. اگر بخواهیم <strong>تمام موارد موجود در هر خط</strong> جایگزین شوند:</p>
+<h2>۲۵. گزینه <code>g</code> در <code>sed</code></h2>
+<p>به طور معمول:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
+<p>در هر خط، اولین مورد را جایگزین می‌کند. اگر بخواهیم <strong>تمام موارد موجود در هر خط</strong> جایگزین شوند:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt</div></div>
-<p>اینجا <code>g</code> → global. مثال: ورودی <code>Linux Linux Linux</code> بدون <code>g</code> → <code>LPIC Linux Linux</code>، با <code>g</code> → <code>LPIC LPIC LPIC</code>.</p>
+<p>اینجا <code>g</code> یعنی global.</p>
+<h4>مثال</h4>
+<p>ورودی:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">Linux Linux Linux</div></div>
+<p>بدون <code>g</code>:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">LPIC Linux Linux</div></div>
+<p>با <code>g</code>:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">LPIC LPIC LPIC</div></div>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> در LPIC-1: <code>s</code> → substitute، <code>g</code> → global را به خوبی بشناس.</div></div>
 
-<h2>۲۶. آیا sed فایل اصلی را تغییر می‌دهد؟</h2>
-<p>به طور پیش‌فرض <code>sed 's/Linux/LPIC/' file.txt</code> فایل اصلی را تغییر نمی‌دهد. فقط نتیجه پردازش را روی <code>stdout</code> نمایش می‌دهد. اگر بخواهی نتیجه را در فایل دیگری ذخیره کنی:</p>
+<h2>۲۶. آیا <code>sed</code> فایل اصلی را تغییر می‌دهد؟</h2>
+<p>به طور پیش‌فرض:</p>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/' file.txt</div></div>
+<p>فایل اصلی را تغییر نمی‌دهد. فقط نتیجه پردازش را روی <code>stdout</code> نمایش می‌دهد. اگر بخواهی نتیجه را در فایل دیگری ذخیره کنی:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt > new.txt</div></div>
 <p>حالا <code>file.txt</code> اصلی و <code>new.txt</code> نتیجه جدید است.</p>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>sed</code> به صورت پیش‌فرض فایل اصلی را تغییر نمی‌دهد.</div></div>
 
-<h2>۲۷. xargs</h2>
-<p><code>xargs</code> در ابتدا ممکن است کمی عجیب باشد، اما ایده آن ساده است: <strong>ورودی را به Argument برای یک Command تبدیل می‌کند.</strong> مثلاً فرض کن این خروجی را داریم: <code>file1.txt file2.txt file3.txt</code> و می‌خواهیم آنها را به یک Command بدهیم:</p>
+<h2>۲۷. <code>xargs</code></h2>
+<p><code>xargs</code> در ابتدا ممکن است کمی عجیب باشد، اما ایده آن ساده است: <strong>ورودی را به Argument برای یک Command تبدیل می‌کند.</strong></p>
+<p>مثلاً فرض کن این خروجی را داریم:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">file1.txt\nfile2.txt\nfile3.txt</div></div>
+<p>و می‌خواهیم آنها را به یک Command بدهیم. مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">printf '%s\\n' file1.txt file2.txt file3.txt | xargs echo</div></div>
-<p>تقریباً به این مفهوم است: <code>echo file1.txt file2.txt file3.txt</code>. پس: Input → xargs → Arguments → Command.</p>
+<p>تقریباً به این مفهوم است:</p>
+<div class="code-container"><span class="code-label">معادل</span><div class="code-block">echo file1.txt file2.txt file3.txt</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Input\n  ↓\nxargs\n  ↓\nArguments\n  ↓\nCommand</div></div>
 
-<h2>۲۸. xargs در برابر Pipe</h2>
+<h2>۲۸. <code>xargs</code> در برابر Pipe</h2>
 <p>این تفاوت بسیار مهم است.</p>
-<ul>
-<li><strong>Pipe:</strong> <code>command1 | command2</code> خروجی <code>command1</code> را به <strong>stdin</strong> دستور دوم می‌دهد.</li>
-<li><strong>xargs:</strong> <code>command1 | xargs command2</code> خروجی <code>command1</code> را به <strong>Argument</strong>های <code>command2</code> تبدیل می‌کند.</li>
-</ul>
-<p>پس: Pipe → stdin، xargs → arguments.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر Command دوم انتظار دارد اطلاعات را از <strong>stdin</strong> بگیرد: <code>|</code>. اگر لازم است خروجی Command اول به شکل <strong>Argument</strong> به Command دوم داده شود: <code>xargs</code> ممکن است مناسب باشد.</div></div>
+<h3>Pipe</h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command1 | command2</div></div>
+<p>خروجی <code>command1</code> را به <strong>stdin</strong> دستور دوم می‌دهد.</p>
+<h3><code>xargs</code></h3>
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command1 | xargs command2</div></div>
+<p>خروجی <code>command1</code> را به <strong>Argument</strong>های <code>command2</code> تبدیل می‌کند.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Pipe:\nstdout → stdin\n\nxargs:\nstdout → arguments</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر Command دوم انتظار دارد اطلاعات را از <strong>stdin</strong> بگیرد → <code>|</code>. اگر لازم است خروجی Command اول به شکل <strong>Argument</strong> به Command دوم داده شود → <code>xargs</code> ممکن است مناسب باشد.</div></div>
 
-<h2>۲۹. مثال معروف xargs</h2>
+<h2>۲۹. مثال معروف <code>xargs</code></h2>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">find . -name "*.tmp" -print0 | xargs -0 rm</div></div>
-<p>مفهوم: <code>find</code> → فایل‌های tmp → <code>xargs</code> → <code>rm file1.tmp file2.tmp ...</code>. یعنی نام فایل‌های پیدا شده به عنوان Argument به <code>rm</code> داده می‌شوند.</p>
-<p><strong>چرا <code>-print0</code> و <code>-0</code>؟</strong> چون نام فایل ممکن است شامل فاصله یا بعضی کاراکترهای خاص باشد. روش ساده <code>find . -name "*.tmp" | xargs rm</code> ممکن است در بعضی نام فایل‌ها مشکل ایجاد کند. روش <code>-print0</code> و <code>xargs -0</code> برای انتقال امن‌تر نام فایل‌ها مناسب‌تر است. برای LPIC-1 مهم است مفهوم <code>xargs</code> را بفهمی؛ لازم نیست تمام جزئیات Parsing آن را حفظ کنی.</p>
+<p>مفهوم:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">find\n ↓\nفایل‌های tmp\n ↓\nxargs\n ↓\nrm file1.tmp file2.tmp ...</div></div>
+<p>یعنی نام فایل‌های پیدا شده به عنوان Argument به <code>rm</code> داده می‌شوند.</p>
+<h4>چرا <code>-print0</code> و <code>-0</code>؟</h4>
+<p>چون نام فایل ممکن است شامل فاصله یا بعضی کاراکترهای خاص باشد. روش ساده:</p>
+<div class="code-container"><span class="code-label">مثال ساده</span><div class="code-block">find . -name "*.tmp" | xargs rm</div></div>
+<p>ممکن است در بعضی نام فایل‌ها مشکل ایجاد کند. روش <code>-print0</code> و <code>xargs -0</code> برای انتقال امن‌تر نام فایل‌ها مناسب‌تر است.</p>
+<blockquote>برای LPIC-1 مهم است مفهوم <code>xargs</code> را بفهمی؛ لازم نیست تمام جزئیات Parsing آن را حفظ کنی.</blockquote>
 
-<h2>۳۰. دام مهم xargs ⚠️</h2>
-<p>این تصور اشتباه است: <code>xargs = Pipe</code>. خیر. <code>|</code> → stdin، <code>xargs</code> → arguments. این یکی از تفاوت‌های مفهومی مهم این جلسه است.</p>
+<h2>۳۰. دام مهم <code>xargs</code> ⚠️</h2>
+<p>این تصور اشتباه است:</p>
+<div class="code-container"><span class="code-label">تصور غلط</span><div class="code-block no-prompt">xargs = Pipe</div></div>
+<div class="code-container"><span class="code-label">واقعیت</span><div class="code-block no-prompt">| → stdin\nxargs → arguments</div></div>
+<p>این یکی از تفاوت‌های مفهومی مهم این جلسه است.</p>
 
 <h2>۳۱. Checksum چیست؟</h2>
 <p>فرض کن یک فایل ISO چند گیگابایتی دانلود کرده‌ای. از کجا بفهمی فایل در مسیر دانلود خراب یا تغییر نکرده؟ اینجا <strong>Checksum</strong> به کار می‌آید. Checksum را می‌توان مثل یک <strong>اثر انگشت دیجیتال فایل</strong> در نظر گرفت.</p>
 
-<h2>۳۲. md5sum</h2>
+<h2>۳۲. <code>md5sum</code></h2>
 <p>برای تولید MD5:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">md5sum file.iso</div></div>
-<p>خروجی چیزی شبیه <code>d41d8cd98f00b204e9800998ecf8427e  file.iso</code>. اگر Checksum فایل دانلودشده را با مقدار رسمی مقایسه کنیم، می‌توانیم متوجه اختلاف شویم.</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">md5sum file.iso</div></div>
+<p>خروجی چیزی شبیه:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">d41d8cd98f00b204e9800998ecf8427e  file.iso</div></div>
+<p>اگر Checksum فایل دانلودشده را با مقدار رسمی مقایسه کنیم، می‌توانیم متوجه اختلاف شویم.</p>
 
-<h2>۳۳. sha256sum</h2>
+<h2>۳۳. <code>sha256sum</code></h2>
 <p>برای SHA-256:</p>
-<div class="code-container"><span class="code-label">مثال</span><div class="code-block">sha256sum file.iso</div></div>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">sha256sum file.iso</div></div>
 <p>SHA-256 امروزه انتخاب بسیار مناسب‌تری برای بررسی Integrity نسبت به MD5 است.</p>
-<p><strong>نکته مهم:</strong> Checksum را می‌توان برای بررسی این موضوع استفاده کرد که <strong>آیا فایل با داده مورد انتظار مطابقت دارد یا خیر؟</strong> اما اگر هدف <strong>امنیت رمزنگاری یا جلوگیری از جعل</strong> باشد، صرفاً داشتن یک Hash کافی نیست؛ باید به منبع و روش اعتبارسنجی نیز اعتماد داشت. برای سطح LPIC-1 همین تفاوت مفهومی کافی است.</p>
+<h4>نکته مهم</h4>
+<p>Checksum را می‌توان برای بررسی این موضوع استفاده کرد که <strong>آیا فایل با داده مورد انتظار مطابقت دارد یا خیر؟</strong> اما اگر هدف <strong>امنیت رمزنگاری یا جلوگیری از جعل</strong> باشد، صرفاً داشتن یک Hash کافی نیست؛ باید به منبع و روش اعتبارسنجی نیز اعتماد داشت. برای سطح LPIC-1 همین تفاوت مفهومی کافی است.</p>
 
 <h2>۳۴. MD5 در برابر SHA-256</h2>
 <div class="table-wrap">
@@ -1999,19 +2111,27 @@
 </tbody>
 </table>
 </div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال پرسید کدام‌یک از این دو برای امنیت مدرن مناسب‌تر است؟ <code>SHA-256</code>.</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال پرسید کدام‌یک از این دو برای امنیت مدرن مناسب‌تر است؟ پاسخ:
+<div class="code-container"><span class="code-label">پاسخ</span><div class="code-block no-prompt">SHA-256</div></div>
+</div></div>
 
 <h2>۳۵. ترکیب ابزارها</h2>
-<p>قدرت واقعی Linux زمانی مشخص می‌شود که Commandها را با هم ترکیب کنیم. مثلاً:</p>
+<p>قدرت واقعی Linux زمانی مشخص می‌شود که Commandها را با هم ترکیب کنیم.</p>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh</div></div>
-<p>یعنی: History → Filter. حالا اگر بخواهیم ذخیره کنیم:</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">History\n   ↓\nFilter</div></div>
+<p>حالا اگر بخواهیم ذخیره کنیم:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">history | grep ssh > ssh.txt</div></div>
-<p>یعنی: History → grep → File. یا:</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">History\n   ↓\ngrep\n   ↓\nFile</div></div>
+<p>یا:</p>
 <div class="code-container"><span class="code-label">مثال</span><div class="code-block">cat file.txt | sed 's/Linux/LPIC/g'</div></div>
-<p>یعنی: File → cat → sed → Modified Output.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">File\n ↓\ncat\n ↓\nsed\n ↓\nModified Output</div></div>
 
 <h2>۳۶. یک سناریوی واقعی</h2>
-<p>فرض کن یک فایل Log بزرگ داریم <code>server.log</code> و فقط خطاها را می‌خواهیم:</p>
+<p>فرض کن یک فایل Log بزرگ داریم به نام <code>server.log</code> و فقط خطاها را می‌خواهیم.</p>
 <div class="code-container"><span class="code-label">مرحله ۱</span><div class="code-block">grep "ERROR" server.log</div></div>
 <p>حالا می‌خواهیم نتیجه را ذخیره کنیم:</p>
 <div class="code-container"><span class="code-label">مرحله ۲</span><div class="code-block">grep "ERROR" server.log > errors.txt</div></div>
@@ -2019,14 +2139,18 @@
 <div class="code-container"><span class="code-label">مرحله ۳</span><div class="code-block">grep "ERROR" server.log | grep ssh</div></div>
 <p>و در نهایت ذخیره کنیم:</p>
 <div class="code-container"><span class="code-label">مرحله ۴</span><div class="code-block">grep "ERROR" server.log | grep ssh > ssh_errors.txt</div></div>
-<p>مدل ذهنی: <code>server.log</code> → <code>grep ERROR</code> → <code>grep ssh</code> → <code>ssh_errors.txt</code>. این همان فلسفه اصلی خط فرمان است: <strong>یک ابزار کار مشخصی انجام می‌دهد؛ سپس خروجی آن را به ابزار بعدی می‌دهیم.</strong></p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">جریان نهایی</span><div class="code-block no-prompt">server.log\n    ↓\n grep ERROR\n    ↓\n grep ssh\n    ↓\nssh_errors.txt</div></div>
+<p>این همان فلسفه اصلی خط فرمان است: <strong>یک ابزار کار مشخصی انجام می‌دهد؛ سپس خروجی آن را به ابزار بعدی می‌دهیم.</strong></p>
 
-<h2>۳۷. یک سناریوی دیگر با sed</h2>
-<p>فرض کن <code>file.txt</code> شامل:</p>
-<div class="code-container"><span class="code-label">محتوا</span><div class="code-block no-prompt">Linux is great.\nLinux is powerful.</div></div>
-<p>می‌خواهیم <code>Linux</code> به <code>LPIC</code> تبدیل شود و نتیجه در فایل جدید ذخیره شود:</p>
+<h2>۳۷. یک سناریوی دیگر با <code>sed</code></h2>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">ورودی</span><div class="code-block no-prompt">Linux is great.\nLinux is powerful.</div></div>
+<p>می‌خواهیم <code>Linux</code> را به <code>LPIC</code> تبدیل کنیم و نتیجه در فایل جدید ذخیره شود:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sed 's/Linux/LPIC/g' file.txt > new.txt</div></div>
-<p>جریان: <code>file.txt</code> → <code>sed</code> → Replace → <code>new.txt</code>. فایل اصلی دست‌نخورده باقی می‌ماند.</p>
+<p>جریان:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">file.txt\n   ↓\nsed\n   ↓\nReplace\n   ↓\nnew.txt</div></div>
+<p>فایل اصلی دست‌نخورده باقی می‌ماند.</p>
 
 <h2>۳۸. جدول طلایی Commandهای جلسه</h2>
 <div class="table-wrap">
@@ -2044,8 +2168,8 @@
 <tr><td><code>&lt;</code></td><td>Redirect کردن stdin</td></tr>
 <tr><td><code>|</code></td><td>انتقال stdout به stdin</td></tr>
 <tr><td><code>sed</code></td><td>پردازش/تغییر متن</td></tr>
-<tr><td><code>s</code></td><td>Substitute در sed</td></tr>
-<tr><td><code>g</code></td><td>Global در sed</td></tr>
+<tr><td><code>s</code> در sed</td><td>Substitute</td></tr>
+<tr><td><code>g</code> در sed</td><td>Global</td></tr>
 <tr><td><code>xargs</code></td><td>تبدیل ورودی به Arguments</td></tr>
 <tr><td><code>md5sum</code></td><td>تولید MD5</td></tr>
 <tr><td><code>sha256sum</code></td><td>تولید SHA-256</td></tr>
@@ -2064,82 +2188,71 @@
 </tbody>
 </table>
 </div>
-<p>حفظ کن: <code>0 → in</code>، <code>1 → out</code>، <code>2 → error</code>.</p>
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">0 → in\n1 → out\n2 → error</div></div>
 
 <h2>۴۰. مقایسه‌های طلایی جلسه</h2>
-<ul>
-<li><strong>grep در برابر find:</strong> <code>grep</code> → داخل محتوا، <code>find</code> → پیدا کردن File/Directory.</li>
-<li><strong>Pipe در برابر Redirect:</strong> <code>|</code> → Command، <code>&gt;</code> → File.</li>
-<li><strong><code>&gt;</code> در برابر <code>&gt;&gt;</code>:</strong> <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append.</li>
-<li><strong>Pipe در برابر xargs:</strong> <code>|</code> → stdout → stdin، <code>xargs</code> → stdout → arguments.</li>
-<li><strong>sed در برابر grep:</strong> <code>grep</code> → پیدا کن، <code>sed</code> → تغییر/پردازش کن.</li>
-<li><strong>md5sum در برابر sha256sum:</strong> MD5 قدیمی‌تر و ضعیف‌تر، SHA256 قوی‌تر و مناسب‌تر برای Integrity مدرن.</li>
-</ul>
+<h3><code>grep</code> در برابر <code>find</code></h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">grep → داخل محتوا\nfind → پیدا کردن File/Directory</div></div>
+<h3>Pipe در برابر Redirect</h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">| → Command\n> → File</div></div>
+<h3><code>&gt;</code> در برابر <code>&gt;&gt;</code></h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">>  → Overwrite\n>> → Append</div></div>
+<h3>Pipe در برابر <code>xargs</code></h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">|     → stdout → stdin\nxargs → stdout → arguments</div></div>
+<h3><code>sed</code> در برابر <code>grep</code></h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">grep → پیدا کن\nsed  → تغییر/پردازش کن</div></div>
+<h3><code>md5sum</code> در برابر <code>sha256sum</code></h3>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">MD5    → قدیمی‌تر و ضعیف‌تر\nSHA256 → قوی‌تر و مناسب‌تر برای Integrity مدرن</div></div>
 
 <h2>۴۱. دام‌های مهم امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> — <code>&gt;</code> فایل را Append می‌کند؟ خیر. <code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append.</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> — Pipe خروجی را داخل فایل می‌ریزد؟ خیر. <code>|</code> → Command بعدی، <code>&gt;</code> → File.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> — <code>&gt;</code> فایل را Append می‌کند؟ خیر.
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">> → Overwrite\n>> → Append</div></div>
+</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> — Pipe خروجی را داخل فایل می‌ریزد؟ خیر.
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">| → Command بعدی\n> → File</div></div>
+</div></div>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> — <code>2&gt;</code> خروجی معمولی را Redirect می‌کند؟ خیر. <code>2&gt;</code> → stderr.</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> — <code>grep</code> نام فایل را جستجو می‌کند؟ به طور معمول <code>grep</code> برای جستجوی Pattern در محتوای متن است. برای پیدا کردن File/Directory بر اساس نام، <code>find</code> ابزار مناسب‌تری است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> — <code>grep</code> نام فایل را جستجو می‌کند؟ به طور معمول <code>grep</code> برای جستجوی Pattern در <strong>محتوای متن</strong> است. برای پیدا کردن File/Directory بر اساس نام، <code>find</code> ابزار مناسب‌تری است.</div></div>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> — <code>sed</code> همیشه فایل اصلی را تغییر می‌دهد؟ خیر. به طور پیش‌فرض خروجی را تولید می‌کند و فایل اصلی را تغییر نمی‌دهد.</div></div>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> — <code>g</code> یعنی فقط یک بار؟ خیر. <code>g</code> → Global یعنی جایگزینی تمام Matchهای مناسب در هر خط.</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> — xargs همان Pipe است؟ خیر. <code>|</code> → stdin، <code>xargs</code> → arguments.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> — <code>xargs</code> همان Pipe است؟ خیر.
+<div class="code-container"><span class="code-label">حفظی</span><div class="code-block no-prompt">Pipe → stdin\nxargs → arguments</div></div>
+</div></div>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> — MD5 امن است؟ برای کاربردهای امنیت رمزنگاری مدرن، MD5 امن محسوب نمی‌شود. در مقایسه با MD5، SHA-256 انتخاب بسیار مناسب‌تری است.</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> — هر خروجی Command الزاماً stdout است؟ خیر. پیام‌های خطا معمولاً به <code>stderr</code> می‌روند. به همین دلیل <code>command > output.txt</code> ممکن است خروجی معمولی را ذخیره کند ولی خطا همچنان روی Terminal دیده شود.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۹</strong> — هر خروجی Command الزاماً stdout است؟ خیر. پیام‌های خطا معمولاً به <code>stderr</code> می‌روند. به همین دلیل:
+<div class="code-container"><span class="code-label">مثال</span><div class="code-block">command > output.txt</div></div>
+ممکن است خروجی معمولی را ذخیره کند ولی خطا همچنان روی Terminal دیده شود.</div></div>
 
 <h2>🧠 نقشه ذهنی جلسه</h2>
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Command Output\n│\n├── Standard Streams\n│     ├── stdin  → 0\n│     ├── stdout → 1\n│     └── stderr → 2\n│\n├── grep\n│     ├── -i\n│     ├── -v\n│     ├── -n\n│     ├── -r\n│     ├── ^\n│     └── $\n│\n├── Redirect\n│     ├── <   → stdin\n│     ├── >   → stdout / Overwrite\n│     ├── >>  → stdout / Append\n│     └── 2>  → stderr\n│\n├── Pipe\n│     └── stdout → stdin\n│\n├── sed\n│     ├── s → substitute\n│     └── g → global\n│\n├── xargs\n│     └── input → arguments\n│\n└── Checksum\n      ├── md5sum\n      └── sha256sum</div></div>
 
 <h2>🔗 جریان اصلی جلسه</h2>
-<p>اگر بخواهیم تمام جلسه را در یک تصویر ذهنی خلاصه کنیم:</p>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">             Command\n                │\n                ▼\n              Output\n                │\n        ┌───────┼────────┐\n        │       │        │\n        ▼       ▼        ▼\n      grep     sed       >\n    Filter    Modify    File\n        │       │\n        └───┬───┘\n            │\n            ▼\n           |\n            │\n            ▼\n      Another Command\n            │\n            ▼\n          xargs\n            │\n            ▼\n        Arguments</div></div>
+<div class="code-container"><span class="code-label">جریان کلی</span><div class="code-block no-prompt">             Command\n                │\n                ▼\n              Output\n                │\n        ┌───────┼────────┐\n        │       │        │\n        ▼       ▼        ▼\n      grep     sed       >\n    Filter    Modify    File\n        │       │\n        └───┬───┘\n            │\n            ▼\n           |\n            │\n            ▼\n      Another Command\n            │\n            ▼\n          xargs\n            │\n            ▼\n        Arguments</div></div>
 
 <div class="box note"><i class="fas fa-flag-checkered"></i><div><strong>⚡ حفظی‌های جلسه — مرور ۲ تا ۳ دقیقه‌ای</strong>
-اگر فقط چند دقیقه وقت داری، این قسمت را بخوان:
+<p>اگر فقط چند دقیقه وقت داری، این قسمت را بخوان:</p>
 <h4>Standard Streams</h4>
-<code>0 → stdin</code>، <code>1 → stdout</code>، <code>2 → stderr</code>
-<h4>grep</h4>
-<ul>
-<li><code>grep</code> → جستجوی Pattern</li>
-<li><code>-i</code> → Ignore Case</li>
-<li><code>-v</code> → Invert</li>
-<li><code>-n</code> → شماره خط</li>
-<li><code>-r</code> → Recursive</li>
-<li><code>^</code> → ابتدای خط</li>
-<li><code>$</code> → انتهای خط</li>
-</ul>
+<div class="code-container"><span class="code-label">اعداد</span><div class="code-block no-prompt">0 → stdin\n1 → stdout\n2 → stderr</div></div>
+<h4><code>grep</code></h4>
+<div class="code-container"><span class="code-label">گزینه‌ها</span><div class="code-block no-prompt">grep       → جستجوی Pattern\n-i         → Ignore Case\n-v         → Invert\n-n         → شماره خط\n-r         → Recursive\n^          → ابتدای خط\n$          → انتهای خط</div></div>
 <h4>Redirect</h4>
-<ul>
-<li><code>&lt;</code> → stdin</li>
-<li><code>&gt;</code> → stdout + Overwrite</li>
-<li><code>&gt;&gt;</code> → stdout + Append</li>
-<li><code>2&gt;</code> → stderr</li>
-</ul>
+<div class="code-container"><span class="code-label">عملگرها</span><div class="code-block no-prompt"><   → stdin\n>   → stdout + Overwrite\n>>  → stdout + Append\n2>  → stderr</div></div>
 <h4>Pipe</h4>
-<code>|</code> → stdout یک Command → stdin Command بعدی
-<h4>sed</h4>
-<ul>
-<li><code>s</code> → substitute</li>
-<li><code>g</code> → global</li>
-<li><code>sed 's/old/new/g' file</code></li>
-<li>به صورت پیش‌فرض <code>sed</code> فایل اصلی را تغییر نمی‌دهد</li>
-</ul>
-<h4>xargs</h4>
-<code>xargs</code> → تبدیل Input به Arguments. پس <code>|</code> → stdin، <code>xargs</code> → arguments.
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">| → stdout یک Command → stdin Command بعدی</div></div>
+<h4><code>sed</code></h4>
+<div class="code-container"><span class="code-label">ساختار</span><div class="code-block no-prompt">s → substitute\ng → global\n\nsed 's/old/new/g' file</div></div>
+<p>و به صورت پیش‌فرض: <code>sed</code> → فایل اصلی را تغییر نمی‌دهد.</p>
+<h4><code>xargs</code></h4>
+<div class="code-container"><span class="code-label">نکته</span><div class="code-block no-prompt">xargs → تبدیل Input به Arguments</div></div>
+<div class="code-container"><span class="code-label">پس</span><div class="code-block no-prompt">| → stdin\nxargs → arguments</div></div>
 <h4>Checksum</h4>
-<code>md5sum</code> → MD5، <code>sha256sum</code> → SHA-256. SHA-256 قوی‌تر و مناسب‌تر از MD5.
+<div class="code-container"><span class="code-label">دستورات</span><div class="code-block no-prompt">md5sum    → MD5\nsha256sum → SHA-256\n\nSHA-256 → قوی‌تر و مناسب‌تر از MD5</div></div>
 <h4>مقایسه‌های خیلی مهم</h4>
-<ul>
-<li><code>grep</code> → داخل محتوا، <code>find</code> → پیدا کردن File/Directory</li>
-<li><code>|</code> → Command، <code>&gt;</code> → File</li>
-<li><code>&gt;</code> → Overwrite، <code>&gt;&gt;</code> → Append</li>
-<li><code>grep</code> → Find، <code>sed</code> → Modify</li>
-<li><code>|</code> → stdin، <code>xargs</code> → arguments</li>
-</ul>
+<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">grep  → داخل محتوا\nfind  → پیدا کردن File/Directory\n\n|     → Command\n>     → File\n\n>     → Overwrite\n>>    → Append\n\ngrep  → Find\nsed   → Modify\n\n|     → stdin\nxargs → arguments</div></div>
 </div></div>
 
 <div class="box important"><i class="fas fa-check-circle"></i><div><strong>🎯 تست نهایی جلسه</strong>
-بدون نگاه کردن به جزوه جواب بده:
+<p>بدون نگاه کردن به جزوه جواب بده:</p>
 <ol>
 <li><code>grep</code> چه کاری انجام می‌دهد؟</li>
 <li>تفاوت <code>grep</code> و <code>find</code> چیست؟</li>
@@ -2160,22 +2273,23 @@
 <li>تفاوت <code>|</code> و <code>xargs</code> چیست؟</li>
 <li>Checksum چیست؟</li>
 <li>تفاوت MD5 و SHA-256 چیست؟</li>
-<li>در این دستور جریان داده را توضیح بده: <code>history | grep ssh > ssh.txt</code></li>
+<li>در دستور زیر جریان داده را توضیح بده:
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">history | grep ssh > ssh.txt</div></div>
+</li>
 </ol>
 </div></div>
 
 <div class="box important"><i class="fas fa-trophy"></i><div><strong>🏆 یک سؤال طلایی</strong>
-اگر این دستور را ببینی:
+<p>اگر این دستور را ببینی:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">grep "ERROR" server.log | sed 's/ERROR/WARNING/g' > result.txt</div></div>
-باید بتوانی بدون حفظ کردن، آن را بخوانی:
+<p>باید بتوانی بدون حفظ کردن، آن را بخوانی:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">server.log\n     ↓\ngrep\nفقط خطوط دارای ERROR\n     ↓\nsed\nERROR → WARNING\n     ↓\n>\nذخیره در result.txt</div></div>
-یعنی: <strong>فایل → جستجو → تغییر → ذخیره</strong>. اگر بتوانی جریان داده را این‌طور در ذهنت ببینی، واقعاً مفهوم جلسه را یاد گرفته‌ای، نه اینکه فقط چند Command را حفظ کرده باشی.
+<p>یعنی <strong>فایل → جستجو → تغییر → ذخیره</strong>. اگر بتوانی جریان داده را این‌طور در ذهنت ببینی، واقعاً مفهوم جلسه را یاد گرفته‌ای، نه اینکه فقط چند Command را حفظ کرده باشی.</p>
 </div></div>
 
 <div class="box note"><i class="fas fa-link"></i><div><strong>🔗 ارتباط با جلسه بعد</strong>
-در این جلسه یاد گرفتیم با خروجی و داده‌های متنی کار کنیم. در جلسه بعد همین مدل را یک مرحله جلوتر می‌بریم:
-<div class="code-container"><span class="code-label">مسیر</span><div class="code-block no-prompt">Command\n   ↓\nOutput\n   ↓\nFilter / Process\n   ↓\nProcess Management</div></div>
-و وارد مباحث <strong>Package Management، Process، ps، top، kill، tmux، nohup، jobs، bg، fg</strong> می‌شویم. پس چیزی که امروز یاد گرفتی فقط مخصوص <code>grep</code> و <code>sed</code> نیست؛ این همان <strong>فلسفه ترکیب Commandها در Linux</strong> است.
+<p>در این جلسه یاد گرفتیم با <strong>خروجی و داده‌های متنی</strong> کار کنیم. در جلسه بعد همین مدل را یک مرحله جلوتر می‌بریم و وارد مباحث <strong>Package Management</strong>، <strong>Process</strong>، <code>ps</code>، <code>top</code>، <code>kill</code>، <code>tmux</code>، <code>nohup</code>، <code>jobs</code>، <code>bg</code> و <code>fg</code> می‌شویم.</p>
+<p>پس چیزی که امروز یاد گرفتی فقط مخصوص <code>grep</code> و <code>sed</code> نیست؛ این همان <strong>فلسفه ترکیب Commandها در Linux</strong> است.</p>
 </div></div>
 `
 ,
@@ -2210,6 +2324,7 @@
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo apt install nginx</div></div>
 <p>تقریباً چنین اتفاقی رخ می‌دهد:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">دستور نصب\n   ↓\nPackage Manager\n   ↓\nRepository\n   ↓\nدریافت Package\n   ↓\nبررسی Dependencies\n   ↓\nنصب</div></div>
+<p><strong>چرا Repository مهم است؟</strong> چون Package Manager می‌تواند نرم‌افزار را پیدا کند، آن را دانلود کند، وابستگی‌ها را مدیریت کند، نرم‌افزار را به‌روزرسانی کند و نسخه‌ی مناسب را نصب کند.</p>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> در سؤال‌های LPIC وقتی صحبت از نصب نرم‌افزار <strong>از مخزن و همراه با مدیریت وابستگی‌ها</strong> است، ذهنمان باید به سمت Package Managerهایی مثل <code>apt</code> و <code>dnf</code> برود.</div></div>
 
 <h3>۲. Package چیست؟</h3>
@@ -2218,6 +2333,7 @@
 
 <h3>۳. دو خانواده مهم Package</h3>
 <p>در LPIC-1 دو خانواده‌ی بسیار مهم را باید بشناسیم:</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>خانواده</th><th>فرمت Package</th><th>ابزارهای مهم</th></tr></thead>
 <tbody>
@@ -2225,24 +2341,27 @@
 <tr><td>Red Hat</td><td><code>.rpm</code></td><td><code>dnf</code>, <code>rpm</code></td></tr>
 </tbody>
 </table>
+</div>
 <p>مثلاً <code>nginx.deb</code> یک Package از خانواده Debian است و <code>nginx.rpm</code> یک Package از خانواده RPM است.</p>
+<div class="box note"><i class="fas fa-circle-info"></i><div><strong>نکته</strong> <code>.rpm</code> نام فرمت Package است و در عین حال <code>rpm</code> نام ابزار مدیریت آن Packageها نیز هست.</div></div>
 
 <h3>۴. <code>apt</code> و <code>dpkg</code></h3>
 <p>این دو را با هم اشتباه نکنید.</p>
 <ul>
-<li><strong>dpkg:</strong> ابزار سطح پایین Debian برای کار با Packageهای <code>.deb</code>. مثال: <code>sudo dpkg -i file.deb</code> (Package مشخص‌شده را مستقیماً نصب کن).</li>
-<li><strong>apt:</strong> ابزار سطح بالاتری که می‌تواند Package را از Repository دریافت کند و وابستگی‌های موردنیاز را نیز مدیریت کند. مثال: <code>sudo apt install nginx</code>.</li>
+<li><strong>dpkg:</strong> ابزار سطح پایین Debian برای کار با Packageهای <code>.deb</code>. مثال: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dpkg -i file.deb</div></div> یعنی Package مشخص‌شده را مستقیماً نصب کن.</li>
+<li><strong>apt:</strong> ابزار سطح بالاتری است که برای مدیریت Packageها استفاده می‌شود. مثال: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo apt install nginx</div></div> در این حالت <code>apt</code> می‌تواند Package را از Repository دریافت کند و وابستگی‌های موردنیاز را نیز مدیریت کند.</li>
 </ul>
 <div class="code-container"><span class="code-label">مدل ذهنی</span><div class="code-block no-prompt">apt\n │\n ├── Repository\n ├── Download\n ├── Dependencies\n └── Package Management\n\ndpkg\n │\n └── کار مستقیم با .deb</div></div>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>dpkg</code> یک Package Manager سطح پایین برای <code>.deb</code> است؛ <code>apt</code> مدیریت سطح بالاتر و وابستگی‌ها و Repository را انجام می‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> این جمله را دقیق به خاطر بسپارید: <code>dpkg</code> یک Package Manager سطح پایین برای <code>.deb</code> است؛ <code>apt</code> مدیریت سطح بالاتر و وابستگی‌ها و Repository را انجام می‌دهد. پس نگویید «<code>dpkg</code> اصلاً Dependency را نمی‌شناسد»؛ بلکه بگویید: <code>dpkg</code> وابستگی‌ها را به شکل سطح پایین بررسی می‌کند، اما خودش مانند <code>apt</code> آن‌ها را از Repository دریافت و حل نمی‌کند.</div></div>
 
 <h3>۵. <code>dnf</code> و <code>rpm</code></h3>
 <p>در خانواده Red Hat نیز مشابه همین مدل را داریم.</p>
 <ul>
-<li><strong>rpm:</strong> برای کار مستقیم با Packageهای RPM: <code>sudo rpm -ivh file.rpm</code></li>
-<li><strong>dnf:</strong> برای مدیریت سطح بالاتر: <code>sudo dnf install nginx</code> (Package را از Repository دریافت کرده و Dependencyها را مدیریت می‌کند).</li>
+<li><strong>rpm:</strong> برای کار مستقیم با Packageهای RPM: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo rpm -ivh file.rpm</div></div></li>
+<li><strong>dnf:</strong> برای مدیریت سطح بالاتر Packageها: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sudo dnf install nginx</div></div> <code>dnf</code> می‌تواند Package را از Repository دریافت کرده و Dependencyهای آن را نیز مدیریت کند.</li>
 </ul>
 <h4>مقایسه طلایی</h4>
+<div class="table-wrap">
 <table>
 <thead><tr><th>ابزار</th><th>نقش اصلی</th></tr></thead>
 <tbody>
@@ -2252,24 +2371,38 @@
 <tr><td><code>rpm</code></td><td>کار مستقیم با <code>.rpm</code></td></tr>
 </tbody>
 </table>
+</div>
 
 <h3>۶. نصب نرم‌افزار از Source Code</h3>
-<p>همه‌ی نرم‌افزارها الزاماً به شکل Package آماده ارائه نمی‌شوند. گاهی <strong>Source Code</strong> در اختیار ما قرار می‌گیرد (مثلاً <code>project.tar.gz</code>). فرآیند سنتی ساخت ممکن است چیزی شبیه این باشد:</p>
+<p>همه‌ی نرم‌افزارها الزاماً به شکل Package آماده ارائه نمی‌شوند. گاهی <strong>Source Code</strong> در اختیار ما قرار می‌گیرد (مثلاً <code>project.tar.gz</code> که داخل آن به جای Package آماده، کد منبع برنامه قرار دارد). فرآیند سنتی ساخت یک نرم‌افزار ممکن است چیزی شبیه این باشد:</p>
 <div class="code-container"><span class="code-label">مراحل</span><div class="code-block">./configure\nmake\nsudo make install</div></div>
-<p>اما همه‌ی پروژه‌ها دقیقاً از این سه دستور استفاده نمی‌کنند. برای LPIC-1، مفهوم اصلی مهم‌تر از حفظ کردن یک روش خاص است:</p>
+<p>اما این نکته بسیار مهم است: <strong>همه‌ی پروژه‌ها دقیقاً از این سه دستور استفاده نمی‌کنند.</strong> امروزه بعضی پروژه‌ها از ابزارهای دیگری مانند CMake، Meson، Autotools یا سیستم‌های Build مخصوص خودشان استفاده می‌کنند. برای LPIC-1، مفهوم اصلی مهم‌تر از حفظ کردن یک روش خاص است:</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Source Code\n    ↓\nBuild / Compile\n    ↓\nInstall</div></div>
+
+<h4>Package یا Source؟</h4>
+<p>یک مقایسه‌ی ساده:</p>
+<div class="code-container"><span class="code-label">تشبیه</span><div class="code-block no-prompt">Package = غذای آماده\nSource Code = مواد اولیه + آشپزی</div></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th></th><th>Package</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><strong>مزایا</strong></td><td>نصب ساده‌تر، مدیریت Dependency، مدیریت آسان‌تر Update و Remove، هماهنگی بیشتر با Distribution</td><td>امکان انتخاب بعضی تنظیمات Build، امکان استفاده از نسخه‌ای که در Repository موجود نیست، امکان تغییر کد</td></tr>
+<tr><td><strong>معایب</strong></td><td>—</td><td>Build پیچیده‌تر، مدیریت Dependency دشوارتر، مدیریت Update و Remove سخت‌تر</td></tr>
+</tbody>
+</table>
+</div>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر نرم‌افزار را از Source نصب کنید، Package Manager توزیع معمولاً اطلاعات آن نصب را مانند Package نصب‌شده در اختیار ندارد.</div></div>
 
 <h3>۷. Snap و AppImage</h3>
-<p>دو روش دیگر برای توزیع نرم‌افزار:</p>
+<p>دو روش دیگر برای توزیع نرم‌افزار، Snap و AppImage هستند. این‌ها با Packageهای سنتی <code>.deb</code> و <code>.rpm</code> یکسان نیستند.</p>
 <ul>
-<li><strong>Snap:</strong> برنامه را به صورت یک Package قابل توزیع ارائه می‌کند و بسیاری از Dependencyهای موردنیاز را نیز مدیریت می‌کند. مثال: <code>snap install package-name</code>.</li>
-<li><strong>AppImage:</strong> بیشتر شبیه یک برنامه‌ی Portable است. معمولاً: <code>chmod +x program.AppImage</code> و سپس <code>./program.AppImage</code> (در بسیاری از موارد نصب سنتی لازم نیست).</li>
+<li><strong>Snap:</strong> برنامه را به صورت یک Package قابل توزیع ارائه می‌کند و بسیاری از Dependencyهای موردنیاز را نیز در قالب Snap یا محیط مربوط به آن مدیریت می‌کند. مثال: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">snap install package-name</div></div> یکی از ایده‌های اصلی Snap این است که نرم‌افزارها را تا حد زیادی مستقل از Package Management سنتی توزیع کند.</li>
+<li><strong>AppImage:</strong> بیشتر شبیه یک برنامه‌ی Portable است. معمولاً: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">chmod +x program.AppImage\n./program.AppImage</div></div> در بسیاری از موارد نصب سنتی لازم نیست.</li>
 </ul>
 <div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> این دو را یکی ندانید: <code>Snap</code> → Package/Containerized application format + مدیریت توسط snapd؛ <code>AppImage</code> → فایل اجرایی قابل حمل، معمولاً بدون نصب سنتی.</div></div>
 
 <h2>بخش دوم — Process Management</h2>
-<p>حالا فرض کنید نرم‌افزار نصب شده است. وقتی آن را اجرا می‌کنیم چه اتفاقی می‌افتد؟</p>
+<p>حالا فرض کنیم نرم‌افزار نصب شده است (مثلاً Firefox روی سیستم وجود دارد). وقتی آن را اجرا می‌کنیم چه اتفاقی می‌افتد؟</p>
 <div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Program\n   ↓\nExecution\n   ↓\nProcess</div></div>
 
 <h3>۸. Program در برابر Process</h3>
@@ -2278,67 +2411,85 @@
 <li><strong>Program:</strong> برنامه‌ی موجود روی دیسک است (مثلاً <code>/usr/bin/something</code>). هنوز فقط یک فایل است.</li>
 <li><strong>Process:</strong> وقتی برنامه اجرا می‌شود، سیستم‌عامل یک نمونه‌ی در حال اجرای آن ایجاد می‌کند.</li>
 </ul>
-<p>پس <strong>Program = برنامه روی دیسک</strong>، <strong>Process = نمونه‌ی در حال اجرای برنامه</strong>. ممکن است یک Program چند Process ایجاد کند.</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Program\n   ↓ execute\nProcess</div></div>
+<p>پس: <strong>Program = برنامه روی دیسک</strong>، <strong>Process = نمونه‌ی در حال اجرای برنامه</strong>. ممکن است یک Program چند Process ایجاد کند.</p>
 
 <h3>۹. Process چه اطلاعاتی دارد؟</h3>
-<p>هر Process اطلاعات مختلفی دارد، از جمله: <strong>PID</strong> (Process ID)، User، وضعیت، CPU usage، Memory usage، زمان اجرا و ارتباط با Processهای دیگر. مهم‌ترین مورد <strong>PID</strong> است که شناسه‌ی منحصر‌به‌فرد Process در سیستم‌عامل است.</p>
+<p>هر Process اطلاعات مختلفی دارد، از جمله: PID، User، وضعیت، CPU usage، Memory usage، زمان اجرا و ارتباط با Processهای دیگر. مهم‌ترین مورد برای مدیریت Process:</p>
+<p><strong>PID</strong> مخفف <strong>Process ID</strong> است. مثلاً <code>Firefox → PID = 2451</code>. وقتی PID را داشته باشیم می‌توانیم دقیقاً همان Process را هدف قرار دهیم.</p>
 
 <h3>۱۰. <code>ps</code> — مشاهده Processها</h3>
-<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps\nps aux\nps -ef</div></div>
-<p><code>ps</code> معمولاً فقط Processهای مرتبط با همان Terminal را نشان می‌دهد. برای مشاهده‌ی اطلاعات گسترده‌تر از <code>ps aux</code> یا <code>ps -ef</code> استفاده می‌کنیم. این دستورات اطلاعاتی مانند User، PID، CPU، Memory، Start time و Command را نمایش می‌دهند.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال گفت «یک Snapshot از Processهای سیستم بگیر» → ذهن به سمت <code>ps</code> می‌رود.</div></div>
+<p>برای مشاهده Processها از <code>ps</code> استفاده می‌کنیم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps</div></div>
+<p>اما <code>ps</code> معمولاً فقط Processهای مرتبط با همان Terminal را نشان می‌دهد. برای مشاهده‌ی اطلاعات گسترده‌تر می‌توان از:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps aux</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps -ef</div></div>
+<p>استفاده کرد. این دستورات اطلاعاتی مانند User، PID، CPU، Memory، Start time و Command را نمایش می‌دهند. در امتحان باید هر دو فرم را بشناسید.</p>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال گفت «یک Snapshot از Processهای سیستم بگیر»، ذهن به سمت <code>ps</code> می‌رود.</div></div>
 
 <h3>۱۱. <code>top</code> — مشاهده‌ی زنده</h3>
-<p><code>ps</code> یک <strong>Snapshot</strong> از وضعیت Processها می‌دهد، اما <code>top</code> اطلاعات را به صورت زنده و دوره‌ای به‌روزرسانی می‌کند.</p>
+<p><code>ps</code> یک <strong>Snapshot</strong> از وضعیت Processها می‌دهد، اما <code>top</code> اطلاعات را به صورت زنده و دوره‌ای به‌روزرسانی می‌کند:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">top</div></div>
-<p>مدل ذهنی: <code>ps</code> → 📸 Snapshot، <code>top</code> → 🔄 Live / Updating View.</p>
+<p>در <code>top</code> می‌توان مواردی مانند PID، User، CPU usage، Memory usage و Process state را مشاهده کرد.</p>
+<div class="code-container"><span class="code-label">مدل ذهنی</span><div class="code-block no-prompt">ps\n↓\n📸 Snapshot\n\ntop\n↓\n🔄 Live / Updating View</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> نگویید <code>ps</code> اصلاً اطلاعات CPU یا RAM ندارد؛ <code>ps</code> می‌تواند این اطلاعات را نمایش دهد، تفاوت اصلی این است که <code>top</code> برای مشاهده‌ی پویا و مداوم طراحی شده است.</div></div>
 
 <h3>۱۲. Signal چیست؟</h3>
-<p>در لینوکس Processها می‌توانند <strong>Signal</strong> دریافت کنند. Signal یک پیام/درخواست کنترلی از طرف سیستم یا Process دیگر است. برای ارسال Signal معمولاً از <code>kill</code> استفاده می‌کنیم.</p>
+<p>در لینوکس Processها می‌توانند <strong>Signal</strong> دریافت کنند. Signal یک پیام/درخواست کنترلی از طرف سیستم یا Process دیگر است:</p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">Process A\n   │\n   │ Signal\n   ↓\nProcess B</div></div>
+<p>برای ارسال Signal معمولاً از <code>kill</code> استفاده می‌کنیم.</p>
 
 <h3>۱۳. <code>kill</code></h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill 2451</div></div>
-<p><code>2451</code> PID است. <code>kill</code> به Process مربوط به این PID یک Signal ارسال می‌کند. Signal پیش‌فرض <code>kill</code> معمولاً <code>SIGTERM</code> است که به Process درخواست می‌شود به شکل مرتب خاتمه پیدا کند.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته مهم</strong> اسم <code>kill</code> به این معنی نیست که همیشه Process را فوراً می‌کشد.</div></div>
+<p><code>2451</code> در اینجا PID است. <code>kill</code> به Process مربوط به این PID یک Signal ارسال می‌کند.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>نکته بسیار مهم</strong> اسم <code>kill</code> به این معنی نیست که همیشه Process را فوراً می‌کشد. Signal پیش‌فرض <code>kill</code> معمولاً <code>SIGTERM</code> است؛ یعنی به Process درخواست می‌شود که به شکل مرتب خاتمه پیدا کند.</div></div>
 
 <h3>۱۴. <code>kill -9</code></h3>
+<p>اگر Process به <code>SIGTERM</code> پاسخ ندهد، ممکن است از این استفاده کنیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill -9 2451</div></div>
-<p>عدد <code>9</code> مربوط به <code>SIGKILL</code> است. <code>SIGKILL</code> قابل Catch، Ignore یا Handle شدن توسط Process نیست و سیستم‌عامل Process را متوقف می‌کند. اما باید معمولاً <strong>آخرین راه‌حل</strong> باشد، چون برنامه فرصت Cleanup عادی خود را ندارد.</p>
+<p>عدد <code>9</code> مربوط به <code>SIGKILL</code> است. <code>SIGKILL</code> قابل Catch، Ignore یا Handle شدن توسط Process نیست و سیستم‌عامل Process را متوقف می‌کند.</p>
+<p>اما یک نکته مهم: <code>kill -9</code> باید معمولاً <strong>آخرین راه‌حل</strong> باشد؛ چون برنامه فرصت Cleanup عادی خود را ندارد (ممکن است فایل‌های باز داشته باشد، داده‌ای هنوز روی دیسک نوشته نشده باشد، یا منابعی در اختیار داشته باشد).</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> <code>kill PID</code> لزوماً به معنی «کشتن فوری» نیست؛ بلکه یعنی ارسال Signal.</div></div>
 
 <h3>۱۵. <code>pkill</code></h3>
 <p>گاهی PID را نمی‌دانیم اما نام Process را می‌دانیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">pkill firefox</div></div>
-<p><code>pkill</code> بر اساس نام یا ویژگی‌های Process، Signal ارسال می‌کند. پس <code>kill</code> → معمولاً بر اساس PID، <code>pkill</code> → بر اساس نام/ویژگی Process.</p>
+<p><code>pkill</code> بر اساس نام یا ویژگی‌های Process، Signal ارسال می‌کند. پس: <code>kill</code> → معمولاً بر اساس PID؛ <code>pkill</code> → بر اساس نام/ویژگی Process.</p>
 
 <h3>۱۶. <code>killall</code></h3>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">killall firefox</div></div>
-<p><code>killall</code> می‌تواند Signal را به Processهای مطابق نام مشخص‌شده ارسال کند.</p>
+<p><code>killall</code> می‌تواند Signal را به Processهای مطابق نام مشخص‌شده ارسال کند؛ یعنی Processهای دارای نام <code>firefox</code> را هدف قرار می‌دهد.</p>
+<div class="box note"><i class="fas fa-circle-info"></i><div><strong>نکته مهم</strong> <code>killall</code> را با <code>kill</code> اشتباه نکنید: <code>kill</code> → PID؛ <code>pkill</code> → Pattern/Process attributes؛ <code>killall</code> → Process name. جزئیات دقیق Matching بین <code>pkill</code> و <code>killall</code> مهم‌تر از این سطح برای LPIC-1 نیست.</div></div>
 
 <h3>۱۷. Job Control</h3>
-<p>Job بیشتر مفهومی مربوط به <strong>Shell</strong> است. فرض کنید اجرا کنیم:</p>
+<p>تا اینجا درباره‌ی <strong>Process</strong> صحبت کردیم. حالا یک مفهوم دیگر: <strong>Job</strong>. Job بیشتر مفهومی مربوط به <strong>Shell</strong> است. فرض کنید اجرا کنیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sleep 300</div></div>
-<p>این دستور در Foreground اجرا می‌شود (Terminal درگیر آن Process است).</p>
+<p>این دستور در Foreground اجرا می‌شود؛ یعنی Terminal درگیر آن Process است.</p>
 
 <h3>۱۸. <code>Ctrl + Z</code></h3>
-<p>اگر هنگام اجرای آن <code>Ctrl + Z</code> بزنید، Shell معمولاً Process را Suspend می‌کند و آن را به عنوان یک Job متوقف‌شده نگه می‌دارد.</p>
+<p>اگر هنگام اجرای آن <code>Ctrl + Z</code> بزنیم، Shell معمولاً Process را Suspend می‌کند و آن را به عنوان یک Job متوقف‌شده نگه می‌دارد.</p>
 
 <h3>۱۹. <code>jobs</code></h3>
 <p>برای مشاهده‌ی Jobهای Shell:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">jobs</div></div>
-<p>مثال خروجی: <code>[1]+  Stopped    sleep 300</code>. <code>[1]</code> شماره‌ی Job است که با PID یکی نیست.</p>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> PID → شناسه Process در سیستم‌عامل، Job ID → شناسه Job در Shell.</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">خروجی</span><div class="code-block no-prompt">[1]+  Stopped    sleep 300</div></div>
+<p>اینجا <code>[1]</code> شماره‌ی Job است؛ این با PID یکی نیست.</p>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام امتحانی ⚠️</strong> PID → شناسه Process در سیستم‌عامل؛ Job ID → شناسه Job در Shell.</div></div>
 
 <h3>۲۰. <code>bg</code></h3>
-<p>اگر Job متوقف‌شده‌ای داشته باشیم، آن را در <strong>Background</strong> ادامه می‌دهد:</p>
+<p>اگر Job متوقف‌شده‌ای داشته باشیم:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">bg %1</div></div>
+<p>آن Job را در <strong>Background</strong> ادامه می‌دهد. مثلاً <code>sleep 300</code> را با <code>Ctrl+Z</code> متوقف کرده‌ایم؛ بعد <code>bg %1</code> باعث می‌شود در پس‌زمینه ادامه پیدا کند.</p>
 
 <h3>۲۱. <code>fg</code></h3>
 <p>برای برگرداندن Job به Foreground:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">fg %1</div></div>
-
 <div class="code-container"><span class="code-label">مدل ذهنی Job Control</span><div class="code-block no-prompt">Foreground\n    │\n    │ Ctrl + Z\n    ↓\nStopped\n    │\n    │ bg\n    ↓\nBackground\n    │\n    │ fg\n    ↓\nForeground</div></div>
 
 <h3>۲۲. Process و Job چه تفاوتی دارند؟</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>Process</th><th>Job</th></tr></thead>
 <tbody>
@@ -2348,26 +2499,68 @@
 <tr><td>مستقل از Terminal می‌تواند وجود داشته باشد</td><td>به Job Control همان Shell مربوط است</td></tr>
 </tbody>
 </table>
-<p>یک Job می‌تواند شامل یک یا چند Process باشد.</p>
+</div>
+<div class="box note"><i class="fas fa-circle-info"></i><div><strong>نکته مهم</strong> یک Job می‌تواند شامل یک یا چند Process باشد. پس Job و Process را یکی ندانید.</div></div>
 
 <h3>۲۳. Foreground و Background</h3>
 <ul>
-<li><strong>Foreground:</strong> برنامه در ارتباط مستقیم با Shell/Terminal است: <code>command</code></li>
-<li><strong>Background:</strong> برنامه در پس‌زمینه اجرا می‌شود: <code>command &</code> (مثلاً <code>sleep 300 &</code>)</li>
+<li><strong>Foreground:</strong> برنامه در ارتباط مستقیم با Shell/Terminal است: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">command</div></div></li>
+<li><strong>Background:</strong> برنامه در پس‌زمینه اجرا می‌شود؛ معمولاً با: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">command &</div></div> مثلاً: <div class="code-container"><span class="code-label">دستور</span><div class="code-block">sleep 300 &</div></div> در این حالت Shell می‌تواند دوباره Command دریافت کند.</li>
 </ul>
 
 <h3>۲۴. <code>nohup</code></h3>
-<p>برای اجرای Command به شکلی که از Hangup ناشی از خروج Session مستقل‌تر باشد:</p>
+<p>فرض کنید با SSH به یک Server متصل شده‌اید:</p>
+<div class="code-container"><span class="code-label">اتصال</span><div class="code-block no-prompt">Your PC\n   │\n   │ SSH\n   ↓\nServer</div></div>
+<p>یک برنامه‌ی طولانی اجرا می‌کنید:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">long-command</div></div>
+<p>اگر Session قطع شود، ممکن است Process نیز به دلیل دریافت SIGHUP خاتمه پیدا کند. برای اجرای Command به شکلی که از Hangup ناشی از خروج Session مستقل‌تر باشد، می‌توان از این استفاده کرد:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">nohup command &</div></div>
+<p>مثلاً:</p>
 <div class="code-container"><span class="code-label">دستور</span><div class="code-block">nohup ./backup.sh &</div></div>
-<p>به‌طور پیش‌فرض خروجی معمولی <code>nohup</code> معمولاً به فایلی مانند <code>nohup.out</code> هدایت می‌شود.</p>
+<p>به‌طور پیش‌فرض خروجی معمولی <code>nohup</code> معمولاً به فایلی مانند <code>nohup.out</code> هدایت می‌شود، اگر جای دیگری Redirect نشده باشد.</p>
 <div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> هدف اصلی <code>nohup</code>: جلوگیری از تأثیر Hangup شدن Session بر اجرای Command.</div></div>
 
 <h3>۲۵. <code>tmux</code></h3>
-<p><code>tmux</code> یک <strong>Terminal Multiplexer</strong> است که می‌توانید داخل یک Session ترمینال، چند Window و Pane داشته باشید و Session را حفظ کنید.</p>
-<p>اگر ارتباط SSH قطع شود، Session <code>tmux</code> می‌تواند روی Server باقی بماند. بعداً دوباره وصل می‌شوید: <code>tmux attach</code> و به همان Session برمی‌گردید.</p>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> <code>nohup</code> → اجرای Command را از Hangup مستقل‌تر می‌کند؛ <code>tmux</code> → یک Session ترمینال پایدار ایجاد می‌کند.</div></div>
+<p>حالا ابزار حرفه‌ای‌تر و بسیار مهمی داریم:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tmux</div></div>
+<p><code>tmux</code> یک <strong>Terminal Multiplexer</strong> است؛ یعنی می‌توانید داخل یک Session ترمینال، چند Window و Pane داشته باشید و Session را حفظ کنید.</p>
+<p><strong>چرا برای SSH مفید است؟</strong></p>
+<div class="code-container"><span class="code-label">جریان</span><div class="code-block no-prompt">SSH\n ↓\nServer\n ↓\ntmux session\n ↓\nlong-running command</div></div>
+<p>اگر ارتباط SSH قطع شود، Session <code>tmux</code> می‌تواند روی Server باقی بماند. بعداً دوباره وصل می‌شوید:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">tmux attach</div></div>
+<p>و به همان Session برمی‌گردید. <code>tmux</code> به‌خصوص برای کار تعاملی بسیار مناسب است.</p>
+<div class="code-container"><span class="code-label">تفاوت مهم با nohup</span><div class="code-block no-prompt">nohup\n→ اجرای Command را از Hangup مستقل‌تر می‌کند\n\ntmux\n→ یک Session ترمینال پایدار ایجاد می‌کند</div></div>
+
+<h3>۲۶. <code>nohup</code> یا <code>tmux</code>؟</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ویژگی</th><th><code>nohup</code></th><th><code>tmux</code></th></tr></thead>
+<tbody>
+<tr><td>اجرای Command بعد از قطع Session</td><td>✅</td><td>✅</td></tr>
+<tr><td>محیط تعاملی</td><td>محدود</td><td>✅</td></tr>
+<tr><td>حفظ Session ترمینال</td><td>❌</td><td>✅</td></tr>
+<tr><td>چند Window/Pane</td><td>❌</td><td>✅</td></tr>
+<tr><td>مناسب کار طولانی روی SSH</td><td>✅</td><td>⭐ بسیار مناسب</td></tr>
+</tbody>
+</table>
+</div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته امتحانی ⭐</strong> اگر سؤال درباره‌ی <strong>ادامه‌ی یک Command بدون وابستگی به Hangup</strong> باشد → <code>nohup</code>. اگر درباره‌ی <strong>حفظ یک Session ترمینال و اتصال مجدد به آن</strong> باشد → <code>tmux</code>.</div></div>
+
+<h3>۲۷. یک سناریوی واقعی</h3>
+<p>فرض کنید روی یک Server از طریق SSH کار می‌کنید:</p>
+<ol>
+<li><strong>ایجاد Session:</strong> <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tmux</div></div></li>
+<li><strong>اجرای برنامه:</strong> <div class="code-container"><span class="code-label">دستور</span><div class="code-block">./backup.sh</div></div></li>
+<li><strong>بررسی Processها</strong> (در یک Pane یا Window دیگر): <div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps aux</div></div></li>
+<li><strong>بررسی مصرف منابع:</strong> <div class="code-container"><span class="code-label">دستور</span><div class="code-block">top</div></div></li>
+<li><strong>پیدا کردن PID:</strong> مثلاً <code>backup.sh → PID = 2451</code></li>
+<li><strong>درخواست پایان:</strong> <div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill 2451</div></div></li>
+<li><strong>اگر پاسخ نداد:</strong> <div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill -9 2451</div></div></li>
+<li><strong>اگر اتصال SSH قطع شد:</strong> بعداً دوباره وصل می‌شوید و <div class="code-container"><span class="code-label">دستور</span><div class="code-block">tmux attach</div></div> به Session برمی‌گردید.</li>
+</ol>
 
 <h2>جدول طلایی دستورات</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>دستور</th><th>کاربرد</th></tr></thead>
 <tbody>
@@ -2392,35 +2585,40 @@
 <tr><td><code>tmux</code></td><td>حفظ Session ترمینال</td></tr>
 </tbody>
 </table>
+</div>
 
 <h2>مقایسه‌های طلایی LPIC-1</h2>
 <h3><code>apt</code> vs <code>dpkg</code></h3>
-<p><code>apt</code> → سطح بالاتر، Repository، Dependency Management؛ <code>dpkg</code> → سطح پایین‌تر، کار مستقیم با <code>.deb</code>.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">apt\n→ سطح بالاتر\n→ Repository\n→ Dependency Management\n\ndpkg\n→ سطح پایین‌تر\n→ کار مستقیم با .deb</div></div>
 <h3><code>dnf</code> vs <code>rpm</code></h3>
-<p><code>dnf</code> → سطح بالاتر، Repository، Dependency Management؛ <code>rpm</code> → سطح پایین‌تر، کار مستقیم با <code>.rpm</code>.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">dnf\n→ سطح بالاتر\n→ Repository\n→ Dependency Management\n\nrpm\n→ سطح پایین‌تر\n→ کار مستقیم با .rpm</div></div>
 <h3><code>ps</code> vs <code>top</code></h3>
-<p><code>ps</code> → Snapshot؛ <code>top</code> → Dynamic / Live.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">ps\n→ Snapshot\n\ntop\n→ Dynamic / Live</div></div>
 <h3><code>kill</code> vs <code>pkill</code> vs <code>killall</code></h3>
-<p><code>kill</code> → PID؛ <code>pkill</code> → Pattern / Process attributes؛ <code>killall</code> → Process name.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">kill\n→ PID\n\npkill\n→ Pattern / Process attributes\n\nkillall\n→ Process name</div></div>
 <h3>Process vs Job</h3>
-<p>Process → Kernel، PID؛ Job → Shell، Job ID.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">Process\n→ Kernel\n→ PID\n\nJob\n→ Shell\n→ Job ID</div></div>
 <h3><code>nohup</code> vs <code>tmux</code></h3>
-<p><code>nohup</code> → جلوگیری از تأثیر Hangup بر Command؛ <code>tmux</code> → حفظ Session ترمینال.</p>
+<div class="code-container"><span class="code-label">مقایسه</span><div class="code-block no-prompt">nohup\n→ جلوگیری از تأثیر Hangup بر Command\n\ntmux\n→ حفظ Session ترمینال</div></div>
 
 <h2>دام‌های امتحانی ⚠️</h2>
-<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><ul>
-<li><strong>دام ۱:</strong> <code>kill</code> همیشه Process را فوراً می‌کشد؟ ❌ خیر؛ <code>kill</code> یک Signal ارسال می‌کند.</li>
-<li><strong>دام ۲:</strong> <code>kill -9</code> یعنی Signal شماره ۹ را به صورت عادی قابل کنترل ارسال کن؟ ❌ خیر؛ <code>SIGKILL</code> قابل Catch یا Ignore نیست.</li>
-<li><strong>دام ۳:</strong> <code>ps</code> نمایش زنده است؟ ❌ خیر؛ <code>ps</code> یک Snapshot می‌دهد.</li>
-<li><strong>دام ۴:</strong> Program و Process یکی هستند؟ ❌ خیر؛ Program روی دیسک است؛ Process نمونه‌ی در حال اجرای آن است.</li>
-<li><strong>دام ۵:</strong> Job همان Process است؟ ❌ خیر؛ Job مفهومی در Shell است و می‌تواند شامل یک یا چند Process باشد.</li>
-<li><strong>دام ۶:</strong> <code>dpkg</code> همان <code>apt</code> است؟ ❌ خیر؛ هر دو مربوط به Debian هستند، اما سطح و نقش یکسانی ندارند.</li>
-<li><strong>دام ۷:</strong> <code>rpm</code> و <code>dnf</code> کاملاً یکسان هستند؟ ❌ خیر؛ <code>rpm</code> ابزار سطح پایین‌تر برای Packageهای RPM است؛ <code>dnf</code> مدیریت سطح بالاتر و Dependency/Repository را انجام می‌دهد.</li>
-<li><strong>دام ۸:</strong> <code>tmux</code> فقط برای اجرای Background است؟ ❌ خیر؛ <code>tmux</code> یک Terminal Multiplexer برای حفظ و مدیریت Sessionهای ترمینال است.</li>
-</ul></div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۱</strong> <code>kill</code> همیشه Process را فوراً می‌کشد؟ ❌ خیر؛ <code>kill</code> یک Signal ارسال می‌کند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۲</strong> <code>kill -9</code> یعنی Signal شماره ۹ را به صورت عادی قابل کنترل ارسال کن؟ ❌ خیر؛ <code>SIGKILL</code> قابل Catch یا Ignore نیست.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۳</strong> <code>ps</code> نمایش زنده است؟ ❌ خیر؛ <code>ps</code> یک Snapshot می‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۴</strong> Program و Process یکی هستند؟ ❌ خیر؛ Program روی دیسک است، Process نمونه‌ی در حال اجرای آن است.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۵</strong> Job همان Process است؟ ❌ خیر؛ Job مفهومی در Shell است و می‌تواند شامل یک یا چند Process باشد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۶</strong> <code>dpkg</code> همان <code>apt</code> است؟ ❌ خیر؛ هر دو مربوط به Debian هستند، اما سطح و نقش یکسانی ندارند.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۷</strong> <code>rpm</code> و <code>dnf</code> کاملاً یکسان هستند؟ ❌ خیر؛ <code>rpm</code> ابزار سطح پایین‌تر برای Packageهای RPM است؛ <code>dnf</code> مدیریت سطح بالاتر و Dependency/Repository را انجام می‌دهد.</div></div>
+<div class="box warning"><i class="fas fa-triangle-exclamation"></i><div><strong>دام ۸</strong> <code>tmux</code> فقط برای اجرای Background است؟ ❌ خیر؛ <code>tmux</code> یک Terminal Multiplexer برای حفظ و مدیریت Sessionهای ترمینال است.</div></div>
 
 <h2>🧠 نقشه ذهنی جلسه</h2>
-<div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">Software Management\n│\n├── Repository\n│\n├── Package\n│   ├── .deb\n│   │   ├── apt\n│   │   └── dpkg\n│   │\n│   └── .rpm\n│       ├── dnf\n│       └── rpm\n│\n├── Source Code\n│\n├── Snap\n└── AppImage\n\n\nProcess Management\n│\n├── Program\n│     ↓ Execute\n├── Process\n│     └── PID\n│\n├── ps\n├── top\n│\n├── Signals\n│     ├── kill\n│     ├── pkill\n│     └── killall\n│\n├── Job Control\n│     ├── jobs\n│     ├── bg\n│     └── fg\n│\n├── nohup\n└── tmux</div></div>
+<div class="code-container"><span class="code-label">نقشه</span><div class="code-block no-prompt">Software Management\n│\n├── Repository\n│\n├── Package\n│   ├── .deb\n│   │   ├── apt\n│   │   └── dpkg\n│   │\n│   └── .rpm\n│       ├── dnf\n│       └── rpm\n│\n├── Source Code\n│\n├── Snap\n└── AppImage\n\n\nProcess Management\n│\n├── Program\n│     ↓ Execute\n├── Process\n│     └── PID\n│\n├── ps\n├── top\n│\n├── Signals\n│     ├── kill\n│     ├── pkill\n│     └── killall\n│\n├── Job Control\n│     ├── jobs\n│     ├── bg\n│     └── fg\n│\n├── nohup\n└── tmux</div></div>
+
+<h2>جمع‌بندی مفهومی</h2>
+<p>کل جلسه را می‌توان در این زنجیره دید:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Software\n   ↓\nInstall\n   │\n   ├── Repository / Package\n   ├── Source\n   ├── Snap\n   └── AppImage\n   ↓\nExecute\n   ↓\nProcess\n   ↓\nPID\n   ↓\nObserve\n   ├── ps\n   └── top\n   ↓\nManage\n   ├── kill\n   ├── pkill\n   └── killall</div></div>
+<p>و برای کنترل اجرای برنامه‌ها:</p>
+<div class="code-container"><span class="code-label">زنجیره</span><div class="code-block no-prompt">Shell\n │\n ├── Foreground\n │\n ├── Background\n │\n ├── jobs\n │\n ├── bg\n │\n └── fg\n\nLong-running / Remote Work\n │\n ├── nohup\n └── tmux</div></div>
 
 <h2>⚡ حفظی‌های همان جلسه — مرور ۲ تا ۳ دقیقه‌ای</h2>
 <h3>Software</h3>
@@ -2439,7 +2637,7 @@
 <div class="code-container"><span class="code-label">خلاصه</span><div class="code-block no-prompt">nohup → مقاومت در برابر Hangup\ntmux  → حفظ Session ترمینال</div></div>
 
 <h2>🎯 خودآزمایی جلسه ۳</h2>
-<div class="box note"><i class="fas fa-check-circle"></i><div><strong>بدون نگاه کردن به جزوه جواب دهید:</strong>
+<div class="box note"><i class="fas fa-check-circle"></i><div><strong>قبل از رفتن به جلسه بعد، بدون نگاه کردن به جزوه جواب دهید:</strong>
 <ol>
 <li>Repository چیست؟</li>
 <li>Package چیست؟</li>
@@ -2470,14 +2668,24 @@
 </div></div>
 
 <h2>⭐ سؤال طلایی جلسه</h2>
-<p>فرض کنید <code>./server.sh</code> را اجرا کرده‌اید. برنامه خیلی CPU مصرف می‌کند و می‌خواهید آن را بررسی کنید. اول <code>top</code> یا <code>ps aux</code> را اجرا می‌کنید، بعد PID را پیدا می‌کنید (مثلاً <code>server.sh → PID 2451</code>). سپس <code>kill 2451</code> را اجرا می‌کنید. اگر به Signal عادی پاسخ نداد، <code>kill -9 2451</code> را اجرا می‌کنید.</p>
+<p>فرض کنید <code>./server.sh</code> را اجرا کرده‌اید. برنامه خیلی CPU مصرف می‌کند و می‌خواهید آن را بررسی کنید. اول:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">top</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">ps aux</div></div>
+<p>بعد PID را پیدا می‌کنید؛ مثلاً <code>server.sh → PID 2451</code>. سپس:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill 2451</div></div>
+<p>اگر به Signal عادی پاسخ نداد:</p>
+<div class="code-container"><span class="code-label">دستور</span><div class="code-block">kill -9 2451</div></div>
 <div class="code-container"><span class="code-label">زنجیره طلایی</span><div class="code-block no-prompt">اجرای Program\n      ↓\nProcess\n      ↓\nPID\n      ↓\nObserve\n      ↓\nps / top\n      ↓\nSignal\n      ↓\nkill</div></div>
 <p>این زنجیره یکی از مهم‌ترین مدل‌های ذهنی این جلسه است.</p>
 
 <div class="box important"><i class="fas fa-link"></i><div><strong>🔗 اتصال به جلسه بعد</strong>
-در این جلسه یاد گرفتیم نرم‌افزار چگونه نصب می‌شود و Processها چگونه مدیریت می‌شوند. اما هنوز یک سؤال مهم باقی مانده: لینوکس دقیقاً با سخت‌افزار، Disk، Partition و Filesystem چگونه کار می‌کند؟ در جلسه بعد وارد این بخش می‌شویم: <code>Hardware → Disk → Partition → Filesystem → Mount → Storage Management</code> که پایه‌ی بخش مهمی از مدیریت سیستم در لینوکس و LPIC-1 است.
+در این جلسه یاد گرفتیم نرم‌افزار چگونه نصب می‌شود و Processها چگونه مدیریت می‌شوند. اما هنوز یک سؤال مهم باقی مانده: لینوکس دقیقاً با سخت‌افزار، Disk، Partition و Filesystem چگونه کار می‌کند؟ در جلسه بعد وارد این بخش می‌شویم:
+<div class="code-container"><span class="code-label">مسیر جلسه بعد</span><div class="code-block no-prompt">Hardware\n   ↓\nDisk\n   ↓\nPartition\n   ↓\nFilesystem\n   ↓\nMount\n   ↓\nStorage Management</div></div>
+که پایه‌ی بخش مهمی از مدیریت سیستم در لینوکس و LPIC-1 است.
 </div></div>
-` ,
+`
+,
 "s4": `
 <div class="section-header">
     <div class="section-badge">۴</div>
