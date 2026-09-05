@@ -301,6 +301,12 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
+        .sub-item.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+
         .sub-icon {
             width: 32px;
             height: 32px;
@@ -505,6 +511,14 @@
                             </div>
                             <div class="sub-arrow">←</div>
                         </a>
+                        <a href="finall-quiz-network.html" class="sub-item">
+                            <div class="sub-icon">🏆</div>
+                            <div class="sub-content">
+                                <div class="sub-title">آزمون نهایی Network+</div>
+                                <div class="sub-desc">سنجش نهایی دانش شما</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -552,21 +566,55 @@
                             </div>
                             <div class="sub-arrow">←</div>
                         </a>
+                        <a href="finall-quiz-lpic1.html" class="sub-item">
+                            <div class="sub-icon">🏆</div>
+                            <div class="sub-content">
+                                <div class="sub-title">آزمون نهایی Lpic1</div>
+                                <div class="sub-desc">سنجش نهایی دانش شما</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- 3 – Python -->
-            <a href="python.html" class="card locked">
-                <div class="card-top">
-                    <div style="display:flex;align-items:center;gap:12px">
+            <div class="chapter active" id="python">
+                <div class="chapter-header" onclick="toggleChapter('python')">
+                    <div class="chapter-left">
                         <div class="num">۳</div>
                         <span class="title">Python</span>
                     </div>
-                    <span class="badge badge-off">به زودی</span>
+                    <div class="header-right">
+                        <span class="badge badge-on">در حال تکمیل</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="desc">برنامه‌نویسی پایتون با رویکرد توسعه ابزارهای امنیت.</div>
-            </a>
+                <div class="desc">برنامه‌نویسی پایتون با رویکرد توسعه ابزارهای امنیت</div>
+
+                <div class="sub-list">
+                    <div class="sub-list-inner">
+                        <a href="python.html" class="sub-item primary">
+                            <div class="sub-icon">📖</div>
+                            <div class="sub-content">
+                                <div class="sub-title">درسنامه</div>
+                                <div class="sub-desc">آموزش گام به گام پایتون</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <div class="sub-item disabled">
+                            <div class="sub-icon">✏️</div>
+                            <div class="sub-content">
+                                <div class="sub-title">تمرین‌ها</div>
+                                <div class="sub-desc">به زودی</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 4 – MCSA -->
             <a href="mcsa.html" class="card locked">

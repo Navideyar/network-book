@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون تستی | ZeroDay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #eef1f3;
+    --card: #ffffff;
+    --border: #e7ebee;
+    --text: #1c2733;
+    --muted: #93a0ab;
+    --accent: #2ea3d6;
+    --accent-soft: #eaf6fb;
+    --correct: #14b892;
+    --correct-soft: #e6f9f4;
+    --wrong: #ef5b6a;
+    --wrong-soft: #fdecee;
+    --skeleton-a: #eceff2;
+    --skeleton-b: #e2e7eb;
+    --sans: 'Vazirmatn', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    color:var(--text);
+    background:var(--bg);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    padding:56px 20px;
+  }
+
+  .blob{position:fixed;border-radius:50%;filter:blur(60px);z-index:0;pointer-events:none;}
+  .blob.b1{width:420px;height:420px;background:#dfe4e8;top:-120px;left:-100px;opacity:.7;}
+  .blob.b2{width:520px;height:520px;background:#e3ecef;bottom:-200px;right:-160px;opacity:.6;}
+  .blob.b3{width:260px;height:260px;background:#eef6f2;top:40%;right:10%;opacity:.5;}
+
+  .wrap{
+    position:relative;z-index:1;
+    max-width:920px;margin:0 auto;
+    display:grid;
+    grid-template-columns:1.7fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    .wrap{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    box-shadow:0 12px 34px rgba(28,39,51,0.05);
+    padding:28px 26px;
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    grid-column:1 / -1;
+    display:flex;align-items:center;gap:16px;
+    padding:16px 22px;
+  }
+  .switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .slider{
+    position:absolute;inset:0;background:#d7dde2;border-radius:999px;cursor:pointer;transition:.2s ease;
+  }
+  .switch .slider::before{
+    content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s ease;box-shadow:0 1px 3px rgba(0,0,0,.18);
+  }
+  .switch input:checked + .slider{background:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(20px);}
+  .toolbar-text{display:flex;flex-direction:column;gap:2px;}
+  .toolbar-text strong{font-size:14px;}
+  .toolbar-text span{font-size:12.5px;color:var(--muted);}
+
+  /* ---------- question card ---------- */
+  .q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .q-head h1{font-size:16px;font-weight:700;margin:0;}
+
+  .options{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:14px;}
+  .opt{display:flex;align-items:center;gap:12px;}
+  .opt .idx{font-size:12.5px;color:var(--muted);flex-shrink:0;width:22px;text-align:center;}
+  .opt .radio{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid #c7ced4;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .opt .radio svg{width:11px;height:11px;opacity:0;transition:opacity .15s ease;}
+
+  .opt .pill{
+    position:relative;flex:1;height:48px;border-radius:999px;overflow:hidden;
+    background:repeating-linear-gradient(
+      -45deg,
+      var(--skeleton-a) 0px, var(--skeleton-a) 8px,
+      var(--skeleton-b) 8px, var(--skeleton-b) 16px
+    );
+    display:flex;align-items:center;padding:0 22px;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .opt .pill span{
+    font-size:14.5px;font-weight:500;opacity:0;transform:translateY(4px);
+    transition:opacity .2s ease .05s, transform .2s ease .05s;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  /* hover: only plain reveal, no verdict color, and only while not yet revealed */
+  .opt:not(.revealed):hover .pill{background:#f3f6f8;}
+  .opt:not(.revealed):hover .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+  .opt:not(.revealed):hover .radio{border-color:var(--accent);}
+
+  /* revealed: locked-in state after selection or answer-key mode */
+  .opt.revealed .pill{background:#f6f8f9;cursor:default;}
+  .opt.revealed .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+
+  .opt.revealed.correct-mark .pill{background:var(--correct-soft);}
+  .opt.revealed.correct-mark .pill span{color:#0d7a61;font-weight:600;}
+  .opt.revealed.correct-mark .radio{background:var(--correct);border-color:var(--correct);}
+  .opt.revealed.correct-mark .radio svg{opacity:1;}
+
+  .opt.revealed.wrong-mark .pill{background:var(--wrong-soft);}
+  .opt.revealed.wrong-mark .pill span{color:#c33646;font-weight:600;}
+  .opt.revealed.wrong-mark .radio{background:var(--wrong);border-color:var(--wrong);}
+  .opt.revealed.wrong-mark .radio svg{opacity:1;}
+
+  .hint{font-size:12px;color:var(--muted);margin:0 0 18px;}
+
+  .explain-box{
+    display:none;
+    background:var(--accent-soft);
+    border:1px solid #cfe9f4;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:20px;
+  }
+  .explain-box.show{display:block;}
+  .explain-box .et{font-size:13px;font-weight:700;color:var(--accent);margin:0 0 6px;}
+  .explain-box p{font-size:13.5px;line-height:2;color:var(--text);margin:0;}
+
+  .q-footer{display:flex;flex-direction:column;gap:12px;}
+  .q-footer-row{display:flex;justify-content:space-between;align-items:center;}
+  .next-btn{
+    display:flex;align-items:center;gap:6px;background:#0f1b2a;color:#fff;border:none;
+    border-radius:12px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;
+    cursor:pointer;transition:opacity .15s ease;
+  }
+  .next-btn:hover{opacity:.88;}
+  .next-btn svg{width:15px;height:15px;}
+  .q-count{font-size:13px;color:var(--muted);}
+  .progress-track{height:6px;background:var(--skeleton-a);border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);width:0%;transition:width .3s ease;border-radius:6px;}
+
+  /* ---------- timer card ---------- */
+  .timer-card h2{font-size:15px;font-weight:700;margin:0 0 20px;}
+  .timer-grid{display:flex;justify-content:space-between;gap:8px;margin-bottom:16px;}
+  .timer-box{flex:1;background:#f5f8fa;border:1px solid var(--border);border-radius:12px;padding:12px 4px;text-align:center;}
+  .timer-box .val{font-size:19px;font-weight:800;color:var(--text);display:block;margin-bottom:4px;}
+  .timer-box .lbl{font-size:11px;color:var(--muted);}
+  .timer-note{font-size:12px;color:var(--muted);line-height:1.9;border-top:1px dashed var(--border);padding-top:14px;}
+
+  /* ---------- mobile responsive (kept last so it wins the cascade) ---------- */
+  @media (max-width:600px){
+    body{padding:28px 10px;}
+    .blob.b1{width:220px;height:220px;top:-80px;left:-80px;}
+    .blob.b2{width:260px;height:260px;bottom:-120px;right:-100px;}
+    .blob.b3{display:none;}
+
+    .wrap{gap:12px;}
+    .card{border-radius:16px;padding:16px 14px;}
+
+    .toolbar{padding:12px 14px;gap:10px;}
+    .switch{width:40px;height:23px;}
+    .switch .slider::before{width:17px;height:17px;left:3px;top:3px;}
+    .switch input:checked + .slider::before{transform:translateX(17px);}
+    .toolbar-text strong{font-size:12.5px;}
+    .toolbar-text span{font-size:11px;line-height:1.6;}
+
+    .q-head{margin-bottom:16px;}
+    .q-head h1{font-size:14px;}
+    #qText{font-size:13.5px !important;line-height:1.8 !important;margin:-2px 0 16px !important;}
+
+    .options{gap:9px;margin-bottom:6px;}
+    .opt{gap:7px;align-items:flex-start;}
+    .opt .idx{width:14px;font-size:11.5px;margin-top:12px;}
+    .opt .radio{width:19px;height:19px;margin-top:10px;}
+    .opt .radio svg{width:9px;height:9px;}
+
+    .opt .pill{
+      height:auto !important;
+      min-height:42px;
+      padding:11px 14px !important;
+      background-size:200% 200%;
+    }
+    .opt .pill span{
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      font-size:13px;
+      line-height:1.55;
+      display:block;
+    }
+
+    .hint{font-size:11px;margin:0 0 14px;}
+    .explain-box{padding:12px 13px;margin-bottom:16px;}
+    .explain-box .et{font-size:12px;}
+    .explain-box p{font-size:12.5px;line-height:1.8;}
+
+    .q-footer{gap:10px;}
+    .q-footer-row{flex-wrap:wrap;gap:8px;}
+    .next-btn{padding:9px 15px;font-size:13px;}
+    .next-btn svg{width:13px;height:13px;}
+    .q-count{font-size:12px;}
+
+    .timer-card h2{font-size:13.5px;margin:0 0 14px;}
+    .timer-grid{gap:6px;margin-bottom:12px;}
+    .timer-box{padding:9px 2px;border-radius:10px;}
+    .timer-box .val{font-size:15px;margin-bottom:2px;}
+    .timer-box .lbl{font-size:9.5px;}
+    .timer-note{font-size:11px;line-height:1.8;padding-top:12px;}
+  }
+
+  @media (max-width:360px){
+    body{padding:20px 8px;}
+    .card{padding:14px 11px;}
+    .timer-grid{flex-wrap:wrap;}
+    .timer-box{flex:1 1 40%;}
+    .opt .pill span{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="wrap">
+
+  <div class="card toolbar">
+    <label class="switch">
+      <input type="checkbox" id="answerKeyToggle">
+      <span class="slider"></span>
+    </label>
+    <div class="toolbar-text">
+      <strong>حالت پاسخنامه</strong>
+      <span>با فعال کردن این گزینه، کدر بودن گزینه‌ها برای همه‌ی سوالات برطرف می‌شود و پاسخ صحیح به‌همراه توضیح تشریحی نمایش داده می‌شود</span>
+    </div>
+  </div>
+
+  <!-- question card -->
+  <div class="card">
+    <div class="q-head">
+      <h1 id="qLabel">سوال 1</h1>
+    </div>
+
+    <p style="font-size:15px;font-weight:600;line-height:1.9;margin:-8px 0 20px;color:var(--text);" id="qText"></p>
+
+    <ul class="options" id="optList"></ul>
+    <p class="hint" id="hintText">برای مشاهده‌ی پاسخ، روی یکی از گزینه‌ها کلیک کنید</p>
+
+    <div class="explain-box" id="explainBox">
+      <p class="et">توضیح تشریحی</p>
+      <p id="explainText"></p>
+    </div>
+
+    <div class="q-footer">
+      <div class="q-footer-row">
+        <button class="next-btn" id="nextBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          سوال بعد
+        </button>
+        <span class="q-count" id="qCount">سوال 1 از 50</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <!-- timer card -->
+  <div class="card timer-card">
+    <h2>زمان باقی مانده</h2>
+    <div class="timer-grid">
+      <div class="timer-box"><span class="val" id="tRoz">۰۰</span><span class="lbl">روز</span></div>
+      <div class="timer-box"><span class="val" id="tSaat">۰۰</span><span class="lbl">ساعت</span></div>
+      <div class="timer-box"><span class="val" id="tDaghigheh">۰۴</span><span class="lbl">دقیقه</span></div>
+      <div class="timer-box"><span class="val" id="tSaniyeh">۰۴</span><span class="lbl">ثانیه</span></div>
+    </div>
+    <p class="timer-note">*در صورت پایان زمان، جواب‌های شما نادرست محاسبه می‌شود</p>
+  </div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// ۵۰ سوال جدید بر اساس فایل متنی ارسال شده
+// ---------------------------------------------------------------
+const questions = [
+  {
+    q: "توزیع محبوب استاد عابدینی در دوره‌های آموزشی، کدام توزیع لینوکس است؟",
+    options: ["اوبونتو (Ubuntu)", "دبیان (Debian)", "فدورا (Fedora)", "لینوکس مینت (Linux Mint)"],
+    answer: 3,
+    explanation: "استاد عابدینی در دوره‌های آموزشی و ویدیوهای فصل ۶، معمولاً از لینوکس مینت به عنوان توزیع اصلی خود برای آموزش استفاده می‌کنند. استاد عابدینی اعتقاد دارند که \"لینوکس ساده‌اس به شرطی که مثل لینوکس یادش بگیری\" و لینوکس مینت بهترین بستر برای این یادگیری اصولی و گام‌به‌گام است."
+  },
+  {
+    q: "در یک سیستم لینوکسی، مدیر سیستم متوجه می‌شود که کامپیوتر می‌تواند با سیستم‌های موجود در شبکه محلی ارتباط برقرار کند، اما نمی‌تواند به هیچ‌یک از شبکه‌های خارج از شبکه محلی دسترسی داشته باشد. تنظیمات کارت شبکه و آدرس IP نیز صحیح هستند. کدام مورد محتمل‌ترین علت این مشکل است؟",
+    options: ["آدرس MAC کارت شبکه به‌درستی تنظیم نشده است.", "مسیر پیش‌فرض Default Route در جدول مسیریابی سیستم وجود ندارد.", "نام رابط شبکه در سیستم به‌صورت صحیح نمایش داده نمی‌شود.", "فایل /etc/hosts فاقد نام سیستم‌های موجود در شبکه محلی است."],
+    answer: 1,
+    explanation: "ارتباط با شبکه محلی نشان‌دهندهٔ صحت تنظیمات IP و لایه‌های پایین‌تر است. عدم دسترسی به شبکه‌های خارجی معمولاً به‌دلیل نبود مسیر پیش‌فرض (Default Gateway) در جدول مسیریابی است که باعث می‌شود سیستم نداند بسته‌های مربوط به شبکه‌های خارجی را به کدام روتر ارسال کند."
+  },
+  {
+    q: "فایل known_hosts در سمت Client SSH معمولاً چه هدفی دارد؟",
+    options: ["تعیین مجوزهای فایل‌های Home", "نگهداری رمز عبور کاربران", "نگهداری کلیدهای میزبان‌های شناخته‌شده برای بررسی هویت آن‌ها", "فهرست Processهای SSH"],
+    answer: 2,
+    explanation: "فایل `known_hosts` در کلاینت SSH، کلید عمومی میزبان‌هایی را که کاربر قبلاً به آن‌ها متصل شده، ذخیره می‌کند. در اتصالات بعدی، SSH از این فایل برای تأیید هویت سرور و جلوگیری از حملات Man-in-the-Middle استفاده می‌کند."
+  },
+  {
+    q: "در یک سیستم Linux با GRUB2، تنظیمات عمومی Boot معمولاً در کدام فایل قرار دارد؟",
+    options: ["/etc/default/grub", "/boot/grub/menu.lst", "/etc/boot/grub.conf", "/var/grub/settings"],
+    answer: 0,
+    explanation: "فایل `/etc/default/grub` محل اصلی تنظیمات عمومی GRUB2 است. کاربران با ویرایش این فایل، پارامترهای بوت را تنظیم می‌کنند و سپس با دستور `grub-mkconfig` فایل نهایی `/boot/grub/grub.cfg` تولید می‌شود."
+  },
+  {
+    q: "اگر بخواهیم سیستم موقتاً در حالت متنی و بدون محیط گرافیکی بوت شود، کدام پارامتر Kernel مناسب‌تر است؟",
+    options: ["systemd.unit=multi-user.target", "linux.textmode=on", "init=terminal.target", "xorg.disable=true"],
+    answer: 0,
+    explanation: "در سیستم‌های دارای systemd، هدف `multi-user.target` معادل حالت Runlevel ۳ است که سرویس‌های شبکه و چندکاربره را فعال می‌کند اما محیط گرافیکی (X11) را راه‌اندازی نمی‌کند. این پارامتر در خط فرمان کرنل در زمان بوت قابل اضافه کردن است."
+  },
+  {
+    q: "وظیفه اصلی Initramfs در مراحل اولیه Boot چیست؟",
+    options: ["فراهم‌کردن ابزارها و ماژول‌های لازم برای دسترسی اولیه به Root Filesystem", "نگهداری فایل‌های شخصی کاربران", "ذخیره تنظیمات Firewall", "مدیریت حساب‌های کاربری"],
+    answer: 0,
+    explanation: "Initramfs یک فایل‌سیستم موقت در حافظه است که قبل از mount شدن ریشهٔ اصلی بارگذاری می‌شود. این فایل‌سیستم شامل ماژول‌های درایور (مانند درایور دیسک‌های SCSI، RAID و LVM) و ابزارهای لازم برای شناسایی و mount کردن ریشهٔ اصلی است."
+  },
+  {
+    q: "ترتیب صحیح آماده‌سازی و فعال‌کردن یک پارتیشن Swap کدام است؟",
+    options: ["swapon /dev/sdb2 ; mkswap /dev/sdb2", "mkswap /dev/sdb2 ; swapon /dev/sdb2", "mkfs.swap /dev/sdb2 ; mount /dev/sdb2", "swapcreate /dev/sdb2 ; swapmount /dev/sdb2"],
+    answer: 1,
+    explanation: "ابتدا باید با دستور `mkswap` پارتیشن را برای استفاده به‌عنوان Swap آماده کرد (نوشتن امضای Swap روی آن) و سپس با دستور `swapon` آن را فعال نمود. ترتیب برعکس باعث خطا می‌شود زیرا پارتیشن هنوز به‌عنوان Swap شناسایی نشده است."
+  },
+  {
+    q: "هدف اصلی استفاده از کوتیشن دوتایی در عبارت `echo \"$file_name\"` چیست؟",
+    options: ["جلوگیری از تقسیم مقدار متغیر بر اساس فاصله‌ها و برخی Expansionهای ناخواسته", "حذف مقدار متغیر", "تبدیل مقدار به عدد", "اجرای متغیر به‌عنوان یک دستور"],
+    answer: 0,
+    explanation: "کوتیشن دوتایی (Double Quotes) در Bash باعث می‌شود مقدار متغیر به‌عنوان یک رشتهٔ واحد در نظر گرفته شود و از Word Splitting (تقسیم بر اساس فاصله، تب و خط جدید) جلوگیری می‌کند. همچنین از expansionهای ناخواسته مانند globbing (*) جلوگیری می‌کند."
+  },
+  {
+    q: "برای تولید یک جفت کلید SSH جدید، کدام دستور مناسب است؟",
+    options: ["keygen-ssh-server", "ssh-keypair --new", "ssh-keygen", "ssh --create-password"],
+    answer: 2,
+    explanation: "دستور `ssh-keygen` ابزار استاندارد برای تولید جفت کلیدهای RSA، DSA، ECDSA یا Ed25519 در SSH است. این دستور به‌صورت پیش‌فرض کلیدهای RSA ۳۰۷۲ بیتی را در `~/.ssh/id_rsa` (کلید خصوصی) و `~/.ssh/id_rsa.pub` (کلید عمومی) ذخیره می‌کند."
+  },
+  {
+    q: "برای غیرفعال کردن یک Swap فعال قبل از راه‌اندازی مجدد، کدام دستور صحیح است؟",
+    options: ["umount --swap /dev/sdb2", "swapoff /dev/sdb2", "disable-swap /dev/sdb2", "swapon -d /dev/sdb2"],
+    answer: 1,
+    explanation: "دستور `swapoff` برای غیرفعال کردن یک فضای Swap فعال استفاده می‌شود. این کار قبل از تغییر پارتیشن‌بندی یا حذف یک پارتیشن Swap ضروری است. گزینه `umount` مربوط به فایل‌سیستم‌های معمولی است و برای Swap کاربرد ندارد."
+  },
+  {
+    q: "برای زمان‌بندی یک دستور فقط یک‌بار در زمان مشخص، کدام ابزار مناسب‌تر است؟",
+    options: ["cron", "periodic", "systemctl", "at"],
+    answer: 3,
+    explanation: "دستور `at` برای اجرای یک‌بارهٔ دستورات در زمان مشخص طراحی شده است. برخلاف `cron` که برای اجرای دوره‌ای و تکراری استفاده می‌شود، `at` فقط یک بار اجرا می‌شود و سپس از صف خارج می‌گردد."
+  },
+  {
+    q: "برای مشاهده اطلاعات پردازنده‌های شناسایی‌شده توسط Kernel، کدام فایل مناسب است؟",
+    options: ["/proc/cpuinfo", "/sys/kernel/cpu", "/etc/cpu.conf", "/var/log/cpuinfo"],
+    answer: 0,
+    explanation: "فایل `/proc/cpuinfo` یک فایل مجازی در سیستم‌فایل proc است که اطلاعات دقیق پردازنده‌ها شامل مدل، سرعت، تعداد هسته‌ها، cache و flagهای پشتیبانی‌شده را نمایش می‌دهد. این اطلاعات مستقیماً از کرنل گرفته می‌شود."
+  },
+  {
+    q: "کدام مسیر مجازی بیشتر برای نمایش اطلاعات سخت‌افزار و دستگاه‌های مدیریت‌شده توسط Kernel استفاده می‌شود؟",
+    options: ["/sys", "/boot", "/opt", "/usr/src"],
+    answer: 0,
+    explanation: "سیستم‌فایل `/sys` (sysfs) اطلاعات دقیقی دربارهٔ دستگاه‌ها، درایورها، busها و دیگر اجزای سخت‌افزاری که کرنل مدیریت می‌کند، ارائه می‌دهد. این سیستم‌فایل در کرنل ۲.۶ به‌بعد معرفی شده و مکملی برای `/proc` است."
+  },
+  {
+    q: "برای نمایش نسخه Kernel در حال اجرای سیستم بدون جزئیات اضافی، کدام دستور مناسب‌تر است؟",
+    options: ["uname -r", "kernel --version-only", "lskernel -v", "cat /etc/kernel"],
+    answer: 0,
+    explanation: "دستور `uname -r` فقط نسخهٔ کرنل را نمایش می‌دهد (مانند `5.15.0-91-generic`). گزینه `-a` همهٔ اطلاعات را نشان می‌دهد اما `-r` مختص نسخهٔ کرنل است."
+  },
+  {
+    q: "ترتیب تعریف پارامترها در Crontab چیست؟",
+    options: ["دقیقه، ساعت، روز ماه، ماه، روز هفته، هفته، دستور", "دقیقه، ساعت، ماه، روز ماه، روز هفته، هفته، دستور", "دستور، دقیقه، ساعت، روز ماه، ماه، روز هفته، هفته", "هفته، روز هفته، ماه، روز ماه، ساعت، دقیقه، دستور"],
+    answer: 0,
+    explanation: "فرمت استاندارد crontab شامل ۵ فیلد زمانی است: دقیقه، ساعت، روز ماه، ماه، روز هفته و سپس دستور. فیلد «هفته» وجود ندارد."
+  },
+  {
+    q: "اگر فایل اصلی یک Symbolic Link حذف شود، معمولاً چه اتفاقی برای لینک رخ می‌دهد؟",
+    options: ["به‌صورت خودکار به فایل جدیدی تبدیل می‌شود.", "به یک Broken Link تبدیل می‌شود.", "محتوای فایل اصلی داخل لینک ذخیره می‌ماند.", "Kernel لینک را به Hard Link تبدیل می‌کند."],
+    answer: 1,
+    explanation: "Symbolic link فقط یک اشاره‌گر (مسیر) به فایل اصلی است. وقتی فایل اصلی حذف شود، لینک به مقصدی ناموجود اشاره می‌کند و به «Broken Link» یا «Dangling Link» تبدیل می‌شود. دستوراتی مانند `ls -l` این حالت را با رنگ قرمز یا فلش نشان می‌دهند."
+  },
+  {
+    q: "برای اجرای یک برنامه گرافیکی روی سیستم مقصد و نمایش پنجره آن روی سیستم مبدأ از طریق SSH، کدام گزینه مهم‌تر است؟",
+    options: ["-X", "-P", "-R", "-N"],
+    answer: 0,
+    explanation: "گزینه `-X` در SSH باعث فعال‌شدن X11 Forwarding می‌شود. این امکان به برنامه‌های گرافیکی اجرا شده روی سرور اجازه می‌دهد تا پنجره‌های خود را روی کلاینت نمایش دهند. برای امنیت بیشتر معمولاً از `-Y` (Trusted X11 Forwarding) نیز استفاده می‌شود."
+  },
+  {
+    q: "کدام ویژگی درباره Hard Link صحیح است؟",
+    options: ["به همان Inode فایل اصلی اشاره می‌کند.", "همیشه یک Inode جدید ایجاد می‌کند.", "فقط برای دایرکتوری‌ها قابل استفاده است.", "می‌تواند به فایلی در فایل‌سیستم دیگر اشاره کند."],
+    answer: 0,
+    explanation: "Hard link یک ورودی دایرکتوری اضافی است که به همان inode فایل اصلی اشاره می‌کند. بنابراین همهٔ hard link‌های یک فایل، شمارندهٔ لینک (link count) را افزایش می‌دهند و تا زمانی که حداقل یک لینک وجود داشته باشد، داده‌های فایل در دیسک باقی می‌مانند."
+  },
+  {
+    q: "تفاوت اصلی modprobe با insmod چیست؟",
+    options: ["modprobe می‌تواند وابستگی‌های ماژول را نیز مدیریت کند.", "insmod فقط برای حذف ماژول استفاده می‌شود.", "modprobe فقط در زمان Boot اجرا می‌شود.", "insmod برای مشاهده اطلاعات CPU است."],
+    answer: 0,
+    explanation: "`insmod` یک ماژول خاص را مستقیماً بارگذاری می‌کند اما وابستگی‌های آن را بررسی نمی‌کند. در مقابل، `modprobe` با استفاده از فایل `modules.dep` وابستگی‌های ماژول را شناسایی کرده و همهٔ ماژول‌های مورد نیاز را به ترتیب بارگذاری می‌کند."
+  },
+  {
+    q: "در Crontab، پنج فیلد زمانی قبل از دستور به‌ترتیب چه مواردی هستند؟",
+    options: ["دقیقه، ساعت، روز ماه، ماه، روز هفته", "ساعت، دقیقه، ماه، روز ماه، سال", "ثانیه، دقیقه، ساعت، روز، ماه", "روز هفته، ماه، روز، ساعت، دقیقه"],
+    answer: 0,
+    explanation: "ترتیب استاندارد فیلدهای زمانی در crontab به این صورت است: دقیقه (۰-۵۹)، ساعت (۰-۲۳)، روز ماه (۱-۳۱)، ماه (۱-۱۲)، روز هفته (۰-۷ که ۰ و ۷ هر دو یکشنبه هستند)."
+  },
+  {
+    q: "دستور `export APP_ENV=production` چه اثری دارد؟",
+    options: ["متغیر را پس از Restart دائمی می‌کند.", "متغیر را فقط برای Shell فعلی تعریف می‌کند.", "یک کاربر به نام APP_ENV ایجاد می‌کند.", "متغیر را تعریف کرده و به Processهای فرزند صادر می‌کند."],
+    answer: 3,
+    explanation: "دستور `export` یک متغیر محیطی ایجاد می‌کند و آن را به تمام زیرپروسس‌های شل جاری صادر می‌کند. بدون `export`، متغیر فقط در همان شل قابل دسترس است و زیرپروسس‌ها به آن دسترسی ندارند."
+  },
+  {
+    q: "کدام گزینه درباره Display Manager صحیح است؟",
+    options: ["فقط برای اتصال SSH استفاده می‌شود.", "وظیفه اصلی آن پارتیشن‌بندی دیسک است.", "مسئول ارائه صفحه Login گرافیکی و آغاز نشست کاربر است.", "جایگزین Kernel سیستم است."],
+    answer: 2,
+    explanation: "Display Manager (مانند GDM، LightDM، SDDM) یک سرویس گرافیکی است که صفحهٔ لاگین را نمایش می‌دهد، اطلاعات کاربر را تأیید کرده و پس از احراز هویت، نشست گرافیکی (Desktop Environment) را برای کاربر راه‌اندازی می‌کند."
+  },
+  {
+    q: "کدام ابزار برای کار با جدول پارتیشن‌بندی GPT طراحی شده است؟",
+    options: ["gpart", "gdisk", "mkswap", "mkinitrd"],
+    answer: 1,
+    explanation: "`gdisk` (GPT fdisk) ابزاری تخصصی برای مدیریت جدول پارتیشن‌بندی GPT (GUID Partition Table) است. این ابزار جایگزین `fdisk` برای دیسک‌های بزرگتر از ۲ ترابایت و سیستم‌های دارای UEFI است."
+  },
+  {
+    q: "اگر مسیر اجرای یک برنامه در PATH نباشد، معمولاً چه اتفاقی می‌افتد؟",
+    options: ["Shell برنامه را از اینترنت دریافت می‌کند.", "Shell بدون مسیر کامل نمی‌تواند آن را پیدا کند.", "برنامه به‌صورت خودکار به PATH اضافه می‌شود.", "Kernel آن را به‌عنوان سرویس اجرا می‌کند."],
+    answer: 1,
+    explanation: "Shell برای یافتن فایل‌های اجرایی، متغیر محیطی `PATH` را جستجو می‌کند. اگر برنامه در هیچ‌یک از دایرکتوری‌های موجود در PATH نباشد، Shell خطای «command not found» را نمایش می‌دهد. برای اجرا باید مسیر کامل (مانند `./program` یا `/usr/local/bin/program`) را مشخص کرد."
+  },
+  {
+    q: "پس از تغییر فایل `/etc/default/grub`، برای تولید فایل پیکربندی نهایی GRUB کدام دستور مناسب است؟",
+    options: ["update-kernel grub.cfg", "grub-install --config-only /etc/default/grub", "grub-mkconfig -o /boot/grub/grub.cfg", "bootctl regenerate /etc/default/grub"],
+    answer: 2,
+    explanation: "پس از ویرایش `/etc/default/grub` یا فایل‌های داخل `/etc/grub.d/`، باید با دستور `grub-mkconfig` فایل پیکربندی نهایی `grub.cfg` را تولید کرد. گزینه `-o` مسیر خروجی را مشخص می‌کند."
+  },
+  {
+    q: "برای بررسی علت خطاهای رخ‌داده در مرحله Boot، کدام دستور پیام‌های اولیه راه‌اندازی را نشان می‌دهد؟",
+    options: ["grub-errors", "bootlog --read", "systemctl boot-errors", "dmesg"],
+    answer: 3,
+    explanation: "دستور `dmesg` پیام‌های بافر حلقه‌ای (ring buffer) کرنل را نمایش می‌دهد که شامل پیام‌های اولیهٔ بوت، شناسایی سخت‌افزار، بارگذاری ماژول‌ها و خطاهای احتمالی است. این دستور برای عیب‌یابی مشکلات بوت بسیار مفید است."
+  },
+  {
+    q: "در یک حلقه Bash، کدام ساختار برای پیمایش فایل‌های دارای پسوند `.conf` در مسیر جاری مناسب است؟",
+    options: ["foreach -f \"*.conf\" print", "loop *.conf: echo \"$f\"", "for f in *.conf; do echo \"$f\"; done", "while files *.conf; do show; done"],
+    answer: 2,
+    explanation: "حلقه `for` در Bash با الگوی `*.conf` تمام فایل‌های با پسوند conf در دایرکتوری جاری را شناسایی کرده و به ترتیب به متغیر `f` نسبت می‌دهد. این ساختار استانداردترین روش برای پیمایش فایل‌ها در Bash است."
+  },
+  {
+    q: "متغیر محیطی DISPLAY در محیط X11 چه چیزی را مشخص می‌کند؟",
+    options: ["محل نمایش خروجی گرافیکی", "مسیر فایل‌های Log", "نام کارت شبکه", "نوع فایل‌سیستم Root"],
+    answer: 0,
+    explanation: "متغیر `DISPLAY` در سیستم‌های X11 مشخص می‌کند که خروجی گرافیکی به کدام نمایشگر (Display) ارسال شود. معمولاً مقدار `:0` به معنای اولین نمایشگر محلی است. برای برنامه‌های راه‌دور با SSH، این متغیر به‌طور خودکار تنظیم می‌شود."
+  },
+  {
+    q: "در یک اسکریپت Bash، نماد `$@` معمولاً به چه چیزی اشاره می‌کند؟",
+    options: ["شناسه Process اسکریپت", "تمام آرگومان‌های ارسال‌شده به اسکریپت", "مقدار آخرین خطای سیستم", "نام فایل اسکریپت"],
+    answer: 1,
+    explanation: "`$@` در Bash به تمام آرگومان‌های ارسال‌شده به اسکریپت یا تابع اشاره می‌کند. تفاوت آن با `$*` در این است که `$@` هر آرگومان را به‌صورت جداگانه و با حفظ کوتیشن‌ها نگهداری می‌کند، در حالی که `$*` همه را به‌عنوان یک رشته واحد در نظر می‌گیرد."
+  },
+  {
+    q: "پس از ایجاد یا تغییر پارتیشن‌ها، برای بازخوانی جدول پارتیشن توسط Kernel کدام دستور مناسب است؟",
+    options: ["partprobe", "partition-reload", "fdisk --refresh-kernel", "mount --rescan"],
+    answer: 0,
+    explanation: "دستور `partprobe` (بخشی از بستهٔ `parted`) به کرنل اطلاع می‌دهد که جدول پارتیشن تغییر کرده است و باید بدون نیاز به راه‌اندازی مجدد، پارتیشن‌های جدید را شناسایی کند."
+  },
+  {
+    q: "تفاوت اصلی متغیر معمولی و متغیر Exportشده در Bash چیست؟",
+    options: ["متغیر Exportشده به Processهای فرزند نیز منتقل می‌شود.", "متغیر معمولی فقط برای کاربر root قابل مشاهده است.", "متغیر Exportشده بعد از خاموشی سیستم باقی می‌ماند.", "متغیر معمولی فقط شامل اعداد است."],
+    answer: 0,
+    explanation: "متغیرهای معمولی فقط در همان شل قابل دسترس هستند. اما متغیرهایی که با `export` صادر شده‌اند، در محیط (Environment) شل قرار می‌گیرند و به تمام زیرپروسس‌ها (مانند اسکریپت‌های اجرا شده) منتقل می‌شوند."
+  },
+  {
+    q: "برای مشاهده پارامترهای Kernel منتقل‌شده در زمان Boot، کدام فایل معمولاً بررسی می‌شود؟",
+    options: ["/sys/boot/options", "/proc/bootargs", "/etc/kernel/cmdline.conf", "/proc/cmdline"],
+    answer: 3,
+    explanation: "فایل `/proc/cmdline` شامل خط فرمانی است که در زمان بوت به کرنل передано شده است. این فایل پارامترهایی مانند `root=`, `quiet`, `splash` و پارامترهای سفارشی را نشان می‌دهد."
+  },
+  {
+    q: "خروجی دستور lsmod چه چیزی را نشان می‌دهد؟",
+    options: ["سرویس‌های فعال systemd", "پارتیشن‌های دیسک", "ماژول‌های Kernel بارگذاری‌شده", "کاربران واردشده به سیستم"],
+    answer: 2,
+    explanation: "دستور `lsmod` لیست ماژول‌های کرنل بارگذاری‌شده را به همراه وابستگی‌ها و تعداد استفاده‌کنندگان (Used by) نمایش می‌دهد. این اطلاعات از فایل `/proc/modules` گرفته می‌شود."
+  },
+  {
+    q: "کدام مورد می‌تواند باعث شود برنامه X11 از طریق SSH اجرا نشود؟",
+    options: ["فعال‌بودن Swap", "غیرفعال‌بودن X11 Forwarding یا نبودن مجوز لازم", "زیادبودن فضای /home", "وجود فایل /etc/hosts"],
+    answer: 1,
+    explanation: "برای اجرای برنامه‌های گرافیکی از طریق SSH، باید X11 Forwarding در دو طرف فعال باشد (گزینه `-X` در کلاینت و `X11Forwarding yes` در سرور) و همچنین متغیر `DISPLAY` به‌درستی تنظیم شود. عدم وجود هر یک از این موارد باعث عدم اجرای برنامه می‌شود."
+  },
+  {
+    q: "در یک سیستم systemd، کدام هدف معمولاً محیط گرافیکی کامل را فراهم می‌کند؟",
+    options: ["rescue.target", "multi-user.target", "graphical.target", "emergency.target"],
+    answer: 2,
+    explanation: "`graphical.target` در systemd معادل Runlevel ۵ است و علاوه بر سرویس‌های چندکاربره و شبکه، سرویس Display Manager (مانند GDM یا LightDM) را نیز راه‌اندازی می‌کند تا محیط گرافیکی در دسترس باشد."
+  },
+  {
+    q: "در فایل `/etc/fstab`، مقدار نوع فایل‌سیستم برای یک فضای Swap معمولاً چه چیزی است؟",
+    options: ["swap", "memory", "ramfs", "virtual"],
+    answer: 0,
+    explanation: "در فایل `fstab`، نوع فایل‌سیستم برای پارتیشن‌های Swap باید `swap` باشد. این باعث می‌شود سیستم در زمان بوت با دستور `swapon -a` آن را فعال کند."
+  },
+  {
+    q: "برای بررسی اینکه مسیر `/etc/ssh` وجود دارد و یک دایرکتوری است، کدام شرط مناسب‌تر است؟",
+    options: ["[ -d /etc/ssh ]", "[ -f /etc/ssh ]", "[ -xdir /etc/ssh ]", "[ -path /etc/ssh ]"],
+    answer: 0,
+    explanation: "در Bash، گزینه `-d` در کمانک‌ها (`[ ]`) بررسی می‌کند که آیا مسیر مشخص‌شده یک دایرکتوری موجود است یا خیر. گزینه `-f` برای فایل معمولی و `-x` برای بررسی قابلیت اجرا استفاده می‌شود."
+  },
+  {
+    q: "برای مشاهده صف کارهای زمان‌بندی‌شده با `at` کدام دستور صحیح است؟",
+    options: ["atq", "at -l jobs", "cronq", "jobs --at"],
+    answer: 0,
+    explanation: "دستور `atq` (معادل `at -l`) لیست کارهای در انتظار اجرا در صف `at` را نمایش می‌دهد. هر کار با یک شماره (Job Number) مشخص می‌شود که برای حذف با `atrm` استفاده می‌شود."
+  },
+  {
+    q: "در Bash، کدام روش برای قرار دادن خروجی یک دستور داخل یک متغیر استفاده می‌شود؟",
+    options: ["result=$(command)", "result=>command", "result<<command", "result|command"],
+    answer: 0,
+    explanation: "روش استاندارد برای ذخیرهٔ خروجی یک دستور در متغیر، استفاده از `$(...)` (Command Substitution) است. خروجی استاندارد دستور داخل پرانتز گرفته شده و به متغیر نسبت داده می‌شود."
+  },
+  {
+    q: "برای ایجاد یک Symbolic Link به نام `current.conf` که به `/etc/app/config.conf` اشاره کند، کدام دستور صحیح است؟",
+    options: ["link --hard /etc/app/config.conf current.conf", "ln /etc/app/config.conf -symbolic current.conf", "ln -s /etc/app/config.conf current.conf", ".conf /etc/app/config.conf"],
+    answer: 2,
+    explanation: "دستور `ln -s` با گزینه `-s` یک symbolic link (لینک نرم) ایجاد می‌کند. ترتیب آرگومان‌ها به این صورت است: اول مسیر مقصد (فایل اصلی) و سپس نام لینک جدید."
+  },
+  {
+    q: "کدام دستور در سیستم‌های دارای UFW، پورت TCP شماره ۴۴۳ را برای ترافیک ورودی مجاز می‌کند؟",
+    options: ["firewall allow-port 443", "ufw open --tcp 443", "ufw allow 443/tcp", "iptables enable 443/tcp"],
+    answer: 2,
+    explanation: "در UFW (Uncomplicated Firewall)، دستور `ufw allow 443/tcp` پورت ۴۴۳ را با پروتکل TCP برای ترافیک ورودی باز می‌کند. این دستور معادل افزودن یک قانون به iptables است."
+  },
+  {
+    q: "برای مشاهده Swapهای فعال سیستم، کدام دستور مناسب‌تر است؟",
+    options: ["swapon --show", "swaplist -a", "free-swap --active", "ls /etc/swap"],
+    answer: 0,
+    explanation: "دستور `swapon --show` (یا `swapon -s`) لیست تمام فضای‌های Swap فعال را به همراه اندازه و اولویت (priority) نمایش می‌دهد. این اطلاعات از فایل `/proc/swaps` گرفته می‌شود."
+  },
+  {
+    q: "دستور `dd if=/dev/zero of=test.img bs=1M count=10` چه کاری انجام می‌دهد؟",
+    options: ["یک فایل تقریباً ۱۰ مگابایتی پر از صفر ایجاد می‌کند.", "دیسک را به ۱۰ پارتیشن تقسیم می‌کند.", "ده فایل صفر بایتی ایجاد می‌کند.", "فایل test.img را فشرده می‌کند."],
+    answer: 0,
+    explanation: "دستور `dd` با `if=/dev/zero` (ورودی: صفر) و `of=test.img` (خروجی: فایل) به‌ازای هر بار خواندن ۱ مگابایت (`bs=1M`) و تکرار ۱۰ بار (`count=10`) یک فایل ۱۰ مگابایتی ایجاد می‌کند که تمام بایت‌های آن صفر است. این روش برای ایجاد فایل‌های خالی با حجم مشخص کاربرد دارد."
+  },
+  {
+    q: "برای ساخت آرشیو cpio از فایل‌هایی که توسط `find` پیدا می‌شوند، کدام الگو صحیح است؟",
+    options: ["find /var/log -type f | cpio -ov > logs.cpio", "cpio -create /var/log | find logs.cpio", "find /var/log -type f > cpio logs.cpio", "archive -cpio /var/log logs.cpio"],
+    answer: 0,
+    explanation: "دستور `find` لیست فایل‌ها را تولید می‌کند و از طریق پایپ (`|`) به `cpio` ارسال می‌شود. گزینه‌های `-ov` در cpio به معنای ایجاد آرشیو (create) با خروجی verbose است و خروجی به فایل `logs.cpio` هدایت می‌شود."
+  },
+  {
+    q: "برای مشاهده جدول پارتیشن‌بندی دیسک `/dev/sda` با ابزار fdisk، کدام دستور مناسب است؟",
+    options: ["fdisk -l /dev/sda", "fdisk -m /dev/sda", "partshow /dev/sda", "diskinfo --partition /dev/sda"],
+    answer: 0,
+    explanation: "دستور `fdisk -l /dev/sda` جدول پارتیشن‌بندی دیسک مشخص‌شده را نمایش می‌دهد. گزینه `-l` (list) بدون تغییر در دیسک، فقط اطلاعات را نشان می‌دهد."
+  },
+  {
+    q: "خروجی کد زیر چیست؟ `name=\"LPIC\"; echo \"Exam: $name-1\"`",
+    options: ["Exam: LPIC-1", "Exam: $name-1", "Exam: LPIC1", "خطای متغیر ناشناخته"],
+    answer: 0,
+    explanation: "در Bash، متغیر `$name` درون کوتیشن دوتایی جایگزین می‌شود و مقدار `LPIC` را نمایش می‌دهد. سپس `-1` به‌عنوان رشتهٔ معمولی به آن اضافه می‌شود و خروجی `Exam: LPIC-1` تولید می‌شود."
+  },
+  {
+    q: "برای تشخیص اینکه دو نام فایل به یک Inode اشاره می‌کنند، کدام دستور مناسب‌تر است؟",
+    options: ["ls -i", "ls -h", "file --same-inode", "inodecheck"],
+    answer: 0,
+    explanation: "گزینه `-i` در دستور `ls` شمارهٔ inode هر فایل را نمایش می‌دهد. اگر دو فایل شمارهٔ inode یکسانی داشته باشند، به یک فایل فیزیکی (Hard Link) اشاره می‌کنند."
+  },
+  {
+    q: "هدف اصلی دستور `ssh-copy-id` چیست؟",
+    options: ["کپی‌کردن کلید عمومی کاربر به فایل مجاز کلیدها روی سرور", "انتقال کل دیسک Client به Server", "کپی‌کردن فایل known_hosts به /etc/hosts", "ایجاد حساب کاربری بدون رمز عبور در سرور"],
+    answer: 0,
+    explanation: "`ssh-copy-id` کلید عمومی کاربر (معمولاً `~/.ssh/id_rsa.pub`) را به فایل `~/.ssh/authorized_keys` در سرور مقصد اضافه می‌کند. این کار امکان اتصال بدون رمز عبور با استفاده از احراز هویت کلید عمومی را فراهم می‌کند."
+  },
+  {
+    q: "برای تغییر موقت پارامتر Kernel `net.ipv4.ip_forward` کدام دستور صحیح است؟",
+    options: ["sysctl -w net.ipv4.ip_forward=1", "kernelctl --enable ip_forward", "modprobe net.ipv4.ip_forward=1", "echo ip_forward >> /etc/modules"],
+    answer: 0,
+    explanation: "دستور `sysctl` با گزینه `-w` برای تغییر موقت پارامترهای کرنل در زمان اجرا استفاده می‌شود. تغییر با `sysctl -w` تا زمان راه‌اندازی مجدد سیستم معتبر است. برای دائمی‌کردن باید در فایل `/etc/sysctl.conf` قرار داده شود."
+  },
+  {
+    q: "کدام گزینه درباره محدودیت Hard Link درست است؟",
+    options: ["Hard Link همیشه دارای مسیر مطلق است.", "Hard Link نمی‌تواند به فایلی در فایل‌سیستم دیگر اشاره کند.", "Hard Link فقط در /tmp ساخته می‌شود.", "Hard Link نمی‌تواند پس از حذف نام اولیه فایل باقی بماند."],
+    answer: 1,
+    explanation: "Hard link نمی‌تواند از مرز یک فایل‌سیستم (Filesystem) عبور کند زیرا به inode اشاره می‌کند و inodeها در هر فایل‌سیستم مستقل هستند. همچنین Hard link برای دایرکتوری‌ها (به جز موارد خاص) مجاز نیست و پس از حذف فایل اصلی، تا زمانی که حداقل یک Hard link وجود داشته باشد، داده‌ها باقی می‌مانند."
+  }
+];
+
+let current = 0;
+const total = questions.length;
+let answerKeyMode = false;
+const selected = new Array(total).fill(null);
+
+const qLabel = document.getElementById('qLabel');
+const qText = document.getElementById('qText');
+const optList = document.getElementById('optList');
+const qCount = document.getElementById('qCount');
+const progressFill = document.getElementById('progressFill');
+const nextBtn = document.getElementById('nextBtn');
+const hintText = document.getElementById('hintText');
+const explainBox = document.getElementById('explainBox');
+const explainText = document.getElementById('explainText');
+const answerKeyToggle = document.getElementById('answerKeyToggle');
+
+const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`;
+const crossSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+function render(){
+  const item = questions[current];
+  const userChoice = selected[current];
+  const revealAll = answerKeyMode || userChoice !== null;
+
+  qLabel.textContent = `سوال ${current+1}`;
+  qText.textContent = item.q;
+  qCount.textContent = `سوال ${current+1} از ${total}`;
+  optList.innerHTML = '';
+
+  item.options.forEach((opt, i) => {
+    const li = document.createElement('li');
+    let cls = 'opt';
+    let iconSvg = '';
+
+    if(revealAll){
+      cls += ' revealed';
+      if(i === item.answer){
+        cls += ' correct-mark';
+        iconSvg = checkSvg;
+      }else if(i === userChoice){
+        cls += ' wrong-mark';
+        iconSvg = crossSvg;
+      }
+    }
+
+    li.className = cls;
+    li.dataset.index = i;
+    li.innerHTML = `
+      <span class="idx">${i+1}-</span>
+      <span class="radio">${iconSvg}</span>
+      <span class="pill"><span>${opt}</span></span>
+    `;
+    optList.appendChild(li);
+  });
+
+  hintText.style.display = (revealAll) ? 'none' : 'block';
+  if(answerKeyMode || userChoice !== null){
+    explainBox.classList.add('show');
+    explainText.textContent = item.explanation;
+  }else{
+    explainBox.classList.remove('show');
+  }
+
+  progressFill.style.width = ((current+1)/total*100) + '%';
+}
+
+optList.addEventListener('click', (e) => {
+  const li = e.target.closest('.opt');
+  if(!li) return;
+  if(selected[current] !== null) return;
+  selected[current] = Number(li.dataset.index);
+  render();
+});
+
+nextBtn.addEventListener('click', () => {
+  current = (current + 1) % total;
+  render();
+});
+
+answerKeyToggle.addEventListener('change', (e) => {
+  answerKeyMode = e.target.checked;
+  render();
+});
+
+render();
+
+// ---------------- countdown timer (75 minutes) ----------------
+const EXAM_MINUTES = 75;
+let remaining = EXAM_MINUTES * 60;
+
+const tRoz = document.getElementById('tRoz');
+const tSaat = document.getElementById('tSaat');
+const tDaghigheh = document.getElementById('tDaghigheh');
+const tSaniyeh = document.getElementById('tSaniyeh');
+
+function toFa(n){
+  const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  return String(n).padStart(2,'0').split('').map(d => faDigits[d] ?? d).join('');
+}
+
+function tick(){
+  if(remaining <= 0){ clearInterval(timerId); return; }
+  remaining--;
+  const days = Math.floor(remaining / 86400);
+  const hours = Math.floor((remaining % 86400) / 3600);
+  const mins = Math.floor((remaining % 3600) / 60);
+  const secs = remaining % 60;
+  tRoz.textContent = toFa(days);
+  tSaat.textContent = toFa(hours);
+  tDaghigheh.textContent = toFa(mins);
+  tSaniyeh.textContent = toFa(secs);
+}
+tick();
+const timerId = setInterval(tick, 1000);
+</script>
+</body>
+</html>

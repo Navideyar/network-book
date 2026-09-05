@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون تستی | ZeroDay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #eef1f3;
+    --card: #ffffff;
+    --border: #e7ebee;
+    --text: #1c2733;
+    --muted: #93a0ab;
+    --accent: #2ea3d6;
+    --accent-soft: #eaf6fb;
+    --correct: #14b892;
+    --correct-soft: #e6f9f4;
+    --wrong: #ef5b6a;
+    --wrong-soft: #fdecee;
+    --skeleton-a: #eceff2;
+    --skeleton-b: #e2e7eb;
+    --sans: 'Vazirmatn', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    color:var(--text);
+    background:var(--bg);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    padding:56px 20px;
+  }
+
+  .blob{position:fixed;border-radius:50%;filter:blur(60px);z-index:0;pointer-events:none;}
+  .blob.b1{width:420px;height:420px;background:#dfe4e8;top:-120px;left:-100px;opacity:.7;}
+  .blob.b2{width:520px;height:520px;background:#e3ecef;bottom:-200px;right:-160px;opacity:.6;}
+  .blob.b3{width:260px;height:260px;background:#eef6f2;top:40%;right:10%;opacity:.5;}
+
+  .wrap{
+    position:relative;z-index:1;
+    max-width:920px;margin:0 auto;
+    display:grid;
+    grid-template-columns:1.7fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    .wrap{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    box-shadow:0 12px 34px rgba(28,39,51,0.05);
+    padding:28px 26px;
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    grid-column:1 / -1;
+    display:flex;align-items:center;gap:16px;
+    padding:16px 22px;
+  }
+  .switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .slider{
+    position:absolute;inset:0;background:#d7dde2;border-radius:999px;cursor:pointer;transition:.2s ease;
+  }
+  .switch .slider::before{
+    content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s ease;box-shadow:0 1px 3px rgba(0,0,0,.18);
+  }
+  .switch input:checked + .slider{background:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(20px);}
+  .toolbar-text{display:flex;flex-direction:column;gap:2px;}
+  .toolbar-text strong{font-size:14px;}
+  .toolbar-text span{font-size:12.5px;color:var(--muted);}
+
+  /* ---------- question card ---------- */
+  .q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .q-head h1{font-size:16px;font-weight:700;margin:0;}
+
+  .options{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:14px;}
+  .opt{display:flex;align-items:center;gap:12px;}
+  .opt .idx{font-size:12.5px;color:var(--muted);flex-shrink:0;width:22px;text-align:center;}
+  .opt .radio{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid #c7ced4;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .opt .radio svg{width:11px;height:11px;opacity:0;transition:opacity .15s ease;}
+
+  .opt .pill{
+    position:relative;flex:1;height:48px;border-radius:999px;overflow:hidden;
+    background:repeating-linear-gradient(
+      -45deg,
+      var(--skeleton-a) 0px, var(--skeleton-a) 8px,
+      var(--skeleton-b) 8px, var(--skeleton-b) 16px
+    );
+    display:flex;align-items:center;padding:0 22px;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .opt .pill span{
+    font-size:14.5px;font-weight:500;opacity:0;transform:translateY(4px);
+    transition:opacity .2s ease .05s, transform .2s ease .05s;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  /* hover: only plain reveal, no verdict color, and only while not yet revealed */
+  .opt:not(.revealed):hover .pill{background:#f3f6f8;}
+  .opt:not(.revealed):hover .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+  .opt:not(.revealed):hover .radio{border-color:var(--accent);}
+
+  /* revealed: locked-in state after selection or answer-key mode */
+  .opt.revealed .pill{background:#f6f8f9;cursor:default;}
+  .opt.revealed .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+
+  .opt.revealed.correct-mark .pill{background:var(--correct-soft);}
+  .opt.revealed.correct-mark .pill span{color:#0d7a61;font-weight:600;}
+  .opt.revealed.correct-mark .radio{background:var(--correct);border-color:var(--correct);}
+  .opt.revealed.correct-mark .radio svg{opacity:1;}
+
+  .opt.revealed.wrong-mark .pill{background:var(--wrong-soft);}
+  .opt.revealed.wrong-mark .pill span{color:#c33646;font-weight:600;}
+  .opt.revealed.wrong-mark .radio{background:var(--wrong);border-color:var(--wrong);}
+  .opt.revealed.wrong-mark .radio svg{opacity:1;}
+
+  .hint{font-size:12px;color:var(--muted);margin:0 0 18px;}
+
+  .explain-box{
+    display:none;
+    background:var(--accent-soft);
+    border:1px solid #cfe9f4;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:20px;
+  }
+  .explain-box.show{display:block;}
+  .explain-box .et{font-size:13px;font-weight:700;color:var(--accent);margin:0 0 6px;}
+  .explain-box p{font-size:13.5px;line-height:2;color:var(--text);margin:0;}
+
+  .q-footer{display:flex;flex-direction:column;gap:12px;}
+  .q-footer-row{display:flex;justify-content:space-between;align-items:center;}
+  .next-btn{
+    display:flex;align-items:center;gap:6px;background:#0f1b2a;color:#fff;border:none;
+    border-radius:12px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;
+    cursor:pointer;transition:opacity .15s ease;
+  }
+  .next-btn:hover{opacity:.88;}
+  .next-btn svg{width:15px;height:15px;}
+  .q-count{font-size:13px;color:var(--muted);}
+  .progress-track{height:6px;background:var(--skeleton-a);border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);width:0%;transition:width .3s ease;border-radius:6px;}
+
+  /* ---------- timer card ---------- */
+  .timer-card h2{font-size:15px;font-weight:700;margin:0 0 20px;}
+  .timer-grid{display:flex;justify-content:space-between;gap:8px;margin-bottom:16px;}
+  .timer-box{flex:1;background:#f5f8fa;border:1px solid var(--border);border-radius:12px;padding:12px 4px;text-align:center;}
+  .timer-box .val{font-size:19px;font-weight:800;color:var(--text);display:block;margin-bottom:4px;}
+  .timer-box .lbl{font-size:11px;color:var(--muted);}
+  .timer-note{font-size:12px;color:var(--muted);line-height:1.9;border-top:1px dashed var(--border);padding-top:14px;}
+
+  /* ---------- mobile responsive (kept last so it wins the cascade) ---------- */
+  @media (max-width:600px){
+    body{padding:28px 10px;}
+    .blob.b1{width:220px;height:220px;top:-80px;left:-80px;}
+    .blob.b2{width:260px;height:260px;bottom:-120px;right:-100px;}
+    .blob.b3{display:none;}
+
+    .wrap{gap:12px;}
+    .card{border-radius:16px;padding:16px 14px;}
+
+    .toolbar{padding:12px 14px;gap:10px;}
+    .switch{width:40px;height:23px;}
+    .switch .slider::before{width:17px;height:17px;left:3px;top:3px;}
+    .switch input:checked + .slider::before{transform:translateX(17px);}
+    .toolbar-text strong{font-size:12.5px;}
+    .toolbar-text span{font-size:11px;line-height:1.6;}
+
+    .q-head{margin-bottom:16px;}
+    .q-head h1{font-size:14px;}
+    #qText{font-size:13.5px !important;line-height:1.8 !important;margin:-2px 0 16px !important;}
+
+    .options{gap:9px;margin-bottom:6px;}
+    .opt{gap:7px;align-items:flex-start;}
+    .opt .idx{width:14px;font-size:11.5px;margin-top:12px;}
+    .opt .radio{width:19px;height:19px;margin-top:10px;}
+    .opt .radio svg{width:9px;height:9px;}
+
+    .opt .pill{
+      height:auto !important;
+      min-height:42px;
+      padding:11px 14px !important;
+      background-size:200% 200%;
+    }
+    .opt .pill span{
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      font-size:13px;
+      line-height:1.55;
+      display:block;
+    }
+
+    .hint{font-size:11px;margin:0 0 14px;}
+    .explain-box{padding:12px 13px;margin-bottom:16px;}
+    .explain-box .et{font-size:12px;}
+    .explain-box p{font-size:12.5px;line-height:1.8;}
+
+    .q-footer{gap:10px;}
+    .q-footer-row{flex-wrap:wrap;gap:8px;}
+    .next-btn{padding:9px 15px;font-size:13px;}
+    .next-btn svg{width:13px;height:13px;}
+    .q-count{font-size:12px;}
+
+    .timer-card h2{font-size:13.5px;margin:0 0 14px;}
+    .timer-grid{gap:6px;margin-bottom:12px;}
+    .timer-box{padding:9px 2px;border-radius:10px;}
+    .timer-box .val{font-size:15px;margin-bottom:2px;}
+    .timer-box .lbl{font-size:9.5px;}
+    .timer-note{font-size:11px;line-height:1.8;padding-top:12px;}
+  }
+
+  @media (max-width:360px){
+    body{padding:20px 8px;}
+    .card{padding:14px 11px;}
+    .timer-grid{flex-wrap:wrap;}
+    .timer-box{flex:1 1 40%;}
+    .opt .pill span{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="wrap">
+
+  <div class="card toolbar">
+    <label class="switch">
+      <input type="checkbox" id="answerKeyToggle">
+      <span class="slider"></span>
+    </label>
+    <div class="toolbar-text">
+      <strong>حالت پاسخنامه</strong>
+      <span>با فعال کردن این گزینه، کدر بودن گزینه‌ها برای همه‌ی سوالات برطرف می‌شود و پاسخ صحیح به‌همراه توضیح تشریحی نمایش داده می‌شود</span>
+    </div>
+  </div>
+
+  <!-- question card -->
+  <div class="card">
+    <div class="q-head">
+      <h1 id="qLabel">سوال 1</h1>
+    </div>
+
+    <p style="font-size:15px;font-weight:600;line-height:1.9;margin:-8px 0 20px;color:var(--text);" id="qText"></p>
+
+    <ul class="options" id="optList"></ul>
+    <p class="hint" id="hintText">برای مشاهده‌ی پاسخ، روی یکی از گزینه‌ها کلیک کنید</p>
+
+    <div class="explain-box" id="explainBox">
+      <p class="et">توضیح تشریحی</p>
+      <p id="explainText"></p>
+    </div>
+
+    <div class="q-footer">
+      <div class="q-footer-row">
+        <button class="next-btn" id="nextBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          سوال بعد
+        </button>
+        <span class="q-count" id="qCount">سوال 1 از 50</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <!-- timer card -->
+  <div class="card timer-card">
+    <h2>زمان باقی مانده</h2>
+    <div class="timer-grid">
+      <div class="timer-box"><span class="val" id="tRoz">۰۰</span><span class="lbl">روز</span></div>
+      <div class="timer-box"><span class="val" id="tSaat">۰۰</span><span class="lbl">ساعت</span></div>
+      <div class="timer-box"><span class="val" id="tDaghigheh">۰۴</span><span class="lbl">دقیقه</span></div>
+      <div class="timer-box"><span class="val" id="tSaniyeh">۰۴</span><span class="lbl">ثانیه</span></div>
+    </div>
+    <p class="timer-note">*در صورت پایان زمان، جواب‌های شما نادرست محاسبه می‌شود</p>
+  </div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// ۵۰ سوال تستی شبکه – زمان آزمون ۷۵ دقیقه
+// ---------------------------------------------------------------
+const questions = [
+  {
+    q: "یک کامپیوتر می‌تواند با دستگاه‌های داخل Subnet خود ارتباط برقرار کند؛ اما به اینترنت دسترسی ندارد. آدرس IP، Subnet Mask و DNS آن صحیح هستند. محتمل‌ترین عامل چیست؟",
+    options: ["Default Gateway اشتباه یا غیرفعال است.", "نام Host اشتباه تنظیم شده است.", "کابل شبکه کاملاً قطع است.", "سوئیچ حتماً در حالت Trunk قرار گرفته است."],
+    answer: 0,
+    explanation: "ارتباط با دستگاه‌های داخل Subnet نشان میدهد لایه ۲ و کابل سالم است. دسترسی به اینترنت نیاز به Default Gateway دارد تا بستهها را به خارج از Subnet هدایت کند. DNS صحیح است، پس مشکل از Gateway است."
+  },
+  {
+    q: "یک شرکت دسترسی سیمی کاربران را با 802.1X و گواهی دیجیتال کنترل می‌کند. پس از منقضی‌شدن Certificate سازمان، لپ‌تاپ‌های کاربران احراز هویت نمی‌شوند؛ اما پرینترهایی که با MAB متصل هستند، همچنان کار می‌کنند. کدام مؤلفه باید بررسی شود؟",
+    options: ["گواهی‌های مورد استفاده در EAP-TLS", "جدول Routing روتر اینترنت", "تنظیمات Port Forwarding", "DNS MX Record"],
+    answer: 0,
+    explanation: "802.1X با EAP-TLS برای احراز هویت به گواهی دیجیتال نیاز دارد. منقضی شدن گواهی باعث شکست احراز هویت لپ‌تاپها میشود، در حالی که MAB (MAC Authentication Bypass) وابسته به گواهی نیست و پرینترها همچنان کار میکنند."
+  },
+  {
+    q: "یک مهاجم با ارسال تعداد زیادی فریم دارای آدرس‌های MAC جعلی، جدول MAC سوئیچ را پر می‌کند. پس از آن، سوئیچ بسیاری از فریم‌ها را از چندین پورت Flood می‌کند. این حمله چیست؟",
+    options: ["ARP Spoofing", "MAC Flooding", "DNS Poisoning", "DHCP Starvation"],
+    answer: 1,
+    explanation: "در حمله MAC Flooding، مهاجم با ارسال آدرس‌های MAC جعلی، جدول MAC سوئیچ را پر میکند. وقتی جدول پر شد، سوئیچ مانند یک Hub عمل کرده و فریم‌ها را از تمام پورتها Flood میکند."
+  },
+  {
+    q: "یک شرکت می‌خواهد کاربران مهمان فقط به اینترنت دسترسی داشته باشند و نتوانند به سرورهای داخلی یا کاربران سازمانی متصل شوند. کدام طراحی مناسب‌تر است؟",
+    options: ["قرار دادن مهمانان در همان VLAN کاربران داخلی", "ایجاد Guest VLAN و اعمال ACL یا Firewall Policy", "غیرفعال‌کردن DHCP برای مهمانان", "استفاده از Hub به‌جای Switch"],
+    answer: 1,
+    explanation: "Guest VLAN جداسازی لایه ۲ را فراهم میکند و با اعمال ACL یا قوانین فایروال میتوان دسترسی مهمانان را فقط به اینترنت محدود کرد و از دسترسی به شبکه داخلی جلوگیری نمود."
+  },
+  {
+    q: "کدام سناریو بهترین توصیف را از عملکرد یک Stateful Firewall ارائه می‌دهد؟",
+    options: ["فایروال فقط بر اساس شماره پورت مقصد تصمیم‌گیری می‌کند.", "هر بسته را بدون توجه به ارتباط‌های قبلی بررسی می‌کند.", "وضعیت Sessionها را نگه می‌دارد و هر بسته را در چارچوب ارتباط مربوط به آن ارزیابی می‌کند.", "فقط آدرس‌های MAC را در لایه ۲ بررسی می‌کند."],
+    answer: 2,
+    explanation: "فایروال Stateful با نگهداری جدول Session، هر بسته را نسبت به ارتباط قبلی بررسی میکند. این بر خلاف Stateless است که هر بسته را مستقل تصمیمگیری میکند."
+  },
+  {
+    q: "کدام گزینه عملکرد ARP را به‌درستی توصیف می‌کند؟",
+    options: ["نام دامنه را به آدرس IP تبدیل می‌کند.", "آدرس IP را در شبکه محلی به آدرس MAC نگاشت می‌کند.", "بسته‌ها را بین Subnetهای مختلف مسیریابی می‌کند.", "آدرس خصوصی را به آدرس عمومی ترجمه می‌کند."],
+    answer: 1,
+    explanation: "ARP (Address Resolution Protocol) وظیفه دارد آدرس IP مقصد را در یک LAN به آدرس MAC فیزیکی تبدیل کند تا فریم در لایه ۲ ارسال شود."
+  },
+  {
+    q: "یک تکنسین متوجه می‌شود دستگاه‌های موجود در یک VLAN می‌توانند با یکدیگر ارتباط برقرار کنند؛ اما قادر به برقراری ارتباط با دستگاه‌های VLAN دیگر نیستند. محتمل‌ترین توضیح چیست؟",
+    options: ["VLANها Broadcast Domainهای جداگانه هستند و برای ارتباط میان آن‌ها به Inter-VLAN Routing نیاز است.", "همه VLANها ذاتاً به یکدیگر متصل هستند.", "این وضعیت فقط می‌تواند ناشی از کابل فیبر خراب باشد.", "این مشکل الزاماً به دلیل خرابی DNS است."],
+    answer: 0,
+    explanation: "VLANها در لایه ۲ کاملاً از هم جدا هستند. برای ارتباط بین VLANها باید از یک دستگاه لایه ۳ (روتر یا سوئیچ لایه ۳) با قابلیت Inter-VLAN Routing استفاده کرد."
+  },
+  {
+    q: "یک کلاینت نام وب‌سایت را به IP صحیح تبدیل می‌کند و TCP Three-Way Handshake روی پورت 443 نیز با موفقیت کامل می‌شود. بااین‌حال، مرورگر هشدار می‌دهد نام درج‌شده در Certificate با نام وب‌سایت مطابقت ندارد. مشکل در کدام بخش قرار دارد؟",
+    options: ["لایه فیزیکی", "مسیریابی لایه ۳", "TLS یا پیکربندی Certificate", "فرآیند ARP Resolution"],
+    answer: 2,
+    explanation: "از آنجا که DNS و اتصال TCP به درستی کار میکنند، مشکل در لایه بالاتر یعنی TLS است. گواهی دیجیتال سرور برای دامنه دیگری صادر شده یا Common Name/SAN آن با آدرس درخواستی مطابقت ندارد."
+  },
+  {
+    q: "یک Load Balancer سلامت سرورهای Backend را فقط با برقراری اتصال TCP روی پورت 443 بررسی می‌کند؛ سرورها اتصال TCP را قبول می‌کنند؛ اما Application دائماً خطای HTTP 500 برمی‌گرداند. بااین‌حال، Load Balancer همچنان ترافیک را به آن سرور ارسال می‌کند. بهترین اصلاح چیست؟",
+    options: ["استفاده از Health Check در سطح HTTP و بررسی Status Code", "حذف Default Gateway سرور", "افزایش DNS TTL", "تغییر VLAN سرور به Native VLAN"],
+    answer: 0,
+    explanation: "Health Check TCP فقط اتصال لایه ۴ را بررسی میکند. برای اطمینان از سلامت برنامه لایه ۷، باید Health Check را به HTTP تغییر داد و کد وضعیت ۲۰۰ یا ۲۰× را بررسی کرد تا خطاهای برنامه مانند HTTP 500 شناسایی شوند."
+  },
+  {
+    q: "دو لینک فیزیکی میان دو سوئیچ برای افزایش ظرفیت در نظر گرفته شده‌اند. روی سوئیچ اول LACP فعال شده است؛ اما روی سوئیچ دوم، پورت‌ها به‌صورت Static EtherChannel تنظیم شده‌اند. در نتیجه Port-Channel تشکیل نمی‌شود. بهترین توضیح چیست؟",
+    options: ["دو سمت از روش‌های ناسازگار برای تشکیل Link Aggregation استفاده می‌کنند.", "روتر Default Route ندارد.", "DNS Server پاسخ نمی‌دهد.", "مقدار TTL لینک‌ها متفاوت است."],
+    answer: 0,
+    explanation: "برای تشکیل Link Aggregation، هر دو سوئیچ باید از یک پروتکل یا حالت یکسان استفاده کنند. LACP (فعال یا غیرفعال) با Static EtherChannel سازگار نیست و باعث عدم تشکیل Port-Channel میشود."
+  },
+  {
+    q: "پس از ایجاد یک VLAN جدید برای واحد مالی، کاربران این VLAN آدرس‌هایی در محدوده 169.254.0.0/16 دریافت می‌کنند. کاربران VLANهای قبلی بدون مشکل از همان DHCP Server آدرس می‌گیرند و Scope مربوط به VLAN مالی نیز ایجاد شده است. کدام تنظیم باید ابتدا بررسی شود؟",
+    options: ["DNS Forwarder", "DHCP Relay روی Interface لایه ۳ VLAN جدید", "Port Forwarding روی فایروال", "SNMP Community String"],
+    answer: 1,
+    explanation: "آدرس APIPA (169.254.x.x) نشان میدهد کلاینتها نتوانستهاند به DHCP Server دسترسی پیدا کنند. از آنجا که DHCP Server در VLAN دیگری قرار دارد، باید روی SVI یا Interface لایه ۳ VLAN جدید، DHCP Relay (ip helper-address) تنظیم شود."
+  },
+  {
+    q: "یک کاربر می‌گوید: «می‌توانم با آدرس IP به سرور دسترسی داشته باشم، اما با نام دامنه نمی‌توانم به آن متصل شوم.» محتمل‌ترین علت چیست؟",
+    options: ["مشکل در کابل شبکه", "مشکل در DNS Resolution", "مشکل در Subnet Mask", "مشکل در Duplex"],
+    answer: 1,
+    explanation: "دسترسی با IP نشاندهنده سلامت مسیریابی و اتصال است. عدم دسترسی با نام دامنه یعنی DNS Server قادر به تبدیل نام به IP نیست یا کلاینت DNS Server اشتباهی را پیکربندی کرده است."
+  },
+  {
+    q: "یک مدیر شبکه متوجه می‌شود کاربران یک VLAN نمی‌توانند به VLAN دیگری دسترسی داشته باشند، اما هر دو VLAN روی Trunk بین سوئیچ و روتر تعریف شده‌اند. بررسی نشان می‌دهد Encapsulation روی Subinterfaceهای روتر تنظیم نشده است. محتمل‌ترین علت چیست؟",
+    options: ["خرابی DHCP Server", "تنظیم‌نبودن 802.1Q روی Subinterfaceها", "پرشدن جدول MAC سوئیچ", "اشتباه‌بودن DNS Suffix"],
+    answer: 1,
+    explanation: "در معماری Router-on-a-Stick، هر Subinterface باید با دستور encapsulation dot1Q و شماره VLAN مربوطه پیکربندی شود تا روتر بتواند ترافیک هر VLAN را از Trunk تشخیص دهد. عدم تنظیم آن باعث شکست Inter-VLAN Routing میشود."
+  },
+  {
+    q: "لاگ‌های فایروال نشان می‌دهند یک اتصال در ساعت 14:10 مسدود شده است؛ اما لاگ همان رخداد روی سرور برنامه، زمان 14:17 را نشان می‌دهد. این اختلاف، بررسی ترتیب رخداد امنیتی را دشوار کرده است. کدام سرویس باید بررسی شود؟",
+    options: ["SMB", "NTP", "ARP", "FTP"],
+    answer: 1,
+    explanation: "اختلاف زمانی بین دستگاههای مختلف نشان میدهد زمان آنها همگام نیست. بررسی و تنظیم NTP (Network Time Protocol) برای همگامسازی ساعت تمام تجهیزات شبکه ضروری است تا ترتیب رویدادها بهدرستی قابل تحلیل باشد."
+  },
+  {
+    q: "در یک سازمان، ترافیک Voice و Data از یک زیرساخت مشترک عبور می‌کنند. مدیر شبکه می‌خواهد هنگام شلوغی شبکه، کیفیت تماس‌ها حفظ شود. کدام فناوری بیشترین ارتباط را با این نیاز دارد؟",
+    options: ["QoS", "NAT", "STP", "WINS"],
+    answer: 0,
+    explanation: "QoS (Quality of Service) با اولویتبندی ترافیک، به ترافیک حساس به تأخیر مانند Voice بالاترین اولویت را میدهد تا در زمان شلوغی، کیفیت تماسها حفظ شود."
+  },
+  {
+    q: "یک کاربر می‌گوید: «زمانی که برای اولین‌بار به یک دستگاه در شبکه محلی ping می‌زنم، بسته اول Timeout می‌شود؛ اما پس از آن ارتباط پایدار است.» محتمل‌ترین توضیح چیست؟",
+    options: ["ARP Resolution اولیه زمان برده است.", "DNS به‌صورت دائمی خراب است.", "کابل شبکه به‌طور کامل قطع شده است.", "MTU از مقدار مجاز بزرگ‌تر است."],
+    answer: 0,
+    explanation: "در اولین Ping، دستگاه مقصد در کش ARP وجود ندارد. دستگاه باید درخواست ARP Broadcast بفرستد و منتظر پاسخ MAC شود که باعث تأخیر یا Timeout در اولین بسته میشود. پس از ذخیره شدن در کش، پاسخهای بعدی سریع هستند."
+  },
+  {
+    q: "روی یک پورت سوئیچ، Port Security با Sticky MAC فعال است. پس از تعویض تلفن IP کاربر، پورت وارد وضعیت Violation می‌شود؛ درحالی‌که VLAN و کابل‌کشی صحیح هستند. علت اصلی چیست؟",
+    options: ["مقدار TTL تلفن جدید بیش از حد زیاد است.", "DHCP Relay غیرفعال شده است.", "MAC Address دستگاه جدید با MAC ذخیره‌شده روی پورت مطابقت ندارد.", "DNS قادر به Resolve کردن نام تلفن نیست."],
+    answer: 2,
+    explanation: "Port Security با Sticky MAC، اولین آدرس MAC متصل به پورت را قفل و ذخیره میکند. تعویض تلفن یعنی آدرس MAC جدیدی وارد پورت شده که با آدرس ذخیرهشده تطابق ندارد، بنابراین پورت حالت Violation میرود."
+  },
+  {
+    q: "یک کاربر به سرور داخلی متصل می‌شود. اتصال TCP برقرار می‌شود، اما هنگام انتقال داده‌های بزرگ، ارتباط قطع می‌گردد. در Capture مشخص شده است که پیام‌های ICMP مربوط به Fragmentation Needed به مقصد نمی‌رسند. کدام مشکل محتمل‌تر است؟",
+    options: ["اختلال در PMTUD به دلیل فیلترشدن ICMP", "خرابی DHCP Scope", "اشتباه‌بودن MAC Address مقصد", "عدم پشتیبانی از IPv4"],
+    answer: 0,
+    explanation: "در مسیر ممکن است MTU کوچکتری وجود داشته باشد. روتر باید با ICMP Type 3 Code 4 به فرستنده اطلاع دهد تا اندازه بسته را تنظیم کند. اگر این ICMP فیلتر شود، PMTUD کار نمیکند و بستههای بزرگ بدون ارسال خطا حذف میشوند."
+  },
+  {
+    q: "کدام گزینه تفاوت TCP و UDP را به‌درستی توصیف می‌کند؟",
+    options: ["TCP سریع‌تر است؛ زیرا Connectionless است.", "UDP تحویل قابل‌اطمینان‌تری نسبت به TCP دارد.", "TCP برای تحویل قابل‌اطمینان و ترتیبی داده‌ها مناسب‌تر است.", "UDP فقط در شبکه‌های محلی قابل استفاده است."],
+    answer: 2,
+    explanation: "TCP با برقراری اتصال، تأییدیه، شماره دنباله و Retransmission، تحویل مطمئن و مرتب دادهها را تضمین میکند، در حالی که UDP این ویژگیها را ندارد و سریعتر ولی غیرقابلاطمینان است."
+  },
+  {
+    q: "در ساعات عادی، تماس‌های VoIP کیفیت مناسبی دارند؛ اما هنگام اجرای Backup شبانه، کاربران با صدای منقطع و Jitter متغیر مواجه می‌شوند. در همین زمان، استفاده از لینک WAN به نزدیک ۱۰۰٪ می‌رسد. مناسب‌ترین راهکار چیست؟",
+    options: ["افزایش DNS TTL", "کاهش MTU تمام سیستم‌ها", "اولویت‌بندی ترافیک صوتی با QoS", "غیرفعال‌کردن STP"],
+    answer: 2,
+    explanation: "پر شدن لینک WAN توسط ترافیک Backup باعث بینظمی در ارسال بستههای Voice میشود. QoS با اولویتدهی به ترافیک Voice نسبت به Backup، تأخیر و Jitter را کاهش داده و کیفیت تماس را حفظ میکند."
+  },
+  {
+    q: "مدیر شبکه می‌خواهد یک کارمند از راه دور، از طریق کانالی رمزنگاری‌شده، به خط فرمان یکی از سرورهای داخلی دسترسی پیدا کند. کدام گزینه مناسب‌تر است؟",
+    options: ["Telnet", "SSH", "FTP", "SNMPv1"],
+    answer: 1,
+    explanation: "SSH (Secure Shell) دسترسی امن و رمزنگاریشده به خط فرمان سرور از راه دور را فراهم میکند. Telnet، FTP و SNMPv1 اطلاعات را بهصورت متنباز (Plaintext) ارسال میکنند و امن نیستند."
+  },
+  {
+    q: "در یک شبکه IPv6، کلاینت‌ها بدون DHCPv6 آدرس IPv6 دریافت می‌کنند؛ اما Gateway پیش‌فرض را از پیام‌های Router Advertisement یاد می‌گیرند. این روش کدام است؟",
+    options: ["SLAAC", "PAT", "NAT64", "APIPA"],
+    answer: 0,
+    explanation: "SLAAC (Stateless Address Autoconfiguration) به کلاینتها اجازه میدهد آدرس IPv6 خود را بر اساس Prefix اعلامشده در Router Advertisement (RA) بسازند و Gateway پیشفرض را نیز از همان RA دریافت کنند، بدون نیاز به DHCPv6."
+  },
+  {
+    q: "دستور traceroute در چند Hop میانی فقط علامت * نشان می‌دهد؛ اما Hopهای بعدی و مقصد نهایی نمایش داده می‌شوند. ارتباط کاربران با مقصد نیز بدون مشکل برقرار است. منطقی‌ترین نتیجه چیست؟",
+    options: ["حتماً در مسیر یک Routing Loop وجود دارد.", "برخی روترهای میانی پیام‌های ICMP را پاسخ نمی‌دهند یا Rate-Limit کرده‌اند.", "DNS Server مقصد از کار افتاده است.", "بسته‌ها در اولین سوئیچ Drop می‌شوند."],
+    answer: 1,
+    explanation: "از آنجا که Hopهای بعدی و مقصد نهایی قابل دسترسی هستند و ارتباط کاربران برقرار است، مسیر سالم است. علامت * فقط نشاندهنده عدم پاسخ آن روترها به ICMP Time Exceeded است که معمولاً به دلیل سیاستهای امنیتی یا Rate-Limit است."
+  },
+  {
+    q: "یک وب‌سرور داخلی از داخل سازمان در دسترس است. کاربران اینترنت نیز نام دامنه آن را به IP عمومی صحیح Resolve می‌کنند؛ اما تلاش‌های اتصال از اینترنت در Firewall سازمان مشاهده نمی‌شوند. بررسی‌ها نشان می‌دهند روتر ISP ترافیک را به IP عمومی دیگری هدایت می‌کند. کدام مورد محتمل‌تر است؟",
+    options: ["وجود مشکل در Route یا تخصیص IP عمومی در سمت ISP", "خرابی ARP Cache کلاینت‌های داخلی", "نبود NTP Server", "اشتباه‌بودن VLAN کاربران داخلی"],
+    answer: 0,
+    explanation: "چون درخواستها در فایروال سازمان دیده نمیشوند و روتر ISP ترافیک را به جای دیگری ارسال میکند، یعنی بستهها هرگز به سازمان نمیرسند. این نشاندهنده مشکل در مسیریابی یا تخصیص IP توسط ISP است."
+  },
+  {
+    q: "سیستم مانیتورینگ گزارش می‌دهد یک MAC Address به‌سرعت بین دو پورت سوئیچ جابه‌جا می‌شود. هم‌زمان میزان Broadcast Traffic نیز به‌شدت افزایش یافته است. کدام مشکل محتمل‌تر است؟",
+    options: ["DHCP Scope Exhaustion", "TCP SYN Flood", "خرابی DNSSEC", "ایجاد Loop در لایه ۲"],
+    answer: 3,
+    explanation: "جابهجایی سریع MAC بین دو پورت و افزایش Broadcast Traffic نشانه کلاسیک حلقه (Loop) در لایه ۲ است که باعث Broadcast Storm و ناپایداری جدول MAC میشود."
+  },
+  {
+    q: "کاربران هنگام بازکردن فایل‌های اشتراکی با کندی شدید مواجه هستند. زمان پاسخ ping مناسب است؛ اما Throughput واقعی پایین بوده و Fragmentation زیادی در مسیر مشاهده می‌شود. کدام عامل محتمل‌تر است؟",
+    options: ["MTU Mismatch", "مشکل در DNS Suffix", "اشتباه‌بودن نام کاربری", "خرابی کامل جدول Routing در Gateway"],
+    answer: 0,
+    explanation: "زمان پاسخ (تأخیر) مناسب است ولی Throughput پایین و Fragmentation زیاد نشاندهنده عدم تطابق MTU یا خردشدن بیش از حد بستهها در مسیر است که باعث کاهش کارایی میشود."
+  },
+  {
+    q: "مدیر امنیت متوجه می‌شود SNMPv2c اطلاعات مدیریتی را با Community String قابل مشاهده در شبکه منتقل می‌کند. سازمان به محرمانگی، احراز هویت و بررسی صحت پیام‌ها نیاز دارد. کدام تغییر مناسب‌تر است؟",
+    options: ["استفاده از SNMPv3 با Authentication و Privacy", "انتقال SNMP از UDP به ICMP", "افزایش Syslog Severity", "فعال‌کردن DHCP Snooping"],
+    answer: 0,
+    explanation: "SNMPv2c Community String را بهصورت متنباز ارسال میکند. SNMPv3 با قابلیتهای Authentication (احراز هویت) و Privacy (رمزنگاری) هر سه نیاز (محرمانگی، احراز هویت و صحت پیام) را تأمین میکند."
+  },
+  {
+    q: "در یک ارتباط TCP، Packet Capture تعداد زیادی Duplicate ACK و Retransmission را فقط در یک جهت نشان می‌دهد. روی پورت سوئیچ متصل به فرستنده نیز تعداد CRC Errorها به‌طور پیوسته افزایش می‌یابد. اولین اقدام منطقی چیست؟",
+    options: ["پاک‌کردن DNS Cache", "بررسی کابل، Connector و Interface فیزیکی فرستنده", "تغییر پورت HTTPS", "غیرفعال‌کردن Default Route"],
+    answer: 1,
+    explanation: "Duplicate ACK و Retransmission فقط در یک جهت و افزایش CRC Error نشانه مشکل فیزیکی (کابل خراب، کانکتور شل یا کارت شبکه معیوب) در سمت فرستنده است؛ بنابراین ابتدا باید لایه فیزیکی بررسی شود."
+  },
+  {
+    q: "یک کاربر داخلی قصد دارد با استفاده از نام دامنه به یک وب‌سایت خارجی متصل شود. کدام توالی کلی منطقی‌تر است؟",
+    options: ["DNS Resolution → TCP Handshake → HTTP/HTTPS Session", "TCP Handshake → DNS Resolution → ARP → HTTP Session", "ARP → ICMP → DNS → NAT", "NAT → DNS → FTP → Traceroute"],
+    answer: 0,
+    explanation: "ابتدا نام دامنه به IP تبدیل میشود (DNS)، سپس اتصال TCP روی پورت مربوطه برقرار میگردد (Three-Way Handshake) و در نهایت درخواست HTTP/HTTPS ارسال میشود."
+  },
+  {
+    q: "کاربران یک شبکه پس از تغییر توپولوژی سوئیچ‌ها، برای چند ثانیه ارتباط ناپایدار دارند. لاگ‌ها نشان می‌دهد چند پورت به‌صورت مکرر در وضعیت Blocking و Forwarding تغییر می‌کنند. این وضعیت بیشتر بیانگر چیست؟",
+    options: ["DNS Cache Poisoning", "STP Topology Change یا Loop لایه ۲", "خرابی NAT", "حمله Brute Force به SSH"],
+    answer: 1,
+    explanation: "تغییر توپولوژی سوئیچها باعث میشود STP دوباره محاسبه شود و پورتها طی مراحل Blocking → Listening → Learning → Forwarding بروند. این نوسان در لاگها و بیثباتی موقت ارتباط، نشانه Topology Change یا وجود Loop است."
+  },
+  {
+    q: "ترافیک خروجی یک سرور از Firewall شماره ۱ عبور می‌کند؛ اما پاسخ‌ها به دلیل تنظیمات Routing از Firewall شماره ۲ بازمی‌گردند. هر دو فایروال Stateful هستند و Session Table مستقلی دارند. چه مشکلی به احتمال زیاد رخ می‌دهد؟",
+    options: ["پاسخ‌ها به دلیل نبود Session متناظر روی Firewall شماره ۲، Drop می‌شوند.", "سوئیچ‌ها MAC Address سرور را یاد نمی‌گیرند.", "DHCP Server به سرور آدرس APIPA می‌دهد.", "DNS به‌صورت Broadcast عمل می‌کند."],
+    answer: 0,
+    explanation: "این مشکل Asymmetric Routing نام دارد. ترافیک خروجی از فایروال ۱ عبور کرده و Session آن در فایروال ۱ ثبت شده، اما پاسخها از فایروال ۲ بازمیگردند. فایروال ۲ این Session را در جدول خود ندارد، بنابراین پاسخها را بهعنوان ترافیک ناخواسته Drop میکند."
+  },
+  {
+    q: "کدام گزینه نمونه‌ای از ترافیک Broadcast در یک شبکه محلی است؟",
+    options: ["ارسال بسته به یک Host مشخص در Subnet دیگر", "ارسال ARP Request برای پیداکردن MAC Address مربوط به یک IP", "انتقال فایل با FTP", "برقراری یک SSH Session"],
+    answer: 1,
+    explanation: "ARP Request یک Broadcast در لایه ۲ است (هدف FF:FF:FF:FF:FF:FF) و به تمام دستگاههای آن Subnet فرستاده میشود. گزینههای دیگر یونیکست یا ارتباط نقطهبهنقطه هستند."
+  },
+  {
+    q: "یک کلاینت پس از روشن‌شدن، آدرس IP معتبر دریافت می‌کند؛ اما Default Gateway اشتباهی روی آن تنظیم شده و نمی‌تواند با شبکه‌های دیگر ارتباط برقرار کند. کدام سرویس احتمالاً به‌درستی پیکربندی نشده است؟",
+    options: ["DNS", "DHCP", "NTP", "ARP Cache"],
+    answer: 1,
+    explanation: "آدرس IP و سایر تنظیمات از جمله Default Gateway معمولاً توسط DHCP تخصیص داده میشوند. اگر Gateway اشتباه باشد، یعنی Scope یا Option Router در DHCP Server بهدرستی تنظیم نشده است."
+  },
+  {
+    q: "مدیر شبکه می‌خواهد بسته‌ها بین Subnetهای مختلف هدایت شوند و برای هر مقصد، مسیر مناسب انتخاب شود. کدام دستگاه در درجه اول این وظیفه را انجام می‌دهد؟",
+    options: ["Switch", "Router", "Hub", "Repeater"],
+    answer: 1,
+    explanation: "روتر دستگاه لایه ۳ است که بستهها را بین شبکههای مختلف بر اساس آدرس IP هدایت و مسیریابی میکند. سوئیچ در لایه ۲ و Hub/Repeater در لایه فیزیکی عمل میکنند."
+  },
+  {
+    q: "یک سوئیچ مدیریتی از طریق HTTP قابل دسترسی است و مدیر شبکه می‌خواهد مدیریت آن را با امنیت بیشتری انجام دهد. کدام اقدام مناسب‌تر است؟",
+    options: ["جایگزین‌کردن HTTP با HTTPS و محدودکردن دسترسی مدیریتی", "فعال‌کردن Telnet برای رمزنگاری بیشتر", "استفاده از FTP برای مدیریت سوئیچ", "قراردادن سوئیچ در شبکه عمومی بدون ACL"],
+    answer: 0,
+    explanation: "HTTPS ارتباط مدیریتی را رمزنگاری میکند و با محدود کردن دسترسی (مثلاً با ACL یا VLAN مدیریتی)، امنیت افزایش مییابد. Telnet و FTP رمزنگاری ندارند."
+  },
+  {
+    q: "در یک محیط سازمانی، سرویس‌ها باید به‌گونه‌ای طراحی شوند که با خرابی یک لینک یا دستگاه، همچنان در دسترس باقی بمانند. این نیاز بیشتر به کدام مفهوم اشاره دارد؟",
+    options: ["Redundancy", "Encryption", "NAT", "Multicast"],
+    answer: 0,
+    explanation: "افزونگی یا Redundancy یعنی داشتن مسیرها، دستگاهها یا لینکهای پشتیبان برای جلوگیری از قطعی سرویس در صورت خرابی یک مؤلفه."
+  },
+  {
+    q: "در یک شبکه، پس از فعال‌کردن DHCP Snooping، تعدادی از کلاینت‌ها دیگر IP دریافت نمی‌کنند. پورت متصل به DHCP Server یا DHCP Relay به‌عنوان Trusted تعریف نشده است. علت چیست؟",
+    options: ["DHCP Snooping پاسخ‌های DHCP از پورت Untrusted را مسدود می‌کند.", "DHCP Snooping فقط بسته‌های DNS را مسدود می‌کند.", "DHCP Server باید روی VLAN Native قرار گیرد.", "کلاینت‌ها باید از Static IP استفاده کنند."],
+    answer: 0,
+    explanation: "DHCP Snooping بهطور پیشفرض همه پورتها را Untrusted در نظر میگیرد و فقط پاسخهای DHCP (مانند DHCPOFFER و DHCPACK) را از پورتهای Trusted عبور میدهد. اگر پورت متصل به DHCP Server Trusted نباشد، پاسخهای سرور مسدود شده و کلاینتها IP نمیگیرند."
+  },
+  {
+    q: "یک سرور وب پشت NAT قرار دارد. کاربران داخلی با IP خصوصی به آن دسترسی دارند، اما کاربران اینترنت نمی‌توانند به آن متصل شوند. تنظیم Port Forwarding برای پورت TCP 443 انجام نشده است. کدام اقدام لازم است؟",
+    options: ["ایجاد Port Forward برای TCP 443 به IP خصوصی سرور", "حذف Default Gateway سرور", "فعال‌کردن DHCP Snooping روی روتر", "تغییر آدرس MAC سرور"],
+    answer: 0,
+    explanation: "برای دسترسی به سرور پشت NAT از اینترنت، باید روی روتر/فایروال Port Forwarding پورت 443 (HTTPS) را به آدرس خصوصی سرور تنظیم کرد تا ترافیک ورودی به آن هدایت شود."
+  },
+  {
+    q: "یک سرویس داخلی و خارجی از آدرس‌های متفاوت استفاده می‌کند و سازمان می‌خواهد پاسخ DNS کاربران داخلی با پاسخ DNS کاربران اینترنتی متفاوت باشد. این طراحی به کدام مفهوم نزدیک‌تر است؟",
+    options: ["Split-Horizon DNS", "MAC Filtering", "Port Aggregation", "ICMP Tunneling"],
+    answer: 0,
+    explanation: "Split-Horizon DNS به DNS سرور اجازه میدهد بر اساس منبع درخواست (داخلی یا خارجی)، پاسخهای متفاوتی بدهد. کاربران داخلی آدرس خصوصی و کاربران اینترنت آدرس عمومی سرور را دریافت میکنند."
+  },
+  {
+    q: "یک سازمان از آدرس‌های خصوصی در شبکه داخلی استفاده می‌کند و می‌خواهد چندین سیستم، با استفاده از یک آدرس IP عمومی، به اینترنت متصل شوند. کدام تکنیک مناسب است؟",
+    options: ["DHCP", "PAT", "VLAN Trunking", "STP"],
+    answer: 1,
+    explanation: "PAT (Port Address Translation) که نوعی NAT است، به چندین دستگاه با آدرسهای خصوصی اجازه میدهد با یک آدرس IP عمومی و با استفاده از پورتهای متفاوت به اینترنت متصل شوند."
+  },
+  {
+    q: "کاربران یک شبکه بی‌سیم قدرت سیگنال بالایی دارند؛ اما سرعت پایین و Retransmission زیادی مشاهده می‌شود. بررسی Spectrum نشان می‌دهد چند Access Point نزدیک، همگی از کانال‌های هم‌پوشان استفاده می‌کنند. بهترین اقدام چیست؟",
+    options: ["افزایش توان فرستنده تمام Access Pointها", "تغییر Default Gateway کاربران", "طراحی مجدد کانال‌ها برای کاهش Co-channel و Adjacent-channel Interference", "کاهش زمان DHCP Lease"],
+    answer: 2,
+    explanation: "قدرت سیگنال بالاست اما تداخل (Interference) از کانالهای همپوشان باعث پایین آمدن سرعت و Retransmission شده است. باید کانالهای غیرهمپوشان (مثلاً ۱، ۶، ۱۱ در باند ۲.۴ گیگاهرتز) انتخاب شوند تا تداخل کاهش یابد."
+  },
+  {
+    q: "یک Access Point پس از نصب در محل جدید، قدرت سیگنال مناسبی دارد؛ اما کاربران در زمان جابه‌جایی بین Access Pointها قطع ارتباط کوتاه‌مدت را تجربه می‌کنند. کدام قابلیت می‌تواند این مشکل را کاهش دهد؟",
+    options: ["802.11r Fast BSS Transition", "DHCP Starvation", "Port Security", "DNSSEC"],
+    answer: 0,
+    explanation: "استاندارد 802.11r برای رومینگ سریع بین اکسسپوینتها طراحی شده و با کاهش زمان احراز هویت هنگام جابهجایی، قطعی کوتاهمدت را به حداقل میرساند."
+  },
+  {
+    q: "یک روتر برای مقصد 10.20.30.45 دو مسیر 10.20.0.0/16 (با Metric 5) و 10.20.30.0/24 (با Metric 30) را در اختیار دارد. روتر کدام مسیر را انتخاب می‌کند؟",
+    options: ["مسیر /16، چون Metric کمتری دارد.", "مسیر /24، چون Prefix اختصاصی‌تری دارد.", "هر دو مسیر را به‌صورت تصادفی استفاده می‌کند.", "هیچ‌کدام را انتخاب نمی‌کند؛ زیرا Metricها برابر نیستند."],
+    answer: 1,
+    explanation: "روتر ابتدا Longest Prefix Match را اعمال میکند، یعنی دقیقترین مسیر (با Subnet Mask بزرگتر) را انتخاب میکند، حتی اگر Metric آن بالاتر باشد."
+  },
+  {
+    q: "یک سازمان می‌خواهد امنیت لایه دسترسی را افزایش دهد و از اتصال ساده دستگاه‌های غیرمجاز به پورت‌های سوئیچ جلوگیری کند. کدام فناوری برای این هدف مناسب‌تر است؟",
+    options: ["802.1X", "NAT", "STP", "ICMP"],
+    answer: 0,
+    explanation: "802.1X با احراز هویت مبتنی بر پورت، از اتصال دستگاههای غیرمجاز به پورتهای سوئیچ جلوگیری میکند و امنیت لایه دسترسی را افزایش میدهد."
+  },
+  {
+    q: "برخی کلاینت‌ها Gateway و DNS صحیح دریافت می‌کنند؛ اما تعدادی دیگر Gateway اشتباه دریافت کرده و به صفحات تبلیغاتی هدایت می‌شوند. Packet Capture نشان می‌دهد برای هر DHCP Discover، دو DHCP Offer از دو دستگاه متفاوت ارسال می‌شود. محتمل‌ترین علت چیست؟",
+    options: ["خراب‌شدن جدول MAC سوئیچ", "وجود Rogue DHCP Server", "کم‌بودن مقدار MTU", "ایجاد TCP Retransmission"],
+    answer: 1,
+    explanation: "دو پاسخ متفاوت به درخواست DHCP نشاندهنده وجود دو DHCP Server است: یکی مجاز و دیگری Rogue. دستگاه غیرمجاز میتواند تنظیمات غلط مانند Gateway اشتباه را به کلاینتها بدهد و آنها را به صفحات تبلیغاتی یا مخرب هدایت کند."
+  },
+  {
+    q: "یک سیستم IPv6 می‌تواند با آدرس Link-local خود با دستگاه‌های همان LAN ارتباط برقرار کند؛ اما هیچ مقصدی خارج از شبکه محلی در دسترس نیست. سیستم آدرس Global Unicast و Default Route نیز ندارد. محتمل‌ترین مشکل چیست؟",
+    options: ["کلاینت پیام‌های Router Advertisement را دریافت نمی‌کند.", "جدول MAC سوئیچ پر شده است.", "پورت TCP 443 مسدود است.", "رکورد MX دامنه اشتباه است."],
+    answer: 0,
+    explanation: "در IPv6، دستگاهها برای دریافت Global Unicast Address و Default Route به پیامهای Router Advertisement (RA) از روتر نیاز دارند. اگر RA دریافت نشود، فقط آدرس Link-local (fe80::/10) را خواهند داشت و نمیتوانند خارج از LAN ارتباط برقرار کنند."
+  },
+  {
+    q: "کاربران متصل از طریق VPN می‌توانند صفحات کوچک یک وب‌سایت داخلی را باز کنند؛ اما دانلود فایل‌های بزرگ پس از چند ثانیه متوقف می‌شود. بسته‌های کوچک ping موفق هستند، ولی بسته‌های بزرگ دارای DF Bit در مسیر عبور نمی‌کنند. محتمل‌ترین علت چیست؟",
+    options: ["اختلال در Path MTU Discovery", "خرابی DNS Cache", "اشتباه‌بودن Native VLAN", "منقضی‌شدن DHCP Lease"],
+    answer: 0,
+    explanation: "بستههای کوچک موفق هستند اما بستههای بزرگ با DF Bit در مسیر عبور نمیکنند. یعنی روتر میانی به دلیل MTU کوچکتر باید با ICMP Fragmentation Needed به فرستنده اطلاع دهد، اما این پیامها فیلتر میشوند؛ در نتیجه PMTUD کار نمیکند و بستههای بزرگ حذف میگردند."
+  },
+  {
+    q: "یک روتر دو مسیر برای مقصد یکسان دارد. مسیر اول از طریق OSPF و مسیر دوم از طریق Static Route یاد گرفته شده است. در شرایط معمول، روتر کدام مسیر را انتخاب می‌کند؟",
+    options: ["مسیر OSPF، چون Dynamic است.", "مسیر Static، چون Administrative Distance کمتری دارد.", "هر دو مسیر به‌صورت تصادفی انتخاب می‌شوند.", "مسیر دارای Hop Count بیشتر."],
+    answer: 1,
+    explanation: "روترها برای انتخاب مسیر، ابتدا Administrative Distance (AD) را مقایسه میکنند؛ عدد کمتر = اولویت بیشتر. AD پیشفرض Static Route برابر با ۱ و OSPF برابر با ۱۱۰ است، بنابراین مسیر Static انتخاب میشود."
+  },
+  {
+    q: "در یک سازمان، چندین واحد کاری باید روی یک سوئیچ فیزیکی مشترک قرار داشته باشند؛ اما ترافیک آن‌ها از یکدیگر جدا بماند. همچنین مدیر شبکه می‌خواهد Broadcast Domainها را محدود کند. بهترین راهکار چیست؟",
+    options: ["NAT", "VLAN", "DHCP Relay", "Port Mirroring"],
+    answer: 1,
+    explanation: "VLANها دقیقاً برای جداسازی ترافیک در سطح لایه ۲ و محدود کردن Broadcast Domain روی یک سوئیچ فیزیکی مشترک طراحی شدهاند."
+  },
+  {
+    q: "یک سازمان از فایروال Next-Generation استفاده میکند و میخواهد ترافیک مشکوک را بر اساس امضای حملات شناسایی کند. کدام قابلیت بیشتر با این نیاز مرتبط است؟",
+    options: ["IDS/IPS", "NAT", "QoS", "VRRP"],
+    answer: 0,
+    explanation: "سیستمهای تشخیص و پیشگیری از نفوذ (IDS/IPS) با استفاده از امضای حملات (Signature-based Detection) ترافیک مشکوک را شناسایی میکنند. فایروالهای نسل بعد معمولاً این قابلیت را دارند."
+  }
+];
+
+let current = 0;
+const total = questions.length;
+let answerKeyMode = false;
+const selected = new Array(total).fill(null);
+
+const qLabel = document.getElementById('qLabel');
+const qText = document.getElementById('qText');
+const optList = document.getElementById('optList');
+const qCount = document.getElementById('qCount');
+const progressFill = document.getElementById('progressFill');
+const nextBtn = document.getElementById('nextBtn');
+const hintText = document.getElementById('hintText');
+const explainBox = document.getElementById('explainBox');
+const explainText = document.getElementById('explainText');
+const answerKeyToggle = document.getElementById('answerKeyToggle');
+
+const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`;
+const crossSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+function render(){
+  const item = questions[current];
+  const userChoice = selected[current];
+  const revealAll = answerKeyMode || userChoice !== null;
+
+  qLabel.textContent = `سوال ${current+1}`;
+  qText.textContent = item.q;
+  qCount.textContent = `سوال ${current+1} از ${total}`;
+  optList.innerHTML = '';
+
+  item.options.forEach((opt, i) => {
+    const li = document.createElement('li');
+    let cls = 'opt';
+    let iconSvg = '';
+
+    if(revealAll){
+      cls += ' revealed';
+      if(i === item.answer){
+        cls += ' correct-mark';
+        iconSvg = checkSvg;
+      }else if(i === userChoice){
+        cls += ' wrong-mark';
+        iconSvg = crossSvg;
+      }
+    }
+
+    li.className = cls;
+    li.dataset.index = i;
+    li.innerHTML = `
+      <span class="idx">${i+1}-</span>
+      <span class="radio">${iconSvg}</span>
+      <span class="pill"><span>${opt}</span></span>
+    `;
+    optList.appendChild(li);
+  });
+
+  hintText.style.display = (revealAll) ? 'none' : 'block';
+  if(answerKeyMode || userChoice !== null){
+    explainBox.classList.add('show');
+    explainText.textContent = item.explanation;
+  }else{
+    explainBox.classList.remove('show');
+  }
+
+  progressFill.style.width = ((current+1)/total*100) + '%';
+}
+
+optList.addEventListener('click', (e) => {
+  const li = e.target.closest('.opt');
+  if(!li) return;
+  if(selected[current] !== null) return;
+  selected[current] = Number(li.dataset.index);
+  render();
+});
+
+nextBtn.addEventListener('click', () => {
+  current = (current + 1) % total;
+  render();
+});
+
+answerKeyToggle.addEventListener('change', (e) => {
+  answerKeyMode = e.target.checked;
+  render();
+});
+
+render();
+
+// ---------------- countdown timer (75 minutes) ----------------
+const EXAM_MINUTES = 75;
+let remaining = EXAM_MINUTES * 60;
+
+const tRoz = document.getElementById('tRoz');
+const tSaat = document.getElementById('tSaat');
+const tDaghigheh = document.getElementById('tDaghigheh');
+const tSaniyeh = document.getElementById('tSaniyeh');
+
+function toFa(n){
+  const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  return String(n).padStart(2,'0').split('').map(d => faDigits[d] ?? d).join('');
+}
+
+function tick(){
+  if(remaining <= 0){ clearInterval(timerId); return; }
+  remaining--;
+  const days = Math.floor(remaining / 86400);
+  const hours = Math.floor((remaining % 86400) / 3600);
+  const mins = Math.floor((remaining % 3600) / 60);
+  const secs = remaining % 60;
+  tRoz.textContent = toFa(days);
+  tSaat.textContent = toFa(hours);
+  tDaghigheh.textContent = toFa(mins);
+  tSaniyeh.textContent = toFa(secs);
+}
+tick();
+const timerId = setInterval(tick, 1000);
+</script>
+</body>
+</html>
