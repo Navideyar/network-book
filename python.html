@@ -2816,6 +2816,595 @@ Type     → str</div></div>
 <p>اینجاست که وارد:</p>
 <blockquote><strong>جلسه ۳ — Type Casting</strong></blockquote>
 <p>می‌شویم؛ یعنی یاد می‌گیریم چگونه داده‌ها را بین Typeهای مختلف تبدیل کنیم.</p>`
+, 
+"ch3-1": `<div class="section-header">
+    <div class="section-badge">۳</div>
+    <div>
+        <h1>Type Casting در Python</h1>
+        <div class="meta">فصل ۳ · بخش ۱ از ۱</div>
+    </div>
+</div>
+<blockquote class="lesson-goal">
+<strong class="goal-title">هدف جلسه</strong>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+<li>مفهوم <strong>Type Casting</strong> را توضیح بدهی و بدانی چه زمانی به آن نیاز داریم.</li>
+<li>با <code>int()</code>، <code>float()</code>، <code>str()</code> و <code>bool()</code> تبدیل نوع انجام بدهی.</li>
+<li>تفاوت تبدیل موفق و تبدیل نامعتبر را تشخیص بدهی.</li>
+<li>رفتار تبدیل <code>float</code> به <code>int</code> و <code>str</code> به عدد را درست پیش‌بینی کنی.</li>
+<li>از Type Casting برای حل مسئله‌های ساده استفاده کنی.</li>
+<li><code>Variable + Type Casting</code> را در یک برنامه واقعی به کار ببری.</li>
+</ol>
+</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">1. از جلسه قبل تا اینجا</h2>
+<p>در جلسه قبل یاد گرفتیم که مقدارهای Python نوع دارند:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10       → int
+10.5     → float
+&quot;10&quot;     → str
+True     → bool
+None     → NoneType</div></div>
+<p>حالا یک مشکل واقعی داریم.</p>
+<p>فرض کن کاربر سنش را وارد می‌کند:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;</div></div>
+<p>ممکن است از خودمان بپرسیم:</p>
+<blockquote>چرا <code>"25"</code> را عدد در نظر نگیریم؟</blockquote>
+<p>چون <code>"25"</code> از نظر Python <strong>متن</strong> است، نه عدد.</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;25&quot; → str
+25   → int</div></div>
+<p>اگر بخواهیم <code>"25"</code> را به <code>25</code> تبدیل کنیم، به <strong>Type Casting</strong> نیاز داریم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">2. Type Casting چیست؟ ⭐⭐⭐</h2>
+<p><strong>Type Casting</strong> یعنی تبدیل یک مقدار از یک Data Type به Data Type دیگر.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Value
+  │
+  ▼
+Type A
+  │
+  │ Casting
+  ▼
+Type B</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;
+
+age = int(age)</div></div>
+<p>قبل:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;25&quot; → str</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25 → int</div></div>
+<p>پس:</p>
+<blockquote>Type Casting یعنی تلاش برای تبدیل یک مقدار به نوع داده‌ای دیگر.</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">3. توابع اصلی Type Casting</h2>
+<p>در Python چند تابع بسیار مهم برای تبدیل نوع داریم:</p>
+<div class="table-wrap"><table><thead><tr><th>تابع</th><th>تبدیل به</th></tr></thead><tbody><tr><td><code>int()</code></td><td><code>int</code></td></tr><tr><td><code>float()</code></td><td><code>float</code></td></tr><tr><td><code>str()</code></td><td><code>str</code></td></tr><tr><td><code>bool()</code></td><td><code>bool</code></td></tr></tbody></table></div>
+<p>در Python Basic همین چهار مورد را باید خیلی خوب بلد باشی. ⭐⭐⭐</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">4. تبدیل به <code>int</code> با <code>int()</code></h2>
+<p>اگر بخواهیم یک مقدار را به عدد صحیح تبدیل کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int()</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;
+
+age = int(age)
+
+print(age)
+print(type(age))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25
+&lt;class 'int'&gt;</div></div>
+<p>قبل:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;25&quot; → str</div></div>
+<p>بعد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25 → int</div></div>
+<h3>تبدیل <code>float</code> به <code>int</code></h3>
+<p>این هم بسیار مهم است:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 19.99
+
+price = int(price)
+
+print(price)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">19</div></div>
+<p>دقت کن!</p>
+<p><code>int()</code> قسمت اعشاری را <strong>حذف می‌کند</strong>؛ گرد نمی‌کند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(9.9)</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">9</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(9.1)</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">9</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">9.9 → 9
+9.1 → 9</div></div>
+<h3>نکته امتحانی ⭐⭐⭐</h3>
+<p><code>int()</code> برای تبدیل <code>float</code> به <code>int</code>، عدد را <strong>truncate</strong> می‌کند؛ یعنی بخش اعشاری را حذف می‌کند.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(4.99)</div></div>
+<p>برابر <code>5</code> نیست.</p>
+<p>بلکه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">4</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">5. تبدیل به <code>float</code> با <code>float()</code></h2>
+<p>برای تبدیل یک مقدار به عدد اعشاری:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">float()</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = &quot;12.5&quot;
+
+x = float(x)
+
+print(x)
+print(type(x))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">12.5
+&lt;class 'float'&gt;</div></div>
+<p>حتی یک عدد صحیح هم می‌تواند به <code>float</code> تبدیل شود:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10
+
+x = float(x)
+
+print(x)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10.0</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10 → 10.0</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">6. تبدیل <code>str</code> به <code>float</code></h2>
+<p>این هم بسیار رایج است:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = &quot;19.99&quot;
+
+price = float(price)</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;19.99&quot; → 19.99
+str       float</div></div>
+<p>و می‌توانیم با آن عملیات عددی انجام دهیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = &quot;19.99&quot;
+
+price = float(price)
+
+total = price * 2
+
+print(total)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">39.98</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">7. تبدیل به <code>str</code> با <code>str()</code></h2>
+<p>گاهی یک مقدار عددی داریم ولی می‌خواهیم آن را به متن تبدیل کنیم.</p>
+<p>از:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">str()</div></div>
+<p>استفاده می‌کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+
+age = str(age)
+
+print(age)
+print(type(age))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25
+&lt;class 'str'&gt;</div></div>
+<p>اما حواست باشد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25   → int
+&quot;25&quot; → str</div></div>
+<p>از نظر نمایش شبیه هستند، اما Type متفاوت است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">8. چرا <code>str()</code> کاربردی است؟</h2>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>و می‌خواهیم مقدار را با یک متن ترکیب کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">message = &quot;I am &quot; + age + &quot; years old.&quot;</div></div>
+<p>این کار خطا می‌دهد، چون:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">str + int</div></div>
+<p>را نمی‌توانیم به این شکل مستقیم با هم ترکیب کنیم.</p>
+<p>می‌توانیم <code>age</code> را به <code>str</code> تبدیل کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+
+message = &quot;I am &quot; + str(age) + &quot; years old.&quot;
+
+print(message)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">I am 25 years old.</div></div>
+<p>البته در جلسه <strong>Strings</strong> با <code>f-string</code> روش بهتر و خواناتری برای این کار یاد می‌گیریم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">9. تبدیل به <code>bool</code> با <code>bool()</code></h2>
+<p>تابع:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">bool()</div></div>
+<p>یک مقدار را به <code>True</code> یا <code>False</code> تبدیل می‌کند.</p>
+<p>چند مثال مهم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(bool(1))
+print(bool(0))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">True
+False</div></div>
+<p>برای String:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(bool(&quot;Hello&quot;))
+print(bool(&quot;&quot;))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">True
+False</div></div>
+<p>مدل ساده‌ای که فعلاً باید یاد بگیری:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0       → False
+&quot;&quot;      → False
+
+عدد غیرصفر → True
+String غیرخالی → True</div></div>
+<p>این مفهوم بعدها در <code>if</code> و شرط‌ها بسیار کاربردی می‌شود.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">10. چند مثال مهم <code>bool()</code></h2>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(bool(10))
+print(bool(-5))
+print(bool(0))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">True
+True
+False</div></div>
+<p>چون <code>0</code> مقدار False محسوب می‌شود ولی اعداد غیرصفر True هستند.</p>
+<p>برای String:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(bool(&quot;Python&quot;))
+print(bool(&quot;0&quot;))
+print(bool(&quot;&quot;))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">True
+True
+False</div></div>
+<h3>نکته مهم ⭐⭐</h3>
+<p>این:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">bool(&quot;0&quot;)</div></div>
+<p>برابر <code>True</code> است.</p>
+<p>چرا؟</p>
+<p>چون <code>"0"</code> یک <strong>String غیرخالی</strong> است.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">bool(0)</div></div>
+<p>برابر <code>False</code> است.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0   → False
+&quot;0&quot; → True</div></div>
+<p>این یکی از دام‌های رایج تستی است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">11. همه تبدیل‌های اصلی کنار هم</h2>
+<p>حالا چهار تابع اصلی را کنار هم ببین:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = &quot;10&quot;
+
+a = int(x)
+b = float(x)
+c = str(x)
+d = bool(x)</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">int(x)   → 10
+float(x) → 10.0
+str(x)   → &quot;10&quot;
+bool(x)  → True</div></div>
+<p>چون <code>"10"</code> یک String غیرخالی است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">12. چه تبدیل‌هایی ممکن است خطا بدهند؟ ⭐⭐⭐</h2>
+<p>Type Casting همیشه موفق نیست.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(&quot;25&quot;)</div></div>
+<p>کاملاً معتبر است.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(&quot;hello&quot;)</div></div>
+<p>معتبر نیست.</p>
+<p>Python نمی‌تواند متن <code>"hello"</code> را به یک عدد صحیح تبدیل کند.</p>
+<p>در نتیجه Exception رخ می‌دهد.</p>
+<p>همچنین:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">float(&quot;3.14&quot;)</div></div>
+<p>معتبر است.</p>
+<p>ولی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">float(&quot;Python&quot;)</div></div>
+<p>معتبر نیست.</p>
+<p>پس قبل از تبدیل باید ببینیم مقدار واقعاً قابلیت تبدیل دارد یا نه.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">13. یک دام مهم: تبدیل <code>"12.5"</code> به <code>int</code></h2>
+<p>این کد را ببین:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = &quot;12.5&quot;
+
+x = int(x)</div></div>
+<p>آیا <code>12</code> می‌شود؟</p>
+<p><strong>خیر.</strong></p>
+<p>خطا رخ می‌دهد.</p>
+<p>چرا؟</p>
+<p>چون <code>"12.5"</code> یک String است که مستقیماً شکل یک Integer ندارد.</p>
+<p>راه درست:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = &quot;12.5&quot;
+
+x = float(x)
+x = int(x)
+
+print(x)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">12</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;12.5&quot;
+   ↓
+12.5
+   ↓
+12
+ str     float    int</div></div>
+<p>این نکته برای تست بسیار مهم است. ⭐⭐⭐</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">14. Type Casting و Variableها</h2>
+<p>گاهی Type Casting را در یک Variable جدید ذخیره می‌کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age_text = &quot;25&quot;
+
+age = int(age_text)
+
+print(age)</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">age_text → &quot;25&quot; → str
+age      → 25   → int</div></div>
+<p>این روش خواناست و برای برنامه‌های واقعی مناسب است.</p>
+<p>گاهی هم همان Variable را تغییر می‌دهیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;
+
+age = int(age)</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">age → 25 → int</div></div>
+<p>هر دو روش معتبر هستند.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">15. Type Casting در محاسبات</h2>
+<p>فرض کن:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">a = &quot;10&quot;
+b = &quot;20&quot;</div></div>
+<p>این دو String هستند.</p>
+<p>اگر بنویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(a + b)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1020</div></div>
+<p>چون دو String به هم متصل شده‌اند.</p>
+<p>اما اگر تبدیل کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">a = int(a)
+b = int(b)
+
+print(a + b)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">30</div></div>
+<p>این مثال اهمیت Type را خیلی خوب نشان می‌دهد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;10&quot; + &quot;20&quot; → &quot;1020&quot;
+
+10 + 20     → 30</div></div>
+<p>پس یک عملیات یکسان، بسته به Type داده می‌تواند نتیجه متفاوتی داشته باشد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">16. یک مدل ذهنی خیلی مهم</h2>
+<p>وقتی با یک مقدار کار می‌کنی، همیشه این سه سؤال را از خودت بپرس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1. Value چیست؟
+2. Type چیست؟
+3. آیا Type موردنیاز عملیات را دارم؟</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;</div></div>
+<p>تحلیل:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Value → &quot;25&quot;
+Type  → str</div></div>
+<p>اگر بخواهیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age + 5</div></div>
+<p>مشکل داریم.</p>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = int(age)</div></div>
+<p>و حالا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Value → 25
+Type  → int</div></div>
+<p>و عملیات عددی ممکن می‌شود.</p>
+<p>این مدل ذهنی در کل Python بسیار مهم است.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-troubleshoot">اشتباهات رایج</h1>
+<h3>مشکل ۱ — <code>ValueError</code></h3>
+<p>اگر بنویسی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = int(&quot;twenty&quot;)</div></div>
+<p>Python نمی‌تواند این String را به <code>int</code> تبدیل کند.</p>
+<p>پس Type Casting به این معنی نیست که:</p>
+<blockquote>هر مقداری را می‌توان به هر Typeای تبدیل کرد.</blockquote>
+<p>مقدار باید قابلیت تبدیل داشته باشد.</p>
+<h3>مشکل ۲ — گرد شدن <code>float</code></h3>
+<p>اگر بنویسی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int(7.9)</div></div>
+<p>جواب:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">7</div></div>
+<p>است، نه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">8</div></div>
+<p><code>int()</code> در این حالت بخش اعشاری را حذف می‌کند.</p>
+<h3>مشکل ۳ — <code>+</code> روی Stringها</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">a = &quot;10&quot;
+b = &quot;20&quot;
+
+print(a + b)</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1020</div></div>
+<p>اگر جمع عددی می‌خواهی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(int(a) + int(b))</div></div>
+<p>نتیجه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">30</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">⭐ نکات مهم جلسه</h2>
+<p>برای مرور سریع:</p>
+<div class="table-wrap"><table><thead><tr><th>کد</th><th>نتیجه</th></tr></thead><tbody><tr><td><code>int(&quot;10&quot;)</code></td><td><code>10</code></td></tr><tr><td><code>float(&quot;10&quot;)</code></td><td><code>10.0</code></td></tr><tr><td><code>str(10)</code></td><td><code>"10"</code></td></tr><tr><td><code>bool(0)</code></td><td><code>False</code></td></tr><tr><td><code>bool(1)</code></td><td><code>True</code></td></tr><tr><td><code>bool("")</code></td><td><code>False</code></td></tr><tr><td><code>bool("0")</code></td><td><code>True</code></td></tr><tr><td><code>int(5.9)</code></td><td><code>5</code></td></tr></tbody></table></div>
+<p>و مهم‌تر از همه:</p>
+<blockquote><strong>Type Casting یعنی تبدیل Type یک مقدار به Type دیگر.</strong></blockquote>
+<p>چهار تابع اصلی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">int()
+float()
+str()
+bool()</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🔄 Recall سریع</h2>
+<p>بدون نگاه‌کردن به درس، سعی کن به این ۸ سؤال جواب بده:</p>
+<ol><li>Type Casting یعنی چه؟</li><li>چهار تابع اصلی Type Casting کدامند؟</li><li><code>int(7.9)</code> چه نتیجه‌ای می‌دهد؟</li><li><code>float("10")</code> چه نتیجه‌ای می‌دهد؟</li><li><code>str(10)</code> چه نتیجه‌ای می‌دهد؟</li><li><code>bool(0)</code> و <code>bool("0")</code> چه تفاوتی دارند؟</li><li>چرا <code>int("12.5")</code> خطا می‌دهد؟</li><li>چرا Type Casting همیشه موفق نیست؟</li></ol>
+<p>اگر توانستی این‌ها را توضیح بدهی، هسته جلسه ۳ را یاد گرفته‌ای.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-scenario">سناریوی ترکیبی — محاسبه قیمت خرید</h1>
+<p>فرض کن یک فروشگاه اطلاعات قیمت را به صورت String دریافت کرده:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = &quot;12.5&quot;
+quantity = &quot;4&quot;</div></div>
+<p>می‌خواهیم قیمت کل را حساب کنیم.</p>
+<h3>مرحله ۱ — وضعیت فعلی</h3>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price    → &quot;12.5&quot; → str
+quantity → &quot;4&quot;    → str</div></div>
+<p>پس هنوز نمی‌توانیم محاسبه عددی مناسب انجام دهیم.</p>
+<h3>مرحله ۲ — تبدیل Type</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = float(price)
+quantity = int(quantity)</div></div>
+<p>حالا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price    → 12.5 → float
+quantity → 4    → int</div></div>
+<h3>مرحله ۳ — محاسبه</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">total = price * quantity
+
+print(total)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">50.0</div></div>
+<p>کد کامل:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = &quot;12.5&quot;
+quantity = &quot;4&quot;
+
+price = float(price)
+quantity = int(quantity)
+
+total = price * quantity
+
+print(total)</div></div>
+<p>اینجا دقیقاً همان چیزی را انجام دادیم که هدف این جلسه بود:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">String Data
+    ↓
+Type Casting
+    ↓
+Numeric Data
+    ↓
+Calculation
+    ↓
+Result</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🧪 تمرین عملی</h2>
+<p>ابتدا خودت کد را بنویس و اجرا کن. <strong>پاسخ‌ها عمداً مخفی هستند</strong> تا قبل از تلاش، راه‌حل را نبینی.</p>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۱</span><div><strong>تمرین پیش‌بینی خروجی</strong><small>قبل از اجرا، خروجی را حدس بزن.</small></div></div>
+  <p>خروجی کد زیر را پیش‌بینی کن:</p>
+  <div class="python-playground" data-playground="ex3-1">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · پیش‌بینی خروجی</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">x = "10"
+
+print(int(x))
+print(float(x))
+print(bool(x))</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol3-1"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۱</button>
+  <div class="exercise-solution" id="sol3-1"><strong>پاسخ:</strong><pre>10
+10.0
+True</pre></div>
+</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۲</span><div><strong>تمرین تبدیل قیمت</strong><small>کد را کامل کن تا <code>price</code> به <code>float</code> تبدیل شود.</small></div></div>
+  <p>کد زیر را کامل کن تا <code>price</code> به <code>float</code> تبدیل شود:</p>
+  <div class="python-playground" data-playground="ex3-2">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · تبدیل قیمت</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">price = "19.99"
+
+price = _________
+
+print(price)
+print(type(price))</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol3-2"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۲</button>
+  <div class="exercise-solution" id="sol3-2"><strong>پاسخ:</strong><pre>price = "19.99"
+price = float(price)
+print(price)
+print(type(price))</pre></div>
+</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۳</span><div><strong>تمرین محاسبه</strong><small>حاصل جمع دو عدد را به صورت عددی چاپ کن.</small></div></div>
+  <p>دو Variable داریم: <code>a = "15"</code> و <code>b = "5"</code>. برنامه‌ای بنویس که حاصل جمع آن‌ها را به صورت عددی چاپ کند.</p>
+  <div class="python-playground" data-playground="ex3-3">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · محاسبه</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">a = "15"
+b = "5"
+
+# کد خودت را اینجا بنویس
+
+</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol3-3"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۳</button>
+  <div class="exercise-solution" id="sol3-3"><strong>پاسخ:</strong><pre>a = "15"
+b = "5"
+
+a = int(a)
+b = int(b)
+
+print(a + b)</pre></div>
+</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۴</span><div><strong>تمرین دام تستی</strong><small>خروجی را حدس بزن.</small></div></div>
+  <p>خروجی کد زیر چیست؟</p>
+  <div class="python-playground" data-playground="ex3-4">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۴ · دام تستی</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">print(bool(0))
+print(bool("0"))</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol3-4"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۴</button>
+  <div class="exercise-solution" id="sol3-4"><strong>پاسخ:</strong><pre>False
+True</pre></div>
+</div>
+<h3>💡 چرا ادیتور داخل درس؟</h3>
+<p>از اینجا به بعد هر جا تمرین واقعاً قابل اجرا باشد، بهتر است همان‌جا کد را بنویسی و نتیجه را ببینی. این کار فاصله بین «خواندن» و «برنامه‌نویسی واقعی» را کمتر می‌کند.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-test">تست پایانی — دقیقاً ۷ سؤال</h1>
+<p>هر سؤال را پاسخ بده و بعد گزینه‌ات را انتخاب کن تا پاسخ و توضیح همان سؤال نمایش داده شود.</p>
+<div class="quiz-card"><p>❓ سؤال ۱: خروجی کد زیر چیست؟ <br><code>x = "10"<br>print(x + "5")</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>15</code></button><button onclick="selectOption(this)">ب) <code>105</code></button><button onclick="selectOption(this)">ج) <code>10 + 5</code></button><button onclick="selectOption(this)">د) Error</button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>هر دو مقدار String هستند، بنابراین با <code>+</code> به هم متصل می‌شوند.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۲: خروجی چیست؟ <br><code>print(int(7.9))</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>8</code></button><button onclick="selectOption(this)">ب) <code>7.9</code></button><button onclick="selectOption(this)">ج) <code>7</code></button><button onclick="selectOption(this)">د) Error</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>int()</code> بخش اعشاری را حذف می‌کند و در این حالت <code>7</code> می‌دهد.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۳: کدام گزینه مقدار <code>"12.5"</code> را به <code>float</code> تبدیل می‌کند؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>int("12.5")</code></button><button onclick="selectOption(this)">ب) <code>float("12.5")</code></button><button onclick="selectOption(this)">ج) <code>str("12.5")</code></button><button onclick="selectOption(this)">د) <code>bool("12.5")</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>float()</code> برای تبدیل مقدار به عدد اعشاری استفاده می‌شود.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۴: خروجی کد زیر چیست؟ <br><code>print(bool(0))<br>print(bool("0"))</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>False</code> / <code>False</code></button><button onclick="selectOption(this)">ب) <code>True</code> / <code>True</code></button><button onclick="selectOption(this)">ج) <code>False</code> / <code>True</code></button><button onclick="selectOption(this)">د) <code>True</code> / <code>False</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>0</code> برابر False است، اما <code>"0"</code> یک String غیرخالی و در نتیجه True است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۵: کدام کد باعث خطا می‌شود؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>int("25")</code></button><button onclick="selectOption(this)">ب) <code>float("3.14")</code></button><button onclick="selectOption(this)">ج) <code>str(100)</code></button><button onclick="selectOption(this)">د) <code>int("Hello")</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: د</strong><br><code>"Hello"</code> یک متن غیرعددی است و نمی‌تواند مستقیماً به <code>int</code> تبدیل شود.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۶: کد زیر چه خروجی‌ای دارد؟ <br><code>x = "12.5"<br>x = float(x)<br>x = int(x)<br>print(x)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>12.5</code></button><button onclick="selectOption(this)">ب) <code>13</code></button><button onclick="selectOption(this)">ج) <code>12</code></button><button onclick="selectOption(this)">د) Error</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>ابتدا <code>"12.5"</code> به <code>12.5</code> و سپس با <code>int()</code> به <code>12</code> تبدیل می‌شود.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۷: فرض کن: <br><code>price = "20"</code><br><code>quantity = "3"</code><br>کدام گزینه حاصل ضرب عددی درست را تولید می‌کند؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>print(price * quantity)</code></button><button onclick="selectOption(this)">ب) <code>print(str(price) * str(quantity))</code></button><button onclick="selectOption(this)">ج) <code>print(int(price) * int(quantity))</code></button><button onclick="selectOption(this)">د) <code>print(bool(price) * bool(quantity))</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>ابتدا هر دو String را به <code>int</code> تبدیل می‌کنیم و سپس عملیات ضرب عددی انجام می‌دهیم؛ نتیجه <code>60</code> خواهد بود.</div></div>
+<h2 class="lesson-title">🔄 جمع‌بندی مفهومی</h2>
+<p>تا اینجا سه جلسه پشت سر گذاشتیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">جلسه ۱
+Python + Interpreter + REPL + VS Code
+              ↓
+جلسه ۲
+Variables + Data Types
+              ↓
+جلسه ۳
+Type Casting</div></div>
+<p>حالا می‌توانیم داده را بگیریم، نوعش را بفهمیم و در صورت نیاز تبدیلش کنیم.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;
+
+print(type(age))
+
+age = int(age)
+
+print(type(age))</div></div>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;25&quot;
+ │
+ │ int()
+ ▼
+25</div></div>
+<p>این مهارت در جلسه بعد بسیار مهم‌تر می‌شود، چون وارد دنیای <strong>Operators</strong> می‌شویم و با داده‌ها عملیات انجام می‌دهیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Data
+ ↓
+Type
+ ↓
+Casting
+ ↓
+Operators
+ ↓
+Result</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🚀 ارتباط با جلسه بعد</h2>
+<p>الان دیگر فقط نمی‌دانی یک Variable چه مقداری دارد؛ می‌توانی <strong>نوع داده را تشخیص بدهی و در صورت نیاز آن را برای عملیات موردنظر تبدیل کنی</strong>.</p>
+<p>در جلسه بعد می‌رسیم به یکی از بخش‌های بسیار مهم Python:</p>
+<blockquote><strong>جلسه ۴ — Operators</strong></blockquote>
+<p>در آنجا یاد می‌گیریم با داده‌هایی که تا اینجا ساخته و تبدیل کرده‌ایم، <strong>محاسبه، مقایسه، تصمیم‌گیری و بررسی رابطه بین مقادیر</strong> انجام دهیم.</p>`
+,
+
+
         };
 
         // ============================================================
