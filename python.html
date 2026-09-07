@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,6 +20,8 @@
             --primary-hover: #1d4b6e;
             --primary-soft: #d1e0f0;
             --primary-glow: rgba(48, 105, 152, 0.25);
+            --link: #245f96;
+            --link-hover: #17466f;
 
             --bg-body: #f5f7fa;
             --bg-card: #ffffff;
@@ -53,6 +55,8 @@
             --primary-hover: #5fa3d9;
             --primary-soft: rgba(77, 141, 199, 0.15);
             --primary-glow: rgba(77, 141, 199, 0.25);
+            --link: #7fc4ff;
+            --link-hover: #a9d9ff;
 
             --bg-body: #1a1e26;
             --bg-card: #242a36;
@@ -331,6 +335,35 @@
             font-weight: 600;
         }
 
+        .toc-practice {
+            display: block;
+            padding: 0;
+            margin-top: 2px;
+            font-size: 0.83rem;
+            line-height: 1.45;
+        }
+
+        .toc-practice a {
+            display: block;
+            padding: 8px 14px 10px 48px;
+            color: var(--link);
+            text-decoration: none;
+            border-right: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .toc-practice a:hover {
+            color: var(--link-hover);
+            background: var(--primary-soft);
+            border-right-color: var(--primary);
+        }
+
+        .toc-practice i {
+            color: inherit;
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+
         /* ===== دکمه باز کردن سایدبار ===== */
         .sidebar-toggle {
             display: none;
@@ -472,12 +505,106 @@
             font-size: 1.05rem;
             margin: 20px 0 8px;
         }
+
+        .lesson-title {
+            color: var(--text-heading);
+            margin-top: 30px;
+        }
         p {
             margin-bottom: 14px;
             text-align: justify;
         }
         strong {
             color: var(--text-heading);
+        }
+
+        /* ===== تمرینات فصل ===== */
+        .exercise-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.65);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .exercise-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .exercise-modal-content {
+            position: relative;
+            width: min(420px, 100%);
+            padding: 32px 24px;
+            text-align: center;
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .exercise-modal-close {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            border: 0;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .exercise-modal-icon {
+            color: var(--primary);
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .exercise-modal-content h2 {
+            margin: 0 0 8px;
+            color: var(--text-heading);
+        }
+
+        .exercise-modal-chapter {
+            margin: 0 0 18px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .exercise-modal-message {
+            margin: 0;
+            color: var(--link);
+            font-weight: 600;
+        }
+
+        /* ===== لینک‌ها ===== */
+        a {
+            color: var(--link);
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        a:hover {
+            color: var(--link-hover);
+        }
+
+        /* لینک‌های فهرست ظاهر اختصاصی خودشان را حفظ می‌کنند */
+        .toc-sections li a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .toc-sections li a:hover,
+        .toc-sections li a.active {
+            color: var(--primary);
         }
         ul,
         ol {
@@ -852,6 +979,26 @@
             color: var(--text-muted);
         }
 
+
+        /* ===== تمرین‌های تعاملی ===== */
+        .exercise-card {
+            margin: 26px 0;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        .exercise-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+        .exercise-head small { display:block; color:var(--text-muted); font-size:.86rem; margin-top:2px; }
+        .exercise-num { width:34px; height:34px; border-radius:10px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+        .solution-toggle { border:1px solid var(--border); background:var(--primary-soft); color:var(--primary); padding:9px 14px; border-radius:9px; font-family:inherit; cursor:pointer; font-weight:600; }
+        .solution-toggle:hover { background:var(--primary); color:#fff; }
+        .exercise-solution { display:none; margin-top:12px; padding:14px 16px; border-right:4px solid var(--note-border); background:var(--note-bg); border-radius:var(--radius-sm); }
+        .exercise-solution.show { display:block; animation:fadeIn .25s ease; }
+        .exercise-solution pre { margin:10px 0 0; direction:ltr; text-align:left; white-space:pre-wrap; font-family:'JetBrains Mono',monospace; font-size:.9rem; }
+        .lesson-divider { border:0; border-top:1px solid var(--border); margin:32px 0; }
+
         /* ===== placeholder ===== */
         .placeholder {
             text-align: center;
@@ -1117,6 +1264,12 @@
             }
         }
     </style>
+<style>
+.lesson-goal{margin:1.25rem 0 1.75rem;padding:1rem 1.25rem;border-right:4px solid var(--primary,#6366f1);border-radius:10px;background:rgba(99,102,241,.06)}
+.lesson-goal .goal-title{display:block;margin-bottom:.55rem;font-size:1.08rem}
+.lesson-goal p{margin:0 0 .55rem}.lesson-goal ol{margin:.25rem 0 0;padding-right:1.35rem}.lesson-goal li{margin:.35rem 0}
+.section-model,.section-practice,.section-troubleshoot,.section-scenario,.section-test{padding:.7rem .9rem;margin-top:1.8rem;border-radius:9px;border-right:4px solid currentColor;background:rgba(127,127,127,.06)}
+</style>
 </head>
 
 <body>
@@ -1330,345 +1483,1339 @@
         // ============================================================
         // محتوای غنی برای ۳ درسنامه تستی (فقط ۳ بخش اول)
         // ============================================================
+        // تمرینات فصل — فعلاً خالی است و در نسخه‌های بعدی تکمیل می‌شود.
+        const chapterExercises = {};
+
         const richContent = {
-"ch1-1": `
-<div class="section-header">
+"ch1-1": `<div class="section-header">
     <div class="section-badge">۱</div>
     <div>
-        <h1>آشنایی با Python، کاربردها، نصب Python، Interpreter، اجرای کد و REPL، VS Code، افزونه Python و اجرای اولین برنامه</h1>
+        <h1>آشنایی با Python، نصب و اولین برنامه</h1>
         <div class="meta">فصل ۱ · بخش ۱ از ۱</div>
     </div>
 </div>
-
-<h2>Python چیست؟</h2>
-<p><strong>Python</strong> یک زبان برنامه‌نویسی سطح بالا، تفسیری و همه‌منظوره است که توسط <strong>Guido van Rossum</strong> در سال ۱۹۹۱ ایجاد شد. فلسفه طراحی Python بر خوانایی کد و سادگی syntax تأکید دارد.</p>
-<p>Python در حوزه‌های مختلفی کاربرد دارد:</p>
-<ul>
-    <li>توسعه وب (Backend با Django، Flask)</li>
-    <li>علم داده و یادگیری ماشین (NumPy، Pandas، TensorFlow، PyTorch)</li>
-    <li>اتوماسیون و اسکریپت‌نویسی</li>
-    <li>برنامه‌های دسکتاپ (با Tkinter، PyQt)</li>
-    <li>هوش مصنوعی و پردازش زبان طبیعی</li>
-    <li>و خیلی موارد دیگر...</li>
-</ul>
-<blockquote>Python یکی از محبوب‌ترین زبان‌های برنامه‌نویسی در جهان است که توسط شرکت‌های بزرگی مثل Google، NASA، Netflix و Instagram استفاده می‌شود.</blockquote>
-
-<h2>نصب Python</h2>
-<p>برای شروع، ابتدا باید Python را روی سیستم خود نصب کنید.</p>
-<h3>نصب روی Windows</h3>
-<p>از سایت رسمی <a href="https://python.org" target="_blank">python.org</a> آخرین نسخه را دانلود کرده و فایل <code>.exe</code> را اجرا کنید. <strong>حتماً گزینه <code>Add Python to PATH</code> را علامت بزنید</strong>.</p>
-<h3>نصب روی macOS</h3>
-<p>با استفاده از <code>brew</code>:</p>
-<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">brew install python</div></div>
-<h3>نصب روی Linux (Debian/Ubuntu)</h3>
-<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">sudo apt update\nsudo apt install python3 python3-pip</div></div>
-<p>پس از نصب، با دستور زیر می‌توانید نسخه Python را بررسی کنید:</p>
-<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python3 --version</div></div>
-
-<h2>Interpreter و اجرای کد</h2>
-<p>Python یک زبان <strong>تفسیری (Interpreted)</strong> است. یعنی کد شما توسط یک برنامه به نام <strong>Interpreter</strong> خط به خط اجرا می‌شود.</p>
-<p>شما می‌توانید کد Python را به دو روش اجرا کنید:</p>
+<blockquote class="lesson-goal">
+<strong class="goal-title">هدف جلسه</strong>
+<p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-    <li><strong>حالت تعاملی (REPL)</strong> — مستقیماً دستورات را تایپ کرده و نتیجه را ببینید.</li>
-    <li><strong>اجرای فایل اسکریپت</strong> — کد را در یک فایل با پسوند <code>.py</code> ذخیره کرده و اجرا کنید.</li>
+<li>توضیح بدهی Python چیست و چرا محبوب است.</li>
+<li>تفاوت کلی <strong>Compiler</strong> و <strong>Interpreter</strong> را بفهمی و جایگاه Python را در این میان تشخیص بدهی.</li>
+<li>معنی شماره نسخه Python مثل <code>3.14.0</code> را توضیح بدهی.</li>
+<li>Python را روی Windows نصب و <code>PATH</code> را درست تنظیم کنی.</li>
+<li>با <strong>Python Interpreter و REPL</strong> کار کنی.</li>
+<li>VS Code و افزونه Python را نصب و Interpreter مناسب را انتخاب کنی.</li>
+<li>اولین برنامه Python را بنویسی و اجرا کنی.</li>
 </ol>
-<h3>REPL چیست؟</h3>
-<p>REPL مخفف <strong>Read-Eval-Print Loop</strong> است. با تایپ <code>python3</code> در ترمینال، وارد محیط تعاملی می‌شوید:</p>
-<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">$ python3\nPython 3.11.0 (main, ...)\nType "help", "copyright", "credits" or "license" for more information.\n>>> print("Hello, World!")\nHello, World!\n>>></div></div>
-<p>برای خروج از REPL از <code>exit()</code> یا <code>Ctrl+D</code> استفاده کنید.</p>
+</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">1. قبل از Python، یک سؤال مهم: برنامه چگونه اجرا می‌شود؟</h2>
+<p>وقتی ما می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello&quot;)</div></div>
+<p>کامپیوتر مستقیماً زبان Python را مثل انسان نمی‌فهمد.</p>
+<p>پردازنده در نهایت با دستورهای سطح پایین و ماشین‌کد کار می‌کند. بنابراین بین <strong>کدی که ما می‌نویسیم</strong> و <strong>اجرای واقعی توسط کامپیوتر</strong> یک مرحله تبدیل/اجرا وجود دارد.</p>
+<p>اینجاست که دو اصطلاح مهم را می‌بینیم:</p>
+<ul><li>Compiler</li></ul>
+<ul><li>Interpreter</li></ul>
+<hr class="lesson-divider">
+<h2>2. Compiler چیست؟</h2>
+<p><strong>Compiler یا کامپایلر</strong> برنامه‌ای است که کد منبع را قبل از اجرا به شکلی قابل‌اجرا برای سیستم تبدیل می‌کند.</p>
+<p>مدل ساده:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Source Code
+     │
+     ▼
+ Compiler
+     │
+     ▼
+Machine Code / Executable
+     │
+     ▼
+     CPU</div></div>
+<p>مثلاً در زبان‌هایی مثل C، معمولاً ابتدا برنامه را کامپایل می‌کنیم و بعد فایل اجرایی تولیدشده را اجرا می‌کنیم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">3. Interpreter چیست؟</h2>
+<p><strong>Interpreter یا مفسر</strong> برنامه‌ای است که کد را دریافت کرده و آن را برای اجرا پردازش می‌کند.</p>
+<p>مدل ذهنی ساده:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python Code
+     │
+     ▼
+ Python Interpreter
+     │
+     ▼
+ Execution</div></div>
+<p>مثلاً وقتی در Terminal می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">python</div></div>
+<p>در واقع داریم <strong>Python Interpreter</strong> را اجرا می‌کنیم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">4. پس Python کامپایلر است یا Interpreter؟</h2>
+<p>اینجا یکی از نکات مهم Python Basic قرار دارد. ⭐⭐⭐</p>
+<p>اگر در یک سؤال ساده پرسیدند:</p>
+<blockquote>Python is a compiled language or interpreted language?</blockquote>
+<p>معمولاً در سطح Basic پاسخ مورد انتظار:</p>
+<blockquote><strong>Python یک زبان interpreted است.</strong></blockquote>
+<p>اما از نظر فنی، داستان کمی دقیق‌تر است.</p>
+<p>در پیاده‌سازی رایج Python یعنی <strong>CPython</strong>، کد Python ابتدا به <strong>Bytecode</strong> تبدیل می‌شود و سپس توسط Python Virtual Machine اجرا می‌شود.</p>
+<p>مدل ساده‌تر و دقیق‌تر:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python Source Code
+        │
+        ▼
+      CPython
+        │
+        ▼
+     Bytecode
+        │
+        ▼
+ Python Virtual Machine
+        │
+        ▼
+     Execution</div></div>
+<p>پس این دو جمله را با هم به خاطر بسپار:</p>
+<blockquote><strong>در سطح Basic:</strong> Python را یک زبان interpreted می‌دانیم.</blockquote>
+<blockquote><strong>از نظر فنی:</strong> CPython کد Python را به bytecode تبدیل کرده و آن را اجرا می‌کند.</blockquote>
+<h3>نکته امتحانی ⭐</h3>
+<p>نگو:</p>
+<blockquote>Python هیچ‌وقت compile نمی‌شود.</blockquote>
+<p>این جمله دقیق نیست.</p>
+<p>در CPython مرحله‌ای برای تبدیل Source Code به <strong>Bytecode</strong> وجود دارد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">5. Python چیست؟</h2>
+<p>Python یک زبان برنامه‌نویسی:</p>
+<ul><li>ساده و خوانا</li></ul>
+<ul><li>سطح بالا</li></ul>
+<ul><li>عمومی (General-Purpose)</li></ul>
+<ul><li>چندمنظوره</li></ul>
+<ul><li>دارای کتابخانه‌های بسیار زیاد</li></ul>
+<p>است.</p>
+<p>یکی از دلایل محبوبیت Python این است که Syntax آن نسبتاً ساده و نزدیک به زبان طبیعی است.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
 
-<h2>VS Code و افزونه Python</h2>
-<p><strong>Visual Studio Code</strong> یکی از محبوب‌ترین ویرایشگرهای کد برای Python است.</p>
-<p>افزونه‌های ضروری:</p>
-<ul>
-    <li><strong>Python</strong> (توسط Microsoft) — شامل IntelliSense، Linting، Debugging و ...</li>
-    <li><strong>Pylance</strong> — برای تکمیل کد سریع‌تر و بررسی نوع داده</li>
-    <li><strong>Jupyter</strong> — اگر با Notebook کار می‌کنید</li>
-</ul>
-
-<h2>اولین برنامه Python</h2>
-<p>بیایید اولین برنامه خود را بنویسیم.</p>
-<p>یک فایل جدید به نام <code>hello.py</code> ایجاد کنید و این کد را در آن بنویسید:</p>
-<div class="code-container"><span class="code-label">hello.py</span><div class="code-block">print("Hello, World!")</div></div>
-<p>سپس در ترمینال (در همان پوشه فایل) اجرا کنید:</p>
-<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python3 hello.py</div></div>
+print(name)</div></div>
+<p>در مقایسه با بسیاری از زبان‌ها، برای شروع بسیار خواناست.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">6. تاریخچه کوتاه Python</h2>
+<p>Python توسط <strong>Guido van Rossum</strong> توسعه داده شد.</p>
+<p>نسخه اولیه Python در اوایل دهه 1990 منتشر شد.</p>
+<p>چند نقطه مهم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1991
+ │
+ └── انتشار اولیه Python
+       │
+       ├── Python 2
+       │
+       └── Python 3
+             │
+             ├── 3.10
+             ├── 3.11
+             ├── 3.12
+             ├── 3.13
+             └── 3.14 ...</div></div>
+<p>Python 2 و Python 3 دو نسل اصلی بودند.</p>
+<p>امروزه برای یادگیری و توسعه جدید، <strong>Python 3</strong> استفاده می‌شود و Python 2 دیگر انتخاب مناسبی برای پروژه‌های جدید نیست.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">7. Python کجا استفاده می‌شود؟</h2>
+<p>Python فقط برای یک نوع کار ساخته نشده است.</p>
+<p>مهم‌ترین کاربردها:</p>
+<div class="table-wrap"><table><thead><tr><th>حوزه</th><th>کاربرد</th></tr></thead><tbody><tr><td>Web Development</td><td>ساخت وب‌سایت و API</td></tr><tr><td>Data Science</td><td>تحلیل داده</td></tr><tr><td>AI / Machine Learning</td><td>هوش مصنوعی و یادگیری ماشین</td></tr><tr><td>Automation</td><td>خودکارسازی کارها</td></tr><tr><td>Scripting</td><td>نوشتن اسکریپت</td></tr><tr><td>Cybersecurity</td><td>ابزارها و اسکریپت‌های امنیتی</td></tr><tr><td>Testing</td><td>تست نرم‌افزار</td></tr><tr><td>Desktop Applications</td><td>ساخت بعضی برنامه‌های دسکتاپ</td></tr></tbody></table></div>
+<p>اما یک نکته مهم:</p>
+<blockquote>لازم نیست در این دوره همه این حوزه‌ها را یاد بگیریم.</blockquote>
+<p>ما ابتدا <strong>هسته Python</strong> را یاد می‌گیریم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Syntax
+  ↓
+Variables
+  ↓
+Data Types
+  ↓
+Operators
+  ↓
+Conditions
+  ↓
+Loops
+  ↓
+Functions
+  ↓
+Data Structures
+  ↓
+Files / Exceptions / OOP
+  ↓
+Projects</div></div>
+<p>این همان مسیری است که در ادامه دوره طی خواهیم کرد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">8. شماره نسخه Python یعنی چه؟</h2>
+<p>فرض کن نسخه‌ای مثل این داشته باشیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python 3.14.0</div></div>
+<p>این عدد را باید بشناسی. ⭐⭐⭐</p>
+<p>به صورت ساده:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">3 . 14 . 0
+│   │    │
+│   │    └── PATCH
+│   └────── MINOR
+└────────── MAJOR</div></div>
+<h3>Major</h3>
+<p>عدد اول:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">3</div></div>
+<p>نسل اصلی Python را مشخص می‌کند.</p>
+<h3>Minor</h3>
+<p>عدد دوم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">14</div></div>
+<p>نسخه فرعی مهم در همان نسل را مشخص می‌کند.</p>
+<h3>Patch</h3>
+<p>عدد سوم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0</div></div>
+<p>معمولاً برای اصلاحات و bug fixها استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">3.14.0
+3.14.1
+3.14.2</div></div>
+<p>هر سه در خانواده <code>3.14</code> هستند، اما patch آنها متفاوت است.</p>
+<h3>یک نکته مهم</h3>
+<p>شماره نسخه به این معنی نیست که:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">3 = سه ویژگی
+14 = چهارده ویژگی
+0 = صفر ویژگی</div></div>
+<p>این اعداد <strong>شماره‌گذاری نسخه</strong> هستند.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">9. نصب Python</h2>
+<p>در این دوره فرض اصلی ما <strong>Windows</strong> است.</p>
+<p>برای نصب Python بهتر است از توزیع رسمی Python استفاده کنیم.</p>
+<p><a href="https://www.python.org/downloads/" target="_blank" rel="noopener noreferrer">دانلود رسمی Python</a></p>
+<p>در مستندات رسمی فعلی Python، روش نصب Windows شامل Python Install Manager و همچنین installerهای Python 3 است. (<a href="https://docs.python.org/3/using/windows.html?highlight=install&amp;utm_source=chatgpt.com "4. Using Python on Windows — Python 3.14.7 documentation"" target="_blank" rel="noopener noreferrer">Python Documentation</a>)</p>
+<hr class="lesson-divider">
+<h2>مرحله 1 — دانلود</h2>
+<p>به صفحه دانلود Python برو و نسخه مناسب Windows را دریافت کن.</p>
+<p>برای یک سیستم معمولی امروزی، نسخه <strong>64-bit</strong> انتخاب معمول است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">10. مهم‌ترین قسمت نصب: PATH ⭐⭐⭐</h2>
+<p>در هنگام نصب، یکی از مهم‌ترین مفاهیمی که باید بفهمی <strong>PATH</strong> است.</p>
+<p>فرض کن Python در این مسیر نصب شده:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">C:\...\Python314\</div></div>
+<p>و فایل اصلی آن:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">python.exe</div></div>
+<p>است.</p>
+<p>اگر مسیر Python در <code>PATH</code> سیستم باشد، وقتی در Terminal بنویسی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">python</div></div>
+<p>سیستم می‌تواند Python را پیدا کند.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Terminal
+   │
+   │  python
+   ▼
+PATH
+   │
+   ▼
+python.exe
+   │
+   ▼
+Python Interpreter</div></div>
+<p>در installerهای Windows، اضافه‌کردن مسیر Python و پوشه <code>Scripts</code> به PATH باعث می‌شود دستورهایی مانند <code>python</code> و <code>pip</code> از Terminal قابل استفاده باشند. (<a href="https://docs.python.org/3.13/using/windows.html "4. Using Python on Windows — Python 3.13.15 documentation"" target="_blank" rel="noopener noreferrer">Python Documentation</a>)</p>
+<hr class="lesson-divider">
+<h2>چرا PATH مهم است؟</h2>
+<p>اگر Python نصب شده باشد ولی PATH درست نباشد، ممکن است این اتفاق بیفتد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">python</div></div>
+<p>و Windows نتواند Python موردنظر را پیدا کند.</p>
+<p>پس:</p>
+<blockquote><strong>نصب Python ≠ الزاماً آماده بودن دستور <code>python</code> در Terminal</strong></blockquote>
+<p>PATH واسطه‌ای است که کمک می‌کند سیستم executable مناسب را پیدا کند.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">11. بررسی نصب Python</h2>
+<p>بعد از نصب، <strong>یک Terminal جدید</strong> باز کن.</p>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python --version</div></div>
+<p>مثلاً ممکن است ببینی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python 3.14.0</div></div>
+<p>یا نسخه جدیدتری از Python 3.</p>
+<p>همچنین می‌توانی امتحان کنی:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python</div></div>
+<p>اگر Python درست نصب شده باشد، وارد محیط Python می‌شوی.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python 3.14.0 ...
+&gt;&gt;&gt;</div></div>
+<p>این <code>&gt;&gt;&gt;</code> بسیار مهم است.</p>
+<p>این علامت یعنی:</p>
+<blockquote>Python آماده دریافت دستور است.</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">12. REPL چیست؟</h2>
+<p>وقتی وارد Python می‌شوی و این را می‌بینی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&gt;&gt;&gt;</div></div>
+<p>در محیط <strong>REPL</strong> هستی.</p>
+<p>REPL مخفف:</p>
+<p><strong>Read – Evaluate – Print – Loop</strong></p>
+<p>است.</p>
+<p>یعنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Read
+  ↓
+Evaluate
+  ↓
+Print
+  ↓
+Loop
+  ↺</div></div>
+<p>Python دستور تو را می‌گیرد، آن را ارزیابی می‌کند، نتیجه را نشان می‌دهد و دوباره منتظر دستور بعدی می‌ماند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">&gt;&gt;&gt; 2 + 3
+5</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">&gt;&gt;&gt; 10 * 5
+50</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">&gt;&gt;&gt; print(&quot;Hello Python&quot;)
+Hello Python</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">13. REPL چه کاربردی دارد؟</h2>
+<p>REPL برای:</p>
+<ul><li>آزمایش سریع کد</li></ul>
+<ul><li>یادگیری</li></ul>
+<ul><li>بررسی رفتار یک دستور</li></ul>
+<ul><li>محاسبات ساده</li></ul>
+<ul><li>تست یک مفهوم</li></ul>
+<p>خیلی مفید است.</p>
+<p>مثلاً قبل از اینکه کدی را وارد یک برنامه بزرگ کنیم، می‌توانیم سریع امتحانش کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">&gt;&gt;&gt; 15 / 3
+5.0</div></div>
+<p>اما پروژه واقعی را معمولاً داخل فایل <code>.py</code> می‌نویسیم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">14. REPL در برابر فایل Python</h2>
+<p>دو روش مهم برای اجرای Python داریم:</p>
+<h3>روش اول: REPL</h3>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Terminal
+   ↓
+python
+   ↓
+&gt;&gt;&gt;</div></div>
+<p>مناسب آزمایش سریع.</p>
+<h3>روش دوم: فایل Python</h3>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">hello.py</div></div>
+<p>داخل فایل:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello Python&quot;)</div></div>
+<p>و بعد اجرای آن:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python hello.py</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">             Python
+              │
+       ┌──────┴──────┐
+       ▼             ▼
+     REPL          .py File
+   آزمایش سریع     برنامه</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">15. نصب VS Code</h2>
+<p>حالا به ابزار اصلی کدنویسی می‌رسیم.</p>
+<p><strong>VS Code</strong> یک Code Editor است.</p>
+<p>نکته مهم:</p>
+<blockquote>VS Code خودش Python نیست.</blockquote>
+<p>سه چیز را از هم جدا کن:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python Interpreter
+       +
+VS Code
+       +
+Python Extension</div></div>
+<p>وظیفه هرکدام:</p>
+<div class="table-wrap"><table><thead><tr><th>ابزار</th><th>وظیفه</th></tr></thead><tbody><tr><td>Python Interpreter</td><td>اجرای کد Python</td></tr><tr><td>VS Code</td><td>نوشتن و مدیریت کد</td></tr><tr><td>Python Extension</td><td>اضافه‌کردن امکانات Python به VS Code</td></tr></tbody></table></div>
+<p>مستندات رسمی VS Code نیز تأکید می‌کند که Interpreter باید جداگانه نصب شود و افزونه Python امکانات Python را به VS Code اضافه می‌کند. (<a href="https://code.visualstudio.com/docs/languages/python "Python in Visual Studio Code"" target="_blank" rel="noopener noreferrer">Visual Studio Code</a>)</p>
+<hr class="lesson-divider">
+<h2>نصب VS Code</h2>
+<p>از سایت رسمی دانلود کن:</p>
+<p><a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">دانلود رسمی Visual Studio Code</a></p>
+<p>در Windows می‌توانی User Setup را نصب کنی. نصب User Setup مسیر <code>code</code> را نیز به PATH اضافه می‌کند تا بتوانی از Terminal با <code>code .</code> یک پوشه را باز کنی. (<a href="https://code.visualstudio.com/docs/setup/windows "Installing Visual Studio Code on Windows"" target="_blank" rel="noopener noreferrer">Visual Studio Code</a>)</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">16. نصب Python Extension</h2>
+<p>VS Code را باز کن.</p>
+<p>از قسمت:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Extensions</div></div>
+<p>عبارت:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python</div></div>
+<p>را جست‌وجو کن.</p>
+<p>افزونه رسمی Python را نصب کن.</p>
+<p>بعد از نصب، VS Code می‌تواند Interpreterهای Python را شناسایی و انتخاب کند. (<a href="https://code.visualstudio.com/docs/languages/python "Python in Visual Studio Code"" target="_blank" rel="noopener noreferrer">Visual Studio Code</a>)</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">17. انتخاب Python Interpreter</h2>
+<p>یکی از مفاهیم مهم VS Code همین است.</p>
+<p>ممکن است روی کامپیوتر چند Python داشته باشی.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python 3.12
+Python 3.13
+Python 3.14</div></div>
+<p>VS Code باید بداند:</p>
+<blockquote>«برای اجرای این پروژه از کدام Python استفاده کنم؟»</blockquote>
+<p>برای همین گزینه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python: Select Interpreter</div></div>
+<p>وجود دارد.</p>
+<p>از Command Palette می‌توانی آن را اجرا کنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ctrl + Shift + P</div></div>
+<p>سپس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python: Select Interpreter</div></div>
+<p>و Python موردنظر را انتخاب کن.</p>
+<h3>مدل ذهنی</h3>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">VS Code
+   │
+   │ Python Extension
+   ▼
+Select Interpreter
+   │
+   ▼
+Python 3.x
+   │
+   ▼
+Run Code</div></div>
+<p>این مفهوم بعداً هنگام کار با <strong>Virtual Environment</strong> بسیار مهم‌تر خواهد شد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">18. اولین برنامه Python</h2>
+<p>حالا وقت آن است که واقعاً برنامه بنویسیم.</p>
+<p>در VS Code یک پوشه برای دوره بساز.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">python-course</div></div>
+<p>داخل آن فایل:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">hello.py</div></div>
+<p>بساز.</p>
+<p>داخل فایل بنویس:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello, Python!&quot;)</div></div>
+<p>حالا فایل را ذخیره کن.</p>
+<hr class="lesson-divider">
+<h2>اجرای برنامه</h2>
+<p>می‌توانی از Terminal داخل VS Code اجرا کنی:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python hello.py</div></div>
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello, World!</div></div>
-<div class="box important"><i class="fas fa-star"></i><div><strong>نکته مهم</strong>تابع <code>print()</code> در Python برای نمایش خروجی در کنسول استفاده می‌شود. رشته <code>"Hello, World!"</code> یک مقدار از نوع <strong>str</strong> (string) است.</div></div>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello, Python!</div></div>
+<p>تبریک! </p>
+<p>این اولین برنامه Python توست.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">19. یک قدم جلوتر</h2>
+<p>حالا برنامه را تغییر بده:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello, Python!&quot;)
+print(&quot;I am learning Python.&quot;)
+print(2 + 3)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello, Python!
+I am learning Python.
+5</div></div>
+<p>اینجا سه نوع دستور ساده را دیدی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;text&quot;)</div></div>
+<p>چاپ متن</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(2 + 3)</div></div>
+<p>محاسبه یک عبارت</p>
+<p>و چند دستور پشت سر هم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(...)
+print(...)
+print(...)</div></div>
+<p>در جلسات بعدی دقیق‌تر می‌بینیم که این مقادیر چه نوع داده‌ای هستند.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">20. یک نکته مهم درباره اجرای کد</h2>
+<p>فرض کن فایل ما این است:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;A&quot;)
+print(&quot;B&quot;)
+print(&quot;C&quot;)</div></div>
+<p>Python برنامه را طبق ترتیب اجرای برنامه پردازش می‌کند:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">print(&quot;A&quot;)
+     ↓
+print(&quot;B&quot;)
+     ↓
+print(&quot;C&quot;)</div></div>
+<p>بنابراین خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">A
+B
+C</div></div>
+<p>است.</p>
+<p>این مفهوم ساده، بعدها پایه‌ی شرط‌ها، حلقه‌ها و توابع خواهد شد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title"> مدل ذهنی کل جلسه</h2>
+<p>اگر بخواهیم کل جلسه را در یک تصویر ذهنی خلاصه کنیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">                 Python
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+    Python Code              Python 3
+        │                       │
+        │                  Versioning
+        ▼
+   CPython / Interpreter
+        │
+        ▼
+     Bytecode
+        │
+        ▼
+ Python Virtual Machine
+        │
+        ▼
+     Execution</div></div>
+<p>و برای محیط کاری:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">┌──────────────────────────────┐
+│          VS Code             │
+│                              │
+│   Write Python Code          │
+│            │                 │
+│     Python Extension         │
+│            │                 │
+│     Select Interpreter       │
+└────────────┬─────────────────┘
+             │
+             ▼
+       Python Interpreter
+             │
+             ▼
+          Execute</div></div>
+<hr class="lesson-divider">
+<h2> تمرین عملی</h2>
+<p>ابتدا خودت کد را بنویس و اجرا کن. <strong>پاسخ‌ها عمداً مخفی هستند</strong> تا قبل از تلاش، راه‌حل را نبینی.</p>
 
-<h2>💻 تمرین عملی در ویرایشگر</h2>
-<p>کدهای زیر را در ویرایشگر اجرا کنید و نتیجه را ببینید. سپس خودتان تغییرات ایجاد کنید.</p>
-
-<!-- کانتینر ویرایشگر بهبودیافته -->
-<div class="python-playground" id="pythonPlaygroundRoot">
-    <div class="playground-header">
-        <div class="playground-title">
-            <i class="fas fa-code"></i>
-            <span>Python Playground</span>
-        </div>
-        <div class="playground-status" id="playgroundStatus">در حال آماده‌سازی...</div>
-        <div class="playground-actions">
-            <button type="button" class="playground-btn clear" onclick="clearPlaygroundOutput()" title="پاک کردن خروجی">
-                <i class="fas fa-eraser"></i> پاک‌کردن
-            </button>
-            <button type="button" class="playground-btn run" id="runPlaygroundBtn" onclick="runCodePlayground()" title="اجرای کد (Ctrl+Enter)">
-                <i class="fas fa-play"></i> اجرا
-            </button>
-        </div>
-    </div>
-    <div class="playground-editor-wrap">
-        <textarea id="pythonPlayground" style="display:none;"># تمرین ۱: سلام دنیا
-print("سلام دنیا!")
-
-# تمرین ۲: جمع دو عدد
-a = 5
-b = 7
-print("جمع:", a + b)
-
-# تمرین ۳: دریافت نام از کاربر (اختیاری)
-# name = input("اسم شما: ")
-# print("سلام", name)
-
-# حالا خودتان تغییرات را امتحان کنید!</textarea>
-    </div>
-    <div class="playground-output" id="playgroundOutput">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۱</span><div><strong>تمرین REPL</strong><small>خروجی هر عبارت را قبل از اجرا حدس بزن.</small></div></div>
+  <p>Python را در Terminal اجرا کن و این چهار عبارت را امتحان کن:</p>
+  <div class="python-playground" data-playground="ex1">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · Python</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">print(10 + 20)
+print(50 - 15)
+print(5 * 4)
+print(20 / 5)</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol1"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۱</button>
+  <div class="exercise-solution" id="sol1"><strong>پاسخ:</strong><pre>30
+35
+20
+4.0</pre></div>
 </div>
 
-<p class="playground-hint"><strong>📌 نکته:</strong> کد را ویرایش کنید و دکمه «اجرا» را بزنید (یا <kbd>Ctrl</kbd>+<kbd>Enter</kbd>). از <code>input()</code> هم می‌توانید استفاده کنید — یک پنجرهٔ کوچک برای ورود باز می‌شود.</p>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۲</span><div><strong>تمرین اولین فایل</strong><small>برنامه‌ای بساز که سه خط مشخص را چاپ کند.</small></div></div>
+  <p>یک برنامه بنویس که این خروجی را تولید کند:</p>
+  <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">My name is ...
+I am learning Python.
+Python is interesting!</div></div>
+  <div class="python-playground" data-playground="ex2">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · about_me.py</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
-<div class="summary-box">
-    <h3>🧠 جمع‌بندی جلسه ۱</h3>
-    <ul>
-        <li>Python یک زبان تفسیری، سطح بالا و همه‌منظوره است.</li>
-        <li>برای نصب Python از سایت رسمی یا مدیر بسته سیستم خود استفاده کنید.</li>
-        <li>REPL محیط تعاملی برای آزمایش سریع کد است.</li>
-        <li>برای نوشتن کدهای جدی از فایل‌های <code>.py</code> و ویرایشگرهایی مثل VS Code استفاده کنید.</li>
-        <li>اولین برنامه: <code>print("Hello, World!")</code></li>
-    </ul>
+</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol2"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۲</button>
+  <div class="exercise-solution" id="sol2"><strong>یک پاسخ نمونه:</strong><pre>print("My name is Ali.")
+print("I am learning Python.")
+print("Python is interesting!")</pre></div>
 </div>
 
-<h2>خودآزمایی</h2>
-<div class="quiz-card"><p>❓ تست ۱: کدام گزینه تعریف درستی از Python است؟</p>
-    <div class="quiz-options">
-        <button onclick="selectOption(this)">الف) یک زبان کامپایلری برای توسعه وب</button>
-        <button onclick="selectOption(this)">ب) یک زبان تفسیری، سطح بالا و همه‌منظوره</button>
-        <button onclick="selectOption(this)">ج) یک سیستمعامل مبتنی بر لینوکس</button>
-        <button onclick="selectOption(this)">د) یک پایگاه داده NoSQL</button>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۳</span><div><strong>تمرین ترکیبی</strong><small>بدون استفاده از متغیرها، خروجی خواسته‌شده را بساز.</small></div></div>
+  <p>برنامه‌ای بنویس که این خروجی را تولید کند:</p>
+  <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Python
+3 + 7 = 10
+I am starting Python.</div></div>
+  <div class="python-playground" data-playground="ex3">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · Python</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol3"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۳</button>
+  <div class="exercise-solution" id="sol3"><strong>پاسخ نمونه:</strong><pre>print("Python")
+print("3 + 7 =", 3 + 7)
+print("I am starting Python.")</pre></div>
+</div>
+
+<h3>💡 چرا ادیتور داخل درس؟</h3>
+<p>از اینجا به بعد هر جا تمرین واقعاً قابل اجرا باشد، بهتر است همان‌جا کد را بنویسی و نتیجه را ببینی. این کار فاصله بین «خواندن» و «برنامه‌نویسی واقعی» را کمتر می‌کند.</p>
+
+<h2> Troubleshooting<h1 class="lesson-title section-troubleshoot">Troubleshooting — اگر Python اجرا نشد</h1>
+<h3>مشکل ۱</h3>
+<p>می‌نویسی:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python --version</div></div>
+<p>ولی Python پیدا نمی‌شود.</p>
+<p>اول Terminal را ببند و دوباره باز کن.</p>
+<p>اگر مشکل ادامه داشت، نصب Python و PATH را بررسی کن. در Windows، مسیر <code>python.exe</code> و پوشه <code>Scripts</code> می‌توانند به PATH اضافه شوند. (<a href="https://docs.python.org/3.13/using/windows.html "4. Using Python on Windows — Python 3.13.15 documentation"" target="_blank" rel="noopener noreferrer">Python Documentation</a>)</p>
+<hr class="lesson-divider">
+<h3>مشکل ۲ — چند نسخه Python</h3>
+<p>ممکن است:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python --version</div></div>
+<p>نسخه‌ای غیر از نسخه‌ای که انتظار داری نشان دهد.</p>
+<p>این معمولاً به وجود چند Python یا تنظیمات PATH مربوط است.</p>
+<p>در ادامه دوره، هنگام یادگیری <code>venv</code> این موضوع را دقیق‌تر مدیریت خواهیم کرد.</p>
+<hr class="lesson-divider">
+<h3>مشکل ۳ — VS Code کد را اجرا نمی‌کند</h3>
+<p>این سه مورد را بررسی کن:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1. Python نصب شده؟
+2. Python Extension نصب شده؟
+3. Interpreter درست انتخاب شده؟</div></div>
+<p>این سه مورد معمولاً پایه اجرای Python در VS Code هستند. (<a href="https://code.visualstudio.com/docs/languages/python "Python in Visual Studio Code"" target="_blank" rel="noopener noreferrer">Visual Studio Code</a>)</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">⭐ نکات مهم جلسه</h2>
+<ul><li><strong>Python</strong> یک زبان برنامه‌نویسی General-Purpose است.</li></ul>
+<ul><li>در سطح Basic، Python را یک زبان <strong>Interpreted</strong> می‌دانیم.</li></ul>
+<ul><li>در CPython، کد ابتدا به <strong>Bytecode</strong> تبدیل می‌شود.</li></ul>
+<ul><li><code>&gt;&gt;&gt;</code> علامت ورود به <strong>REPL</strong> است.</li></ul>
+<ul><li>REPL یعنی <strong>Read → Evaluate → Print → Loop</strong>.</li></ul>
+<ul><li>فایل‌های Python معمولاً پسوند <code>.py</code> دارند.</li></ul>
+<ul><li><code>python --version</code> نسخه Python را نشان می‌دهد.</li></ul>
+<ul><li>در <code>3.14.0</code>، سه بخش اصلی داریم: <strong>Major / Minor / Patch</strong>.</li></ul>
+<ul><li><code>PATH</code> به سیستم کمک می‌کند executableهایی مثل Python را پیدا کند.</li></ul>
+<ul><li><strong>VS Code جای Python Interpreter را نمی‌گیرد.</strong></li></ul>
+<ul><li>Python Extension امکانات Python را به VS Code اضافه می‌کند.</li></ul>
+<ul><li>VS Code و Python Interpreter دو چیز متفاوت هستند.</li></ul>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🔄 Recall سریع</h2>
+<p>بدون نگاه‌کردن به درس، سعی کن به این ۸ سؤال جواب بده:</p>
+<ol><li>Compiler چه کاری انجام می‌دهد؟</li></ol>
+<ol><li>Interpreter چیست؟</li></ol>
+<ol><li>Python در سطح Basic در کدام دسته قرار می‌گیرد؟</li></ol>
+<ol><li>Bytecode چیست؟</li></ol>
+<ol><li><code>&gt;&gt;&gt;</code> چه مفهومی دارد؟</li></ol>
+<ol><li><code>PATH</code> چرا مهم است؟</li></ol>
+<ol><li>VS Code چه تفاوتی با Python Interpreter دارد؟</li></ol>
+<ol><li><code>3.14.0</code> را چگونه تفسیر می‌کنیم؟</li></ol>
+<p>اگر توانستی این‌ها را توضیح بدهی، هسته جلسه ۱ را یاد گرفته‌ای.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-scenario">سناریوی ترکیبی</h1>
+<p>فرض کن دوستت می‌خواهد Python را شروع کند و می‌گوید:</p>
+<blockquote>«Python را نصب کردم ولی وقتی در Terminal می‌نویسم <code>python</code>، اجرا نمی‌شود. VS Code هم نصب کردم.»</blockquote>
+<p>بیایید مرحله‌ای مشکل را بررسی کنیم.</p>
+<h3>مرحله ۱ — بررسی Python</h3>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python --version</div></div>
+<p>اگر نسخه نمایش داده نشد، مشکل احتمالاً در نصب یا PATH است.</p>
+<h3>مرحله ۲ — بررسی VS Code</h3>
+<p>VS Code را باز می‌کنیم و مطمئن می‌شویم Python Extension نصب شده است.</p>
+<h3>مرحله ۳ — انتخاب Interpreter</h3>
+<p>از:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ctrl + Shift + P</div></div>
+<p>استفاده می‌کنیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python: Select Interpreter</div></div>
+<p>و Python نصب‌شده را انتخاب می‌کنیم.</p>
+<h3>مرحله ۴ — ساخت برنامه</h3>
+<p>فایل:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">hello.py</div></div>
+<p>با:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello Python&quot;)</div></div>
+<h3>مرحله ۵ — اجرا</h3>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python hello.py</div></div>
+<p>اگر خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello Python</div></div>
+<p>را دیدیم، زنجیره کامل درست است:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python Installation
+        ↓
+       PATH
+        ↓
+Interpreter
+        ↓
+VS Code
+        ↓
+Python Extension
+        ↓
+      .py File
+        ↓
+      Execute</div></div>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-test">تست پایانی — دقیقاً ۷ سؤال</h1>
+<p>هر سؤال را پاسخ بده و بعد گزینه‌ات را انتخاب کن تا پاسخ و توضیح همان سؤال نمایش داده شود.</p>
+<div class="quiz-card"><p>❓ سؤال ۱: کدام گزینه بهترین توضیح برای Interpreter است؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) برنامه‌ای که فقط فایل‌های Python را ویرایش می‌کند</button><button onclick="selectOption(this)">ب) برنامه‌ای که کد را برای اجرا پردازش می‌کند</button><button onclick="selectOption(this)">ج) سخت‌افزاری برای اجرای Python</button><button onclick="selectOption(this)">د) متغیری که نسخه Python را مشخص می‌کند</button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Interpreter کد را برای اجرا پردازش می‌کند.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۲: در CPython، کد Python به چه چیزی تبدیل می‌شود؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) HTML</button><button onclick="selectOption(this)">ب) CSS</button><button onclick="selectOption(this)">ج) Bytecode</button><button onclick="selectOption(this)">د) SQL</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>CPython کد منبع را به Bytecode تبدیل می‌کند و سپس آن را اجرا می‌کند.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۳: خروجی کد زیر چیست؟ <br><code>print(5 + 3)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>53</code></button><button onclick="selectOption(this)">ب) <code>8</code></button><button onclick="selectOption(this)">ج) <code>5 + 3</code></button><button onclick="selectOption(this)">د) Error</button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>عملگر <code>+</code> بین دو عدد، جمع انجام می‌دهد.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۴: عبارت <code>&gt;&gt;&gt;</code> در Python معمولاً نشان‌دهنده چیست؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) خطای Python</button><button onclick="selectOption(this)">ب) پایان برنامه</button><button onclick="selectOption(this)">ج) Python REPL آماده دریافت دستور است</button><button onclick="selectOption(this)">د) نسخه Python</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>&gt;&gt;&gt;</code> prompt محیط تعاملی Python یا REPL است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۵: در نسخه <code>3.14.2</code> عدد <code>2</code> معمولاً نشان‌دهنده چیست؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) Major</button><button onclick="selectOption(this)">ب) Minor</button><button onclick="selectOption(this)">ج) Patch</button><button onclick="selectOption(this)">د) Architecture</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>در شماره‌گذاری <code>Major.Minor.Patch</code>، بخش سوم Patch است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۶: اگر Python نصب شده باشد اما <code>python --version</code> کار نکند، کدام مورد یکی از اولین چیزهایی است که باید بررسی شود؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) RAM</button><button onclick="selectOption(this)">ب) PATH</button><button onclick="selectOption(this)">ج) نام فایل <code>.py</code></button><button onclick="selectOption(this)">د) رنگ VS Code</button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>PATH یکی از عوامل اصلی پیدا شدن executable مربوط به Python از Terminal است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۷: کدام گزینه درباره VS Code و Python درست است؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) VS Code خودش Python Interpreter است.</button><button onclick="selectOption(this)">ب) برای اجرای Python، VS Code به هیچ Interpreterای نیاز ندارد.</button><button onclick="selectOption(this)">ج) Python Interpreter و VS Code دو ابزار متفاوت هستند.</button><button onclick="selectOption(this)">د) Python Extension جایگزین Python Interpreter است.</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>VS Code محیط ویرایش کد است؛ Interpreter مسئول اجرای Python است و Extension امکانات Python را در VS Code فراهم می‌کند.</div></div>
+<h2 class="lesson-title"> جمع‌بندی جلسه</h2>
+<p>در جلسه اول هنوز وارد خود زبان Python به شکل جدی نشده‌ایم؛ در واقع <strong>زمین بازی را آماده کردیم</strong>.</p>
+<p>مسیر ذهنی ما این است:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Python چیست؟
+      ↓
+چطور اجرا می‌شود؟
+      ↓
+Interpreter / Bytecode
+      ↓
+Python Version
+      ↓
+Installation
+      ↓
+PATH
+      ↓
+REPL
+      ↓
+VS Code
+      ↓
+Python Extension
+      ↓
+اولین فایل .py
+      ↓
+اولین برنامه </div></div>
+<p>از <strong>جلسه ۲</strong> وارد بخش اصلی زبان می‌شویم:</p>
+<blockquote><strong>Variables + Data Types</strong></blockquote>
+<p>و آنجا دیگر شروع می‌کنیم به ساختن برنامه‌هایی که واقعاً با داده‌ها کار می‌کنند.</p>`
+,
+"ch2-1": `<div class="section-header">
+    <div class="section-badge">۲</div>
+    <div>
+        <h1>Variables و Data Types</h1>
+        <div class="meta">فصل ۲ · بخش ۱ از ۱</div>
     </div>
-    <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Python یک زبان تفسیری (Interpreted)، سطح بالا (High-level) و همه‌منظوره (General-purpose) است.</div>
 </div>
+<blockquote class="lesson-goal">
+<strong class="goal-title">هدف جلسه</strong>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+<li>مفهوم <strong>Variable</strong> را به‌صورت درست و مفهومی توضیح بدهی.</li>
+<li>متغیر بسازی، مقدارش را بخوانی و مقدار جدید به آن بدهی.</li>
+<li>قوانین مهم <strong>نام‌گذاری Variables</strong> را رعایت کنی.</li>
+<li>تفاوت <code>int</code>، <code>float</code>، <code>str</code>، <code>bool</code> و <code>None</code> را تشخیص بدهی.</li>
+<li>با <code>type()</code> نوع داده یک مقدار را بررسی کنی.</li>
+<li>در یک برنامه ساده چند نوع داده را کنار هم استفاده کنی.</li>
+</ol>
+</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">1. از جلسه قبل تا این جلسه</h2>
+<p>در جلسه قبل نوشتیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(&quot;Hello Python&quot;)
+print(10 + 20)</div></div>
+<p>اما یک مشکل داریم.</p>
+<p>اگر عدد <code>10</code> یا نام <code>"Ali"</code> را چندین بار در برنامه استفاده کنیم، بهتر است آن را <strong>در یک نام نگه داریم</strong> تا بتوانیم بعداً از آن استفاده یا مقدارش را تغییر دهیم.</p>
+<p>اینجاست که مفهوم <strong>Variable</strong> وارد می‌شود.</p>
+<p>مدل ذهنی این جلسه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">                    Python Data
+                        │
+          ┌─────────────┼─────────────┐
+          ▼             ▼             ▼
+       Numbers        Text         Logic
+          │             │             │
+      int / float      str           bool
+                                     
+                         +
+                       None</div></div>
+<p>و Variable وسیله‌ای است که به ما کمک می‌کند با این داده‌ها کار کنیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variable
+   │
+   ▼
+Value + Type</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">2. Variable چیست؟ ⭐⭐⭐</h2>
+<p>فرض کن می‌خواهیم سن یک شخص را در برنامه نگه داریم.</p>
+<p>می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>اینجا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">age  ───────►  25</div></div>
+<p><code>age</code> نام متغیر است و <code>25</code> مقدار آن است.</p>
+<p>به زبان ساده:</p>
+<blockquote><strong>Variable یک نام است که در برنامه برای دسترسی به یک مقدار استفاده می‌کنیم.</strong></blockquote>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+age = 25
+height = 1.75</div></div>
+<p>حالا داریم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name    → &quot;Ali&quot;
+age     → 25
+height  → 1.75</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">3. علامت <code>=</code> در Python</h2>
+<p>این یکی از مهم‌ترین نکات جلسه است.</p>
+<p>در:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>علامت <code>=</code> را در این سطح به معنی <strong>Assignment</strong> در نظر بگیر.</p>
+<p>یعنی:</p>
+<blockquote>مقدار سمت راست را به نام سمت چپ نسبت بده.</blockquote>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">age = 25
+│     │
+│     └── Value
+└──────── Variable</div></div>
+<p>بنابراین:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10</div></div>
+<p>یعنی:</p>
+<blockquote>مقدار <code>10</code> را به <code>x</code> نسبت بده.</blockquote>
+<h3>❌ اشتباه رایج</h3>
+<p>ممکن است مبتدی فکر کند:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10</div></div>
+<p>یعنی:</p>
+<blockquote>x برابر با 10 است.</blockquote>
+<p>برای شروع بد نیست، اما مدل ذهنی دقیق‌تر این است:</p>
+<blockquote><code>10</code> را به نام <code>x</code> <strong>Assignment</strong> کن.</blockquote>
+<p>چون بعداً می‌توانیم بنویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 20</div></div>
+<p>و مقدار جدیدی به همان Variable نسبت بدهیم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">4. تغییر مقدار Variable</h2>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 20
 
-<div class="quiz-card"><p>❓ تست ۲: برای اجرای یک فایل Python به نام <code>script.py</code> در ترمینال از کدام دستور استفاده می‌کنیم؟</p>
-    <div class="quiz-options">
-        <button onclick="selectOption(this)">الف) <code>python script</code></button>
-        <button onclick="selectOption(this)">ب) <code>python3 script.py</code></button>
-        <button onclick="selectOption(this)">ج) <code>run script.py</code></button>
-        <button onclick="selectOption(this)">د) <code>py script</code></button>
-    </div>
-    <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>دستور صحیح <code>python3 script.py</code> است. در برخی سیستم‌ها <code>python script.py</code> نیز کار می‌کند.</div>
+print(age)
+
+age = 21
+
+print(age)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">20
+21</div></div>
+<p>یعنی Variable می‌تواند مقدار جدید بگیرد.</p>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">age ──► 20
+
+age = 21
+
+age ──► 21</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">5. استفاده از Variable</h2>
+<p>وقتی Variable ساختیم، می‌توانیم از نام آن در قسمت‌های مختلف برنامه استفاده کنیم.</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Sara&quot;
+age = 22
+
+print(name)
+print(age)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Sara
+22</div></div>
+<p>حتی می‌توانیم از Variable در محاسبات استفاده کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 100
+count = 3
+
+total = price * count
+
+print(total)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">300</div></div>
+<p>اینجا چند Variable داریم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price → 100
+count → 3
+total → 300</div></div>
+<p>این دقیقاً همان چیزی است که در جلسات آینده برای ساخت برنامه‌های واقعی به آن نیاز داریم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">6. چند Variable را همزمان بسازیم</h2>
+<p>می‌توانیم بنویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+age = 25
+city = &quot;Baku&quot;</div></div>
+<p>هر خط یک Assignment است.</p>
+<p>این روش برای مبتدیان خواناتر است و فعلاً بهترین روش یادگیری ماست.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">7. قوانین نام‌گذاری Variable ⭐⭐⭐</h2>
+<p>Python برای نام Variableها قوانین مشخصی دارد.</p>
+<h3>قانون ۱ — می‌توانیم از حروف استفاده کنیم</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+age = 20</div></div>
+<h3>قانون ۲ — می‌توانیم از عدد استفاده کنیم، اما نه در ابتدای نام</h3>
+<p>درست:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age2 = 20</div></div>
+<p>درست:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">user1 = &quot;Ali&quot;</div></div>
+<p>غلط:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">2age = 20</div></div>
+<p>چون نام Variable نباید با عدد شروع شود.</p>
+<h3>قانون ۳ — از <code>_</code> می‌توانیم استفاده کنیم</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">first_name = &quot;Ali&quot;
+user_age = 25</div></div>
+<p>این روش بسیار رایج است.</p>
+<h3>قانون ۴ — فاصله مجاز نیست</h3>
+<p>غلط:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">first name = &quot;Ali&quot;</div></div>
+<p>درست:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">first_name = &quot;Ali&quot;</div></div>
+<h3>قانون ۵ — Python به حروف بزرگ و کوچک حساس است</h3>
+<p>این دو Variable متفاوت هستند:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+Name = &quot;Sara&quot;
+
+print(name)
+print(Name)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ali
+Sara</div></div>
+<p>پس:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name ≠ Name</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">8. Convention مناسب برای نام‌گذاری</h2>
+<p>از نظر Syntax ممکن است نام‌های مختلفی مجاز باشند، اما یک سبک استاندارد و خوانا داریم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">first_name = &quot;Ali&quot;
+user_age = 25
+total_price = 100</div></div>
+<p>این سبک را <strong>snake_case</strong> می‌گوییم.</p>
+<p>در Python معمولاً برای نام Variableها از <code>snake_case</code> استفاده می‌کنیم.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">9. Data Type چیست؟ ⭐⭐⭐</h2>
+<p>حالا به بخش بسیار مهم جلسه می‌رسیم.</p>
+<p>همه مقادیر یکسان نیستند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+name = &quot;Ali&quot;
+height = 1.75
+is_student = True</div></div>
+<p>این‌ها انواع مختلفی از داده هستند.</p>
+<p>به نوع داده می‌گوییم:</p>
+<blockquote><strong>Data Type</strong></blockquote>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Value
+ │
+ └── Data Type</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25       → int
+1.75     → float
+&quot;Ali&quot;    → str
+True     → bool
+None     → NoneType</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">10. <code>int</code> — عدد صحیح ⭐⭐⭐</h2>
+<p><code>int</code> مخفف <strong>Integer</strong> است.</p>
+<p>برای اعداد صحیح استفاده می‌شود:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+score = 100
+temperature = -5</div></div>
+<p>همه این‌ها <code>int</code> هستند.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+
+print(type(age))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'int'&gt;</div></div>
+<h3>عدد مثبت، منفی و صفر</h3>
+<p>همه این‌ها <code>int</code> هستند:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10
+y = -10
+z = 0</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">11. <code>float</code> — عدد اعشاری ⭐⭐⭐</h2>
+<p>برای اعداد دارای بخش اعشاری از <code>float</code> استفاده می‌کنیم.</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 19.99
+height = 1.75
+temperature = -2.5</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 19.99
+
+print(type(price))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'float'&gt;</div></div>
+<h3>نکته مهم</h3>
+<p>در Python برای اعشار از <strong><code>.</code></strong> استفاده می‌کنیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1.5</div></div>
+<p>نه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1,5</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">12. تفاوت <code>int</code> و <code>float</code></h2>
+<div class="table-wrap"><table><thead><tr><th>Data Type</th><th>مثال</th><th>مفهوم</th></tr></thead><tbody><tr><td><code>int</code></td><td><code>10</code></td><td>عدد صحیح</td></tr><tr><td><code>float</code></td><td><code>10.5</code></td><td>عدد اعشاری</td></tr></tbody></table></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">a = 10
+b = 10.0</div></div>
+<p>از نظر مقدار عددی ممکن است مشابه به نظر برسند، اما <strong>نوع داده متفاوت است</strong>:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10    → int
+10.0  → float</div></div>
+<p>بررسی:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(type(a))
+print(type(b))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'int'&gt;
+&lt;class 'float'&gt;</div></div>
+<p>⭐ این تفاوت در Python مهم است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">13. <code>str</code> — رشته متنی ⭐⭐⭐</h2>
+<p><code>str</code> مخفف <strong>String</strong> است.</p>
+<p>برای متن استفاده می‌شود.</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+city = &quot;Baku&quot;
+message = &quot;Hello Python&quot;</div></div>
+<p>متن معمولاً داخل quotation قرار می‌گیرد:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;Ali&quot;</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">'Ali'</div></div>
+<p>هر دو قابل استفاده‌اند.</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name1 = &quot;Ali&quot;
+name2 = 'Sara'</div></div>
+<h3>عدد یا متن؟</h3>
+<p>به این دو دقت کن:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>و:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;</div></div>
+<p>این دو <strong>یکسان نیستند</strong>.</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">25   → int
+&quot;25&quot; → str</div></div>
+<p>اولی عدد است و می‌توانیم با آن محاسبه کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25
+
+print(age + 5)</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">30</div></div>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;
+
+print(age + 5)</div></div>
+<p>خطا می‌دهد، چون Python نمی‌تواند به شکل مستقیم <code>str</code> و <code>int</code> را با <code>+</code> جمع کند.</p>
+<p>این موضوع در جلسه <strong>Type Casting</strong> به‌صورت کامل‌تر بررسی خواهد شد.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">14. <code>bool</code> — مقدار منطقی ⭐⭐⭐</h2>
+<p><code>bool</code> مخفف <strong>Boolean</strong> است.</p>
+<p>فقط دو مقدار دارد:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">True
+False</div></div>
+<p>دقت کن:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">True</div></div>
+<p>با:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">&quot;True&quot;</div></div>
+<p>متفاوت است.</p>
+<p>اولی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">bool</div></div>
+<p>دومی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">str</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">is_student = True
+is_admin = False</div></div>
+<p>این نوع داده بعداً در شرط‌ها بسیار مهم خواهد شد.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">is_logged_in = True</div></div>
+<p>می‌تواند بیان کند که کاربر وارد سیستم شده است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">15. <code>None</code> — یعنی «فعلاً هیچ مقداری نداریم» ⭐⭐</h2>
+<p><code>None</code> یک مقدار خاص در Python است که معمولاً برای نشان دادن <strong>نبودن مقدار</strong> استفاده می‌شود.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = None</div></div>
+<p>یعنی فعلاً <code>result</code> مقدار مشخصی ندارد.</p>
+<p>نوع آن:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(type(result))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'NoneType'&gt;</div></div>
+<h3>نکته مهم</h3>
+<p><code>None</code> با صفر یکی نیست:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">None ≠ 0</div></div>
+<p>و با رشته خالی هم یکی نیست:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">None ≠ &quot;&quot;</div></div>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = None
+y = 0
+z = &quot;&quot;</div></div>
+<p>سه مقدار متفاوت داریم.</p>
+<p>در Python Basic فعلاً همین مدل ذهنی کافی است:</p>
+<blockquote><code>None</code> یعنی «مقدار وجود ندارد / فعلاً مقداری تعیین نشده».</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">16. جدول مهم Data Types</h2>
+<p>این جدول را حتماً بلد باش. ⭐⭐⭐</p>
+<div class="table-wrap"><table><thead><tr><th>Type</th><th>نام</th><th>مثال</th><th>کاربرد</th></tr></thead><tbody><tr><td><code>int</code></td><td>Integer</td><td><code>25</code></td><td>عدد صحیح</td></tr><tr><td><code>float</code></td><td>Floating Point</td><td><code>3.14</code></td><td>عدد اعشاری</td></tr><tr><td><code>str</code></td><td>String</td><td><code>"Python"</code></td><td>متن</td></tr><tr><td><code>bool</code></td><td>Boolean</td><td><code>True</code></td><td>درست/غلط</td></tr><tr><td><code>NoneType</code></td><td>None</td><td><code>None</code></td><td>نبود مقدار</td></tr></tbody></table></div>
+<p>مدل حفظی ساده:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">int      → عدد صحیح
+float    → عدد اعشاری
+str      → متن
+bool     → True / False
+None     → نبود مقدار</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">17. تابع <code>type()</code> ⭐⭐⭐</h2>
+<p>برای فهمیدن Data Type یک مقدار از <code>type()</code> استفاده می‌کنیم.</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10
+
+print(type(x))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'int'&gt;</div></div>
+<p>مثال:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+price = 10.5
+active = True
+data = None
+
+print(type(name))
+print(type(price))
+print(type(active))
+print(type(data))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'str'&gt;
+&lt;class 'float'&gt;
+&lt;class 'bool'&gt;
+&lt;class 'NoneType'&gt;</div></div>
+<p>پس:</p>
+<blockquote><code>type()</code> برای بررسی نوع داده یک مقدار استفاده می‌شود.</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">18. Variable و Data Type چه ارتباطی دارند؟</h2>
+<p>این دو مفهوم را قاطی نکن.</p>
+<p>مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>داریم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variable → age
+Value    → 25
+Type     → int</div></div>
+<p>یا:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;</div></div>
+<p>داریم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variable → name
+Value    → &quot;Ali&quot;
+Type     → str</div></div>
+<p>مدل ذهنی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">             Variable
+                │
+                ▼
+              Value
+                │
+                ▼
+              Type</div></div>
+<p>در واقع Variable نامی است که با آن به داده دسترسی پیدا می‌کنیم؛ Data Type ویژگی نوع آن داده است.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">19. Python Dynamic Typing دارد</h2>
+<p>یکی از ویژگی‌های مهم Python این است که لازم نیست هنگام ساخت Variable نوع آن را از قبل بنویسیم.</p>
+<p>مثلاً نمی‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">int age = 25</div></div>
+<p>بلکه می‌نویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>Python خودش می‌فهمد که <code>25</code> یک <code>int</code> است.</p>
+<p>حتی می‌توانیم بعداً مقدار دیگری به همان Variable بدهیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10
+
+print(type(x))
+
+x = &quot;Hello&quot;
+
+print(type(x))</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&lt;class 'int'&gt;
+&lt;class 'str'&gt;</div></div>
+<p>یعنی Variable <code>x</code> ابتدا به یک <code>int</code> اشاره می‌کند و بعد به یک <code>str</code>.</p>
+<h3>نکته مهم ⭐⭐</h3>
+<p>در Python:</p>
+<blockquote>نوع داده به <strong>Value</strong> مربوط است و Variable مجبور نیست برای همیشه یک نوع ثابت داشته باشد.</blockquote>
+<hr class="lesson-divider">
+<h2 class="lesson-title">20. چند نوع داده در یک برنامه</h2>
+<p>حالا چیزهایی که یاد گرفتیم را کنار هم بگذاریم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Ali&quot;
+age = 25
+height = 1.75
+is_student = True
+phone = None
+
+print(name)
+print(age)
+print(height)
+print(is_student)
+print(phone)</div></div>
+<p>مدل ذهنی برنامه:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name        → &quot;Ali&quot;   → str
+age         → 25      → int
+height      → 1.75    → float
+is_student  → True    → bool
+phone       → None    → NoneType</div></div>
+<p>این اولین تصویر واقعی ما از داده‌ها در Python است.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-troubleshoot">اشتباهات رایج</h1>
+<h3>۱. استفاده از <code>=</code> به جای مقایسه</h3>
+<p>فعلاً بدان:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = 10</div></div>
+<p>برای Assignment است.</p>
+<p>موضوع مقایسه را در <strong>Operators</strong> به شکل کامل یاد می‌گیریم.</p>
+<h3>۲. اشتباه گرفتن <code>"10"</code> و <code>10</code></h3>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10</div></div>
+<p>یک <code>int</code> است.</p>
+<p>اما:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">&quot;10&quot;</div></div>
+<p>یک <code>str</code> است.</p>
+<p>ظاهرشان شبیه است، اما Python آن‌ها را دو نوع داده متفاوت می‌داند.</p>
+<h3>۳. نوشتن <code>true</code> به جای <code>True</code></h3>
+<p>در Python درست:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">True
+False</div></div>
+<p>غلط:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">true
+false</div></div>
+<p>Python به حروف بزرگ و کوچک حساس است.</p>
+<h3>۴. نوشتن <code>None</code> داخل quotation</h3>
+<p>این:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = None</div></div>
+<p>با این:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">x = &quot;None&quot;</div></div>
+<p>فرق دارد.</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">None     → NoneType
+&quot;None&quot;   → str</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">⭐ نکات مهم جلسه</h2>
+<ul><li>Variable یک <strong>نام برای دسترسی به یک مقدار</strong> است.</li><li><code>=</code> برای Assignment استفاده می‌شود.</li><li>نام Variable نمی‌تواند با عدد شروع شود.</li><li>فاصله در نام Variable مجاز نیست؛ از <code>_</code> استفاده کن.</li><li>Python به حروف بزرگ و کوچک حساس است.</li><li><code>int</code> → عدد صحیح</li><li><code>float</code> → عدد اعشاری</li><li><code>str</code> → متن</li><li><code>bool</code> → <code>True</code> / <code>False</code></li><li><code>None</code> → نبود مقدار</li><li><code>type()</code> نوع داده را مشخص می‌کند.</li><li><code>10</code> و <code>"10"</code> دو نوع داده متفاوت هستند.</li><li>Python <strong>Dynamic Typing</strong> دارد.</li><li>نوع داده به Value مربوط است، نه اینکه Variable برای همیشه یک Type ثابت داشته باشد.</li></ul>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🔄 Recall سریع</h2>
+<p>بدون نگاه‌کردن به درس، سعی کن به این ۸ سؤال جواب بده:</p>
+<ol><li>Variable چیست؟</li><li><code>=</code> چه کاری انجام می‌دهد؟</li><li>کدام نوع داده برای اعداد صحیح است؟</li><li>کدام نوع داده برای متن است؟</li><li><code>bool</code> چه مقدارهایی می‌گیرد؟</li><li><code>None</code> یعنی چه؟</li><li>تابع <code>type()</code> چه کاربردی دارد؟</li><li>Python Dynamic Typing یعنی چه؟</li></ol>
+<p>اگر توانستی این‌ها را توضیح بدهی، هسته جلسه ۲ را یاد گرفته‌ای.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-scenario">سناریوی ترکیبی — اطلاعات یک محصول</h1>
+<p>فرض کن می‌خواهیم اطلاعات یک محصول را در برنامه ذخیره کنیم.</p>
+<p>محصول ما:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Laptop
+Price: 1200.50
+Stock: 10
+Available: True
+Description: None</div></div>
+<h3>مرحله ۱ — تبدیل اطلاعات به Variable</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = &quot;Laptop&quot;
+price = 1200.50
+stock = 10
+available = True
+description = None</div></div>
+<p>حالا Data Typeها:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name        → str
+price       → float
+stock       → int
+available   → bool
+description → NoneType</div></div>
+<h3>مرحله ۲ — نمایش اطلاعات</h3>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(name)
+print(price)
+print(stock)
+print(available)
+print(description)</div></div>
+<h3>مرحله ۳ — بررسی Typeها</h3>
+<p>حالا این بخش را خودت بنویس:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(________)
+print(________)</div></div>
+<p>هدف این است که Type <code>price</code> و <code>available</code> را پیدا کنی.</p>
+<div class="python-playground" data-playground="ex-ch2-scenario">
+  <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>سناریوی ترکیبی</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+  <div class="playground-editor-wrap"><textarea class="python-editor">name = "Laptop"
+price = 1200.50
+stock = 10
+available = True
+description = None
+
+print(name)
+print(price)
+print(stock)
+print(available)
+print(description)
+
+# بررسی type price و available
+print(type(price))
+print(type(available))</textarea></div>
+  <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
 </div>
+<button class="solution-toggle" type="button" data-solution="sol2-scenario"><i class="fas fa-eye"></i> نمایش پاسخ سناریو</button>
+<div class="exercise-solution" id="sol2-scenario"><strong>پاسخ:</strong><pre>print(type(price))   # <class 'float'>
+print(type(available))  # <class 'bool'></pre></div>
+<p>اینجا دو مفهوم اصلی جلسه را با هم استفاده کردیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variables
+    +
+Data Types
+    ↓
+Simple Python Program</div></div>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🧪 تمرین عملی</h2>
+<p>ابتدا خودت کد را بنویس و اجرا کن. <strong>پاسخ‌ها عمداً مخفی هستند</strong> تا قبل از تلاش، راه‌حل را نبینی.</p>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۱</span><div><strong>تمرین تشخیص Type</strong><small>نوع هر Variable را حدس بزن.</small></div></div>
+  <p>بدون اجرای کد، نوع هر Variable را مشخص کن:</p>
+  <div class="python-playground" data-playground="ex2-1">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · تشخیص Type</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor">a = 10
+b = 10.5
+c = "10"
+d = True
+e = None
 
-<div class="quiz-card"><p>❓ تست ۳: خروجی دستور زیر در REPL چیست؟ <br><code>print("Python " + "Course")</code></p>
-    <div class="quiz-options">
-        <button onclick="selectOption(this)">الف) Python Course</button>
-        <button onclick="selectOption(this)">ب) PythonCourse</button>
-        <button onclick="selectOption(this)">ج) Python + Course</button>
-        <button onclick="selectOption(this)">د) خطا</button>
-    </div>
-    <div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>عملگر <code>+</code> روی رشته‌ها، آن‌ها را به هم متصل (Concatenate) می‌کند. بنابراین خروجی <code>Python Course</code> خواهد بود.</div>
+# برای بررسی type هر کدام از type() استفاده کن
+print(type(a))
+print(type(b))
+print(type(c))
+print(type(d))
+print(type(e))</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol2-1"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۱</button>
+  <div class="exercise-solution" id="sol2-1"><strong>پاسخ:</strong><pre>a → int
+b → float
+c → str
+d → bool
+e → NoneType</pre></div>
 </div>
-`,
-            "ch2-1": `
-        <div class="section-header">
-            <div class="section-badge">۲</div>
-            <div>
-                <h1>Variables، قوانین نام‌گذاری و Data Types — int، float، str، bool و None</h1>
-                <div class="meta">فصل ۲ · بخش ۱ از ۱</div>
-            </div>
-        </div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۲</span><div><strong>تمرین ساخت اطلاعات کاربر</strong><small>Variableهای مشخص شده را بساز.</small></div></div>
+  <p>Variableهای زیر را با مقادیر دلخواه بساز:</p>
+  <ul><li><code>name</code></li><li><code>age</code></li><li><code>height</code></li><li><code>is_student</code></li></ul>
+  <div class="python-playground" data-playground="ex2-2">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · اطلاعات کاربر</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
+name = "Sara"
+age = 22
+height = 1.68
+is_student = True
 
-        <h2>متغیر (Variable) چیست؟</h2>
-        <p>متغیرها در برنامه‌نویسی مانند ظرف‌هایی هستند که داده‌ها را در خود ذخیره می‌کنند. در Python برای تعریف متغیر نیازی به اعلام نوع نیست؛ خود Python نوع داده را بر اساس مقداری که به متغیر نسبت می‌دهیم تشخیص می‌دهد.</p>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = 10\nname = "Ali"\npi = 3.14\nis_valid = True</div></div>
+print(name)
+print(age)
+print(height)
+print(is_student)</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol2-2"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۲</button>
+  <div class="exercise-solution" id="sol2-2"><strong>یک پاسخ نمونه:</strong><pre>name = "Sara"
+age = 22
+height = 1.68
+is_student = True</pre></div>
+</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۳</span><div><strong>تمرین تغییر مقدار</strong><small>مقدار یک متغیر را تغییر بده.</small></div></div>
+  <p>کدی بنویس که:</p>
+  <ol><li><code>score</code> را برابر <code>50</code> قرار دهد و چاپ کند.</li><li>مقدار آن را به <code>80</code> تغییر دهد و دوباره چاپ کند.</li></ol>
+  <div class="python-playground" data-playground="ex2-3">
+    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · تغییر مقدار</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
+    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
+score = 50
+print(score)
 
-        <h2>قوانین نام‌گذاری متغیرها</h2>
-        <ul>
-            <li>نام متغیر باید با یک حرف (a-z, A-Z) یا زیرخط (<code>_</code>) شروع شود.</li>
-            <li>بعد از حرف اول می‌توانید از حروف، اعداد و زیرخط استفاده کنید.</li>
-            <li>نام متغیرها به حروف بزرگ و کوچک حساس هستند (<code>age</code> با <code>Age</code> متفاوت است).</li>
-            <li>نمی‌توانید از کلمات کلیدی Python مثل <code>if</code>، <code>for</code>، <code>while</code> و ... استفاده کنید.</li>
-        </ul>
-        <div class="code-container"><span class="code-label">نام‌های معتبر</span><div class="code-block no-prompt">my_var = 5\n_private = 10\nuser2 = "John"\nMyClass = "test"</div></div>
-        <div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نام‌های نامعتبر</strong><br><code>2var = 5</code> (شروع با عدد)<br><code>my-var = 5</code> (استفاده از خط تیره)<br><code>class = 5</code> (کلمه کلیدی)</div></div>
+score = 80
+print(score)</textarea></div>
+    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+  </div>
+  <button class="solution-toggle" type="button" data-solution="sol2-3"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۳</button>
+  <div class="exercise-solution" id="sol2-3"><strong>پاسخ:</strong><pre>score = 50
+print(score)
 
-        <h2>انواع داده (Data Types)</h2>
-        <p>در Python انواع داده‌های مختلفی وجود دارد. مهم‌ترین آن‌ها عبارتند از:</p>
-        <h3>int — اعداد صحیح</h3>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">age = 25\nscore = -10</div></div>
-        <h3>float — اعداد اعشاری</h3>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">pi = 3.14\ntemperature = -2.5</div></div>
-        <h3>str — رشته (متن)</h3>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">name = "Ali"\nmessage = 'Hello Python'</div></div>
-        <h3>bool — مقدار بولی (True یا False)</h3>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">is_active = True\nis_admin = False</div></div>
-        <h3>None — نشان‌دهنده عدم وجود مقدار</h3>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">result = None</div></div>
-
-        <h2>تشخیص نوع داده با <code>type()</code></h2>
-        <p>با تابع <code>type()</code> می‌توانید نوع داده هر متغیر را مشاهده کنید:</p>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = 10\nprint(type(x))  # <class 'int'>\n\ny = 3.14\nprint(type(y))  # <class 'float'>\n\nname = "Ali"\nprint(type(name))  # <class 'str'>\n\nflag = True\nprint(type(flag))  # <class 'bool'>\n\nz = None\nprint(type(z))  # <class 'NoneType'></div></div>
-
-        <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>در Python متغیرها به صورت <strong>پویا (Dynamic)</strong> هستند؛ یعنی می‌توانید در طول برنامه نوع متغیر را تغییر دهید. اما این کار معمولاً توصیه نمی‌شود چون خوانایی کد را کاهش می‌دهد.</div></div>
-
-        <h2>تمرین عملی</h2>
-        <ol>
-            <li>متغیرهای زیر را تعریف کرده و نوع هر کدام را با <code>type()</code> چاپ کنید:
-                <ul>
-                    <li><code>age = 30</code></li>
-                    <li><code>price = 99.99</code></li>
-                    <li><code>city = "Tehran"</code></li>
-                    <li><code>is_student = False</code></li>
-                    <li><code>data = None</code></li>
-                </ul>
-            </li>
-            <li>یک متغیر با نام <code>_score</code> تعریف کرده و مقدار ۸۵ را به آن بدهید.</li>
-            <li>سعی کنید یک متغیر با نام <code>2number</code> تعریف کنید و ببینید چه خطایی رخ می‌دهد.</li>
-        </ol>
-
-        <div class="summary-box">
-            <h3>🧠 جمع‌بندی جلسه ۲</h3>
-            <ul>
-                <li>متغیرها برای ذخیره داده‌ها استفاده می‌شوند.</li>
-                <li>نام‌گذاری متغیرها باید با حرف یا زیرخط شروع شود و از کلمات کلیدی پرهیز شود.</li>
-                <li>انواع داده اصلی: <code>int</code>، <code>float</code>، <code>str</code>، <code>bool</code> و <code>NoneType</code>.</li>
-                <li>با <code>type()</code> می‌توان نوع داده را تشخیص داد.</li>
-            </ul>
-        </div>
-
-        <h2>خودآزمایی</h2>
-        <div class="quiz-card"><p>❓ تست ۱: کدام یک نام متغیر نامعتبر است؟</p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>_private</code></button>
-                <button onclick="selectOption(this)">ب) <code>user2</code></button>
-                <button onclick="selectOption(this)">ج) <code>2user</code></button>
-                <button onclick="selectOption(this)">د) <code>my_var</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>نام متغیر نمی‌تواند با عدد شروع شود. پس <code>2user</code> نامعتبر است.</div>
-        </div>
-
-        <div class="quiz-card"><p>❓ تست ۲: خروجی کد زیر چیست؟ <br><code>print(type(3.14))</code></p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>&lt;class 'int'&gt;</code></button>
-                <button onclick="selectOption(this)">ب) <code>&lt;class 'float'&gt;</code></button>
-                <button onclick="selectOption(this)">ج) <code>&lt;class 'str'&gt;</code></button>
-                <button onclick="selectOption(this)">د) <code>&lt;class 'bool'&gt;</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>3.14</code> یک عدد اعشاری است، بنابراین نوع آن <code>float</code> است.</div>
-        </div>
-
-        <div class="quiz-card"><p>❓ تست ۳: کدام یک از موارد زیر یک <strong>کلمه کلیدی</strong> در Python است و نمی‌تواند نام متغیر باشد؟</p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>name</code></button>
-                <button onclick="selectOption(this)">ب) <code>for</code></button>
-                <button onclick="selectOption(this)">ج) <code>user1</code></button>
-                <button onclick="selectOption(this)">د) <code>_temp</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>for</code> یک کلمه کلیدی در Python است (برای حلقه‌ها) و نمی‌توان از آن به عنوان نام متغیر استفاده کرد.</div>
-        </div>
-        `,
-
-            "ch3-1": `
-        <div class="section-header">
-            <div class="section-badge">۳</div>
-            <div>
-                <h1>Type Casting و تبدیل انواع داده + ترکیب Variables و Type Casting در برنامه‌های ساده</h1>
-                <div class="meta">فصل ۳ · بخش ۱ از ۱</div>
-            </div>
-        </div>
-
-        <h2>Type Casting چیست؟</h2>
-        <p><strong>Type Casting</strong> یا تبدیل نوع، فرایند تبدیل یک داده از یک نوع به نوع دیگر است. در Python توابع داخلی برای این کار وجود دارند.</p>
-        <p>توابع اصلی تبدیل نوع:</p>
-        <ul>
-            <li><code>int()</code> — تبدیل به عدد صحیح</li>
-            <li><code>float()</code> — تبدیل به عدد اعشاری</li>
-            <li><code>str()</code> — تبدیل به رشته</li>
-            <li><code>bool()</code> — تبدیل به مقدار بولی</li>
-        </ul>
-
-        <h2>تبدیل به int</h2>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = "10"\nprint(type(x))  # <class 'str'>\n\ny = int(x)\nprint(type(y))  # <class 'int'>\nprint(y + 5)    # 15</div></div>
-        <div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>توجه</strong>اگر رشته قابل تبدیل به عدد نباشد، خطای <code>ValueError</code> رخ می‌دهد. مثلاً <code>int("abc")</code> خطا می‌دهد.</div></div>
-
-        <h2>تبدیل به float</h2>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">a = "3.14"\nb = float(a)\nprint(b)  # 3.14\nprint(type(b))  # <class 'float'></div></div>
-
-        <h2>تبدیل به str</h2>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">num = 100\ns = str(num)\nprint(s)  # "100"\nprint(type(s))  # <class 'str'></div></div>
-
-        <h2>تبدیل به bool</h2>
-        <p>قوانین تبدیل به <code>bool</code>:</p>
-        <ul>
-            <li>اعداد غیرصفر → <code>True</code>، عدد صفر → <code>False</code></li>
-            <li>رشته‌های غیرخالی → <code>True</code>، رشته خالی → <code>False</code></li>
-            <li>لیست‌ها، دیکشنری‌ها و ... نیز بر اساس خالی بودن یا نبودن به <code>bool</code> تبدیل می‌شوند.</li>
-        </ul>
-        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">print(bool(1))    # True\nprint(bool(0))    # False\nprint(bool(""))   # False\nprint(bool("abc")) # True\nprint(bool(None)) # False</div></div>
-
-        <h2>ترکیب Variables و Type Casting</h2>
-        <p>اغلب در برنامه‌ها نیاز داریم ورودی کاربر را که به صورت رشته دریافت می‌شود، به عدد تبدیل کنیم تا بتوانیم محاسبات انجام دهیم.</p>
-        <div class="code-container"><span class="code-label">برنامه جمع دو عدد</span><div class="code-block"># دریافت دو عدد از کاربر\nnum1 = input("عدد اول را وارد کنید: ")\nnum2 = input("عدد دوم را وارد کنید: ")\n\n# تبدیل به int\nnum1 = int(num1)\nnum2 = int(num2)\n\nresult = num1 + num2\nprint("حاصل جمع:", result)</div></div>
-
-        <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>تابع <code>input()</code> همیشه خروجی از نوع <code>str</code> برمی‌گرداند. پس برای محاسبات عددی باید Type Casting انجام دهیم.</div></div>
-
-        <h2>تمرین عملی</h2>
-        <ol>
-            <li>برنامه‌ای بنویسید که دو عدد اعشاری را از کاربر بگیرد، آن‌ها را به <code>float</code> تبدیل کرده و میانگین آن‌ها را چاپ کند.</li>
-            <li>یک رشته شامل عدد مانند <code>"123"</code> را به <code>int</code> تبدیل کرده و سپس به <code>str</code> برگردانید.</li>
-            <li>مقادیر مختلف را با <code>bool()</code> تست کنید و ببینید کدام‌ها <code>True</code> و کدام‌ها <code>False</code> هستند.</li>
-        </ol>
-
-        <div class="summary-box">
-            <h3>🧠 جمع‌بندی جلسه ۳</h3>
-            <ul>
-                <li>Type Casting یعنی تغییر نوع داده از یک نوع به نوع دیگر.</li>
-                <li>توابع اصلی: <code>int()</code>، <code>float()</code>، <code>str()</code>، <code>bool()</code>.</li>
-                <li>ورودی <code>input()</code> همیشه رشته است؛ برای محاسبات باید Cast کنیم.</li>
-                <li>تبدیل به <code>bool</code> بر اساس «تهی بودن» یا «صفر بودن» تعیین می‌شود.</li>
-            </ul>
-        </div>
-
-        <h2>خودآزمایی</h2>
-        <div class="quiz-card"><p>❓ تست ۱: خروجی کد زیر چیست؟ <br><code>print(int("10") + 5)</code></p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>"105"</code></button>
-                <button onclick="selectOption(this)">ب) <code>15</code></button>
-                <button onclick="selectOption(this)">ج) <code>خطا</code></button>
-                <button onclick="selectOption(this)">د) <code>10.5</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>"10"</code> به <code>int</code> تبدیل شده و با ۵ جمع می‌شود، نتیجه <code>15</code> می‌شود.</div>
-        </div>
-
-        <div class="quiz-card"><p>❓ تست ۲: کدام عبارت <code>True</code> است؟</p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>bool("")</code></button>
-                <button onclick="selectOption(this)">ب) <code>bool(0)</code></button>
-                <button onclick="selectOption(this)">ج) <code>bool(" ") </code></button>
-                <button onclick="selectOption(this)">د) <code>bool(None)</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>رشته <code>" "</code> (با یک فاصله) خالی نیست، بنابراین <code>True</code> است. گزینه‌های دیگر همگی <code>False</code> هستند.</div>
-        </div>
-
-        <div class="quiz-card"><p>❓ تست ۳: فرض کنید کاربر عدد <code>12.7</code> را وارد کند. کد زیر چه خروجی دارد؟ <br><code>num = input("Enter: ")</code><br><code>print(type(num))</code></p>
-            <div class="quiz-options">
-                <button onclick="selectOption(this)">الف) <code>&lt;class 'int'&gt;</code></button>
-                <button onclick="selectOption(this)">ب) <code>&lt;class 'float'&gt;</code></button>
-                <button onclick="selectOption(this)">ج) <code>&lt;class 'str'&gt;</code></button>
-                <button onclick="selectOption(this)">د) <code>&lt;class 'bool'&gt;</code></button>
-            </div>
-            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>input()</code> همیشه خروجی از نوع <code>str</code> است، حتی اگر کاربر یک عدد وارد کند.</div>
-        </div>
-        `
+score = 80
+print(score)</pre></div>
+</div>
+<div class="exercise-card">
+  <div class="exercise-head"><span class="exercise-num">۴</span><div><strong>تمرین تشخیص خطا</strong><small>کدام Variable نامعتبر است؟</small></div></div>
+  <p>کدام یک از Variable‌های زیر نامعتبر است؟</p>
+  <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">user_name = &quot;Ali&quot;
+age2 = 20
+2age = 30</div></div>
+  <button class="solution-toggle" type="button" data-solution="sol2-4"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۴</button>
+  <div class="exercise-solution" id="sol2-4"><strong>پاسخ:</strong><p><code>2age = 30</code> نامعتبر است، چون Variable نمی‌تواند با عدد شروع شود.</p></div>
+</div>
+<h3>💡 چرا ادیتور داخل درس؟</h3>
+<p>از اینجا به بعد هر جا تمرین واقعاً قابل اجرا باشد، بهتر است همان‌جا کد را بنویسی و نتیجه را ببینی. این کار فاصله بین «خواندن» و «برنامه‌نویسی واقعی» را کمتر می‌کند.</p>
+<hr class="lesson-divider">
+<h1 class="lesson-title section-test">تست پایانی — دقیقاً ۷ سؤال</h1>
+<p>هر سؤال را پاسخ بده و بعد گزینه‌ات را انتخاب کن تا پاسخ و توضیح همان سؤال نمایش داده شود.</p>
+<div class="quiz-card"><p>❓ سؤال ۱: کدام یک مقدار <code>int</code> است؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>"10"</code></button><button onclick="selectOption(this)">ب) <code>10.0</code></button><button onclick="selectOption(this)">ج) <code>10</code></button><button onclick="selectOption(this)">د) <code>None</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>10</code> از نوع <code>int</code> است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۲: خروجی کد زیر چیست؟ <br><code>x = 5<br>y = x<br>x = 10<br>print(y)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>5</code></button><button onclick="selectOption(this)">ب) <code>10</code></button><button onclick="selectOption(this)">ج) <code>None</code></button><button onclick="selectOption(this)">د) خطا</button></div><div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br><code>y</code> مقدار <code>5</code> را ذخیره کرده است و تغییر <code>x</code> روی آن تأثیری ندارد.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۳: کدام نام Variable معتبر نیست؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>user_age</code></button><button onclick="selectOption(this)">ب) <code>_temp</code></button><button onclick="selectOption(this)">ج) <code>2score</code></button><button onclick="selectOption(this)">د) <code>score2</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Variable نمی‌تواند با عدد شروع شود.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۴: خروجی <code>type(True)</code> چیست؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>&lt;class 'str'&gt;</code></button><button onclick="selectOption(this)">ب) <code>&lt;class 'bool'&gt;</code></button><button onclick="selectOption(this)">ج) <code>&lt;class 'int'&gt;</code></button><button onclick="selectOption(this)">د) <code>&lt;class 'NoneType'&gt;</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>True</code> از نوع <code>bool</code> است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۵: کدام یک از موارد زیر <code>float</code> است؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>3</code></button><button onclick="selectOption(this)">ب) <code>3.0</code></button><button onclick="selectOption(this)">ج) <code>"3"</code></button><button onclick="selectOption(this)">د) <code>True</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>3.0</code> یک عدد اعشاری و از نوع <code>float</code> است.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۶: Python چه نوع زبانی از نظر Type system است؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) Static Typing</button><button onclick="selectOption(this)">ب) Dynamic Typing</button><button onclick="selectOption(this)">ج) بدون Type</button><button onclick="selectOption(this)">د) None of the above</button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Python <strong>Dynamic Typing</strong> دارد، یعنی نوع داده به خود مقدار وابسته است و Variable می‌تواند نوع خود را تغییر دهد.</div></div>
+<div class="quiz-card"><p>❓ سؤال ۷: خروجی کد زیر چیست؟ <br><code>name = "Ali"<br>print(type(name))</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>&lt;class 'int'&gt;</code></button><button onclick="selectOption(this)">ب) <code>&lt;class 'str'&gt;</code></button><button onclick="selectOption(this)">ج) <code>&lt;class 'float'&gt;</code></button><button onclick="selectOption(this)">د) <code>&lt;class 'bool'&gt;</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>"Ali"</code> یک رشته است، پس از نوع <code>str</code> است.</div></div>
+<h2 class="lesson-title">🔄 جمع‌بندی مفهومی</h2>
+<p>در جلسه قبل یاد گرفتیم چگونه Python را اجرا کنیم.</p>
+<p>امروز اولین مفهوم اساسی زبان را ساختیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">             Python Program
+                   │
+                   ▼
+              Variables
+                   │
+                   ▼
+                Values
+                   │
+                   ▼
+              Data Types
+                   │
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+       int       float       str
+                             
+                   +
+                bool
+                   +
+                None</div></div>
+<p>پس اگر بخواهیم مثلاً سن کاربر را ذخیره کنیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = 25</div></div>
+<p>می‌توانیم آن را این‌طور تحلیل کنیم:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variable → age
+Value    → 25
+Type     → int</div></div>
+<p>و اگر بنویسیم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;</div></div>
+<p>تبدیل می‌شود به:</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Variable → age
+Value    → &quot;25&quot;
+Type     → str</div></div>
+<p>این تفاوت در جلسه بعد بسیار مهم خواهد شد، چون می‌خواهیم یاد بگیریم چگونه <strong>Typeها را به یکدیگر تبدیل کنیم</strong>.</p>
+<hr class="lesson-divider">
+<h2 class="lesson-title">🚀 ارتباط با جلسه بعد</h2>
+<p>الان ممکن است با چنین مسئله‌ای روبه‌رو شویم:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">age = &quot;25&quot;</div></div>
+<p>ولی می‌خواهیم با آن مثل یک عدد کار کنیم.</p>
+<p>یا مثلاً:</p>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 100</div></div>
+<p>و بخواهیم آن را به نوع دیگری تبدیل کنیم.</p>
+<p>اینجاست که وارد:</p>
+<blockquote><strong>جلسه ۳ — Type Casting</strong></blockquote>
+<p>می‌شویم؛ یعنی یاد می‌گیریم چگونه داده‌ها را بین Typeهای مختلف تبدیل کنیم.</p>`
         };
 
         // ============================================================
@@ -1726,6 +2873,23 @@ print("جمع:", a + b)
                     li.appendChild(a);
                     ul.appendChild(li);
                 });
+
+                // تمرینات فصل — فعلاً با پیام «بزودی قرار می‌گیرد»
+                const practiceLi = document.createElement('li');
+                practiceLi.className = 'toc-practice';
+
+                const practiceA = document.createElement('a');
+                practiceA.href = '#chapter-exercises-' + ch.id;
+                practiceA.innerHTML = '<i class="fas fa-dumbbell"></i> تمرینات فصل';
+                practiceA.title = 'تمرینات فصل — بزودی قرار می‌گیرد';
+
+                practiceA.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showChapterExercises(ch.id, ch.title);
+                });
+
+                practiceLi.appendChild(practiceA);
+                ul.appendChild(practiceLi);
 
                 details.appendChild(ul);
                 toc.appendChild(details);
@@ -1787,6 +2951,38 @@ print("جمع:", a + b)
         // ============================================================
         // توابع ناوبری
         // ============================================================
+        function showChapterExercises(chapterId, chapterTitle) {
+            const modal = document.getElementById('exerciseModal');
+
+            if (!modal) {
+                const wrapper = document.createElement('div');
+                wrapper.id = 'exerciseModal';
+                wrapper.className = 'exercise-modal';
+                wrapper.innerHTML = `
+                    <div class="exercise-modal-content">
+                        <button class="exercise-modal-close" aria-label="بستن">&times;</button>
+                        <div class="exercise-modal-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <h2>تمرینات فصل</h2>
+                        <p class="exercise-modal-chapter"></p>
+                        <p class="exercise-modal-message">بزودی قرار می‌گیره 🚀<br><small>تمرین‌های این فصل در حال آماده‌سازی هستند.</small></p>
+                    </div>
+                `;
+
+                document.body.appendChild(wrapper);
+
+                wrapper.addEventListener('click', function(e) {
+                    if (e.target === wrapper || e.target.closest('.exercise-modal-close')) {
+                        wrapper.classList.remove('show');
+                    }
+                });
+            }
+
+            document.querySelector('.exercise-modal-chapter').textContent = chapterTitle;
+            document.getElementById('exerciseModal').classList.add('show');
+        }
+
         function showSection(index) {
             if (index < 0 || index >= allSections.length) return;
 
@@ -1863,7 +3059,7 @@ print("جمع:", a + b)
             }
         }
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
 
@@ -1923,118 +3119,88 @@ print("جمع:", a + b)
 
 <script>
 (function () {
-    const textarea = document.getElementById('pythonPlayground');
-    const outputEl = document.getElementById('playgroundOutput');
-    const statusEl = document.getElementById('playgroundStatus');
-    const runBtn = document.getElementById('runPlaygroundBtn');
-
-    if (!textarea || !outputEl) return;
-
-    // CodeMirror setup
-    const editor = CodeMirror.fromTextArea(textarea, {
-        mode: 'python',
-        theme: 'dracula',
-        lineNumbers: true,
-        indentUnit: 4,
-        tabSize: 4,
-        indentWithTabs: false,
-        lineWrapping: true,
-        autofocus: false,
-        viewportMargin: Infinity,
-        extraKeys: {
-            'Ctrl-Enter': function () { runCodePlayground(); },
-            'Cmd-Enter': function () { runCodePlayground(); },
-            'Tab': function (cm) {
-                if (cm.somethingSelected()) cm.indentSelection('add');
-                else cm.replaceSelection('    ', 'end');
-            }
-        }
-    });
-
-    // Refresh when section becomes visible (fixes zero-height on some mobile browsers)
-    function refreshEditor() {
-        try { editor.refresh(); } catch (e) {}
-    }
-    setTimeout(refreshEditor, 200);
-    window.addEventListener('resize', refreshEditor);
+    const playgrounds = Array.from(document.querySelectorAll('.python-playground[data-playground]'));
+    if (!playgrounds.length || typeof CodeMirror === 'undefined') return;
 
     let pyodide = null;
     let pyodideReady = false;
-    let isRunning = false;
+    let loadingPromise = null;
+    const editors = new Map();
 
-    function setStatus(text) {
-        if (statusEl) statusEl.textContent = text;
+    function setOutput(root, text, type) {
+        const out = root.querySelector('.playground-output');
+        if (!out) return;
+        out.textContent = text;
+        out.classList.remove('error', 'success', 'loading');
+        if (type) out.classList.add(type);
+    }
+    function setStatus(root, text) {
+        const el = root.querySelector('.playground-status');
+        if (el) el.textContent = text;
     }
 
-    function setOutput(text, type) {
-        outputEl.textContent = text;
-        outputEl.classList.remove('error', 'success', 'loading');
-        if (type) outputEl.classList.add(type);
-    }
-
-    window.clearPlaygroundOutput = function () {
-        setOutput('▶ خروجی پاک شد. کد را اجرا کنید.', null);
-        setStatus(pyodideReady ? 'آماده' : 'در حال آماده‌سازی...');
-    };
-
-    async function loadPyodideForPlayground() {
-        if (pyodideReady) return true;
-        setOutput('⏳ در حال بارگذاری مفسر پایتون (اولین بار کمی طول می‌کشد)...', 'loading');
-        setStatus('بارگذاری...');
-        if (runBtn) runBtn.disabled = true;
-
-        try {
-            pyodide = await loadPyodide({
-                indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'
+    function setupEditors() {
+        playgrounds.forEach(root => {
+            const ta = root.querySelector('.python-editor');
+            if (!ta) return;
+            const editor = CodeMirror.fromTextArea(ta, {
+                mode: 'python', theme: 'dracula', lineNumbers: true,
+                indentUnit: 4, tabSize: 4, indentWithTabs: false,
+                lineWrapping: true, autofocus: false, viewportMargin: Infinity,
+                extraKeys: {
+                    'Ctrl-Enter': () => run(root),
+                    'Cmd-Enter': () => run(root),
+                    'Tab': cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection('    ', 'end')
+                }
             });
+            editors.set(root, editor);
+            root.querySelector('[data-action="run"]').addEventListener('click', () => run(root));
+            root.querySelector('[data-action="clear"]').addEventListener('click', () => {
+                setOutput(root, '▶ خروجی پاک شد. کد را اجرا کنید.');
+                setStatus(root, pyodideReady ? 'آماده' : 'در حال آماده‌سازی...');
+            });
+            setTimeout(() => editor.refresh(), 200);
+        });
+    }
 
-            // Polyfill input() so it works via browser prompt
-            pyodide.runPython(`
+    async function loadPyodideOnce() {
+        if (pyodideReady) return true;
+        if (loadingPromise) return loadingPromise;
+        loadingPromise = (async () => {
+            playgrounds.forEach(r => { setStatus(r, 'بارگذاری...'); setOutput(r, '⏳ در حال بارگذاری مفسر پایتون (اولین بار کمی طول می‌کشد)...', 'loading'); });
+            try {
+                pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/' });
+                pyodide.runPython(`
 import builtins
+from js import prompt as _browser_prompt
 def _input(prompt=""):
-    from js import prompt as js_prompt
-    result = js_prompt(str(prompt) if prompt else "")
-    if result is None:
-        return ""
-    return str(result)
+    result = _browser_prompt(str(prompt) if prompt else "")
+    return "" if result is None else str(result)
 builtins.input = _input
 `);
-
-            pyodideReady = true;
-            setOutput('✅ مفسر آماده است. کد را بنویسید و اجرا کنید.', 'success');
-            setStatus('آماده');
-            if (runBtn) runBtn.disabled = false;
-            return true;
-        } catch (err) {
-            setOutput('❌ خطا در بارگذاری مفسر: ' + (err.message || String(err)), 'error');
-            setStatus('خطا');
-            if (runBtn) runBtn.disabled = false;
-            return false;
-        }
+                pyodideReady = true;
+                playgrounds.forEach(r => { setStatus(r, 'آماده'); setOutput(r, '✅ مفسر آماده است..', 'success'); });
+                return true;
+            } catch (err) {
+                playgrounds.forEach(r => { setStatus(r, 'خطا'); setOutput(r, '❌ خطا در بارگذاری مفسر: ' + (err.message || String(err)), 'error'); });
+                return false;
+            }
+        })();
+        return loadingPromise;
     }
 
-    window.runCodePlayground = async function () {
-        if (isRunning) return;
-
-        if (!pyodideReady) {
-            const ok = await loadPyodideForPlayground();
-            if (!ok) return;
-        }
-
-        const code = editor.getValue();
-        if (!code.trim()) {
-            setOutput('⚠️ لطفاً کدی بنویسید.', 'loading');
-            return;
-        }
-
-        isRunning = true;
+    async function run(root) {
+        const editor = editors.get(root);
+        if (!editor || root.dataset.running === '1') return;
+        root.dataset.running = '1';
+        const runBtn = root.querySelector('[data-action="run"]');
         if (runBtn) runBtn.disabled = true;
-        setOutput('⏳ در حال اجرا...', 'loading');
-        setStatus('اجرا...');
-
         try {
-            // Capture stdout/stderr
-            await pyodide.runPythonAsync(`
+            if (!(await loadPyodideOnce())) return;
+            const code = editor.getValue();
+            if (!code.trim()) { setOutput(root, '⚠️ لطفاً کدی بنویسید.', 'loading'); return; }
+            setOutput(root, '⏳ در حال اجرا...', 'loading'); setStatus(root, 'اجرا...');
+            pyodide.runPython(`
 import sys
 from io import StringIO
 __stdout_backup = sys.stdout
@@ -2042,65 +3208,46 @@ __stderr_backup = sys.stderr
 sys.stdout = StringIO()
 sys.stderr = StringIO()
 `);
-
-            let result = null;
-            let execError = null;
-            try {
-                result = await pyodide.runPythonAsync(code);
-            } catch (e) {
-                execError = e;
-            }
-
-            const stdout = pyodide.runPython(`
+            let result = null, error = null;
+            try { result = await pyodide.runPythonAsync(code); } catch (e) { error = e; }
+            const captured = pyodide.runPython(`
 out = sys.stdout.getvalue()
 err = sys.stderr.getvalue()
 sys.stdout = __stdout_backup
 sys.stderr = __stderr_backup
 out + (err if err else "")
 `);
-
-            let finalOutput = (stdout || '').trimEnd();
-            if (result !== undefined && result !== null && String(result) !== 'None') {
-                finalOutput += (finalOutput ? '\n' : '') + String(result);
-            }
-
-            if (execError) {
-                let errMsg = execError.message || String(execError);
-                // Clean common Pyodide noise
-                errMsg = errMsg
-                    .replace(/File "<exec>", line \d+, in <module>\n?/g, '')
-                    .replace(/File "<exec>", line \d+, in /g, '')
-                    .trim();
-                finalOutput = (finalOutput ? finalOutput + '\n\n' : '') + '❌ ' + errMsg;
-                setOutput(finalOutput || '❌ خطا', 'error');
-                setStatus('خطا');
+            let finalOutput = (captured || '').trimEnd();
+            if (result !== undefined && result !== null && String(result) !== 'None') finalOutput += (finalOutput ? '\n' : '') + String(result);
+            if (error) {
+                let msg = error.message || String(error);
+                msg = msg.replace(/File "<exec>", line \d+, in <module>\n?/g, '').replace(/File "<exec>", line \d+, in /g, '').trim();
+                setOutput(root, (finalOutput ? finalOutput + '\n\n' : '') + '❌ ' + msg, 'error');
+                setStatus(root, 'خطا');
             } else {
-                setOutput(finalOutput || '✅ اجرا شد (بدون خروجی)', finalOutput ? null : 'success');
-                setStatus('آماده');
+                setOutput(root, finalOutput || '✅ اجرا شد (بدون خروجی)', finalOutput ? null : 'success');
+                setStatus(root, 'آماده');
             }
-        } catch (err) {
-            let msg = err.message || String(err);
-            msg = msg.replace(/File "<exec>", line \d+, in /g, '').trim();
-            setOutput('❌ خطا: ' + msg, 'error');
-            setStatus('خطا');
         } finally {
-            isRunning = false;
+            root.dataset.running = '0';
             if (runBtn) runBtn.disabled = false;
-            refreshEditor();
+            try { editor.refresh(); } catch(e) {}
         }
-    };
-
-    // Auto-load Pyodide after page is ready
-    window.addEventListener('load', function () {
-        setTimeout(loadPyodideForPlayground, 400);
-    });
-
-    // Also try when document already complete
-    if (document.readyState === 'complete') {
-        setTimeout(loadPyodideForPlayground, 500);
     }
 
-    console.log('✅ Python Playground initialized');
+    document.querySelectorAll('.solution-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = document.getElementById(btn.dataset.solution);
+            if (!target) return;
+            const show = target.classList.toggle('show');
+            btn.innerHTML = show ? '<i class="fas fa-eye-slash"></i> مخفی‌کردن پاسخ' : '<i class="fas fa-eye"></i> نمایش پاسخ';
+        });
+    });
+
+    setupEditors();
+    window.addEventListener('resize', () => editors.forEach(e => { try { e.refresh(); } catch(_) {} }));
+    window.addEventListener('load', () => setTimeout(loadPyodideOnce, 400));
+    if (document.readyState === 'complete') setTimeout(loadPyodideOnce, 500);
 })();
 </script>
 
