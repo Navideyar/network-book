@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دو مسیر برای ساخت وب‌بوک آموزشی</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Farsi-Digits/font-face.css" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0c0f;
+    --bg-soft:#0d1014;
+    --surface:#14181e;
+    --surface-2:#1a1f27;
+    --border:#242b34;
+    --text:#eef0f2;
+    --text-muted:#8d96a3;
+    --text-faint:#5c6572;
+
+    --p1:#ff7a3d;
+    --p1-dim:rgba(255,122,61,.10);
+    --p1-line:rgba(255,122,61,.35);
+
+    --p2:#22c7a6;
+    --p2-dim:rgba(34,199,166,.10);
+    --p2-line:rgba(34,199,166,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Vazirmatn","Segoe UI",Tahoma,sans-serif;
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:rgba(255,122,61,.35); }
+
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+
+  /* ---------- topbar ---------- */
+  .topbar{
+    padding:22px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    font-size:.95rem;
+    color:var(--text);
+  }
+  .brand-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    flex-shrink:0;
+  }
+  .topbar-sub{
+    font-size:.8rem;
+    color:var(--text-faint);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:64px 0 40px;
+    text-align:center;
+  }
+  .hero h1{
+    font-size:clamp(1.8rem,4.4vw,2.7rem);
+    font-weight:800;
+    margin:0 0 18px;
+    line-height:1.55;
+    letter-spacing:-0.01em;
+  }
+  .hero p{
+    font-size:1.05rem;
+    color:var(--text-muted);
+    max-width:560px;
+    margin:0 auto;
+  }
+
+  /* ---------- fork visual ---------- */
+  .fork-wrap{
+    padding:20px 0 70px;
+  }
+  .fork-connector{
+    display:block;
+    width:100%;
+    max-width:560px;
+    height:70px;
+    margin:0 auto;
+  }
+  .fork-connector path{
+    fill:none;
+    stroke-width:2;
+  }
+  .fork-connector .line-1{ stroke:var(--p1-line); }
+  .fork-connector .line-2{ stroke:var(--p2-line); }
+  .fork-start{
+    display:flex;
+    justify-content:center;
+    margin-bottom:-8px;
+  }
+  .fork-start span{
+    font-size:.78rem;
+    color:var(--text-faint);
+    background:var(--bg);
+    padding:0 12px;
+  }
+
+  .fork-cards{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+    margin-top:-6px;
+  }
+
+  .path-card{
+    position:relative;
+    text-align:right;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:26px 24px;
+    overflow:hidden;
+    transition:transform .18s ease, border-color .18s ease;
+    color:var(--text);
+  }
+  .path-card:hover{ transform:translateY(-3px); }
+  .path-card:focus-visible{ outline:2px solid var(--text); outline-offset:3px; }
+
+  .path-card .icon{
+    width:34px;height:34px;
+    margin-bottom:16px;
+  }
+  .path-card h2{
+    font-size:1.18rem;
+    margin:0 0 6px;
+    font-weight:800;
+  }
+  .path-card .tagline{
+    color:var(--text-muted);
+    font-size:.88rem;
+    margin:0 0 20px;
+  }
+  .path-card .cta{
+    font-size:.85rem;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .path-card .cta svg{ width:15px; height:15px; transition:transform .18s ease; }
+  .path-card:hover .cta svg{ transform:translateX(-3px); }
+
+  /* path 1 — speed */
+  .path-1{ border-color:var(--p1-line); }
+  .path-1::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      repeating-linear-gradient(-35deg, var(--p1-dim) 0 2px, transparent 2px 22px);
+    opacity:.7;
+    pointer-events:none;
+  }
+  .path-1 .icon, .path-1 .cta{ color:var(--p1); }
+  .path-1:hover{ border-color:var(--p1); }
+
+  /* path 2 — depth / layered */
+  .path-2{
+    background:var(--surface);
+  }
+  .path-2::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      repeating-linear-gradient(-35deg, var(--p2-dim) 0 2px, transparent 2px 22px);
+    opacity:.7;
+    pointer-events:none;
+  }
+  .path-2{ border-color:var(--p2-line); }
+  .path-2 .icon, .path-2 .cta{ color:var(--p2); }
+  .path-2:hover{ border-color:var(--p2); }
+
+  /* ---------- content section ---------- */
+  .content-section{ padding:10px 0 90px; }
+  .back-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:.82rem;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:34px;
+  }
+  .back-btn:hover{ color:var(--text); border-color:var(--text-faint); }
+  .back-btn svg{ width:13px; height:13px; }
+
+  .content-head{ margin-bottom:44px; }
+  .content-head .kicker{
+    font-size:.8rem;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .content-head.for-1 .kicker{ color:var(--p1); }
+  .content-head.for-2 .kicker{ color:var(--p2); }
+  .content-head h2{
+    font-size:clamp(1.5rem,3.6vw,2rem);
+    margin:0 0 8px;
+    font-weight:800;
+  }
+  .content-head p{ color:var(--text-muted); margin:0; }
+
+  /* timeline */
+  .steps{ position:relative; }
+  .step{
+    display:flex;
+    gap:20px;
+    position:relative;
+  }
+  .step-marker{
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:40px;
+  }
+  .step-num{
+    width:38px; height:38px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:.95rem;
+    background:var(--surface);
+    border:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .for-1 .step-num{ color:var(--p1); border-color:var(--p1-line); }
+  .for-2 .step-num{ color:var(--p2); border-color:var(--p2-line); }
+
+  .step-line{
+    width:1px;
+    flex:1;
+    background:var(--border);
+    margin-top:6px;
+  }
+  .step:last-child .step-line{ display:none; }
+
+  .step-body{ padding-bottom:44px; flex:1; min-width:0; }
+  .step-body h3{
+    margin:6px 0 12px;
+    font-size:1.08rem;
+    font-weight:700;
+  }
+  .step-body p{ margin:0 0 12px; color:var(--text); }
+  .step-body p.muted{ color:var(--text-muted); }
+
+  /* prompt box */
+  .prompt-box{
+    position:relative;
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin:14px 0 16px;
+    overflow:hidden;
+  }
+  .prompt-box-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 14px;
+    border-bottom:1px solid var(--border);
+    background:var(--surface-2);
+  }
+  .prompt-box-head span{
+    font-size:.75rem;
+    color:var(--text-faint);
+    font-weight:700;
+  }
+  .copy-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    border-radius:7px;
+    padding:5px 10px;
+    font-size:.75rem;
+    font-weight:700;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .copy-btn svg{ width:13px; height:13px; }
+  .copy-btn:hover{ color:var(--text); border-color:var(--text-faint); }
+  .copy-btn.copied{ color:var(--p2); border-color:var(--p2-line); }
+
+  .prompt-box pre{
+    margin:0;
+    padding:16px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-family:"Vazirmatn","Segoe UI",Tahoma,sans-serif;
+    font-size:.88rem;
+    color:#cfd5dc;
+    line-height:1.85;
+    max-height:340px;
+    overflow-y:auto;
+  }
+
+  /* note / tip callout */
+  .note{
+    display:flex;
+    gap:10px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-right:3px solid var(--text-faint);
+    border-radius:8px;
+    padding:12px 14px;
+    margin:6px 0 16px;
+    font-size:.9rem;
+    color:var(--text-muted);
+  }
+  .for-1 .note{ border-right-color:var(--p1); }
+  .for-2 .note{ border-right-color:var(--p2); }
+  .note svg{ width:16px; height:16px; flex-shrink:0; margin-top:3px; }
+
+  .closing{
+    margin-top:10px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    color:var(--text-muted);
+  }
+  .closing p{ margin:0 0 10px; }
+
+  .switch-path{
+    margin-top:36px;
+    text-align:center;
+  }
+  .switch-path button{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    border-radius:999px;
+    padding:10px 20px;
+    font-size:.85rem;
+  }
+  .switch-path button:hover{ color:var(--text); border-color:var(--text-faint); }
+
+  /* toast */
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:.85rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:50;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  footer{
+    padding:30px 0 50px;
+    text-align:center;
+    color:var(--text-faint);
+    font-size:.8rem;
+  }
+
+  @media (max-width:680px){
+    .fork-cards{ grid-template-columns:1fr; }
+    .fork-connector{ display:none; }
+    .fork-start{ display:none; }
+    .step{ gap:14px; }
+    .step-num{ width:32px; height:32px; font-size:.85rem; }
+    .step-marker{ width:32px; }
+    .prompt-box pre{ font-size:.83rem; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .path-card, .path-card:hover{ transition:none; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand"><span class="brand-dot"></span> راهنمای ساخت وب‌بوک آموزشی</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="hero">
+    <h1>چطور یک وب‌بوک حرفه‌ای بسازیم؟</h1>
+    <p>دو مسیر متفاوت وجود داره؛ یکی سریع‌تره و یکی باکیفیت‌تر. (به صورت مرحله به مرحله توضیح دادم)</p>
+  </section>
+
+  <section class="fork-wrap" id="fork">
+    <div class="fork-start"><span>نقطهٔ شروع</span></div>
+    <svg class="fork-connector" viewBox="0 0 560 70" preserveAspectRatio="none" aria-hidden="true">
+      <path class="line-1" d="M280,0 C280,30 420,20 480,68"/>
+      <path class="line-2" d="M280,0 C280,30 140,20 80,68"/>
+    </svg>
+
+    <div class="fork-cards">
+      <button class="path-card path-1" data-path="1" aria-label="نمایش راه اول">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 3 14h7l-1 8 11-14h-7z"/></svg>
+        <h2>راه اول</h2>
+        <p class="tagline">سریع‌تر، اما کم‌کیفیت‌تر</p>
+        <span class="cta">مشاهدهٔ مراحل
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+        </span>
+      </button>
+
+      <button class="path-card path-2" data-path="2" aria-label="نمایش راه دوم">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="14" width="16" height="4" rx="1"/><rect x="4" y="9" width="16" height="4" rx="1"/><rect x="4" y="4" width="16" height="4" rx="1"/></svg>
+        <h2>راه دوم</h2>
+        <p class="tagline">بهتر و باکیفیت‌تر، ولی زمان‌برتر</p>
+        <span class="cta">مشاهدهٔ مراحل
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <section class="content-section" id="content" hidden>
+    <button class="back-btn" id="backBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      بازگشت به انتخاب مسیر
+    </button>
+
+    <div class="content-head" id="contentHead">
+      <div class="kicker" id="contentKicker"></div>
+      <h2 id="contentTitle"></h2>
+      <p id="contentSubtitle"></p>
+    </div>
+
+    <div class="steps" id="stepsContainer"></div>
+
+    <div class="closing" id="closingNote"></div>
+
+    <div class="switch-path">
+      <button id="switchPathBtn"></button>
+    </div>
+  </section>
+
+</main>
+
+
+
+<div class="toast" id="toast">پرامپت کپی شد ✓</div>
+
+<script>
+const ICONS = {
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>'
+};
+
+const DATA = {
+  1: {
+    label: "راه اول",
+    tagline: "راه سریع‌تر، اما کم‌کیفیت‌تر",
+    steps: [
+      {
+        num: "۱",
+        title: "گرفتن درسنامه از AI",
+        paragraphs: [
+          "اول درسنامهٔ مورد نظر رو از AI (ترجیحاً ChatGPT) می‌گیری، با یه پرامپ ساده مثل این:"
+        ],
+        prompt: `موضوع: [نام موضوع]
+
+یک درسنامه آموزشی و منسجم درباره این موضوع بنویس.
+
+- سطح: مبتدی تا متوسط
+- زبان: فارسی ساده و روان
+- ابتدا مفهوم و کاربرد کلی را توضیح بده، سپس جزئیات مهم را آموزش بده.
+- مثال عملی و در صورت نیاز دستورها/کدهای مرتبط را اضافه کن.
+- از مطالب غیرضروری و طولانی‌گویی خودداری کن.
+- در پایان، نکات مهم و یک خلاصه کوتاه برای مرور ارائه بده.`
+      },
+      {
+        num: "۲",
+        title: "تبدیل به HTML با Claude یا DeepSeek",
+        paragraphs: [
+          "به یک هوش مصنوعی مثل کلاد یا دیپ‌سیک می‌دی و می‌گی این رو برام به فرمت HTML دربیار.",
+          "پرامپ دقیق‌تر:"
+        ],
+        prompt: `این درسنامه را بدون تغییر محتوا، به یک صفحه HTML + CSS شیک و مدرن تبدیل کن؛ کاملاً RTL، ریسپانسیو، مرتب و مناسب سایت آموزشی. کدها، نکات مهم، مثال‌ها و هشدارها را با باکس‌های زیبا نمایش بده. خروجی فقط کد کامل HTML باشد.
+
+درسنامه:
+[متن درسنامه]`
+      }
+    ],
+    closing: [
+      "و تمام! این مدل ساده و سریع برای ساختن وب‌بوک بود. و اما وب‌بوک باکیفیت‌تر رو تو «راه دوم» توضیح دادم.",
+      "بعدش هم می‌تونید این وب‌بوکتون رو به روش‌های مختلف تو اینترنت به اشتراک بذارید؛ روش‌های مختلفش رو سرفرصت جدا توضیح می‌دم."
+    ]
+  },
+  2: {
+    label: "راه دوم",
+    tagline: "بهتر و باکیفیت‌تر، ولی زمان‌برتر (روش خودم هم همینه)",
+    steps: [
+      {
+        num: "۱",
+        title: "بهینه کردن فهرست با ChatGPT",
+        paragraphs: [
+          "اولین قدم، که خیلی هم مهم و تأثیرگذار توی کیفیت وب‌بوک هست، فهرست خوب و اصولیه.",
+          "پس اولین گام اینه که فهرست رو بدید و بگید فهرست رو براتون بهینه کنه و ترتیب مفهومی رو رعایت کنه (طبق اسلایدهای دوره و نکاتی که از دوره گرفتید که می‌تونید پیوست کنید و بگید این مطالب رو پوشش داده باشه توی فهرست). بعد فهرست و این پرامپ رو بدید به AI (ترجیحاً GPT برای این مرحله):"
+        ],
+        prompt: `این فهرست کامل دوره را بهینه کن.
+
+هدف:
+
+- تا حد امکان جلسات کوتاه و مرتبط را با هم ترکیب کن.
+- ترتیب اصلی سرفصل‌ها و روند آموزشی حفظ شود.
+- کمترین تغییر ممکن نسبت به فهرست اولیه ایجاد شود.
+- هیچ مبحث مهمی حذف نشود.
+- از ایجاد جلسات خیلی طولانی جلوگیری کن.
+- فقط در صورت منطقی بودن، جلسات را جابه‌جا یا ترکیب کن.
+
+در پایان فقط فهرست نهایی فصل‌ها و جلسات را با همان فرمت فهرست اولیه ارائه بده.`
+      },
+      {
+        num: "۲",
+        title: "گرفتن درسنامهٔ تک‌تک جلسات با ChatGPT",
+        paragraphs: [
+          "این مرحله مهم‌ترین مرحله برای کیفیت کاره. باید یه پرامپ حرفه‌ای بدید به AI (ترجیحاً ChatGPT) که درسنامهٔ تک‌تک جلسات رو بگیرید. پرامپ پیشنهادی (که می‌تونید شخصی‌سازی کنید):"
+        ],
+        prompt: `# نقش
+
+تو یک مدرس حرفه‌ای و طراح آموزشی هستی.
+
+هدف: آموزش مفهومی، ساده، کاربردی، منسجم و متناسب با سطح دوره؛ به‌گونه‌ای که یادگیرنده هم مفهوم را بفهمد، هم بتواند آن را در عمل استفاده کند و هم برای آزمون/ارزیابی آماده شود.
+
+# اصل آموزش
+
+درسنامه باید فشرده اما کامل باشد:
+
+- مطالب ضروری را کامل و قابل‌فهم آموزش بده.
+- مطالب مهم را کوتاه و هدفمند توضیح بده.
+- جزئیات کم‌اهمیت، پیشرفته و غیرضروری را حذف کن.
+- کوتاه بودن هدف نیست؛ هدف یادگیری هسته اصلی موضوع در کمترین زمان منطقی است.
+
+## قانون طلایی
+
+اگر حذف یک مطلب باعث شود یادگیرنده مفهوم اصلی را اشتباه بفهمد، نتواند کار اصلی را انجام دهد یا سؤال مهمی را از دست بدهد، آن مطلب باید آموزش داده شود.
+
+# اصول آموزش
+
+- ابتدا تصویر کلی و مدل ذهنی موضوع را بساز، سپس از کل به جزء پیش برو.
+- ترتیب مفاهیم را بر اساس وابستگی مفهومی و مسیر طبیعی یادگیری تنظیم کن.
+- هر بخش باید زمینه لازم برای بخش بعدی را فراهم کند.
+- از پرش بین موضوعات و تکرار غیرضروری جلوگیری کن.
+- در صورت تناسب: چیست و چرا → چگونه کار می‌کند → چگونه استفاده می‌شود → Troubleshooting
+- پیش‌نیازهای ضروری را فقط به اندازه لازم توضیح بده.
+- از جدول، دیاگرام و مثال فقط زمانی استفاده کن که ارزش آموزشی داشته باشند.
+- مثال‌ها تا حد امکان واقعی و قابل اجرا باشند.
+
+# ساختار درسنامه
+
+### 1. اهداف یادگیری
+
+۳ تا ۵ هدف مشخص.
+
+### 2. معرفی
+
+اهمیت موضوع، چیزهایی که یاد می‌گیریم و تصویر کلی آن را کوتاه توضیح بده.
+
+### 3. درسنامه
+
+مفاهیم را ساده، دقیق و پیوسته مانند یک کلاس واقعی آموزش بده.
+
+در صورت نیاز از:
+
+- تعریف و توضیح
+- مدل ذهنی / دیاگرام
+- جدول
+- مثال عملی
+- Syntax / کد
+- نکته مهم
+- اشتباه رایج
+- Recall کوتاه
+
+استفاده کن. قالب را مصنوعی پر نکن.
+
+### 4. نکات مهم
+
+مهم‌ترین نکات را برای مرور سریع، بدون تکرار درسنامه، جمع‌بندی کن.
+
+### 5. جمع‌بندی مفهومی
+
+ارتباط مفاهیم و منطق موضوع را به زبان ساده توضیح بده؛ نه تکرار متن درسنامه.
+
+### 6. سناریوی ترکیبی
+
+یک سناریوی واقعی و متوسط طراحی و مرحله‌به‌مرحله حل کن که چند مفهوم اصلی را به‌صورت طبیعی ترکیب کند.
+
+### 7. Cheat Sheet
+
+حداکثر ۸ خط؛ فقط مهم‌ترین دستورات، نکات یا موارد قابل‌مرور.
+
+### 8. تست پایانی
+
+دقیقاً ۷ سؤال چهارگزینه‌ای متناسب با سطح دوره؛ ترکیبی از سؤال‌های مفهومی، عملی و سناریویی.
+حداقل ۲ سؤال سناریویی یا Troubleshooting باشد.
+برای هر سؤال پاسخ صحیح و توضیح کوتاه ارائه کن.
+
+# قوانین مهم
+
+- هیچ مبحث ضروری حذف نشود.
+- از تکرار غیرضروری جلوگیری کن.
+- هر مفهوم اصلی را یک‌بار کامل آموزش بده و بعد فقط به آن ارجاع بده.
+- از طولانی‌گویی و جزئیات کم‌ارزش خودداری کن.
+- دقت فنی مثال‌ها، کدها و دستورات را بررسی کن.
+- سطح و عمق مطالب دقیقاً متناسب با این دوره و سطح یادگیرنده باشد.
+- هدف، یادگیری سریع، عمیق و ماندگار هسته اصلی موضوع است، نه پوشش حداکثری مطالب.
+
+# بازبینی نهایی
+
+قبل از ارائه بررسی کن:
+
+1. مطالب ضروری پوشش داده شده باشند.
+2. ترتیب مفاهیم منطقی و آموزشی باشد.
+3. ارتباط بخش‌ها با یکدیگر واضح باشد.
+4. مدل ذهنی موضوع شکل گرفته باشد.
+5. تکرار و جزئیات غیرضروری حذف شده باشند.
+6. سطح مطالب مناسب دوره باشد.
+7. مثال‌ها و مطالب فنی صحیح باشند.
+8. تست‌ها واقعاً فهم و کاربرد را بسنجند.`
+      },
+      {
+        num: "۳",
+        title: "پوشه‌بندی و ذخیرهٔ درسنامه‌ها در Obsidian",
+        paragraphs: [
+          "تک‌تک جلساتی که از AI می‌گیرید رو باید توی یه جایی، مثلاً Obsidian، ذخیره کنید به‌صورت مرتب و پوشه‌بندی‌شده (برنامهٔ Obsidian رو پیشنهاد می‌کنم حتماً نصب کنید چون خیلی کاربردی و به‌دردبخوره)."
+        ],
+        prompt: null
+      },
+      {
+        num: "۴",
+        title: "گرفتن HTML مادر (تمپلت کلی) با Claude یا Grok",
+        paragraphs: [
+          "گرفتن یک فایل HTML مادر از AI یا هر جای دیگه — ترجیحاً از کلاد (Claude) یا گراک (Grok) — پیشنهاد می‌کنم هر دو رو تست کنید و بهترین رو انتخاب کنید. با این پرامپ:"
+        ],
+        prompt: `یک قالب HTML + CSS حرفه‌ای و مدرن برای وب‌بوک آموزشی طراحی کن.
+
+ویژگی‌ها:
+
+- RTL و کاملاً مناسب فارسی
+- ریسپانسیو برای موبایل و دسکتاپ
+- ظاهر تمیز، حرفه‌ای و مدرن
+- مناسب درسنامه‌های فنی و آموزشی
+- طراحی بخش‌های عنوان، فهرست مطالب، متن، کد، جدول، نکته، هشدار، مثال و تست
+- رنگ‌بندی حرفه‌ای و چشم‌نواز
+- قابل استفاده به‌عنوان تمپلت ثابت برای تمام درسنامه‌های یک دوره
+- بدون Bootstrap و کتابخانه خارجی
+- CSS داخلی و ساختار HTML تمیز و قابل ویرایش
+- محتوا را نمونه‌ای قرار بده تا بعداً بتوانم با درسنامه واقعی جایگزین کنم.
+
+خروجی فقط کد کامل HTML باشد.
+
+با این فهرست :`,
+        note: "توجه کنید که حتماً آخر این پرامپ، فهرست مراحل قبل (خروجی مرحلهٔ ۱) رو بذارید.",
+        afterNote: [
+          "این رو به‌عنوان تمپلت اصلی انتخاب کنید و بعد جداجدا درسنامه‌ها رو بگیرید و در این کد اصلی جای‌گذاری کنید.",
+          "حتی اگر می‌خواید مثل یه پلتفرم چند-دوره‌ای، فهرست چند دوره رو داشته باشه، از AI یه صفحهٔ index.html هم بگیرید (اسم تک‌تک دوره‌ها رو بدید و بگید برای این دوره‌ها صفحهٔ index.html می‌خوام که صفحهٔ ورود به جزوه‌های مختلف باشه)."
+        ]
+      },
+      {
+        num: "۵",
+        title: "تبدیل تک‌تک درسنامه‌ها به فرمت تمپلت مادر با DeepSeek",
+        paragraphs: [
+          "فایل تمپلت مادر رو به AI (ترجیحاً DeepSeek با حالت DeepThink) بدید و بگید:"
+        ],
+        prompt: `این تمپلت رو با دقت بررسی کن و یادت باشه، قراره درسنامهٔ تک‌تک جلسات رو بدم تا کد HTML رو بدی که در این کد در جای مناسب قرار بدم.
+فعلاً هیچی نگو تا خودم بگم.`,
+        afterNote: [
+          "بعد فایل جلسهٔ ۱ رو بهش می‌دید و می‌گید کد جلسهٔ ۱ رو برای قالبی که قبلاً دادم بده."
+        ]
+      },
+      {
+        num: "۶",
+        title: "جای‌گذاری در کد مادر",
+        paragraphs: [
+          "تک‌تک کدهایی که گرفتید رو در کد مادر جای‌گذاری کنید و تمام!"
+        ],
+        prompt: null
+      }
+    ],
+    closing: [
+      "بعدش هم می‌تونید این وب‌بوکتون رو دامنهٔ شخصی خودتون به اشتراک بذارید که کار سختی نیست. اگه خواستید بگید اون رو هم کوتاه توضیح بدم.",
+      "موفق باشید 🌸"
+    ]
+  }
+};
+
+const forkSection = document.getElementById('fork');
+const heroSection = document.getElementById('hero');
+const contentSection = document.getElementById('content');
+const stepsContainer = document.getElementById('stepsContainer');
+const contentTitle = document.getElementById('contentTitle');
+const contentKicker = document.getElementById('contentKicker');
+const contentSubtitle = document.getElementById('contentSubtitle');
+const contentHead = document.getElementById('contentHead');
+const closingNote = document.getElementById('closingNote');
+const backBtn = document.getElementById('backBtn');
+const switchPathBtn = document.getElementById('switchPathBtn');
+const toast = document.getElementById('toast');
+
+function buildPromptBox(promptText){
+  const box = document.createElement('div');
+  box.className = 'prompt-box';
+  box.innerHTML = `
+    <div class="prompt-box-head">
+      <span>پرامپت آماده</span>
+      <button class="copy-btn" type="button">${ICONS.copy}<span>کپی</span></button>
+    </div>
+    <pre></pre>
+  `;
+  box.querySelector('pre').textContent = promptText;
+  const btn = box.querySelector('.copy-btn');
+  btn.addEventListener('click', () => copyPrompt(promptText, btn));
+  return box;
+}
+
+function buildNote(text){
+  const note = document.createElement('div');
+  note.className = 'note';
+  note.innerHTML = `${ICONS.note}<span></span>`;
+  note.querySelector('span').textContent = text;
+  return note;
+}
+
+function renderPath(key){
+  const data = DATA[key];
+  contentHead.className = 'content-head for-' + key;
+  contentKicker.textContent = data.label;
+  contentKicker.style.color = '';
+  contentTitle.textContent = data.label;
+  contentSubtitle.textContent = data.tagline;
+
+  stepsContainer.innerHTML = '';
+  data.steps.forEach((step, i) => {
+    const row = document.createElement('div');
+    row.className = 'step for-' + key;
+
+    const marker = document.createElement('div');
+    marker.className = 'step-marker';
+    marker.innerHTML = `<div class="step-num">${step.num}</div><div class="step-line"></div>`;
+
+    const body = document.createElement('div');
+    body.className = 'step-body';
+    const h3 = document.createElement('h3');
+    h3.textContent = step.title;
+    body.appendChild(h3);
+
+    step.paragraphs.forEach(p => {
+      const el = document.createElement('p');
+      el.textContent = p;
+      body.appendChild(el);
+    });
+
+    if (step.prompt){
+      body.appendChild(buildPromptBox(step.prompt));
+    }
+    if (step.note){
+      body.appendChild(buildNote(step.note));
+    }
+    if (step.afterNote){
+      step.afterNote.forEach(p => {
+        const el = document.createElement('p');
+        el.className = 'muted';
+        el.textContent = p;
+        body.appendChild(el);
+      });
+    }
+
+    row.appendChild(marker);
+    row.appendChild(body);
+    stepsContainer.appendChild(row);
+  });
+
+  closingNote.innerHTML = '';
+  data.closing.forEach(p => {
+    const el = document.createElement('p');
+    el.textContent = p;
+    closingNote.appendChild(el);
+  });
+
+  switchPathBtn.textContent = key == 1 ? 'مشاهدهٔ راه دوم (باکیفیت‌تر ولی زمان‌برتر)' : 'مشاهدهٔ راه اول (سریع‌تر ولی کم‌کیفیت‌تر)';
+  switchPathBtn.dataset.target = key == 1 ? '2' : '1';
+}
+
+function showContent(key){
+  renderPath(key);
+  heroSection.hidden = true;
+  forkSection.hidden = true;
+  contentSection.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showFork(){
+  contentSection.hidden = true;
+  heroSection.hidden = false;
+  forkSection.hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.path-card').forEach(card => {
+  card.addEventListener('click', () => showContent(card.dataset.path));
+});
+backBtn.addEventListener('click', showFork);
+switchPathBtn.addEventListener('click', () => showContent(switchPathBtn.dataset.target));
+
+let toastTimer;
+function showToast(){
+  clearTimeout(toastTimer);
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+function copyPrompt(text, btn){
+  const done = () => {
+    btn.classList.add('copied');
+    btn.innerHTML = `${ICONS.check}<span>کپی شد</span>`;
+    showToast();
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `${ICONS.copy}<span>کپی</span>`;
+    }, 1600);
+  };
+
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>

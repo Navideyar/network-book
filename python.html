@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>دوره Python · ZeroDay</title>
+
+    <!-- فونت‌ها -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- CodeMirror (editor) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css" />
+
+    <style>
+        /* ===== متغیرهای CSS ===== */
+        :root {
+            --primary: #306998;
+            --primary-hover: #1d4b6e;
+            --primary-soft: #d1e0f0;
+            --primary-glow: rgba(48, 105, 152, 0.25);
+
+            --bg-body: #f5f7fa;
+            --bg-card: #ffffff;
+            --bg-navbar: rgba(255, 255, 255, 0.92);
+            --bg-code: #1e293b;
+            --bg-toc-hover: #eef4fb;
+
+            --text-main: #2d3748;
+            --text-heading: #1a202c;
+            --text-muted: #4a5568;
+
+            --border: #e2e8f0;
+            --shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+            --radius: 14px;
+            --radius-sm: 10px;
+
+            --note-bg: #e6ffed;
+            --note-border: #2b8a3e;
+            --important-bg: #e3f2fd;
+            --important-border: #1976d2;
+            --warning-bg: #fff8e1;
+            --warning-border: #f57c00;
+
+            --code-text: #e2e8f0;
+            --terminal-green: #8ae234;
+            --sidebar-width: 300px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #4d8dc7;
+            --primary-hover: #5fa3d9;
+            --primary-soft: rgba(77, 141, 199, 0.15);
+            --primary-glow: rgba(77, 141, 199, 0.25);
+
+            --bg-body: #1a1e26;
+            --bg-card: #242a36;
+            --bg-navbar: rgba(30, 34, 44, 0.95);
+            --bg-code: #0f131a;
+            --bg-toc-hover: rgba(77, 141, 199, 0.12);
+
+            --text-main: #e2e8f0;
+            --text-heading: #f0f4fa;
+            --text-muted: #a0aec0;
+
+            --border: #3a4050;
+            --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+
+            --note-bg: rgba(43, 138, 62, 0.15);
+            --note-border: #5fbf7a;
+            --important-bg: rgba(25, 118, 210, 0.15);
+            --important-border: #64b5f6;
+            --warning-bg: rgba(245, 124, 0, 0.15);
+            --warning-border: #ffb74d;
+
+            --code-text: #e2e8f0;
+        }
+
+        /* ===== ریست و پایه ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.8;
+            font-size: 16.5px;
+            padding-top: 64px;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+            max-width: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== نوار بالا ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-navbar);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            z-index: 1000;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .nav-spacer {
+            flex: 1;
+        }
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .theme-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* ===== نوار پیشرفت ===== */
+        .progress-track {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            z-index: 999;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #7ab7e0);
+            width: 0%;
+            transition: width 0.15s;
+        }
+
+        /* ===== سایدبار ===== */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 60px);
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 900;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, border-color 0.3s;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.04);
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 2;
+        }
+        .sidebar-header h3 {
+            font-size: 1rem;
+            color: var(--text-heading);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-header h3 i {
+            color: var(--primary);
+        }
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .sidebar-close:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        /* ===== فهرست مطالب ===== */
+        .toc {
+            padding: 8px 0 30px;
+        }
+        .toc-chapter {
+            border-bottom: 1px solid var(--border);
+        }
+        .toc-chapter:last-child {
+            border-bottom: none;
+        }
+        .toc-chapter summary {
+            padding: 12px 14px;
+            font-weight: 600;
+            color: var(--text-heading);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            transition: background 0.15s;
+            user-select: none;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            border-radius: 0;
+        }
+        .toc-chapter summary::-webkit-details-marker {
+            display: none;
+        }
+        .toc-chapter summary::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: auto;
+            margin-top: 2px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.25s;
+            flex-shrink: 0;
+        }
+        .toc-chapter[open] summary::after {
+            transform: rotate(180deg);
+        }
+        .toc-chapter summary:hover {
+            background: var(--bg-toc-hover);
+        }
+        .toc-chapter[open]>summary {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+        .chapter-num {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .toc-sections {
+            list-style: none;
+            padding: 0 0 8px 0;
+            margin: 0;
+            background: var(--bg-body);
+        }
+        .toc-sections li a {
+            display: block;
+            padding: 8px 14px 8px 48px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.15s;
+            border-right: 3px solid transparent;
+            line-height: 1.45;
+        }
+        .toc-sections li a:hover {
+            color: var(--primary);
+            background: var(--bg-toc-hover);
+        }
+        .toc-sections li a.active {
+            color: var(--primary);
+            background: var(--primary-soft);
+            border-right-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ===== دکمه باز کردن سایدبار ===== */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: 1.25rem;
+            box-shadow: 0 6px 20px var(--primary-glow);
+            z-index: 950;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .sidebar-toggle:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 850;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.open {
+            display: block;
+        }
+
+        /* ===== محتوای اصلی ===== */
+        .main {
+            max-width: 820px;
+            margin: 0 auto;
+            margin-right: calc(var(--sidebar-width) + 24px);
+            padding: 32px 24px 80px;
+            transition: margin 0.3s;
+            min-width: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.35s ease;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== هدر بخش ===== */
+        .section-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary);
+        }
+        .section-badge {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+        .section-header h1 {
+            font-size: 1.3rem;
+            color: var(--text-heading);
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+        .section-header .meta {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== تایپوگرافی ===== */
+        h2 {
+            color: var(--text-heading);
+            font-size: 1.25rem;
+            margin: 32px 0 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        h3 {
+            color: var(--text-heading);
+            font-size: 1.05rem;
+            margin: 20px 0 8px;
+        }
+        p {
+            margin-bottom: 14px;
+            text-align: justify;
+        }
+        strong {
+            color: var(--text-heading);
+        }
+        ul,
+        ol {
+            margin: 10px 0 18px;
+            padding-right: 24px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        blockquote {
+            background: var(--primary-soft);
+            border-right: 4px solid var(--primary);
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            color: var(--text-heading);
+            font-style: italic;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        /* ===== جعبه‌های اطلاعاتی ===== */
+        .box {
+            display: flex;
+            gap: 14px;
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            margin: 22px 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: break-word;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .box>div {
+            min-width: 0;
+            flex: 1;
+            overflow-wrap: break-word;
+        }
+        .box i {
+            font-size: 1.3rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .box strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+        .box.note {
+            background: var(--note-bg);
+            border-color: var(--note-border);
+        }
+        .box.note i,
+        .box.note strong {
+            color: var(--note-border);
+        }
+        .box.important {
+            background: var(--important-bg);
+            border-color: var(--important-border);
+        }
+        .box.important i,
+        .box.important strong {
+            color: var(--important-border);
+        }
+        .box.warning {
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+        }
+        .box.warning i,
+        .box.warning strong {
+            color: var(--warning-border);
+        }
+
+        /* ===== کد ===== */
+        .code-container {
+            position: relative;
+            margin: 24px 0;
+            max-width: 100%;
+            min-width: 0;
+            width: 100%;
+        }
+        .code-label {
+            position: absolute;
+            top: -11px;
+            left: 14px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 14px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 1;
+            letter-spacing: 0.3px;
+        }
+        .code-block {
+            background: var(--bg-code);
+            color: var(--code-text);
+            padding: 28px 18px 18px;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+            white-space: pre;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            max-width: 100%;
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+            transition: background 0.3s, border-color 0.3s;
+            line-height: 1.6;
+        }
+        .code-block::before {
+            content: '>>> ';
+            color: var(--terminal-green);
+        }
+        .code-block.no-prompt::before {
+            content: none;
+        }
+
+        /* ===== جدول ===== */
+        .table-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 22px 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            font-size: 0.93rem;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            min-width: 0;
+        }
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 11px 14px;
+            text-align: right;
+            vertical-align: top;
+        }
+        th {
+            background: var(--primary-soft);
+            color: var(--text-heading);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tr:hover td {
+            background: var(--bg-body);
+        }
+        td code {
+            white-space: nowrap;
+        }
+
+        /* ===== جمع‌بندی ===== */
+        .summary-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            margin: 24px 0;
+            box-shadow: var(--shadow);
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: break-word;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .summary-box h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        /* ===== کوئیز ===== */
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            margin: 28px 0 16px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .quiz-card>p {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-heading);
+            margin-bottom: 16px;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quiz-options button {
+            background: var(--bg-body);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            text-align: right;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .quiz-options button:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .quiz-options button.selected {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        .quiz-answer {
+            display: none;
+            margin-top: 14px;
+            padding: 14px 16px;
+            background: var(--note-bg);
+            border-radius: var(--radius-sm);
+            border-right: 4px solid var(--note-border);
+            color: var(--text-heading);
+            font-size: 0.95rem;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .quiz-answer.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        /* ===== ویرایشگر پایتون (Playground) ===== */
+        .python-playground {
+            margin: 24px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+            background: #1e1e2e;
+            border: 1px solid #313244;
+            direction: ltr;
+            max-width: 100%;
+        }
+        .playground-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #181825;
+            padding: 10px 14px;
+            border-bottom: 1px solid #313244;
+            flex-wrap: wrap;
+        }
+        .playground-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cdd6f4;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .playground-title i {
+            color: #89b4fa;
+        }
+        .playground-status {
+            font-size: 12px;
+            color: #a6adc8;
+            font-family: 'JetBrains Mono', monospace;
+            margin-right: auto;
+            margin-left: 8px;
+        }
+        .playground-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .playground-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            border-radius: 7px;
+            padding: 6px 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.18s;
+            line-height: 1.3;
+        }
+        .playground-btn.run {
+            background: #89b4fa;
+            color: #1e1e2e;
+        }
+        .playground-btn.run:hover {
+            background: #b4befe;
+        }
+        .playground-btn.run:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        .playground-btn.clear {
+            background: #313244;
+            color: #cdd6f4;
+        }
+        .playground-btn.clear:hover {
+            background: #45475a;
+        }
+        .playground-editor-wrap {
+            position: relative;
+            min-height: 180px;
+            max-height: 360px;
+            overflow: auto;
+        }
+        .python-playground .CodeMirror {
+            height: 220px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.55;
+            direction: ltr;
+            text-align: left;
+            background: #1e1e2e !important;
+        }
+        .python-playground .CodeMirror-scroll {
+            min-height: 180px;
+        }
+        .python-playground .CodeMirror-gutters {
+            background: #181825 !important;
+            border-right: 1px solid #313244;
+        }
+        .python-playground .CodeMirror-linenumber {
+            color: #6c7086;
+        }
+        .playground-output {
+            background: #11111b;
+            color: #a6adc8;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13.5px;
+            min-height: 72px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-top: 1px solid #313244;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .playground-output.error {
+            color: #f38ba8;
+        }
+        .playground-output.success {
+            color: #a6e3a1;
+        }
+        .playground-output.loading {
+            color: #f9e2af;
+        }
+        .playground-hint {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== placeholder ===== */
+        .placeholder {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 48px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .placeholder i {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 14px;
+            opacity: 0.7;
+            display: block;
+        }
+
+        /* ===== دکمه‌های ناوبری ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            gap: 12px;
+        }
+        .nav-btn {
+            padding: 11px 22px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+        .nav-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ===== ریسپانسیو ===== */
+        @media (max-width: 1000px) {
+            .sidebar {
+                transform: translateX(100%);
+                top: 0;
+                height: 100vh;
+                width: 310px;
+                max-width: 88vw;
+                border-left: none;
+                box-shadow: -8px 0 30px rgba(0, 0, 0, 0.12);
+                -webkit-overflow-scrolling: touch;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-close {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sidebar-toggle {
+                display: flex;
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .main {
+                margin-right: 0 !important;
+                padding: 20px 14px 100px;
+                max-width: 100%;
+                width: 100%;
+                overflow-x: hidden;
+            }
+            body {
+                padding-top: 56px;
+                font-size: 15.5px;
+                line-height: 1.8;
+            }
+            .navbar {
+                height: 56px;
+                padding: 0 14px;
+                gap: 10px;
+            }
+            .progress-track {
+                top: 56px;
+            }
+            .brand span {
+                display: none;
+            }
+            .section-header {
+                padding: 14px 14px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .section-badge {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            .section-header h1 {
+                font-size: 1.1rem;
+                line-height: 1.45;
+                word-break: break-word;
+            }
+            .section-header .meta {
+                font-size: 0.8rem;
+            }
+            h2 {
+                font-size: 1.08rem;
+            }
+            h3 {
+                font-size: 0.98rem;
+            }
+            .code-block {
+                font-size: 0.78rem;
+                padding: 24px 12px 14px;
+                white-space: pre;
+                overflow-x: auto;
+                overflow-y: hidden;
+                max-width: 100%;
+                min-width: 0;
+                -webkit-overflow-scrolling: touch;
+            }
+            .code-label {
+                font-size: 0.68rem;
+                left: 10px;
+            }
+            .table-wrap {
+                margin: 16px -4px;
+                border-radius: 8px;
+            }
+            table {
+                font-size: 0.82rem;
+                min-width: 420px;
+            }
+            th,
+            td {
+                padding: 8px 10px;
+            }
+            .box {
+                padding: 12px 12px;
+                gap: 10px;
+            }
+            .box i {
+                font-size: 1.15rem;
+            }
+            .quiz-card {
+                padding: 16px;
+            }
+            .quiz-options button {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            .nav-buttons {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.88rem;
+                flex: 1 1 auto;
+                justify-content: center;
+            }
+            .summary-box {
+                padding: 14px 14px;
+            }
+            blockquote {
+                padding: 12px 14px;
+            }
+            .code-container {
+                max-width: 100%;
+            }
+            .python-playground {
+                margin: 18px 0;
+                border-radius: 10px;
+            }
+            .playground-header {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+            .playground-title {
+                font-size: 12px;
+            }
+            .playground-status {
+                font-size: 11px;
+                width: 100%;
+                margin: 4px 0 0;
+                order: 3;
+            }
+            .playground-btn {
+                padding: 5px 11px;
+                font-size: 12px;
+            }
+            .python-playground .CodeMirror {
+                height: 190px;
+                font-size: 13px;
+            }
+            .playground-output {
+                font-size: 12.5px;
+                padding: 10px 12px;
+                min-height: 60px;
+                max-height: 160px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar-toggle {
+                bottom: 18px;
+                left: 18px;
+                width: 48px;
+                height: 48px;
+            }
+            .main {
+                padding: 14px 10px 100px;
+            }
+            body {
+                font-size: 15px;
+            }
+            .section-header h1 {
+                font-size: 1.02rem;
+            }
+            .python-playground .CodeMirror {
+                height: 170px;
+                font-size: 12.5px;
+            }
+            .playground-btn {
+                padding: 5px 9px;
+                font-size: 11.5px;
+            }
+            .playground-title span {
+                display: none;
+            }
+            .code-block {
+                font-size: 0.72rem;
+                padding: 22px 10px 12px;
+            }
+            table {
+                font-size: 0.78rem;
+                min-width: 360px;
+            }
+            th,
+            td {
+                padding: 7px 8px;
+            }
+            .nav-btn {
+                font-size: 0.84rem;
+                padding: 9px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- نوار بالا -->
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fab fa-python"></i></div>
+            <span>دوره Python · ZeroDay</span>
+        </div>
+        <div class="nav-spacer"></div>
+        <button class="theme-btn" onclick="toggleTheme()" title="تغییر تم">
+            <i class="fas fa-moon theme-icon"></i>
+        </button>
+    </nav>
+
+    <!-- نوار پیشرفت -->
+    <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- دکمه باز کردن سایدبار -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="فهرست مطالب">
+        <i class="fas fa-list-ul"></i>
+    </button>
+
+    <!-- اوورلی -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- سایدبار -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-book-open"></i> فهرست مطالب</h3>
+            <button class="sidebar-close" id="sidebarClose" aria-label="بستن">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="toc" id="tocNav"></nav>
+    </aside>
+
+    <!-- محتوای اصلی -->
+    <main class="main" id="mainContent"></main>
+
+    <script>
+        // ============================================================
+        // داده‌های دوره (بر اساس منوی درسی)
+        // ============================================================
+        const course = [{
+            "id": "ch1",
+            "title": "Introduction & Install",
+            "en": "Intro & Install",
+            "badge": "۱",
+            "sections": [
+                { "id": "ch1-1",
+                "title": "آشنایی با Python، کاربردها، نصب Python، Interpreter، اجرای کد و REPL، VS Code، افزونه Python و اجرای اولین برنامه" }
+            ]
+        }, {
+            "id": "ch2",
+            "title": "Variables & Data Types",
+            "en": "Variables & Data Types",
+            "badge": "۲",
+            "sections": [
+                { "id": "ch2-1", "title": "Variables، قوانین نام‌گذاری و Data Types — int، float، str، bool و None" }
+            ]
+        }, {
+            "id": "ch3",
+            "title": "Type Casting",
+            "en": "Type Casting",
+            "badge": "۳",
+            "sections": [
+                { "id": "ch3-1", "title": "Type Casting و تبدیل انواع داده + ترکیب Variables و Type Casting در برنامه‌های ساده" }
+            ]
+        }, {
+            "id": "ch4",
+            "title": "Operators",
+            "en": "Operators",
+            "badge": "۴",
+            "sections": [
+                { "id": "ch4-1", "title": "Arithmetic، Assignment، Comparison، Logical، Membership و Identity Operators" }
+            ]
+        }, {
+            "id": "ch5",
+            "title": "Input & Output",
+            "en": "Input & Output",
+            "badge": "۵",
+            "sections": [
+                { "id": "ch5-1", "title": "print()، input()، sep، end و ترکیب Input، Output و Type Casting" }
+            ]
+        }, {
+            "id": "ch6",
+            "title": "Strings",
+            "en": "Strings",
+            "badge": "۶",
+            "sections": [
+                { "id": "ch6-1", "title": "String، Indexing، Slicing، String Methods و String Formatting با f-string" }
+            ]
+        }, {
+            "id": "ch7",
+            "title": "Data Structures",
+            "en": "Data Structures",
+            "badge": "۷",
+            "sections": [
+                { "id": "ch7-1", "title": "List — ساخت، دسترسی، تغییر و متدهای مهم" },
+                { "id": "ch7-2", "title": "Tuple، Set و Unpacking + مقایسه کاربردهای Tuple، Set و List" },
+                { "id": "ch7-3", "title": "Dictionary — ساخت، دسترسی، تغییر و متدهای مهم + Nested Data Structures" }
+            ]
+        }, {
+            "id": "ch8",
+            "title": "Control Flow: Conditionals",
+            "en": "Conditionals",
+            "badge": "۸",
+            "sections": [
+                { "id": "ch8-1", "title": "if، elif، else، شرط‌های ترکیبی و Nested Conditions" },
+                { "id": "ch8-2", "title": "حل مسئله با شرط‌ها و تمرین‌های ترکیبی" }
+            ]
+        }, {
+            "id": "ch9",
+            "title": "Control Flow: Loops",
+            "en": "Loops",
+            "badge": "۹",
+            "sections": [
+                { "id": "ch9-1", "title": "while و کاربردهای آن" },
+                { "id": "ch9-2", "title": "for، range() و enumerate()" },
+                { "id": "ch9-3", "title": "break، continue، pass، Nested Loops و zip()" }
+            ]
+        }, {
+            "id": "ch10",
+            "title": "Functions",
+            "en": "Functions",
+            "badge": "۱۰",
+            "sections": [
+                { "id": "ch10-1", "title": "تعریف Function، Parameters، Arguments و return" },
+                { "id": "ch10-2", "title": "انواع Arguments، Variable Scope — Local و Global و طراحی توابع کاربردی" }
+            ]
+        }, {
+            "id": "ch11",
+            "title": "Lambda & Comprehensions",
+            "en": "Lambda & Comprehensions",
+            "badge": "۱۱",
+            "sections": [
+                { "id": "ch11-1", "title": "List، Set و Dictionary Comprehension" },
+                { "id": "ch11-2", "title": "Lambda، map()، filter() و sorted()" }
+            ]
+        }, {
+            "id": "ch12",
+            "title": "Modules & Packages",
+            "en": "Modules & Packages",
+            "badge": "۱۲",
+            "sections": [
+                { "id": "ch12-1", "title": "Module، import و استفاده از ماژول‌ها + Package، ساختار پروژه و __name__ == '__main__'" },
+                { "id": "ch12-2", "title": "pip، Virtual Environment (venv) و requirements.txt" }
+            ]
+        }, {
+            "id": "ch13",
+            "title": "Work With Files",
+            "en": "Files",
+            "badge": "۱۳",
+            "sections": [
+                { "id": "ch13-1", "title": "باز کردن، بستن، خواندن و نوشتن فایل + with" },
+                { "id": "ch13-2", "title": "کار با مسیر فایل‌ها، pathlib و آشنایی با os" }
+            ]
+        }, {
+            "id": "ch14",
+            "title": "Error Handling",
+            "en": "Error Handling",
+            "badge": "۱۴",
+            "sections": [
+                { "id": "ch14-1", "title": "Error و Exception، try، except، finally و raise" },
+                { "id": "ch14-2", "title": "مدیریت خطا در برنامه‌های واقعی" }
+            ]
+        }, {
+            "id": "ch15",
+            "title": "OOP",
+            "en": "OOP",
+            "badge": "۱۵",
+            "sections": [
+                { "id": "ch15-1", "title": "Class، Object، Attribute و Method" },
+                { "id": "ch15-2", "title": "Constructor، __init__() و Instance/Class Attributes" },
+                { "id": "ch15-3", "title": "Inheritance، super() و Method Overriding" },
+                { "id": "ch15-4", "title": "Encapsulation و طراحی کلاس" }
+            ]
+        }, {
+            "id": "ch16",
+            "title": "Regular Expressions",
+            "en": "Regex",
+            "badge": "۱۶",
+            "sections": [
+                { "id": "ch16-1", "title": "آشنایی با Regular Expression، الگوهای پایه و Regex با re" },
+                { "id": "ch16-2", "title": "کاربردهای عملی Regex" }
+            ]
+        }, {
+            "id": "ch17",
+            "title": "کاربردهای مهم Python",
+            "en": "Applications",
+            "badge": "۱۷",
+            "sections": [
+                { "id": "ch17-1", "title": "datetime، json و کار با داده‌های رایج" },
+                { "id": "ch17-2", "title": "random، math، statistics و مباحث مشابه در صورت نیاز پروژه معرفی می‌شوند." }
+            ]
+        }, {
+            "id": "ch18",
+            "title": "Final Project",
+            "en": "Final Project",
+            "badge": "۱۸",
+            "sections": [
+                { "id": "ch18-1", "title": "تحلیل مسئله، طراحی و شروع پروژه" },
+                { "id": "ch18-2", "title": "پیاده‌سازی، Debugging و تکمیل پروژه" }
+            ]
+        }];
+
+        // ============================================================
+        // محتوای غنی برای ۳ درسنامه تستی (فقط ۳ بخش اول)
+        // ============================================================
+        const richContent = {
+"ch1-1": `
+<div class="section-header">
+    <div class="section-badge">۱</div>
+    <div>
+        <h1>آشنایی با Python، کاربردها، نصب Python، Interpreter، اجرای کد و REPL، VS Code، افزونه Python و اجرای اولین برنامه</h1>
+        <div class="meta">فصل ۱ · بخش ۱ از ۱</div>
+    </div>
+</div>
+
+<h2>Python چیست؟</h2>
+<p><strong>Python</strong> یک زبان برنامه‌نویسی سطح بالا، تفسیری و همه‌منظوره است که توسط <strong>Guido van Rossum</strong> در سال ۱۹۹۱ ایجاد شد. فلسفه طراحی Python بر خوانایی کد و سادگی syntax تأکید دارد.</p>
+<p>Python در حوزه‌های مختلفی کاربرد دارد:</p>
+<ul>
+    <li>توسعه وب (Backend با Django، Flask)</li>
+    <li>علم داده و یادگیری ماشین (NumPy، Pandas، TensorFlow، PyTorch)</li>
+    <li>اتوماسیون و اسکریپت‌نویسی</li>
+    <li>برنامه‌های دسکتاپ (با Tkinter، PyQt)</li>
+    <li>هوش مصنوعی و پردازش زبان طبیعی</li>
+    <li>و خیلی موارد دیگر...</li>
+</ul>
+<blockquote>Python یکی از محبوب‌ترین زبان‌های برنامه‌نویسی در جهان است که توسط شرکت‌های بزرگی مثل Google، NASA، Netflix و Instagram استفاده می‌شود.</blockquote>
+
+<h2>نصب Python</h2>
+<p>برای شروع، ابتدا باید Python را روی سیستم خود نصب کنید.</p>
+<h3>نصب روی Windows</h3>
+<p>از سایت رسمی <a href="https://python.org" target="_blank">python.org</a> آخرین نسخه را دانلود کرده و فایل <code>.exe</code> را اجرا کنید. <strong>حتماً گزینه <code>Add Python to PATH</code> را علامت بزنید</strong>.</p>
+<h3>نصب روی macOS</h3>
+<p>با استفاده از <code>brew</code>:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">brew install python</div></div>
+<h3>نصب روی Linux (Debian/Ubuntu)</h3>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">sudo apt update\nsudo apt install python3 python3-pip</div></div>
+<p>پس از نصب، با دستور زیر می‌توانید نسخه Python را بررسی کنید:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python3 --version</div></div>
+
+<h2>Interpreter و اجرای کد</h2>
+<p>Python یک زبان <strong>تفسیری (Interpreted)</strong> است. یعنی کد شما توسط یک برنامه به نام <strong>Interpreter</strong> خط به خط اجرا می‌شود.</p>
+<p>شما می‌توانید کد Python را به دو روش اجرا کنید:</p>
+<ol>
+    <li><strong>حالت تعاملی (REPL)</strong> — مستقیماً دستورات را تایپ کرده و نتیجه را ببینید.</li>
+    <li><strong>اجرای فایل اسکریپت</strong> — کد را در یک فایل با پسوند <code>.py</code> ذخیره کرده و اجرا کنید.</li>
+</ol>
+<h3>REPL چیست؟</h3>
+<p>REPL مخفف <strong>Read-Eval-Print Loop</strong> است. با تایپ <code>python3</code> در ترمینال، وارد محیط تعاملی می‌شوید:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">$ python3\nPython 3.11.0 (main, ...)\nType "help", "copyright", "credits" or "license" for more information.\n>>> print("Hello, World!")\nHello, World!\n>>></div></div>
+<p>برای خروج از REPL از <code>exit()</code> یا <code>Ctrl+D</code> استفاده کنید.</p>
+
+<h2>VS Code و افزونه Python</h2>
+<p><strong>Visual Studio Code</strong> یکی از محبوب‌ترین ویرایشگرهای کد برای Python است.</p>
+<p>افزونه‌های ضروری:</p>
+<ul>
+    <li><strong>Python</strong> (توسط Microsoft) — شامل IntelliSense، Linting، Debugging و ...</li>
+    <li><strong>Pylance</strong> — برای تکمیل کد سریع‌تر و بررسی نوع داده</li>
+    <li><strong>Jupyter</strong> — اگر با Notebook کار می‌کنید</li>
+</ul>
+
+<h2>اولین برنامه Python</h2>
+<p>بیایید اولین برنامه خود را بنویسیم.</p>
+<p>یک فایل جدید به نام <code>hello.py</code> ایجاد کنید و این کد را در آن بنویسید:</p>
+<div class="code-container"><span class="code-label">hello.py</span><div class="code-block">print("Hello, World!")</div></div>
+<p>سپس در ترمینال (در همان پوشه فایل) اجرا کنید:</p>
+<div class="code-container"><span class="code-label">Terminal</span><div class="code-block no-prompt">python3 hello.py</div></div>
+<p>خروجی:</p>
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello, World!</div></div>
+<div class="box important"><i class="fas fa-star"></i><div><strong>نکته مهم</strong>تابع <code>print()</code> در Python برای نمایش خروجی در کنسول استفاده می‌شود. رشته <code>"Hello, World!"</code> یک مقدار از نوع <strong>str</strong> (string) است.</div></div>
+
+<h2>💻 تمرین عملی در ویرایشگر</h2>
+<p>کدهای زیر را در ویرایشگر اجرا کنید و نتیجه را ببینید. سپس خودتان تغییرات ایجاد کنید.</p>
+
+<!-- کانتینر ویرایشگر بهبودیافته -->
+<div class="python-playground" id="pythonPlaygroundRoot">
+    <div class="playground-header">
+        <div class="playground-title">
+            <i class="fas fa-code"></i>
+            <span>Python Playground</span>
+        </div>
+        <div class="playground-status" id="playgroundStatus">در حال آماده‌سازی...</div>
+        <div class="playground-actions">
+            <button type="button" class="playground-btn clear" onclick="clearPlaygroundOutput()" title="پاک کردن خروجی">
+                <i class="fas fa-eraser"></i> پاک‌کردن
+            </button>
+            <button type="button" class="playground-btn run" id="runPlaygroundBtn" onclick="runCodePlayground()" title="اجرای کد (Ctrl+Enter)">
+                <i class="fas fa-play"></i> اجرا
+            </button>
+        </div>
+    </div>
+    <div class="playground-editor-wrap">
+        <textarea id="pythonPlayground" style="display:none;"># تمرین ۱: سلام دنیا
+print("سلام دنیا!")
+
+# تمرین ۲: جمع دو عدد
+a = 5
+b = 7
+print("جمع:", a + b)
+
+# تمرین ۳: دریافت نام از کاربر (اختیاری)
+# name = input("اسم شما: ")
+# print("سلام", name)
+
+# حالا خودتان تغییرات را امتحان کنید!</textarea>
+    </div>
+    <div class="playground-output" id="playgroundOutput">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<p class="playground-hint"><strong>📌 نکته:</strong> کد را ویرایش کنید و دکمه «اجرا» را بزنید (یا <kbd>Ctrl</kbd>+<kbd>Enter</kbd>). از <code>input()</code> هم می‌توانید استفاده کنید — یک پنجرهٔ کوچک برای ورود باز می‌شود.</p>
+
+<div class="summary-box">
+    <h3>🧠 جمع‌بندی جلسه ۱</h3>
+    <ul>
+        <li>Python یک زبان تفسیری، سطح بالا و همه‌منظوره است.</li>
+        <li>برای نصب Python از سایت رسمی یا مدیر بسته سیستم خود استفاده کنید.</li>
+        <li>REPL محیط تعاملی برای آزمایش سریع کد است.</li>
+        <li>برای نوشتن کدهای جدی از فایل‌های <code>.py</code> و ویرایشگرهایی مثل VS Code استفاده کنید.</li>
+        <li>اولین برنامه: <code>print("Hello, World!")</code></li>
+    </ul>
+</div>
+
+<h2>خودآزمایی</h2>
+<div class="quiz-card"><p>❓ تست ۱: کدام گزینه تعریف درستی از Python است؟</p>
+    <div class="quiz-options">
+        <button onclick="selectOption(this)">الف) یک زبان کامپایلری برای توسعه وب</button>
+        <button onclick="selectOption(this)">ب) یک زبان تفسیری، سطح بالا و همه‌منظوره</button>
+        <button onclick="selectOption(this)">ج) یک سیستمعامل مبتنی بر لینوکس</button>
+        <button onclick="selectOption(this)">د) یک پایگاه داده NoSQL</button>
+    </div>
+    <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Python یک زبان تفسیری (Interpreted)، سطح بالا (High-level) و همه‌منظوره (General-purpose) است.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۲: برای اجرای یک فایل Python به نام <code>script.py</code> در ترمینال از کدام دستور استفاده می‌کنیم؟</p>
+    <div class="quiz-options">
+        <button onclick="selectOption(this)">الف) <code>python script</code></button>
+        <button onclick="selectOption(this)">ب) <code>python3 script.py</code></button>
+        <button onclick="selectOption(this)">ج) <code>run script.py</code></button>
+        <button onclick="selectOption(this)">د) <code>py script</code></button>
+    </div>
+    <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>دستور صحیح <code>python3 script.py</code> است. در برخی سیستم‌ها <code>python script.py</code> نیز کار می‌کند.</div>
+</div>
+
+<div class="quiz-card"><p>❓ تست ۳: خروجی دستور زیر در REPL چیست؟ <br><code>print("Python " + "Course")</code></p>
+    <div class="quiz-options">
+        <button onclick="selectOption(this)">الف) Python Course</button>
+        <button onclick="selectOption(this)">ب) PythonCourse</button>
+        <button onclick="selectOption(this)">ج) Python + Course</button>
+        <button onclick="selectOption(this)">د) خطا</button>
+    </div>
+    <div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>عملگر <code>+</code> روی رشته‌ها، آن‌ها را به هم متصل (Concatenate) می‌کند. بنابراین خروجی <code>Python Course</code> خواهد بود.</div>
+</div>
+`,
+            "ch2-1": `
+        <div class="section-header">
+            <div class="section-badge">۲</div>
+            <div>
+                <h1>Variables، قوانین نام‌گذاری و Data Types — int، float، str، bool و None</h1>
+                <div class="meta">فصل ۲ · بخش ۱ از ۱</div>
+            </div>
+        </div>
+
+        <h2>متغیر (Variable) چیست؟</h2>
+        <p>متغیرها در برنامه‌نویسی مانند ظرف‌هایی هستند که داده‌ها را در خود ذخیره می‌کنند. در Python برای تعریف متغیر نیازی به اعلام نوع نیست؛ خود Python نوع داده را بر اساس مقداری که به متغیر نسبت می‌دهیم تشخیص می‌دهد.</p>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = 10\nname = "Ali"\npi = 3.14\nis_valid = True</div></div>
+
+        <h2>قوانین نام‌گذاری متغیرها</h2>
+        <ul>
+            <li>نام متغیر باید با یک حرف (a-z, A-Z) یا زیرخط (<code>_</code>) شروع شود.</li>
+            <li>بعد از حرف اول می‌توانید از حروف، اعداد و زیرخط استفاده کنید.</li>
+            <li>نام متغیرها به حروف بزرگ و کوچک حساس هستند (<code>age</code> با <code>Age</code> متفاوت است).</li>
+            <li>نمی‌توانید از کلمات کلیدی Python مثل <code>if</code>، <code>for</code>، <code>while</code> و ... استفاده کنید.</li>
+        </ul>
+        <div class="code-container"><span class="code-label">نام‌های معتبر</span><div class="code-block no-prompt">my_var = 5\n_private = 10\nuser2 = "John"\nMyClass = "test"</div></div>
+        <div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نام‌های نامعتبر</strong><br><code>2var = 5</code> (شروع با عدد)<br><code>my-var = 5</code> (استفاده از خط تیره)<br><code>class = 5</code> (کلمه کلیدی)</div></div>
+
+        <h2>انواع داده (Data Types)</h2>
+        <p>در Python انواع داده‌های مختلفی وجود دارد. مهم‌ترین آن‌ها عبارتند از:</p>
+        <h3>int — اعداد صحیح</h3>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">age = 25\nscore = -10</div></div>
+        <h3>float — اعداد اعشاری</h3>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">pi = 3.14\ntemperature = -2.5</div></div>
+        <h3>str — رشته (متن)</h3>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">name = "Ali"\nmessage = 'Hello Python'</div></div>
+        <h3>bool — مقدار بولی (True یا False)</h3>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">is_active = True\nis_admin = False</div></div>
+        <h3>None — نشان‌دهنده عدم وجود مقدار</h3>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">result = None</div></div>
+
+        <h2>تشخیص نوع داده با <code>type()</code></h2>
+        <p>با تابع <code>type()</code> می‌توانید نوع داده هر متغیر را مشاهده کنید:</p>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = 10\nprint(type(x))  # <class 'int'>\n\ny = 3.14\nprint(type(y))  # <class 'float'>\n\nname = "Ali"\nprint(type(name))  # <class 'str'>\n\nflag = True\nprint(type(flag))  # <class 'bool'>\n\nz = None\nprint(type(z))  # <class 'NoneType'></div></div>
+
+        <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>در Python متغیرها به صورت <strong>پویا (Dynamic)</strong> هستند؛ یعنی می‌توانید در طول برنامه نوع متغیر را تغییر دهید. اما این کار معمولاً توصیه نمی‌شود چون خوانایی کد را کاهش می‌دهد.</div></div>
+
+        <h2>تمرین عملی</h2>
+        <ol>
+            <li>متغیرهای زیر را تعریف کرده و نوع هر کدام را با <code>type()</code> چاپ کنید:
+                <ul>
+                    <li><code>age = 30</code></li>
+                    <li><code>price = 99.99</code></li>
+                    <li><code>city = "Tehran"</code></li>
+                    <li><code>is_student = False</code></li>
+                    <li><code>data = None</code></li>
+                </ul>
+            </li>
+            <li>یک متغیر با نام <code>_score</code> تعریف کرده و مقدار ۸۵ را به آن بدهید.</li>
+            <li>سعی کنید یک متغیر با نام <code>2number</code> تعریف کنید و ببینید چه خطایی رخ می‌دهد.</li>
+        </ol>
+
+        <div class="summary-box">
+            <h3>🧠 جمع‌بندی جلسه ۲</h3>
+            <ul>
+                <li>متغیرها برای ذخیره داده‌ها استفاده می‌شوند.</li>
+                <li>نام‌گذاری متغیرها باید با حرف یا زیرخط شروع شود و از کلمات کلیدی پرهیز شود.</li>
+                <li>انواع داده اصلی: <code>int</code>، <code>float</code>، <code>str</code>، <code>bool</code> و <code>NoneType</code>.</li>
+                <li>با <code>type()</code> می‌توان نوع داده را تشخیص داد.</li>
+            </ul>
+        </div>
+
+        <h2>خودآزمایی</h2>
+        <div class="quiz-card"><p>❓ تست ۱: کدام یک نام متغیر نامعتبر است؟</p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>_private</code></button>
+                <button onclick="selectOption(this)">ب) <code>user2</code></button>
+                <button onclick="selectOption(this)">ج) <code>2user</code></button>
+                <button onclick="selectOption(this)">د) <code>my_var</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>نام متغیر نمی‌تواند با عدد شروع شود. پس <code>2user</code> نامعتبر است.</div>
+        </div>
+
+        <div class="quiz-card"><p>❓ تست ۲: خروجی کد زیر چیست؟ <br><code>print(type(3.14))</code></p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>&lt;class 'int'&gt;</code></button>
+                <button onclick="selectOption(this)">ب) <code>&lt;class 'float'&gt;</code></button>
+                <button onclick="selectOption(this)">ج) <code>&lt;class 'str'&gt;</code></button>
+                <button onclick="selectOption(this)">د) <code>&lt;class 'bool'&gt;</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>3.14</code> یک عدد اعشاری است، بنابراین نوع آن <code>float</code> است.</div>
+        </div>
+
+        <div class="quiz-card"><p>❓ تست ۳: کدام یک از موارد زیر یک <strong>کلمه کلیدی</strong> در Python است و نمی‌تواند نام متغیر باشد؟</p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>name</code></button>
+                <button onclick="selectOption(this)">ب) <code>for</code></button>
+                <button onclick="selectOption(this)">ج) <code>user1</code></button>
+                <button onclick="selectOption(this)">د) <code>_temp</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>for</code> یک کلمه کلیدی در Python است (برای حلقه‌ها) و نمی‌توان از آن به عنوان نام متغیر استفاده کرد.</div>
+        </div>
+        `,
+
+            "ch3-1": `
+        <div class="section-header">
+            <div class="section-badge">۳</div>
+            <div>
+                <h1>Type Casting و تبدیل انواع داده + ترکیب Variables و Type Casting در برنامه‌های ساده</h1>
+                <div class="meta">فصل ۳ · بخش ۱ از ۱</div>
+            </div>
+        </div>
+
+        <h2>Type Casting چیست؟</h2>
+        <p><strong>Type Casting</strong> یا تبدیل نوع، فرایند تبدیل یک داده از یک نوع به نوع دیگر است. در Python توابع داخلی برای این کار وجود دارند.</p>
+        <p>توابع اصلی تبدیل نوع:</p>
+        <ul>
+            <li><code>int()</code> — تبدیل به عدد صحیح</li>
+            <li><code>float()</code> — تبدیل به عدد اعشاری</li>
+            <li><code>str()</code> — تبدیل به رشته</li>
+            <li><code>bool()</code> — تبدیل به مقدار بولی</li>
+        </ul>
+
+        <h2>تبدیل به int</h2>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">x = "10"\nprint(type(x))  # <class 'str'>\n\ny = int(x)\nprint(type(y))  # <class 'int'>\nprint(y + 5)    # 15</div></div>
+        <div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>توجه</strong>اگر رشته قابل تبدیل به عدد نباشد، خطای <code>ValueError</code> رخ می‌دهد. مثلاً <code>int("abc")</code> خطا می‌دهد.</div></div>
+
+        <h2>تبدیل به float</h2>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">a = "3.14"\nb = float(a)\nprint(b)  # 3.14\nprint(type(b))  # <class 'float'></div></div>
+
+        <h2>تبدیل به str</h2>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">num = 100\ns = str(num)\nprint(s)  # "100"\nprint(type(s))  # <class 'str'></div></div>
+
+        <h2>تبدیل به bool</h2>
+        <p>قوانین تبدیل به <code>bool</code>:</p>
+        <ul>
+            <li>اعداد غیرصفر → <code>True</code>، عدد صفر → <code>False</code></li>
+            <li>رشته‌های غیرخالی → <code>True</code>، رشته خالی → <code>False</code></li>
+            <li>لیست‌ها، دیکشنری‌ها و ... نیز بر اساس خالی بودن یا نبودن به <code>bool</code> تبدیل می‌شوند.</li>
+        </ul>
+        <div class="code-container"><span class="code-label">مثال</span><div class="code-block">print(bool(1))    # True\nprint(bool(0))    # False\nprint(bool(""))   # False\nprint(bool("abc")) # True\nprint(bool(None)) # False</div></div>
+
+        <h2>ترکیب Variables و Type Casting</h2>
+        <p>اغلب در برنامه‌ها نیاز داریم ورودی کاربر را که به صورت رشته دریافت می‌شود، به عدد تبدیل کنیم تا بتوانیم محاسبات انجام دهیم.</p>
+        <div class="code-container"><span class="code-label">برنامه جمع دو عدد</span><div class="code-block"># دریافت دو عدد از کاربر\nnum1 = input("عدد اول را وارد کنید: ")\nnum2 = input("عدد دوم را وارد کنید: ")\n\n# تبدیل به int\nnum1 = int(num1)\nnum2 = int(num2)\n\nresult = num1 + num2\nprint("حاصل جمع:", result)</div></div>
+
+        <div class="box important"><i class="fas fa-info-circle"></i><div><strong>نکته</strong>تابع <code>input()</code> همیشه خروجی از نوع <code>str</code> برمی‌گرداند. پس برای محاسبات عددی باید Type Casting انجام دهیم.</div></div>
+
+        <h2>تمرین عملی</h2>
+        <ol>
+            <li>برنامه‌ای بنویسید که دو عدد اعشاری را از کاربر بگیرد، آن‌ها را به <code>float</code> تبدیل کرده و میانگین آن‌ها را چاپ کند.</li>
+            <li>یک رشته شامل عدد مانند <code>"123"</code> را به <code>int</code> تبدیل کرده و سپس به <code>str</code> برگردانید.</li>
+            <li>مقادیر مختلف را با <code>bool()</code> تست کنید و ببینید کدام‌ها <code>True</code> و کدام‌ها <code>False</code> هستند.</li>
+        </ol>
+
+        <div class="summary-box">
+            <h3>🧠 جمع‌بندی جلسه ۳</h3>
+            <ul>
+                <li>Type Casting یعنی تغییر نوع داده از یک نوع به نوع دیگر.</li>
+                <li>توابع اصلی: <code>int()</code>، <code>float()</code>، <code>str()</code>، <code>bool()</code>.</li>
+                <li>ورودی <code>input()</code> همیشه رشته است؛ برای محاسبات باید Cast کنیم.</li>
+                <li>تبدیل به <code>bool</code> بر اساس «تهی بودن» یا «صفر بودن» تعیین می‌شود.</li>
+            </ul>
+        </div>
+
+        <h2>خودآزمایی</h2>
+        <div class="quiz-card"><p>❓ تست ۱: خروجی کد زیر چیست؟ <br><code>print(int("10") + 5)</code></p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>"105"</code></button>
+                <button onclick="selectOption(this)">ب) <code>15</code></button>
+                <button onclick="selectOption(this)">ج) <code>خطا</code></button>
+                <button onclick="selectOption(this)">د) <code>10.5</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>"10"</code> به <code>int</code> تبدیل شده و با ۵ جمع می‌شود، نتیجه <code>15</code> می‌شود.</div>
+        </div>
+
+        <div class="quiz-card"><p>❓ تست ۲: کدام عبارت <code>True</code> است؟</p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>bool("")</code></button>
+                <button onclick="selectOption(this)">ب) <code>bool(0)</code></button>
+                <button onclick="selectOption(this)">ج) <code>bool(" ") </code></button>
+                <button onclick="selectOption(this)">د) <code>bool(None)</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>رشته <code>" "</code> (با یک فاصله) خالی نیست، بنابراین <code>True</code> است. گزینه‌های دیگر همگی <code>False</code> هستند.</div>
+        </div>
+
+        <div class="quiz-card"><p>❓ تست ۳: فرض کنید کاربر عدد <code>12.7</code> را وارد کند. کد زیر چه خروجی دارد؟ <br><code>num = input("Enter: ")</code><br><code>print(type(num))</code></p>
+            <div class="quiz-options">
+                <button onclick="selectOption(this)">الف) <code>&lt;class 'int'&gt;</code></button>
+                <button onclick="selectOption(this)">ب) <code>&lt;class 'float'&gt;</code></button>
+                <button onclick="selectOption(this)">ج) <code>&lt;class 'str'&gt;</code></button>
+                <button onclick="selectOption(this)">د) <code>&lt;class 'bool'&gt;</code></button>
+            </div>
+            <div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>input()</code> همیشه خروجی از نوع <code>str</code> است، حتی اگر کاربر یک عدد وارد کند.</div>
+        </div>
+        `
+        };
+
+        // ============================================================
+        // ساخت آرایه flat از تمام بخش‌ها
+        // ============================================================
+        const allSections = [];
+        course.forEach((ch, chIdx) => {
+            ch.sections.forEach((sec, secIdx) => {
+                allSections.push(Object.assign({}, sec, {
+                    chapterId: ch.id,
+                    chapterTitle: ch.title,
+                    badge: ch.badge,
+                    chapterIndex: chIdx,
+                    sectionIndex: secIdx,
+                    totalInChapter: ch.sections.length
+                }));
+            });
+        });
+
+        let currentIndex = 0;
+
+        // ============================================================
+        // ساخت TOC
+        // ============================================================
+        function buildTOC() {
+            const toc = document.getElementById('tocNav');
+            toc.innerHTML = '';
+
+            course.forEach((ch, idx) => {
+                const details = document.createElement('details');
+                details.className = 'toc-chapter';
+                if (idx === 0) details.open = true;
+
+                const summary = document.createElement('summary');
+                summary.innerHTML = '<span class="chapter-num">' + ch.badge + '</span><span>' + ch.title +
+                '</span>';
+                details.appendChild(summary);
+
+                const ul = document.createElement('ul');
+                ul.className = 'toc-sections';
+
+                ch.sections.forEach(sec => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#' + sec.id;
+                    a.textContent = sec.title;
+                    a.dataset.id = sec.id;
+
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const index = allSections.findIndex(s => s.id === sec.id);
+                        if (index !== -1) showSection(index);
+                    });
+
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+
+                details.appendChild(ul);
+                toc.appendChild(details);
+            });
+        }
+
+        // ============================================================
+        // ساخت بخش‌ها
+        // ============================================================
+        function buildSections() {
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '';
+
+            allSections.forEach((sec, idx) => {
+                const div = document.createElement('div');
+                div.className = 'section' + (idx === 0 ? ' active' : '');
+                div.id = sec.id;
+
+                const isFirst = idx === 0;
+                const isLast = idx === allSections.length - 1;
+
+                let body = '';
+
+                if (richContent[sec.id]) {
+                    body = richContent[sec.id];
+                } else {
+                    body = `
+                        <div class="section-header">
+                            <div class="section-badge">${sec.badge}</div>
+                            <div>
+                                <h1>${sec.title}</h1>
+                                <div class="meta">${sec.chapterTitle} · بخش ${sec.sectionIndex + 1} از ${sec.totalInChapter}</div>
+                            </div>
+                        </div>
+                        <div class="placeholder">
+                            <i class="fas fa-laptop-code"></i>
+                            <p>محتوای این بخش در حال آماده‌سازی است...</p>
+                            <p style="font-size:0.9rem;margin-top:6px;opacity:0.8;">${sec.chapterTitle} — ${sec.title}</p>
+                        </div>
+                    `;
+                }
+
+                body += `
+                    <div class="nav-buttons">
+                        <button class="nav-btn" ${isFirst ? 'disabled' : ''} onclick="goToPrev()">
+                            ${isFirst ? 'بخش قبلی' : '<i class="fas fa-arrow-right"></i> بخش قبلی'}
+                        </button>
+                        <button class="nav-btn" ${isLast ? 'disabled' : ''} onclick="goToNext()">
+                            ${isLast ? 'پایان' : 'بخش بعدی <i class="fas fa-arrow-left"></i>'}
+                        </button>
+                    </div>
+                `;
+
+                div.innerHTML = body;
+                main.appendChild(div);
+            });
+        }
+
+        // ============================================================
+        // توابع ناوبری
+        // ============================================================
+        function showSection(index) {
+            if (index < 0 || index >= allSections.length) return;
+
+            currentIndex = index;
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(allSections[index].id);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.toc-sections a').forEach(a => {
+                a.classList.remove('active');
+                if (a.dataset.id === allSections[index].id) a.classList.add('active');
+            });
+
+            const chIdx = allSections[index].chapterIndex;
+            document.querySelectorAll('.toc-chapter').forEach((d, i) => {
+                d.open = (i === chIdx);
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.innerWidth <= 1000) closeSidebar();
+        }
+
+        function goToPrev() {
+            if (currentIndex > 0) showSection(currentIndex - 1);
+        }
+
+        function goToNext() {
+            if (currentIndex < allSections.length - 1) showSection(currentIndex + 1);
+        }
+
+        // ============================================================
+        // سایدبار
+        // ============================================================
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const closeBtn = document.getElementById('sidebarClose');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        toggleBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // ============================================================
+        // تم
+        // ============================================================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('.theme-icon');
+            if (theme === 'dark') {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        // ============================================================
+        // کوئیزها
+        // ============================================================
+        function selectOption(btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            parent.nextElementSibling.classList.add('show');
+        }
+
+        // ============================================================
+        // نوار پیشرفت
+        // ============================================================
+        window.onscroll = function() {
+            const scroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('progressBar').style.width = (height > 0 ? (scroll / height * 100) : 0) + '%';
+        };
+
+        // ============================================================
+        // کلیدهای صفحه‌کلید
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+            if (e.key === 'ArrowLeft') goToNext();
+            if (e.key === 'ArrowRight') goToPrev();
+        });
+
+        // ============================================================
+        // بسته‌بندی جدول‌ها
+        // ============================================================
+        function wrapTables() {
+            document.querySelectorAll('.section table').forEach(function(table) {
+                if (table.parentElement && table.parentElement.classList.contains('table-wrap')) return;
+                var wrap = document.createElement('div');
+                wrap.className = 'table-wrap';
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            });
+        }
+
+        // ============================================================
+        // مقداردهی اولیه
+        // ============================================================
+        buildTOC();
+        buildSections();
+        wrapTables();
+        showSection(0);
+    </script>
+<!-- ===== اسکریپت‌های ویرایشگر ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+<script>
+(function () {
+    const textarea = document.getElementById('pythonPlayground');
+    const outputEl = document.getElementById('playgroundOutput');
+    const statusEl = document.getElementById('playgroundStatus');
+    const runBtn = document.getElementById('runPlaygroundBtn');
+
+    if (!textarea || !outputEl) return;
+
+    // CodeMirror setup
+    const editor = CodeMirror.fromTextArea(textarea, {
+        mode: 'python',
+        theme: 'dracula',
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+        autofocus: false,
+        viewportMargin: Infinity,
+        extraKeys: {
+            'Ctrl-Enter': function () { runCodePlayground(); },
+            'Cmd-Enter': function () { runCodePlayground(); },
+            'Tab': function (cm) {
+                if (cm.somethingSelected()) cm.indentSelection('add');
+                else cm.replaceSelection('    ', 'end');
+            }
+        }
+    });
+
+    // Refresh when section becomes visible (fixes zero-height on some mobile browsers)
+    function refreshEditor() {
+        try { editor.refresh(); } catch (e) {}
+    }
+    setTimeout(refreshEditor, 200);
+    window.addEventListener('resize', refreshEditor);
+
+    let pyodide = null;
+    let pyodideReady = false;
+    let isRunning = false;
+
+    function setStatus(text) {
+        if (statusEl) statusEl.textContent = text;
+    }
+
+    function setOutput(text, type) {
+        outputEl.textContent = text;
+        outputEl.classList.remove('error', 'success', 'loading');
+        if (type) outputEl.classList.add(type);
+    }
+
+    window.clearPlaygroundOutput = function () {
+        setOutput('▶ خروجی پاک شد. کد را اجرا کنید.', null);
+        setStatus(pyodideReady ? 'آماده' : 'در حال آماده‌سازی...');
+    };
+
+    async function loadPyodideForPlayground() {
+        if (pyodideReady) return true;
+        setOutput('⏳ در حال بارگذاری مفسر پایتون (اولین بار کمی طول می‌کشد)...', 'loading');
+        setStatus('بارگذاری...');
+        if (runBtn) runBtn.disabled = true;
+
+        try {
+            pyodide = await loadPyodide({
+                indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'
+            });
+
+            // Polyfill input() so it works via browser prompt
+            pyodide.runPython(`
+import builtins
+def _input(prompt=""):
+    from js import prompt as js_prompt
+    result = js_prompt(str(prompt) if prompt else "")
+    if result is None:
+        return ""
+    return str(result)
+builtins.input = _input
+`);
+
+            pyodideReady = true;
+            setOutput('✅ مفسر آماده است. کد را بنویسید و اجرا کنید.', 'success');
+            setStatus('آماده');
+            if (runBtn) runBtn.disabled = false;
+            return true;
+        } catch (err) {
+            setOutput('❌ خطا در بارگذاری مفسر: ' + (err.message || String(err)), 'error');
+            setStatus('خطا');
+            if (runBtn) runBtn.disabled = false;
+            return false;
+        }
+    }
+
+    window.runCodePlayground = async function () {
+        if (isRunning) return;
+
+        if (!pyodideReady) {
+            const ok = await loadPyodideForPlayground();
+            if (!ok) return;
+        }
+
+        const code = editor.getValue();
+        if (!code.trim()) {
+            setOutput('⚠️ لطفاً کدی بنویسید.', 'loading');
+            return;
+        }
+
+        isRunning = true;
+        if (runBtn) runBtn.disabled = true;
+        setOutput('⏳ در حال اجرا...', 'loading');
+        setStatus('اجرا...');
+
+        try {
+            // Capture stdout/stderr
+            await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+__stdout_backup = sys.stdout
+__stderr_backup = sys.stderr
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+`);
+
+            let result = null;
+            let execError = null;
+            try {
+                result = await pyodide.runPythonAsync(code);
+            } catch (e) {
+                execError = e;
+            }
+
+            const stdout = pyodide.runPython(`
+out = sys.stdout.getvalue()
+err = sys.stderr.getvalue()
+sys.stdout = __stdout_backup
+sys.stderr = __stderr_backup
+out + (err if err else "")
+`);
+
+            let finalOutput = (stdout || '').trimEnd();
+            if (result !== undefined && result !== null && String(result) !== 'None') {
+                finalOutput += (finalOutput ? '\n' : '') + String(result);
+            }
+
+            if (execError) {
+                let errMsg = execError.message || String(execError);
+                // Clean common Pyodide noise
+                errMsg = errMsg
+                    .replace(/File "<exec>", line \d+, in <module>\n?/g, '')
+                    .replace(/File "<exec>", line \d+, in /g, '')
+                    .trim();
+                finalOutput = (finalOutput ? finalOutput + '\n\n' : '') + '❌ ' + errMsg;
+                setOutput(finalOutput || '❌ خطا', 'error');
+                setStatus('خطا');
+            } else {
+                setOutput(finalOutput || '✅ اجرا شد (بدون خروجی)', finalOutput ? null : 'success');
+                setStatus('آماده');
+            }
+        } catch (err) {
+            let msg = err.message || String(err);
+            msg = msg.replace(/File "<exec>", line \d+, in /g, '').trim();
+            setOutput('❌ خطا: ' + msg, 'error');
+            setStatus('خطا');
+        } finally {
+            isRunning = false;
+            if (runBtn) runBtn.disabled = false;
+            refreshEditor();
+        }
+    };
+
+    // Auto-load Pyodide after page is ready
+    window.addEventListener('load', function () {
+        setTimeout(loadPyodideForPlayground, 400);
+    });
+
+    // Also try when document already complete
+    if (document.readyState === 'complete') {
+        setTimeout(loadPyodideForPlayground, 500);
+    }
+
+    console.log('✅ Python Playground initialized');
+})();
+</script>
+
+</body>
+</html>
