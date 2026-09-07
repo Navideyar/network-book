@@ -5323,6 +5323,322 @@ print(account_info(name, balance))</pre>
     <p style="color: var(--text-muted); text-align: center; font-size: 0.95rem;">
         <i class="fas fa-info-circle"></i> تمام تمرین‌های این فصل را می‌توانید مستقیماً در همین صفحه اجرا کنید.
     </p>
+`,
+"ch11": `
+    <!-- ===== تمرین ۱ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۱</span>
+            <div>
+                <strong>List Comprehension - اعداد زوج</strong>
+                <small>درجه سختی: ساده</small>
+            </div>
+        </div>
+        <p>لیست زیر را در نظر بگیرید:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
+        <p>با استفاده از <strong>List Comprehension</strong> یک لیست جدید بسازید که فقط اعداد زوج را شامل شود.</p>
+        <div class="python-playground" data-playground="ch11-ex1">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · اعداد زوج</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol1"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol1">
+            <strong>پاسخ:</strong>
+            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+even_numbers = [number for number in numbers if number % 2 == 0]
+
+print(even_numbers)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۲ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۲</span>
+            <div>
+                <strong>List Comprehension - حروف بزرگ</strong>
+                <small>درجه سختی: ساده</small>
+            </div>
+        </div>
+        <p>لیست زیر را دارید:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["ali", "sara", "reza", "mina", "ahmad"]</div></div>
+        <p>با استفاده از <strong>List Comprehension</strong> لیستی جدید بسازید که تمام نام‌ها را با حروف بزرگ ذخیره کند.</p>
+        <p>خروجی مورد انتظار:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">['ALI', 'SARA', 'REZA', 'MINA', 'AHMAD']</div></div>
+        <div class="python-playground" data-playground="ch11-ex2">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · حروف بزرگ</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol2"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol2">
+            <strong>پاسخ:</strong>
+            <pre>names = ["ali", "sara", "reza", "mina", "ahmad"]
+
+upper_names = [name.upper() for name in names]
+
+print(upper_names)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۳ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۳</span>
+            <div>
+                <strong>List Comprehension - تخفیف ۲۰٪</strong>
+                <small>درجه سختی: متوسط</small>
+            </div>
+        </div>
+        <p>لیست زیر شامل قیمت محصولات است:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">prices = [100, 250, 80, 450, 120]</div></div>
+        <p>با استفاده از <strong>List Comprehension</strong> لیست جدیدی بسازید که قیمت هر محصول را با ۲۰٪ تخفیف محاسبه کند.</p>
+        <p>خروجی مورد انتظار:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">[80.0, 200.0, 64.0, 360.0, 96.0]</div></div>
+        <div class="python-playground" data-playground="ch11-ex3">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · تخفیف ۲۰٪</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol3"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol3">
+            <strong>پاسخ:</strong>
+            <pre>prices = [100, 250, 80, 450, 120]
+
+discounted_prices = [price * 0.8 for price in prices]
+
+print(discounted_prices)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۴ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۴</span>
+            <div>
+                <strong>Set Comprehension - مربع اعداد فرد</strong>
+                <small>درجه سختی: متوسط</small>
+            </div>
+        </div>
+        <p>لیست زیر را در نظر بگیرید:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
+        <p>با استفاده از <strong>Set Comprehension</strong> یک مجموعه بسازید که مربع اعداد فرد را شامل شود.</p>
+        <p>خروجی مورد انتظار:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{1, 9, 25, 49, 81}</div></div>
+        <div class="python-playground" data-playground="ch11-ex4">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۴ · مربع اعداد فرد</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol4"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol4">
+            <strong>پاسخ:</strong>
+            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+odd_squares = {number ** 2 for number in numbers if number % 2 != 0}
+
+print(odd_squares)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۵ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۵</span>
+            <div>
+                <strong>Dictionary Comprehension - نمرات ≥ ۱۷</strong>
+                <small>درجه سختی: سخت</small>
+            </div>
+        </div>
+        <p>لیست زیر شامل نام و نمره دانش‌آموزان است:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">students = {
+    "Ali": 18,
+    "Sara": 15,
+    "Reza": 19,
+    "Mina": 12,
+    "Ahmad": 17
+}</div></div>
+        <p>با استفاده از <strong>Dictionary Comprehension</strong> یک دیکشنری جدید بسازید که فقط دانش‌آموزانی را شامل شود که نمره آن‌ها حداقل ۱۷ است.</p>
+        <p>خروجی مورد انتظار:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{'Ali': 18, 'Reza': 19, 'Ahmad': 17}</div></div>
+        <div class="python-playground" data-playground="ch11-ex5">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۵ · نمرات ≥ ۱۷</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol5"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol5">
+            <strong>پاسخ:</strong>
+            <pre>students = {
+    "Ali": 18,
+    "Sara": 15,
+    "Reza": 19,
+    "Mina": 12,
+    "Ahmad": 17
+}
+
+successful_students = {
+    name: score
+    for name, score in students.items()
+    if score >= 17
+}
+
+print(successful_students)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۶ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۶</span>
+            <div>
+                <strong>Dictionary Comprehension - زوج / فرد</strong>
+                <small>درجه سختی: سخت</small>
+            </div>
+        </div>
+        <p>لیست زیر شامل اعداد است:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
+        <p>با استفاده از <strong>Dictionary Comprehension</strong> دیکشنری‌ای بسازید که:</p>
+        <ul>
+            <li>کلید = عدد</li>
+            <li>مقدار = <code>"زوج"</code> اگر عدد زوج باشد</li>
+            <li>مقدار = <code>"فرد"</code> اگر عدد فرد باشد</li>
+        </ul>
+        <p>خروجی مورد انتظار:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{1: 'فرد', 2: 'زوج', 3: 'فرد', 4: 'زوج', 5: 'فرد', 6: 'زوج', 7: 'فرد', 8: 'زوج', 9: 'فرد', 10: 'زوج'}</div></div>
+        <div class="python-playground" data-playground="ch11-ex6">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۶ · زوج / فرد</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol6"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol6">
+            <strong>پاسخ:</strong>
+            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+number_types = {
+    number: "زوج" if number % 2 == 0 else "فرد"
+    for number in numbers
+}
+
+print(number_types)</pre>
+        </div>
+    </div>
+
+    <!-- ===== تمرین ۷ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۷</span>
+            <div>
+                <strong>Dictionary + Set Comprehension - ترکیبی</strong>
+                <small>درجه سختی: چالشی</small>
+            </div>
+        </div>
+        <p>لیست زیر شامل چند کلمه است:</p>
+        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">words = ["python", "java", "javascript", "go", "ruby", "c", "php"]</div></div>
+        <p>با استفاده از <strong>Dictionary Comprehension</strong> دیکشنری‌ای بسازید که:</p>
+        <ul>
+            <li>کلید = کلمه</li>
+            <li>مقدار = طول کلمه</li>
+            <li>فقط کلماتی در دیکشنری قرار بگیرند که حداقل ۵ حرف دارند.</li>
+        </ul>
+        <p>سپس با استفاده از <strong>Set Comprehension</strong> مجموعه‌ای از طول کلمات موجود در دیکشنری ایجاد کنید.</p>
+        <p>خروجی دیکشنری:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{'python': 6, 'javascript': 10}</div></div>
+        <p>و مجموعه طول‌ها:</p>
+        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{6, 10}</div></div>
+        <div class="python-playground" data-playground="ch11-ex7">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۷ · ترکیبی</span></div>
+                <div class="playground-status">آماده</div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor"># کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+        </div>
+        <button class="solution-toggle" type="button" data-solution="ch11-sol7"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+        <div class="exercise-solution" id="ch11-sol7">
+            <strong>پاسخ:</strong>
+            <pre>words = ["python", "java", "javascript", "go", "ruby", "c", "php"]
+
+word_lengths = {
+    word: len(word)
+    for word in words
+    if len(word) >= 5
+}
+
+lengths = {length for length in word_lengths.values()}
+
+print(word_lengths)
+print(lengths)</pre>
+        </div>
+    </div>
+
+    <hr class="lesson-divider">
+    <p style="color: var(--text-muted); text-align: center; font-size: 0.95rem;">
+        <i class="fas fa-info-circle"></i> تمام تمرین‌های این فصل را می‌توانید مستقیماً در همین صفحه اجرا کنید.
+    </p>
 `
         
         };
