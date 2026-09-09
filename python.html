@@ -22344,598 +22344,912 @@ return
         <div class="meta">فصل ۱۰ · بخش ۲ از ۲</div>
     </div>
 </div>
+
 <blockquote class="lesson-goal">
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>تفاوت Argumentهای Positional و Keyword را توضیح بدهی.</li>
-<li>از Default Parameter برای تعیین مقدار پیش‌فرض استفاده کنی.</li>
-<li>مفهوم Scope و تفاوت متغیرهای Local و Global را در سطح Basic درک کنی.</li>
-<li>تشخیص بدهی یک متغیر داخل یا خارج Function در چه محدوده‌ای قابل استفاده است.</li>
-<li>Functionها را با ورودی و خروجی مناسب طراحی کنی.</li>
-<li>Functionهای چندبخشی را با ترکیب چند تابع ساده سازمان‌دهی کنی.</li>
+<li>تفاوت <strong>Positional</strong> و <strong>Keyword Argument</strong> را توضیح بدهی.</li>
+<li>از <strong>Default Parameter</strong> برای ورودی‌های اختیاری استفاده کنی.</li>
+<li>قانون قرارگیری Parameterهای اجباری و Default را رعایت کنی.</li>
+<li>مفهوم <strong>Scope</strong> و تفاوت <strong>Local</strong> و <strong>Global</strong> را درک کنی.</li>
+<li>تشخیص بدهی یک متغیر در کدام محدوده قابل دسترسی است.</li>
+<li>Functionهایی با ورودی، پردازش و خروجی مشخص طراحی کنی.</li>
+<li>چند Function ساده را برای ساخت یک برنامه منظم با هم ترکیب کنی.</li>
 </ol>
 </blockquote>
-<hr class="lesson-divider">
-<h2 class="lesson-title">1. مرور جلسه قبل</h2>
-<p>جلسه قبل با این الگو آشنا شدیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b</div></div>
-<p>و استفاده:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = add(10, 20)
-print(result)</div></div>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Argument
-   ↓
-Parameter
-   ↓
-Function
-   ↓
-Processing
-   ↓
-return
-   ↓
-Result</div></div>
-<p>امروز می‌خواهیم روی قسمت <strong>Argument → Parameter</strong> و همچنین محدوده متغیرها تمرکز بیشتری کنیم.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">2. چرا انواع Argument مهم هستند؟ </h2>
-<p>فرض کن تابع زیر را داریم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def introduce(name, age):
-    print("Name:", name)
-    print("Age:", age)</div></div>
-<p>می‌توانیم آن را این‌طور صدا بزنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce("Ali", 20)</div></div>
-<p>اما Python روش‌های دیگری هم برای ارسال اطلاعات به Function دارد.</p>
-<p>این موضوع زمانی مهم می‌شود که:</p>
-<ul><li>تعداد پارامترها زیاد شود.</li><li>بخواهیم کد خواناتر باشد.</li><li>بخواهیم بعضی ورودی‌ها مقدار پیش‌فرض داشته باشند.</li></ul>
-<p>در این جلسه مهم‌ترین روش‌های Basic را یاد می‌گیریم.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">3. Positional Argument </h2>
-<p>تا اینجا بیشتر از این روش استفاده کردیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def introduce(name, age):
-    print(name)
-    print(age)
 
-introduce("Ali", 20)</div></div>
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">1. مرور جلسه قبل</h2>
+
+<p>در جلسه قبل یاد گرفتیم Function برای انجام یک کار مشخص ساخته می‌شود و می‌تواند ورودی دریافت کند و نتیجه را با <code>return</code> برگرداند.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def add(a, b):
+    return a + b
+
+result = add(10, 20)
+print(result)</div>
+</div>
+
+<p>در این مثال:</p>
+
+<ul>
+<li><code>a</code> و <code>b</code> → <strong>Parameter</strong></li>
+<li><code>10</code> و <code>20</code> → <strong>Argument</strong></li>
+<li><code>return</code> → نتیجه را از Function خارج می‌کند.</li>
+</ul>
+
+<p>حالا می‌خواهیم ببینیم اطلاعات را چگونه می‌توانیم به شکل‌های مختلف به Function بدهیم و متغیرها در چه محدوده‌ای قابل استفاده هستند.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">2. Argument چیست و چرا چند نوع دارد؟</h2>
+
+<p>وقتی یک Function را صدا می‌زنیم، مقداری که به آن ارسال می‌کنیم <strong>Argument</strong> نام دارد.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def introduce(name, age):
+    print("Name:", name)
+    print("Age:", age)
+
+introduce("Ali", 20)</div>
+</div>
+
 <p>در اینجا:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">"Ali" → name
-20     → age</div></div>
-<p>یعنی جایگاه Argument تعیین می‌کند به کدام Parameter منتقل شود.</p>
-<p>به این نوع می‌گوییم:</p>
-<blockquote><strong>Positional Argument</strong></blockquote>
-<p>چون بر اساس <strong>موقعیت</strong> کار می‌کند.</p>
-<h3>مثال</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def subtract(a, b):
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">"Ali" → name
+20     → age</div>
+</div>
+
+<p>Python چند روش برای ارسال این مقادیر دارد. در این سطح سه مورد مهم را یاد می‌گیریم:</p>
+
+<ul>
+<li><strong>Positional Argument</strong></li>
+<li><strong>Keyword Argument</strong></li>
+<li><strong>Default Parameter</strong></li>
+</ul>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">3. Positional Argument</h2>
+
+<p>در <strong>Positional Argument</strong>، مقدار بر اساس <strong>جایگاه</strong> آن به Parameter مربوط می‌شود.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def subtract(a, b):
     return a - b
 
-print(subtract(10, 3))</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">a = 10
-b = 3</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">10 - 3 = 7</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">7</div></div>
-<p>اما اگر بنویسیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(subtract(3, 10))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">-7</div></div>
-<p>چون جای Argumentها عوض شده است.</p>
+print(subtract(10, 3))</div>
+</div>
+
+<p>Python مقدارها را از چپ به راست قرار می‌دهد:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">10 → a
+3  → b</div>
+</div>
+
+<p>بنابراین:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">10 - 3 = 7</div>
+</div>
+
+<p>اما اگر ترتیب را تغییر دهیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(subtract(3, 10))</div>
+</div>
+
+<p>خروجی می‌شود:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">-7</div>
+</div>
+
+<p>چون در Positional، <strong>ترتیب مهم است</strong>.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">4. Keyword Argument </h2>
-<p>در روش Keyword، به جای اینکه فقط موقعیت مقدار را مشخص کنیم، <strong>نام Parameter</strong> را هم مشخص می‌کنیم.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def introduce(name, age):
+
+<h2 class="lesson-title">4. Keyword Argument</h2>
+
+<p>در <strong>Keyword Argument</strong>، علاوه بر مقدار، نام Parameter را نیز مشخص می‌کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def introduce(name, age):
     print("Name:", name)
-    print("Age:", age)</div></div>
-<p>می‌توانیم بنویسیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce(name="Ali", age=20)</div></div>
-<p>اینجا کاملاً مشخص است:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name → "Ali"
-age  → 20</div></div>
-<p>حتی می‌توانیم ترتیب را تغییر دهیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce(age=20, name="Ali")</div></div>
-<p>خروجی همچنان:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Ali
-Age: 20</div></div>
-<p>چون Python از نام Parameterها استفاده کرده است.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">5. Positional در مقابل Keyword</h2>
-<div class="table-wrap"><table><thead><tr><th>نوع</th><th>مثال</th><th>وابسته به ترتیب؟</th></tr></thead><tbody><tr><td>Positional</td><td><code>add(10, 20)</code></td><td>بله </td></tr><tr><td>Keyword</td><td><code>add(a=10, b=20)</code></td><td>نه </td></tr></tbody></table></div>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Positional
-10 → پارامتر اول
-20 → پارامتر دوم
+    print("Age:", age)
 
+introduce(name="Ali", age=20)</div>
+</div>
 
-Keyword
-a=10 → پارامتر a
-b=20 → پارامتر b</div></div>
+<p>در این روش Python از نام Parameter برای قرار دادن مقدار استفاده می‌کند:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">name → "Ali"
+age  → 20</div>
+</div>
+
+<p>مزیت مهم این روش این است که ترتیب Keywordها اهمیت ندارد:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">introduce(age=20, name="Ali")</div>
+</div>
+
+<p>این کد نیز همان نتیجه را دارد.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Name: Ali
+Age: 20</div>
+</div>
+
 <hr class="lesson-divider">
+
+<h2 class="lesson-title">5. Positional در برابر Keyword</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>نوع</th>
+<th>مثال</th>
+<th>ترتیب مهم است؟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Positional</td>
+<td><code>add(10, 20)</code></td>
+<td>بله</td>
+</tr>
+<tr>
+<td>Keyword</td>
+<td><code>add(a=10, b=20)</code></td>
+<td>خیر</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>پس یک قانون ساده:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Positional → بر اساس جایگاه
+Keyword   → بر اساس نام Parameter</div>
+</div>
+
+<hr class="lesson-divider">
+
 <h2 class="lesson-title">6. ترکیب Positional و Keyword</h2>
-<p>می‌توانیم این دو روش را با هم استفاده کنیم.</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def introduce(name, age):
+
+<p>این دو نوع Argument را می‌توانیم با هم استفاده کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def introduce(name, age):
     print(name, age)
 
-introduce("Ali", age=20)</div></div>
-<p>این کد درست است.</p>
+introduce("Ali", age=20)</div>
+</div>
+
+<p>این کد صحیح است.</p>
+
 <p>اما یک قانون مهم وجود دارد:</p>
-<blockquote><strong>Argumentهای Positional باید قبل از Keyword Argumentها بیایند.</strong></blockquote>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce("Ali", age=20)</div></div>
-<p>درست است.</p>
-<p>ولی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce(name="Ali", 20)</div></div>
-<p>اشتباه است.</p>
-<p>چون بعد از Keyword Argument نمی‌توانیم یک Positional Argument معمولی قرار دهیم.</p>
-<h3> نکته امتحانی</h3>
-<p>ترتیب مجاز:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Positional → Keyword</div></div>
-<p>نه:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Keyword → Positional</div></div>
+
+<blockquote>
+<strong>Positional Argument باید قبل از Keyword Argument قرار بگیرد.</strong>
+</blockquote>
+
+<p>درست:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">introduce("Ali", age=20)</div>
+</div>
+
+<p>اشتباه:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">introduce(name="Ali", 20)</div>
+</div>
+
+<p>چون بعد از یک Keyword Argument نمی‌توانیم یک Positional Argument معمولی قرار دهیم.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">ترتیب صحیح:
+
+Positional → Keyword</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">7. Default Parameter </h2>
-<p>حالا به یک مشکل واقعی برسیم.</p>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name):
-    print("Hello", name)</div></div>
-<p>هر بار باید <code>name</code> را ارسال کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">greet("Ali")
-greet("Sara")</div></div>
-<p>اما شاید بخواهیم اگر کاربر نامی وارد نکرد، یک مقدار پیش‌فرض داشته باشیم.</p>
-<p>می‌توانیم بنویسیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name="Guest"):
-    print("Hello", name)</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">greet("Ali")
-greet()</div></div>
+
+<h2 class="lesson-title">7. Default Parameter</h2>
+
+<p>گاهی یک ورودی معمولاً مقدار مشخصی دارد و نمی‌خواهیم کاربر مجبور باشد هر بار آن را ارسال کند.</p>
+
+<p>برای این کار می‌توانیم برای Parameter یک مقدار پیش‌فرض تعیین کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(name="Guest"):
+    print("Hello", name)</div>
+</div>
+
+<p>حالا دو حالت داریم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">greet("Ali")
+greet()</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello Ali
-Hello Guest</div></div>
-<p><code>"Guest"</code> یک <strong>Default Value</strong> است.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Hello Ali
+Hello Guest</div>
+</div>
+
+<p>وقتی Argument ارسال شود، مقدار ارسال‌شده استفاده می‌شود.</p>
+
+<p>اگر Argument ارسال نشود، Python مقدار پیش‌فرض را استفاده می‌کند.</p>
+
 <hr class="lesson-divider">
+
 <h2 class="lesson-title">8. Default Parameter چگونه کار می‌کند؟</h2>
-<p>وقتی تابع را این‌طور تعریف می‌کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name="Guest"):</div></div>
+
+<p>این تعریف:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(name="Guest"):</div>
+</div>
+
 <p>یعنی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">اگر name داده شد
-      ↓
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Argument وجود دارد
+        ↓
 از مقدار ارسال‌شده استفاده کن
 
-اگر name داده نشد
-      ↓
-از "Guest" استفاده کن</div></div>
+Argument وجود ندارد
+        ↓
+از "Guest" استفاده کن</div>
+</div>
+
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">greet("Reza")</div></div>
-<p>داریم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name = "Reza"</div></div>
-<p>ولی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">greet()</div></div>
-<p>داریم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name = "Guest"</div></div>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">greet("Reza")
+greet()</div>
+</div>
+
+<p>در فراخوانی اول:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">name = "Reza"</div>
+</div>
+
+<p>و در فراخوانی دوم:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">name = "Guest"</div>
+</div>
+
 <hr class="lesson-divider">
+
 <h2 class="lesson-title">9. مثال کاربردی Default Parameter</h2>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_price(price, discount=0):
-    return price - (price * discount / 100)</div></div>
-<p>اگر تخفیف نداشته باشیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(calculate_price(100))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">100.0</div></div>
-<p>چون:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">discount = 0</div></div>
-<p>اگر تخفیف داشته باشیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(calculate_price(100, 20))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">80.0</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">10. Parameterهای اجباری و اختیاری</h2>
-<p>در مثال:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_price(price, discount=0):</div></div>
-<p>داریم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price
- ↓
-پارامتر اجباری
 
-discount
- ↓
-پارامتر دارای مقدار پیش‌فرض</div></div>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate_price(100)</div></div>
-<p>درست است.</p>
-<p>و:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate_price(100, 20)</div></div>
-<p>هم درست است.</p>
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_price(price, discount=0):
+    return price - (price * discount / 100)</div>
+</div>
+
+<p>اگر تخفیف ارسال نکنیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(calculate_price(100))</div>
+</div>
+
+<p>چون مقدار پیش‌فرض <code>discount</code> برابر <code>0</code> است، قیمت تغییر نمی‌کند.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">100.0</div>
+</div>
+
+<p>اگر تخفیف ارسال کنیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(calculate_price(100, 20))</div>
+</div>
+
+<p>خروجی:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">80.0</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">10. Parameter اجباری و اختیاری</h2>
+
+<p>در این Function:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_price(price, discount=0):
+    return price - (price * discount / 100)</div>
+</div>
+
+<p><code>price</code> اجباری است، چون مقدار پیش‌فرض ندارد.</p>
+
+<p><code>discount</code> اختیاری است، چون مقدار پیش‌فرض دارد.</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>نوع</th>
+<th>مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>price</code></td>
+<td>اجباری</td>
+<td><code>calculate_price(100)</code></td>
+</tr>
+<tr>
+<td><code>discount=0</code></td>
+<td>اختیاری</td>
+<td><code>calculate_price(100, 20)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>بنابراین:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">calculate_price(100)</div>
+</div>
+
+<p>صحیح است.</p>
+
 <p>اما:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate_price()</div></div>
-<p>اشتباه است، چون <code>price</code> مقدار پیش‌فرض ندارد.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">calculate_price()</div>
+</div>
+
+<p>خطاست، چون <code>price</code> مقدار پیش‌فرض ندارد.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">11. یک قانون مهم در تعریف Parameterها</h2>
-<p>وقتی پارامتر Default داریم، پارامترهای معمولی باید قبل از آن قرار بگیرند.</p>
+
+<h2 class="lesson-title">11. قانون مهم در تعریف Parameterها</h2>
+
+<p>وقتی یک Parameter مقدار پیش‌فرض دارد، Parameterهای اجباری باید قبل از آن قرار بگیرند.</p>
+
 <p>درست:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name, message="Hello"):
-    print(message, name)</div></div>
-<p>اما این ساختار اشتباه است:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(message="Hello", name):
-    print(message, name)</div></div>
-<p>چون یک پارامتر اجباری را بعد از پارامتر دارای مقدار پیش‌فرض قرار داده‌ایم.</p>
-<h3> برای Basic حفظ کن:</h3>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">اجباری → Default</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">12. مثال ترکیبی</h2>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def welcome(name, language="English"):
-    print("Name:", name)
-    print("Language:", language)</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">welcome("Ali")</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Ali
-Language: English</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">welcome("Sara", "French")</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Sara
-Language: French</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">13. حالا یک سؤال مهم: Scope چیست؟ </h2>
-<p>به این کد نگاه کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = "Ali"
 
-def say_hello():
-    print(name)</div></div>
-<p>اینجا <code>name</code> خارج Function ساخته شده است.</p>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">say_hello()</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ali</div></div>
-<p>اما اگر داخل تابع متغیری بسازیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
-    message = "Hello"
-    print(message)</div></div>
-<p>آیا خارج تابع می‌توانیم بنویسیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(message)</div></div>
-<p>خیر.</p>
-<p>چرا؟</p>
-<p>چون <code>message</code> داخل محدوده Function ساخته شده است.</p>
-<p>این همان مفهوم:</p>
-<blockquote><strong>Scope</strong></blockquote>
-<p>است.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">14. Scope یعنی چه؟ </h2>
-<p>Scope یعنی:</p>
-<blockquote><strong>محدوده‌ای که یک متغیر در آن قابل دسترسی است.</strong></blockquote>
-<p>فعلاً در Python Basic با دو مفهوم اصلی کار داریم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Local Scope
-Global Scope</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">15. Local Variable</h2>
-<p>اگر متغیری داخل Function تعریف شود، در سطح Basic آن را یک <strong>Local Variable</strong> در نظر می‌گیریم.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate():
-    result = 100
-    print(result)</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">result</div></div>
-<p>داخل تابع ساخته شده است.</p>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate()</div></div>
-<p>درست است.</p>
-<p>ولی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(result)</div></div>
-<p>خارج تابع قابل استفاده نیست.</p>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">                 برنامه
-        ┌─────────────────────┐
-        │                     │
-        │   Function          │
-        │   ┌─────────────┐   │
-        │   │ result     │   │
-        │   └─────────────┘   │
-        │                     │
-        └─────────────────────┘
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(name, message="Hello"):
+    print(message, name)</div>
+</div>
 
-result فقط در محدوده خودش تعریف شده</div></div>
+<p>اشتباه:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(message="Hello", name):
+    print(message, name)</div>
+</div>
+
+<p>برای سطح فعلی این قانون را به خاطر بسپار:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Required Parameter → Default Parameter</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">16. Global Variable</h2>
-<p>اگر متغیر خارج Function تعریف شود، در سطح Basic می‌توانیم آن را <strong>Global Variable</strong> در نظر بگیریم.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = "Ali"
+
+<h2 class="lesson-title">12. ترکیب Default و Keyword</h2>
+
+<p>حالا چند مفهوم را با هم ترکیب کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(name, message="Hello"):
+    return message + " " + name</div>
+</div>
+
+<p>استفاده معمولی:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(greet("Ali"))</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Hello Ali</div>
+</div>
+
+<p>تغییر مقدار Default با Keyword:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(greet("Ali", message="Welcome"))</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Welcome Ali</div>
+</div>
+
+<p>و می‌توانیم همه Argumentها را به صورت Keyword بنویسیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(greet(name="Sara", message="Hi"))</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Hi Sara</div>
+</div>
+
+<p>در این مثال چهار مفهوم کنار هم قرار گرفته‌اند:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Parameter
+Default Parameter
+Keyword Argument
+return</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">13. Scope چیست؟</h2>
+
+<p>حالا از نحوه ارسال داده به Function عبور می‌کنیم و به محدوده متغیرها می‌رسیم.</p>
+
+<p><strong>Scope</strong> یعنی محدوده‌ای که یک متغیر در آن قابل دسترسی است.</p>
+
+<p>به این مثال توجه کن:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">name = "Ali"
 
 def say_hello():
     print(name)
 
-say_hello()</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ali</div></div>
-<p>تابع توانسته مقدار <code>name</code> را بخواند.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">17. یک نکته مهم درباره Global Variable</h2>
-<p>اگر فقط می‌خواهیم مقدار Global Variable را <strong>بخوانیم</strong>، معمولاً می‌توانیم آن را داخل تابع استفاده کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">score = 20
+say_hello()</div>
+</div>
 
-def show_score():
-    print(score)
+<p>چون <code>name</code> خارج Function تعریف شده، تابع می‌تواند مقدار آن را بخواند.</p>
 
-show_score()</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">20</div></div>
-<p>اما تغییر دادن Global Variable داستان متفاوتی دارد.</p>
-<p>برای Python Basic فعلاً اصل مهم‌تر این است:</p>
-<blockquote>تا حد امکان اطلاعات را از طریق Parameter به Function بده و نتیجه را با <code>return</code> برگردان.</blockquote>
-<p>این روش برنامه را قابل‌فهم‌تر می‌کند.</p>
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Ali</div>
+</div>
+
+<p>اما اگر متغیر داخل Function ساخته شود:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def say_hello():
+    message = "Hello"
+    print(message)</div>
+</div>
+
+<p><code>message</code> متعلق به محدوده داخل Function است.</p>
+
+<p>بنابراین این کد خارج Function به آن متغیر دسترسی مستقیم ندارد:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(message)</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">18. چرا بهتر است زیاد به Global Variable وابسته نباشیم؟</h2>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">score = 20
+
+<h2 class="lesson-title">14. Local Variable</h2>
+
+<p>متغیری که داخل Function تعریف می‌شود، در سطح Basic یک <strong>Local Variable</strong> محسوب می‌شود.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate():
+    result = 100
+    print(result)
+
+calculate()</div>
+</div>
+
+<p>اینجا <code>result</code> فقط در محدوده اجرای Function تعریف شده است.</p>
+
+<p>بنابراین:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(result)</div>
+</div>
+
+<p>خارج از Function قابل دسترسی مستقیم نیست.</p>
+
+<p>نکته مهم: <strong>Parameterهای Function نیز در محدوده همان Function قرار دارند.</strong></p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def square(number):
+    return number * number</div>
+</div>
+
+<p><code>number</code> یک Parameter است و در جریان اجرای این Function در دسترس است.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">15. Global Variable</h2>
+
+<p>اگر متغیری خارج از Function تعریف شود، در سطح Basic می‌توانیم آن را <strong>Global Variable</strong> در نظر بگیریم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">name = "Ali"
+
+def say_hello():
+    print(name)
+
+say_hello()</div>
+</div>
+
+<p>خروجی:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Ali</div>
+</div>
+
+<p>تابع توانسته متغیر Global را بخواند.</p>
+
+<p>اما بهتر است Functionها برای دریافت اطلاعات موردنیاز خود، تا حد امکان به Parameterها تکیه کنند.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">16. چرا وابستگی به Global مناسب نیست؟</h2>
+
+<p>این Function به یک متغیر بیرونی وابسته است:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">score = 20
 
 def check_score():
-    if score >= 10:
-        return "Pass"
-    else:
-        return "Fail"</div></div>
-<p>این تابع به یک متغیر بیرونی وابسته است.</p>
-<p>حالا طراحی بهتر:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check_score(score):
-    if score >= 10:
-        return "Pass"
-    else:
-        return "Fail"</div></div>
-<p>و:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = check_score(20)</div></div>
-<p>این نسخه بهتر است، چون تابع ورودی خودش را دریافت می‌کند.</p>
-<p>مدل:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Global dependency
-     ↓
-تابع به بیرون وابسته است
+    return score >= 10</div>
+</div>
 
+<p>روش بهتر این است که داده موردنیاز را به Function بدهیم:</p>
 
-Parameter
-     ↓
-تابع ورودی خودش را دریافت می‌کند</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">19. یک Function خوب: Input → Process → Output </h2>
-<p>یکی از بهترین مدل‌های ذهنی برای طراحی تابع:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">       Input
-         ↓
-     Function
-         ↓
-     Processing
-         ↓
-       Output</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2):
-    return (score1 + score2) / 2</div></div>
-<p>ورودی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">score1
-score2</div></div>
-<p>پردازش:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">جمع → تقسیم بر 2</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">average</div></div>
-<hr class="lesson-divider">
-<h2 class="lesson-title">20. چرا <code>return</code> بهتر از وابستگی به <code>print</code> است؟</h2>
-<p>تابع:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(a, b):
-    return (a + b) / 2</div></div>
-<p>انعطاف‌پذیر است.</p>
-<p>می‌توانیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">average = calculate_average(10, 20)</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(calculate_average(10, 20))</div></div>
-<p>یا حتی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">if calculate_average(10, 20) >= 15:
-    print("Good")</div></div>
-<p>اما اگر تابع فقط:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(a, b):
-    print((a + b) / 2)</div></div>
-<p>باشد، استفاده از نتیجه در بخش‌های دیگر سخت می‌شود.</p>
-<p>پس در طراحی Functionهای محاسباتی معمولاً:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Function → return
-بخش اصلی برنامه → print</div></div>
-<p>الگوی خوبی است.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">21. Functionها می‌توانند همدیگر را صدا بزنند</h2>
-<p>این قسمت بسیار مهم است.</p>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b</div></div>
-<p>می‌توانیم تابع دیگری بسازیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return add(price, quantity)</div></div>
-<p>البته از نظر منطقی این مثال چندان کاربردی نیست، اما مفهوم را نشان می‌دهد.</p>
-<p>یک مثال بهتر:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return price * quantity
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def check_score(score):
+    return score >= 10
 
+result = check_score(20)</div>
+</div>
 
-def calculate_discount(total):
-    return total * 0.10</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">total = calculate_total(200, 3)
-discount = calculate_discount(total)
+<p>در نسخه دوم، Function ورودی خودش را دریافت می‌کند و به متغیر بیرونی وابسته نیست.</p>
 
-print(discount)</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">60.0</div></div>
-<p>یعنی خروجی یک Function می‌تواند ورودی Function دیگر شود.</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Function A
-    ↓
-return
-    ↓
-Function B
-    ↓
-return</div></div>
-<p>این الگو در برنامه‌های واقعی بسیار پرکاربرد است.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>روش</th>
+<th>ویژگی</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Global Variable</td>
+<td>Function به بیرون وابسته است</td>
+</tr>
+<tr>
+<td>Parameter</td>
+<td>Function ورودی خودش را دریافت می‌کند</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>برای طراحی Functionهای ساده و قابل استفاده مجدد، معمولاً روش دوم انتخاب بهتری است.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">22. مثال: چند Function کوچک به جای یک Function بزرگ</h2>
-<p>فرض کن می‌خواهیم برنامه خرید بنویسیم.</p>
-<p>به جای اینکه همه‌چیز را در یک تابع بنویسیم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">محاسبه قیمت
-محاسبه تخفیف
-محاسبه مالیات
-نمایش نتیجه</div></div>
-<p>می‌توانیم آن را تقسیم کنیم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">calculate_total()
-        ↓
-calculate_discount()
-        ↓
-calculate_tax()
-        ↓
-calculate_final_price()</div></div>
-<p>هر Function یک وظیفه مشخص دارد.</p>
-<p>این باعث می‌شود:</p>
-<ul><li>کد خواناتر شود.</li><li>تست کردن راحت‌تر شود.</li><li>تغییر دادن یک بخش ساده‌تر شود.</li><li>کدها دوباره قابل استفاده باشند.</li></ul>
-<hr class="lesson-divider">
-<h2 class="lesson-title">23. یک نکته مهم درباره Scope و Parameter</h2>
-<p>به این کد نگاه کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name):
-    message = "Hello " + name
-    return message</div></div>
-<p>اینجا:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name</div></div>
-<p>یک Parameter است.</p>
-<p>و:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">message</div></div>
-<p>یک متغیر Local داخل تابع است.</p>
-<p>هر دو داخل محدوده Function قرار دارند.</p>
-<p>پس:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Function Scope
-├── name
-└── message</div></div>
-<p>بیرون تابع نباید انتظار داشته باشیم <code>message</code> مستقیماً در دسترس باشد.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">24. نام یک متغیر داخل و خارج تابع</h2>
-<p>ممکن است یک نام مشابه در دو Scope داشته باشیم.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = "Ali"
+
+<h2 class="lesson-title">17. تفاوت نام یکسان در Scopeهای مختلف</h2>
+
+<p>ممکن است یک نام در دو Scope مختلف وجود داشته باشد.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">name = "Ali"
 
 def show_name():
     name = "Sara"
     print(name)
 
 show_name()
-print(name)</div></div>
+print(name)</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Sara
-Ali</div></div>
-<p>چرا؟</p>
-<p>چون:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">داخل Function
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Sara
+Ali</div>
+</div>
+
+<p>چرا؟ چون دو متغیر در دو محدوده مختلف داریم:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">داخل Function:
 name = "Sara"
 
-خارج Function
-name = "Ali"</div></div>
-<p>این دو متغیر در دو محدوده متفاوت هستند.</p>
-<h3> نکته امتحانی</h3>
-<p>وجود یک نام مشابه به این معنی نیست که حتماً یک متغیر واحد داریم.</p>
-<p>Scope مهم است.</p>
+خارج Function:
+name = "Ali"</div>
+</div>
+
+<p>پس وجود یک نام یکسان لزوماً به معنی یک متغیر واحد نیست؛ <strong>Scope مهم است.</strong></p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">25. پارامتر هم داخل Scope تابع است</h2>
+
+<h2 class="lesson-title">18. یک Function خوب چه ساختاری دارد؟</h2>
+
+<p>یکی از بهترین الگوهای ساده برای طراحی Function این است:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Input
+  ↓
+Processing
+  ↓
+Output</div>
+</div>
+
 <p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
-    return number * number</div></div>
-<p><code>number</code> فقط در جریان اجرای این Function معنا دارد.</p>
-<p>بیرون تابع نباید انتظار داشته باشیم بتوانیم از آن به عنوان همان Parameter استفاده کنیم.</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">square(5)
-   ↓
-number = 5
-   ↓
-25</div></div>
-<p>بعد از پایان اجرای تابع، آن اجرای تابع تمام شده است.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(score1, score2):
+    return (score1 + score2) / 2</div>
+</div>
+
+<p>در این Function:</p>
+
+<ul>
+<li><code>score1</code> و <code>score2</code> → ورودی</li>
+<li>جمع و تقسیم → پردازش</li>
+<li><code>return</code> → خروجی</li>
+</ul>
+
+<p>این نوع طراحی باعث می‌شود Function ساده، قابل فهم و قابل استفاده مجدد باشد.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">26. طراحی Function با نام مناسب</h2>
-<p>Function خوب فقط Functionای نیست که درست اجرا شود؛ باید خوانا هم باشد.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2):
-    return (score1 + score2) / 2</div></div>
-<p>نام:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">calculate_average</div></div>
-<p>دقیقاً می‌گوید تابع چه کاری انجام می‌دهد.</p>
-<p>در مقابل:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def f(a, b):
-    return (a + b) / 2</div></div>
-<p>کار می‌کند، اما خوانایی پایین‌تری دارد.</p>
-<h3>قانون ساده:</h3>
-<blockquote>نام Function باید تا حد ممکن نشان دهد Function چه کاری انجام می‌دهد.</blockquote>
+
+<h2 class="lesson-title">19. چرا return بهتر از print است؟</h2>
+
+<p>Function زیر نتیجه را برمی‌گرداند:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(a, b):
+    return (a + b) / 2</div>
+</div>
+
+<p>به همین دلیل می‌توانیم نتیجه را در جاهای مختلف استفاده کنیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">average = calculate_average(10, 20)
+
+print(average)</div>
+</div>
+
+<p>یا مستقیماً:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(calculate_average(10, 20))</div>
+</div>
+
+<p>یا حتی در یک شرط:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">if calculate_average(10, 20) >= 15:
+    print("Good")</div>
+</div>
+
+<p>اما اگر Function فقط <code>print()</code> کند:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(a, b):
+    print((a + b) / 2)</div>
+</div>
+
+<p>نتیجه فقط نمایش داده می‌شود و برای استفاده در بخش‌های دیگر برنامه در دسترس نیست.</p>
+
+<p>برای Functionهای محاسباتی، این الگو معمولاً مناسب‌تر است:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Function → return
+Program  → print / use result</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">27. نام Parameter هم مهم است</h2>
-<p>مقایسه کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(x, y):
-    return x * y</div></div>
-<p>با:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return price * quantity</div></div>
-<p>دومی خواناتر است.</p>
-<p>وقتی کد را چند روز بعد باز می‌کنی، این:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price * quantity</div></div>
-<p>خیلی سریع‌تر مفهوم را منتقل می‌کند.</p>
+
+<h2 class="lesson-title">20. Functionها می‌توانند با هم همکاری کنند</h2>
+
+<p>در برنامه‌های واقعی لازم نیست یک Function تمام کارها را انجام دهد.</p>
+
+<p>می‌توانیم یک کار بزرگ را به چند Function کوچک تقسیم کنیم.</p>
+
+<p>مثلاً در یک سیستم خرید:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">calculate_total()
+        ↓
+calculate_discount()
+        ↓
+calculate_tax()
+        ↓
+calculate_final_price()</div>
+</div>
+
+<p>هر Function یک مسئولیت مشخص دارد.</p>
+
+<p>همچنین خروجی یک Function می‌تواند ورودی Function بعدی باشد.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_total(price, quantity):
+    return price * quantity
+
+def calculate_discount(total):
+    return total * 0.10
+
+total = calculate_total(200, 3)
+discount = calculate_discount(total)
+
+print(discount)</div>
+</div>
+
+<p>خروجی Function اول وارد Function دوم شده است.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">calculate_total()
+      ↓
+    total
+      ↓
+calculate_discount()
+      ↓
+  discount</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">28. یک Function نباید بیش از حد کار انجام دهد</h2>
-<p>فرض کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def process_student():
-    # دریافت نام
-    # دریافت چند نمره
-    # محاسبه میانگین
-    # بررسی قبولی
-    # چاپ گزارش
-    # ذخیره فایل
-    ...</div></div>
-<p>این Function خیلی مسئولیت دارد.</p>
-<p>در سطح Basic لازم نیست وارد معماری پیچیده شویم، اما بهتر است منطق را تا حد امکان به قسمت‌های مشخص تقسیم کنیم.</p>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2):
+
+<h2 class="lesson-title">21. Function را بیش از حد بزرگ نکن</h2>
+
+<p>اگر یک Function همزمان ورودی بگیرد، محاسبه کند، نتیجه را بررسی کند، گزارش بسازد و فایل ذخیره کند، نگهداری آن سخت‌تر می‌شود.</p>
+
+<p>بهتر است منطق را به Functionهای کوچک‌تر تقسیم کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(score1, score2):
     return (score1 + score2) / 2
 
 
 def check_result(average):
     if average >= 10:
         return "Pass"
-    return "Fail"</div></div>
-<p>حالا هر تابع کار خودش را انجام می‌دهد.</p>
+    return "Fail"</div>
+</div>
+
+<p>حالا هر Function یک مسئولیت مشخص دارد:</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>وظیفه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>calculate_average()</code></td>
+<td>محاسبه میانگین</td>
+</tr>
+<tr>
+<td><code>check_result()</code></td>
+<td>بررسی قبولی</td>
+</tr>
+</tbody>
+</table>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">29. ترکیب شرط با <code>return</code></h2>
-<p>در جلسه قبل دیدیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check_score(score):
-    if score >= 10:
-        return "Pass"
-    else:
-        return "Fail"</div></div>
-<p>در اینجا می‌توانیم کمی کوتاه‌تر بنویسیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check_score(score):
+
+<h2 class="lesson-title">22. ترکیب Function با شرط</h2>
+
+<p>در Function می‌توانیم از شرط استفاده کنیم و در هر مسیر یک مقدار مناسب برگردانیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def check_score(score):
     if score >= 10:
         return "Pass"
 
-    return "Fail"</div></div>
-<p>چرا درست است؟</p>
-<p>اگر شرط برقرار باشد:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">return "Pass"</div></div>
-<p>تابع همان‌جا تمام می‌شود.</p>
-<p>اگر شرط برقرار نباشد، به خط بعد می‌رسد:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">return "Fail"</div></div>
-<p>این الگو را زیاد در کدهای Python خواهی دید.</p>
+    return "Fail"</div>
+</div>
+
+<p>اگر شرط درست باشد، <code>return "Pass"</code> اجرا می‌شود و Function همان‌جا تمام می‌شود.</p>
+
+<p>اگر شرط درست نباشد، برنامه به <code>return "Fail"</code> می‌رسد.</p>
+
+<p>این الگو در Functionهای Python بسیار رایج است.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">30. Default Parameter + Keyword Argument</h2>
-<p>حالا چند مفهوم را با هم ترکیب کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def greet(name, message="Hello"):
-    return message + " " + name</div></div>
-<p>فراخوانی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(greet("Ali"))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello Ali</div></div>
-<p>یا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(greet("Ali", message="Welcome"))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Welcome Ali</div></div>
-<p>و حتی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(greet(name="Sara", message="Hi"))</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hi Sara</div></div>
-<p>اینجا همزمان از:</p>
-<ul><li>Parameter</li><li>Default Parameter</li><li>Keyword Argument</li><li>return</li></ul>
-<p>استفاده کردیم.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">31. <code>input()</code> و Function</h2>
-<p>حالا یک برنامه کوچک واقعی‌تر بسازیم.</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2):
+
+<h2 class="lesson-title">23. Function و input()</h2>
+
+<p>می‌توانیم Function را با <code>input()</code> ترکیب کنیم، اما بهتر است مسئولیت‌ها را جدا نگه داریم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(score1, score2):
     return (score1 + score2) / 2
 
 
@@ -22944,55 +23258,65 @@ score2 = float(input("Score 2: "))
 
 average = calculate_average(score1, score2)
 
-print("Average:", average)</div></div>
-<p>مثلاً ورودی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Score 1: 18
-Score 2: 16</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Average: 17.0</div></div>
-<p>نکته مهم:</p>
-<p>Function خودش مسئول دریافت Input از کاربر نیست.</p>
-<p>ما می‌توانیم داده را بیرون بگیریم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">input
- ↓
-casting
- ↓
+print("Average:", average)</div>
+</div>
+
+<p>در این ساختار:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">input()
+   ↓
+تبدیل نوع
+   ↓
 Function
- ↓
+   ↓
 return
- ↓
-print</div></div>
-<p>این جداسازی معمولاً کد را تمیزتر می‌کند.</p>
+   ↓
+print()</div>
+</div>
+
+<p>Function فقط کار خودش را انجام می‌دهد و دریافت Input و نمایش Output در بخش اصلی برنامه انجام می‌شود.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">32. Function و Loop</h2>
-<p>می‌توانیم تابع را داخل حلقه هم استفاده کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
+
+<h2 class="lesson-title">24. Function و Loop</h2>
+
+<p>Function را می‌توانیم داخل Loop نیز استفاده کنیم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def square(number):
     return number * number
 
 
 for number in range(1, 6):
     result = square(number)
-    print(result)</div></div>
+    print(result)</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">1
 4
 9
 16
-25</div></div>
-<p>حالا تابع را یک بار نوشته‌ایم ولی Loop آن را چند بار اجرا می‌کند.</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Loop
- ↓
-number
- ↓
-Function
- ↓
-return
- ↓
-result</div></div>
+25</div>
+</div>
+
+<p>Function یک بار تعریف شده، اما Loop آن را چند بار با Argumentهای مختلف اجرا می‌کند.</p>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">33. Function و Data Structure</h2>
-<p>چون List را هم قبلاً یاد گرفته‌ایم، می‌توانیم آن را به Function بدهیم.</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_sum(numbers):
+
+<h2 class="lesson-title">25. Function و List</h2>
+
+<p>Function می‌تواند یک List را نیز به عنوان Argument دریافت کند.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_sum(numbers):
     return sum(numbers)
 
 
@@ -23000,29 +23324,59 @@ scores = [10, 15, 20]
 
 result = calculate_sum(scores)
 
-print(result)</div></div>
+print(result)</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">45</div></div>
-<p>اینجا <code>numbers</code> یک Parameter است و List را به عنوان Argument ارسال کرده‌ایم.</p>
-<p>نکته: تابع <code>sum()</code> را قبلاً لازم نیست خودمان پیاده‌سازی کنیم؛ Python آن را در اختیارمان قرار داده است.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title">34. Function با List و Loop</h2>
-<p>برای درک بهتر می‌توانیم خودمان مجموع را محاسبه کنیم:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_sum(numbers):
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">45</div>
+</div>
+
+<p>اینجا:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">scores
+   ↓
+Argument
+
+numbers
+   ↓
+Parameter</div>
+</div>
+
+<p>حتی می‌توانیم همین کار را با <code>for</code> خودمان انجام دهیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_sum(numbers):
     total = 0
 
     for number in numbers:
         total += number
 
-    return total</div></div>
-<p>حالا:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [10, 20, 30]
+    return total
 
-print(calculate_sum(numbers))</div></div>
+
+numbers = [10, 20, 30]
+
+print(calculate_sum(numbers))</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">60</div></div>
-<p>این مثال ترکیب چند مفهوم مهم دوره است:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">List
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">60</div>
+</div>
+
+<p>این مثال چند مفهوم قبلی را با هم ترکیب می‌کند:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">List
  +
 Function
  +
@@ -23032,374 +23386,561 @@ for
  +
 Variable
  +
-return</div></div>
+return</div>
+</div>
+
 <hr class="lesson-divider">
-<h2 class="lesson-title">🧠 مدل ذهنی کل جلسه</h2>
-<p>در پایان جلسه، Function را این‌طور ببین:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">                    Function
-                       │
-          ┌────────────┼────────────┐
-          │            │            │
-     Parameters     Processing    return
-          │            │            │
-          ▼            ▼            ▼
-       Input        Logic         Output</div></div>
-<p>روش‌های مهم ارسال داده:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Positional
-    ↓
-add(10, 20)
 
+<h1 class="lesson-title section-scenario">سناریوی ترکیبی — سیستم ساده نمرات</h1>
 
-Keyword
-    ↓
-add(a=10, b=20)
+<p>حالا تمام مفاهیم این فصل را در یک برنامه کوچک ترکیب می‌کنیم.</p>
 
+<p>فرض کن اطلاعات یک دانش‌آموز را داریم:</p>
 
-Default
-    ↓
-function(a, b=0)</div></div>
-<p>و Scope:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Global Scope
-│
-├── variable
-│
-└── Function
-     │
-     ├── Parameter
-     └── Local Variable</div></div>
-<hr class="lesson-divider">
-<h1 class="lesson-title section-troubleshoot">Troubleshooting</h1>
-<h3>مشکل ۱ — <code>SyntaxError</code> در Argumentها</h3>
-<p>این اشتباه است:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce(name="Ali", 20)</div></div>
-<p>چون Positional بعد از Keyword آمده است.</p>
-<p>درست:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce("Ali", age=20)</div></div>
-<h3>مشکل ۲ — Default Parameter جای اشتباه قرار گرفته</h3>
-<p>اشتباه:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def test(a=10, b):
-    ...</div></div>
-<p>درست:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def test(a, b=10):
-    ...</div></div>
-<h3>مشکل ۳ — متغیر داخل Function بیرون آن پیدا نمی‌شود</h3>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def test():
-    result = 10
+<ul>
+<li>نام</li>
+<li>سه نمره</li>
+</ul>
 
-print(result)</div></div>
-<p><code>result</code> داخل Function تعریف شده و بیرون آن قابل دسترسی مستقیم نیست.</p>
-<p>اگر می‌خواهی نتیجه را بیرون استفاده کنی، از <code>return</code> استفاده کن:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def test():
-    result = 10
-    return result
-
-
-result = test()
-print(result)</div></div>
-<h3>مشکل ۴ — تابع به Global Variable وابسته شده</h3>
-<p>این روش ممکن است کار کند:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">score = 20
-
-def check():
-    return score >= 10</div></div>
-<p>اما طراحی بهتر:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check(score):
-    return score >= 10
-
-
-print(check(20))</div></div>
-<p>تابع دوم مستقل‌تر و قابل استفاده مجددتر است.</p>
-<h3>مشکل ۵ — انتظار داریم <code>print</code> نتیجه را برگرداند</h3>
-<p>این:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    print(a + b)</div></div>
-<p>برای نمایش مناسب است.</p>
-<p>ولی اگر بخواهی:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = add(2, 3)</div></div>
-<p>و <code>result</code> برابر <code>5</code> شود، باید:</p>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b</div></div>
-<p>بنویسی.</p>
-<hr class="lesson-divider">
-<h2 class="lesson-title"> نکات مهم جلسه</h2>
-<ul><li><strong>Positional Argument</strong> بر اساس ترتیب ارسال می‌شود.</li><li><strong>Keyword Argument</strong> با نام Parameter ارسال می‌شود.</li><li>Positional باید قبل از Keyword قرار بگیرد.</li><li>Parameter دارای مقدار پیش‌فرض را <strong>Default Parameter</strong> می‌گوییم.</li><li>پارامترهای اجباری باید قبل از Default Parameterها قرار بگیرند.</li><li>Scope یعنی محدوده دسترسی یک متغیر.</li><li>متغیر تعریف‌شده داخل Function معمولاً Local است.</li><li>متغیر تعریف‌شده خارج Function می‌تواند Global باشد.</li><li>Function می‌تواند مقدار Global را بخواند، اما بهتر است برای طراحی تمیز، وابستگی غیرضروری به Globalها نداشته باشیم.</li><li>برای انتقال اطلاعات به Function از Parameter استفاده کن.</li><li>برای گرفتن نتیجه از Function از <code>return</code> استفاده کن.</li><li>Function بهتر است یک وظیفه مشخص داشته باشد.</li><li>نام مناسب Function و Parameter خوانایی کد را بالا می‌برد.</li><li>خروجی یک Function می‌تواند ورودی Function دیگری باشد.</li></ul>
-<hr class="lesson-divider">
-<h2 class="lesson-title">🔄 Recall سریع</h2>
-<ol><li>این دو چه تفاوتی دارند؟ <code>add(10, 20)</code> و <code>add(a=10, b=20)</code></li><li>مقدار پیش‌فرض کجاست؟ <code>def greet(name="Guest"):</code></li><li>آیا این درست است؟ <code>def test(a=10, b): ...</code></li><li>Scope چیست؟</li><li>خروجی چیست؟ <code>x = 10<br>def test():<br>    x = 20<br>    print(x)<br>test()<br>print(x)</code></li><li>برای انتقال نتیجه Function به بیرون از آن معمولاً از چه چیزی استفاده می‌کنیم؟</li></ol>
-<p>پاسخ‌های کلیدی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1. اولی Positional، دومی Keyword
-2. "Guest" مقدار پیش‌فرض name است
-3. خیر، اجباری نباید بعد از Default بیاید
-4. محدوده دسترسی متغیر
-5. 20 و 10
-6. return</div></div>
-<hr class="lesson-divider">
-<h1 class="lesson-title section-scenario">سناریوی ترکیبی</h1>
-<p>فرض کن می‌خواهیم یک سیستم ساده برای بررسی نمرات دانش‌آموز بسازیم.</p>
-<p>اطلاعات:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">نام دانش‌آموز
-نمره اول
-نمره دوم</div></div>
 <p>می‌خواهیم:</p>
-<ol><li>میانگین را محاسبه کنیم.</li><li>قبولی را بررسی کنیم.</li><li>گزارش نهایی نمایش دهیم.</li></ol>
-<p>اینجا سه Function مناسب داریم.</p>
+
+<ol>
+<li>میانگین را محاسبه کنیم.</li>
+<li>وضعیت قبولی را مشخص کنیم.</li>
+<li>در پایان گزارش را نمایش دهیم.</li>
+</ol>
+
 <h3>مرحله ۱ — محاسبه میانگین</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2):
-    return (score1 + score2) / 2</div></div>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_average(score1, score2, score3):
+    return (score1 + score2 + score3) / 3</div>
+</div>
+
 <h3>مرحله ۲ — بررسی وضعیت</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check_result(average):
-    if average >= 10:
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def check_result(average):
+    if average >= 12:
         return "Pass"
 
-    return "Fail"</div></div>
-<h3>مرحله ۳ — ساخت گزارش</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def create_report(name, average, result):
-    return f"{name}: {average} - {result}"</div></div>
-<h3>مرحله ۴ — ترکیب Functionها</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = "Ali"
-score1 = 18
-score2 = 16
+    return "Fail"</div>
+</div>
 
-average = calculate_average(score1, score2)
+<h3>مرحله ۳ — ساخت گزارش</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def create_report(name, average, result):
+    return f"{name}: {average} - {result}"</div>
+</div>
+
+<h3>مرحله ۴ — ترکیب Functionها</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">name = "Sara"
+
+score1 = 18
+score2 = 15
+score3 = 17
+
+average = calculate_average(score1, score2, score3)
+
 result = check_result(average)
 
 report = create_report(name, average, result)
 
-print(report)</div></div>
+print(report)</div>
+</div>
+
 <p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ali: 17.0 - Pass</div></div>
-<p>مدل ذهنی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">score1 + score2
-       ↓
-calculate_average()
-       ↓
-   average
-       ↓
-check_result()
-       ↓
-   Pass/Fail
-       ↓
-create_report()
-       ↓
-    report</div></div>
-<h3>چرا این طراحی خوب است؟</h3>
-<p>چون هر Function یک کار مشخص انجام می‌دهد:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">calculate_average
-        ↓
-محاسبه میانگین
 
-check_result
-        ↓
-بررسی وضعیت
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Sara: 16.666666666666668 - Pass</div>
+</div>
 
-create_report
-        ↓
-ساخت گزارش</div></div>
-<p>و هیچ Function مجبور نیست همه کارها را به‌تنهایی انجام دهد.</p>
-<h3>🧪 بخش کدنویسی برای تو</h3>
-<p>حالا همین سناریو را کمی تغییر بده:</p>
-<p>برنامه‌ای بنویس که:</p>
-<ul><li>سه نمره بگیرد.</li><li>میانگین سه نمره را محاسبه کند.</li><li>اگر میانگین حداقل <code>12</code> بود <code>"Pass"</code> و در غیر این صورت <code>"Fail"</code> برگرداند.</li><li>در پایان نام دانش‌آموز، میانگین و وضعیت را چاپ کند.</li></ul>
-<h3>یک راه‌حل ممکن</h3>
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_average(score1, score2, score3):
-    return (score1 + score2 + score3) / 3
+<p>نکته مهم این برنامه این است که هر Function فقط یک کار انجام می‌دهد و خروجی هر مرحله می‌تواند ورودی مرحله بعد باشد.</p>
 
-
-def check_result(average):
-    if average >= 12:
-        return "Pass"
-
-    return "Fail"
-
-
-name = input("Name: ")
-
-score1 = float(input("Score 1: "))
-score2 = float(input("Score 2: "))
-score3 = float(input("Score 3: "))
-
-average = calculate_average(score1, score2, score3)
-result = check_result(average)
-
-print("Name:", name)
-print("Average:", average)
-print("Result:", result)</div></div>
-<p>مثلاً:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Sara
-Score 1: 18
-Score 2: 15
-Score 3: 17</div></div>
-<p>خروجی:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Name: Sara
-Average: 16.666666666666668
-Result: Pass</div></div>
-<p>در جلسات بعدی با روش‌های بهتر نمایش اعداد آشنا خواهیم شد.</p>
 <hr class="lesson-divider">
-<h2 class="lesson-title">🧪 تمرین عملی</h2>
-<p>ابتدا خودت کد را بنویس و اجرا کن. <strong>پاسخ‌ها عمداً مخفی هستند</strong> تا قبل از تلاش، راه‌حل را نبینی.</p>
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۱</span><div><strong>تمرین Keyword Argument</strong><small>با Keyword Argument فراخوانی کن.</small></div></div>
-  <p>تابعی به نام <code>introduce</code> بساز که <code>name</code> و <code>age</code> را دریافت کند. آن را با Keyword Argument فراخوانی کن.</p>
-  <div class="python-playground" data-playground="ex16-1">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · Keyword Argument</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
-</textarea></div>
-    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
-  </div>
-  <button class="solution-toggle" type="button" data-solution="sol16-1"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۱</button>
-  <div class="exercise-solution" id="sol16-1"><strong>پاسخ:</strong><pre>def introduce(name, age):
+<h2 class="lesson-title">🧪 تمرین کدنویسی</h2>
+
+<p>قبل از دیدن پاسخ، ابتدا خودت مسئله را حل کن.</p>
+
+<div class="exercise-card">
+<div class="exercise-head">
+<span class="exercise-num">۱</span>
+<div>
+<strong>Keyword Argument</strong>
+<small>تمرین ارسال Argument با نام Parameter</small>
+</div>
+</div>
+
+<p>تابعی به نام <code>introduce</code> بساز که <code>name</code> و <code>age</code> را دریافت کند و آن را با Keyword Argument فراخوانی کن.</p>
+
+<div class="python-playground" data-playground="ex16-1">
+<div class="playground-header">
+<div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۱ · Keyword Argument</span></div>
+<div class="playground-status">آماده</div>
+<div class="playground-actions">
+<button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+<button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+</div>
+</div>
+<div class="playground-editor-wrap">
+<textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea>
+</div>
+<div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<button class="solution-toggle" type="button" data-solution="sol16-1">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-1">
+<strong>پاسخ:</strong>
+<pre>def introduce(name, age):
     print("Name:", name)
     print("Age:", age)
 
-introduce(name="Ali", age=20)</pre></div>
+introduce(name="Ali", age=20)</pre>
 </div>
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۲</span><div><strong>تمرین Default Parameter</strong><small>مقدار پیش‌فرض برای نام.</small></div></div>
-  <p>تابعی بنویس که نام کاربر را دریافت کند و اگر نام ارسال نشد، <code>"Guest"</code> را استفاده کند.</p>
-  <div class="python-playground" data-playground="ex16-2">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · Default Parameter</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
+</div>
 
-</textarea></div>
-    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
-  </div>
-  <button class="solution-toggle" type="button" data-solution="sol16-2"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۲</button>
-  <div class="exercise-solution" id="sol16-2"><strong>پاسخ:</strong><pre>def greet(name="Guest"):
+<div class="exercise-card">
+<div class="exercise-head">
+<span class="exercise-num">۲</span>
+<div>
+<strong>Default Parameter</strong>
+<small>استفاده از مقدار پیش‌فرض</small>
+</div>
+</div>
+
+<p>تابعی بنویس که نام کاربر را دریافت کند و اگر نام ارسال نشد، از <code>"Guest"</code> استفاده کند.</p>
+
+<div class="python-playground" data-playground="ex16-2">
+<div class="playground-header">
+<div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۲ · Default Parameter</span></div>
+<div class="playground-status">آماده</div>
+<div class="playground-actions">
+<button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+<button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+</div>
+</div>
+<div class="playground-editor-wrap">
+<textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea>
+</div>
+<div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<button class="solution-toggle" type="button" data-solution="sol16-2">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-2">
+<strong>پاسخ:</strong>
+<pre>def greet(name="Guest"):
     print("Hello", name)
 
 greet("Sara")
-greet()</pre></div>
+greet()</pre>
 </div>
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۳</span><div><strong>تمرین محاسبه با Default</strong><small>تابع با discount پیش‌فرض.</small></div></div>
-  <p>تابعی بنویس: <code>calculate_price(price, discount)</code> که مقدار <code>discount</code> به صورت پیش‌فرض <code>0</code> باشد.</p>
-  <div class="python-playground" data-playground="ex16-3">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · محاسبه با Default</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
+</div>
 
-</textarea></div>
-    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
-  </div>
-  <button class="solution-toggle" type="button" data-solution="sol16-3"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۳</button>
-  <div class="exercise-solution" id="sol16-3"><strong>پاسخ:</strong><pre>def calculate_price(price, discount=0):
+<div class="exercise-card">
+<div class="exercise-head">
+<span class="exercise-num">۳</span>
+<div>
+<strong>محاسبه قیمت</strong>
+<small>ترکیب Parameter اجباری و Default</small>
+</div>
+</div>
+
+<p>تابعی به نام <code>calculate_price</code> بنویس که <code>price</code> را دریافت کند و <code>discount</code> مقدار پیش‌فرض <code>0</code> داشته باشد.</p>
+
+<div class="python-playground" data-playground="ex16-3">
+<div class="playground-header">
+<div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۳ · محاسبه قیمت</span></div>
+<div class="playground-status">آماده</div>
+<div class="playground-actions">
+<button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+<button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+</div>
+</div>
+<div class="playground-editor-wrap">
+<textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea>
+</div>
+<div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<button class="solution-toggle" type="button" data-solution="sol16-3">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-3">
+<strong>پاسخ:</strong>
+<pre>def calculate_price(price, discount=0):
     return price - (price * discount / 100)
 
 print(calculate_price(100))
-print(calculate_price(100, 20))</pre></div>
+print(calculate_price(100, 20))</pre>
 </div>
+</div>
+
 <div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۴</span><div><strong>تمرین تشخیص Scope</strong><small>خروجی کد را حدس بزن.</small></div></div>
-  <p>کد زیر را بررسی کن و خروجی را مشخص کن:</p>
-  <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">name = "Ali"
+<div class="exercise-head">
+<span class="exercise-num">۴</span>
+<div>
+<strong>تشخیص Scope</strong>
+<small>خروجی کد را قبل از اجرا حدس بزن</small>
+</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">name = "Ali"
 
 def test():
     name = "Sara"
     print(name)
 
 test()
-print(name)</div></div>
-  <button class="solution-toggle" type="button" data-solution="sol16-4"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۴</button>
-  <div class="exercise-solution" id="sol16-4"><strong>پاسخ:</strong><pre>Sara
-Ali</pre></div>
+print(name)</div>
 </div>
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۵</span><div><strong>تمرین Function + List + Loop</strong><small>مجموع اعداد List را با for محاسبه کن.</small></div></div>
-  <p>تابعی بنویس که یک List از اعداد دریافت کند و مجموع اعداد را با <code>for</code> محاسبه و <code>return</code> کند.</p>
-  <div class="python-playground" data-playground="ex16-5">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۵ · Function + List + Loop</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
-</textarea></div>
-    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
-  </div>
-  <button class="solution-toggle" type="button" data-solution="sol16-5"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۵</button>
-  <div class="exercise-solution" id="sol16-5"><strong>پاسخ:</strong><pre>def calculate_sum(numbers):
+<button class="solution-toggle" type="button" data-solution="sol16-4">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-4">
+<strong>پاسخ:</strong>
+<pre>Sara
+Ali</pre>
+<p>متغیر داخل Function محلی است و روی متغیر خارج Function تأثیری ندارد.</p>
+</div>
+</div>
+
+<div class="exercise-card">
+<div class="exercise-head">
+<span class="exercise-num">۵</span>
+<div>
+<strong>Function + List + Loop</strong>
+<small>ترکیب مفاهیم قبلی</small>
+</div>
+</div>
+
+<p>تابعی بنویس که یک List از اعداد دریافت کند، با <code>for</code> مجموع آن‌ها را محاسبه کند و نتیجه را با <code>return</code> برگرداند.</p>
+
+<div class="python-playground" data-playground="ex16-5">
+<div class="playground-header">
+<div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۵ · Function + List + Loop</span></div>
+<div class="playground-status">آماده</div>
+<div class="playground-actions">
+<button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+<button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+</div>
+</div>
+<div class="playground-editor-wrap">
+<textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea>
+</div>
+<div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<button class="solution-toggle" type="button" data-solution="sol16-5">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-5">
+<strong>پاسخ:</strong>
+<pre>def calculate_sum(numbers):
     total = 0
+
     for number in numbers:
         total += number
+
     return total
 
 numbers = [5, 10, 15]
-print(calculate_sum(numbers))</pre></div>
-</div>
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۶</span><div><strong>تمرین Function + Condition</strong><small>بررسی سن با return.</small></div></div>
-  <p>تابعی بنویس که سن را دریافت کند: اگر سن حداقل 18 بود <code>"Adult"</code> و در غیر این صورت <code>"Minor"</code> را برگرداند.</p>
-  <div class="python-playground" data-playground="ex16-6">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۶ · Function + Condition</span></div><div class="playground-status">آماده</div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
-</textarea></div>
-    <div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
-  </div>
-  <button class="solution-toggle" type="button" data-solution="sol16-6"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۶</button>
-  <div class="exercise-solution" id="sol16-6"><strong>پاسخ:</strong><pre>def check_age(age):
+print(calculate_sum(numbers))</pre>
+</div>
+</div>
+
+<div class="exercise-card">
+<div class="exercise-head">
+<span class="exercise-num">۶</span>
+<div>
+<strong>Function + Condition</strong>
+<small>استفاده از شرط و return</small>
+</div>
+</div>
+
+<p>تابعی بنویس که سن را دریافت کند. اگر سن حداقل <code>18</code> بود <code>"Adult"</code> و در غیر این صورت <code>"Minor"</code> را برگرداند.</p>
+
+<div class="python-playground" data-playground="ex16-6">
+<div class="playground-header">
+<div class="playground-title"><i class="fas fa-code"></i><span>تمرین ۶ · Function + Condition</span></div>
+<div class="playground-status">آماده</div>
+<div class="playground-actions">
+<button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> پاک‌کردن</button>
+<button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> اجرا</button>
+</div>
+</div>
+<div class="playground-editor-wrap">
+<textarea class="python-editor"># کد خودت را اینجا بنویس
+
+</textarea>
+</div>
+<div class="playground-output">▶ خروجی در اینجا نمایش داده می‌شود...</div>
+</div>
+
+<button class="solution-toggle" type="button" data-solution="sol16-6">
+<i class="fas fa-eye"></i> نمایش پاسخ
+</button>
+
+<div class="exercise-solution" id="sol16-6">
+<strong>پاسخ:</strong>
+<pre>def check_age(age):
     if age >= 18:
         return "Adult"
+
     return "Minor"
 
 print(check_age(20))
-print(check_age(15))</pre></div>
+print(check_age(15))</pre>
 </div>
-<h3></h3>
-<p></p>
-<hr class="lesson-divider">
-<h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
-<p>هر سؤال را پاسخ بده و بعد گزینه‌ات را انتخاب کن تا پاسخ و توضیح همان سؤال نمایش داده شود.</p>
-<div class="quiz-card"><p>❓ سؤال ۱ — Positional: خروجی چیست؟ <br><code>def subtract(a, b): return a - b<br>print(subtract(10, 3))</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>3</code></button><button onclick="selectOption(this)">ب) <code>7</code></button><button onclick="selectOption(this)">ج) <code>-7</code></button><button onclick="selectOption(this)">د) <code>13</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در Positional Argument، <code>10</code> به <code>a</code> و <code>3</code> به <code>b</code> می‌رسد.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۲ — Keyword Argument: کدام فراخوانی با تعریف زیر صحیح است؟ <br><code>def introduce(name, age): print(name, age)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>introduce(age=20, name="Ali")</code></button><button onclick="selectOption(this)">ب) <code>introduce(name="Ali", 20)</code></button><button onclick="selectOption(this)">ج) <code>introduce(age, name)</code></button><button onclick="selectOption(this)">د) <code>introduce(name="Ali", age)</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>Keyword Argumentها می‌توانند جابه‌جا شوند، اما در گزینه‌های B و D یک Positional بعد از Keyword آمده است.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۳ — Default Parameter: خروجی چیست؟ <br><code>def greet(name="Guest"): return "Hello " + name<br>print(greet())</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>Hello</code></button><button onclick="selectOption(this)">ب) <code>Guest</code></button><button onclick="selectOption(this)">ج) <code>Hello Guest</code></button><button onclick="selectOption(this)">د) خطا</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>چون Argument ارسال نشده، مقدار پیش‌فرض <code>"Guest"</code> استفاده می‌شود.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۴ — Scope: خروجی چیست؟ <br><code>x = 10<br>def test():<br>    x = 20<br>    print(x)<br>test()<br>print(x)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>10<br>10</code></button><button onclick="selectOption(this)">ب) <code>20<br>20</code></button><button onclick="selectOption(this)">ج) <code>20<br>10</code></button><button onclick="selectOption(this)">د) خطا</button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>x</code> داخل تابع در محدوده Local است و <code>x</code> بیرون تابع متغیر دیگری در Global Scope است.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۵ — Local Variable: کدام کد مشکل Scope دارد؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>def test():<br>    x = 10<br>    print(x)</code></button><button onclick="selectOption(this)">ب) <code>x = 10<br>def test():<br>    print(x)</code></button><button onclick="selectOption(this)">ج) <code>def test():<br>    x = 10<br>print(x)</code></button><button onclick="selectOption(this)">د) <code>x = 10<br>print(x)</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>x</code> داخل Function تعریف شده و بیرون Function در دسترس مستقیم نیست.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۶ — طراحی Function: کدام Function برای محاسبه مجموع دو عدد طراحی بهتری دارد؟</p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>def x(a, b): print(a + b)</code></button><button onclick="selectOption(this)">ب) <code>def calculate_sum(a, b): return a + b</code></button><button onclick="selectOption(this)">ج) <code>def calculate_sum(): print("sum")</code></button><button onclick="selectOption(this)">د) <code>def function(): input()</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>نام مشخص دارد، ورودی‌ها را دریافت می‌کند و نتیجه را با <code>return</code> برمی‌گرداند.</div></div>
-<div class="quiz-card"><p>❓ سؤال ۷ — ترکیبی: خروجی کد زیر چیست؟ <br><code>def calculate_price(price, discount=10): return price - (price * discount / 100)<br>result = calculate_price(200)<br>print(result)</code></p><div class="quiz-options"><button onclick="selectOption(this)">الف) <code>180</code></button><button onclick="selectOption(this)">ب) <code>190</code></button><button onclick="selectOption(this)">ج) <code>200</code></button><button onclick="selectOption(this)">د) <code>20</code></button></div><div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>چون مقدار <code>discount</code> ارسال نشده، مقدار پیش‌فرض <code>10</code> استفاده می‌شود: <code>200 × 10% = 20</code> و <code>200 - 20 = 180</code>.</div></div>
-<h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
-<p>در جلسه قبل یاد گرفتیم Function می‌تواند:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Input → Processing → return → Output</div></div>
-<p>امروز این مدل را کامل‌تر کردیم.</p>
-<p>برای ارسال ورودی می‌توانیم داشته باشیم:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Positional
-↓
-add(10, 20)
+</div>
 
+<hr class="lesson-divider">
+
+<h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
+
+<p>قبل از دیدن پاسخ، ابتدا گزینه درست را انتخاب کن.</p>
+
+<div class="quiz-card">
+<p>❓ سؤال ۱ — در کد زیر Argumentها از چه نوعی هستند؟<br>
+<code>subtract(10, 3)</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Keyword</button>
+<button onclick="selectOption(this)">ب) Positional</button>
+<button onclick="selectOption(this)">ج) Default</button>
+<button onclick="selectOption(this)">د) Local</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong><br>
+چون مقدارها بر اساس موقعیت ارسال شده‌اند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۲ — کدام فراخوانی صحیح است؟<br>
+<code>def introduce(name, age): ...</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>introduce(age=20, name="Ali")</code></button>
+<button onclick="selectOption(this)">ب) <code>introduce(name="Ali", 20)</code></button>
+<button onclick="selectOption(this)">ج) <code>introduce(name="Ali", age)</code></button>
+<button onclick="selectOption(this)">د) <code>introduce(name, age)</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: الف</strong><br>
+در Keyword Argumentها می‌توانیم ترتیب Parameterها را تغییر دهیم.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۳ — خروجی چیست؟<br>
+<code>def greet(name="Guest"):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return "Hello " + name<br>
+print(greet())</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>Hello</code></button>
+<button onclick="selectOption(this)">ب) <code>Guest</code></button>
+<button onclick="selectOption(this)">ج) <code>Hello Guest</code></button>
+<button onclick="selectOption(this)">د) خطا</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong><br>
+چون Argument ارسال نشده، مقدار پیش‌فرض <code>"Guest"</code> استفاده می‌شود.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۴ — کدام تعریف صحیح است؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)"><code>def test(a=10, b): ...</code></button>
+<button onclick="selectOption(this)"><code>def test(a, b=10): ...</code></button>
+<button onclick="selectOption(this)"><code>def test(a=10, b=20, c): ...</code></button>
+<button onclick="selectOption(this)"><code>def test(a=10, b, c=20): ...</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong><br>
+Parameterهای اجباری باید قبل از Parameterهای دارای مقدار پیش‌فرض قرار بگیرند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۵ — خروجی چیست؟<br>
+<code>x = 10<br>
+def test():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;x = 20<br>
+&nbsp;&nbsp;&nbsp;&nbsp;print(x)<br>
+test()<br>
+print(x)</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>10<br>10</code></button>
+<button onclick="selectOption(this)">ب) <code>20<br>20</code></button>
+<button onclick="selectOption(this)">ج) <code>20<br>10</code></button>
+<button onclick="selectOption(this)">د) خطا</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong><br>
+<code>x</code> داخل Function یک Local Variable است و با <code>x</code> خارج Function متفاوت است.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۶ — کدام Function طراحی بهتری دارد؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)"><code>def x(a, b): print(a + b)</code></button>
+<button onclick="selectOption(this)"><code>def calculate_sum(a, b): return a + b</code></button>
+<button onclick="selectOption(this)"><code>def calculate_sum(): print("sum")</code></button>
+<button onclick="selectOption(this)"><code>def function(): input()</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong><br>
+نام Function مشخص است، ورودی دریافت می‌کند و نتیجه را با <code>return</code> برمی‌گرداند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۷ — خروجی چیست؟<br>
+<code>def calculate_price(price, discount=10):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return price - (price * discount / 100)<br>
+print(calculate_price(200))</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>180</code></button>
+<button onclick="selectOption(this)">ب) <code>190</code></button>
+<button onclick="selectOption(this)">ج) <code>200</code></button>
+<button onclick="selectOption(this)">د) <code>20</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: الف</strong><br>
+چون <code>discount</code> ارسال نشده، مقدار پیش‌فرض <code>10</code> استفاده می‌شود. بنابراین ۲۰ واحد تخفیف از ۲۰۰ کم می‌شود و نتیجه <code>180</code> است.
+</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">🎯 جمع‌بندی نهایی فصل Functions</h2>
+
+<p>در این فصل یاد گرفتیم Function چگونه برنامه را از یک کد بزرگ و تکراری به قسمت‌های کوچک‌تر و قابل استفاده مجدد تبدیل می‌کند.</p>
+
+<p>در این جلسه سه روش مهم برای کار با ورودی‌ها را یاد گرفتیم:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Positional
+→ add(10, 20)
 
 Keyword
-↓
-add(a=10, b=20)
-
+→ add(a=10, b=20)
 
 Default
-↓
-def add(a, b=0)</div></div>
-<p>همچنین فهمیدیم هر متغیر یک <strong>Scope</strong> دارد:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Global
-   │
-   └── Function
-          │
-          ├── Parameter
-          └── Local Variable</div></div>
-<p>و مهم‌تر از همه، یاد گرفتیم Function خوب معمولاً:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">ورودی مشخص
-     ↓
-وظیفه مشخص
-     ↓
-خروجی مشخص</div></div>
-<p>دارد.</p>
-<p>پس به جای اینکه برنامه را یک تکه بزرگ ببینیم، شروع می‌کنیم به شکستن آن:</p>
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">برنامه بزرگ
-    │
-    ├── Function 1
-    │
-    ├── Function 2
-    │
-    ├── Function 3
-    │
-    └── Function 4</div></div>
-<p>این طرز فکر، پایه‌ی نوشتن برنامه‌های واقعی‌تر در ادامه دوره است.</p>
-<p>در <strong>جلسه ۱۷</strong> وارد فصل <strong>Lambda &amp; Comprehensions</strong> می‌شویم و یاد می‌گیریم چطور با <strong>List / Set / Dictionary Comprehension</strong> بعضی عملیات روی داده‌ها را به شکل کوتاه‌تر و Pythonic انجام دهیم.</p>`
+→ def add(a, b=0)</div>
+</div>
 
+<p>همچنین فهمیدیم <strong>Scope</strong> تعیین می‌کند یک متغیر در کجا قابل دسترسی باشد:</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>تعریف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local</td>
+<td>متغیری که داخل Function تعریف می‌شود.</td>
+</tr>
+<tr>
+<td>Global</td>
+<td>متغیری که خارج Function تعریف می‌شود.</td>
+</tr>
+<tr>
+<td>Parameter</td>
+<td>نام ورودی تعریف‌شده در Function.</td>
+</tr>
+<tr>
+<td>Argument</td>
+<td>مقداری که هنگام فراخوانی ارسال می‌کنیم.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>و مهم‌تر از همه، یک Function خوب معمولاً ساختار مشخصی دارد:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Input
+  ↓
+Processing
+  ↓
+return
+  ↓
+Output</div>
+</div>
+
+<p>به جای وابسته کردن Function به متغیرهای Global، بهتر است اطلاعات موردنیاز را با <strong>Parameter</strong> وارد کنیم و نتیجه را با <strong>return</strong> خارج کنیم.</p>
+
+<p>همچنین یک برنامه بزرگ را می‌توانیم به چند Function کوچک تقسیم کنیم؛ هر Function یک وظیفه مشخص انجام دهد و خروجی آن در صورت نیاز وارد Function بعدی شود.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Program
+   │
+   ├── Function 1
+   │       ↓
+   ├── Function 2
+   │       ↓
+   ├── Function 3
+   │       ↓
+   └── Final Result</div>
+</div>
+
+<p><strong>اگر این جلسه را خوب یاد گرفته باشی، باید بتوانی یک برنامه ساده را به چند Function مستقل تقسیم کنی، ورودی‌های آن‌ها را با Argumentهای مناسب ارسال کنی، از Default Parameter استفاده کنی و نتیجه را با return بین بخش‌های مختلف برنامه منتقل کنی.</strong></p>
+
+<p>با پایان فصل ۱۰، مبانی اصلی Functionها را یاد گرفته‌ایم و در فصل بعد وارد <strong>Lambda و Comprehension</strong> می‌شویم.</p>
+
+<p>در آنجا یاد می‌گیریم بعضی عملیات روی داده‌ها را با روش‌های کوتاه‌تر و Pythonic بنویسیم.</p>`
 
         };
 
