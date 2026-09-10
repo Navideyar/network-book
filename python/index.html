@@ -1437,7 +1437,8 @@
             "sections": [
                 { "id": "ch7-1", "title": "List — ساخت، دسترسی، تغییر و متدهای مهم" },
                 { "id": "ch7-2", "title": "Tuple، Set و Unpacking + مقایسه کاربردهای Tuple، Set و List" },
-                { "id": "ch7-3", "title": "Dictionary — ساخت، دسترسی، تغییر و متدهای مهم + Nested Data Structures" }
+                { "id": "ch7-3", "title": "Dictionary — ساخت، دسترسی، تغییر و متدهای مهم + Nested Data Structures" },
+                { "id": "ch7-4", "title": "جمع‌بندی Data Structures — انتخاب و کار با List، Tuple، Set و Dictionary" }
             ]
         }, {
             "id": "ch8",
@@ -15496,6 +15497,857 @@ Add New Key</div>
     <strong>List، Tuple، Set و Dictionary</strong> را می‌شناسیم.
     در جلسات بعد می‌توانیم این ساختارها را با <strong>Control Flow</strong>
     ترکیب کنیم تا روی داده‌ها تصمیم‌گیری و پردازش انجام دهیم.
+</p>`
+,
+"ch7-4": `<div class="section-header">
+    <div class="section-badge">۷</div>
+    <div>
+        <h1>جمع‌بندی Data Structures در Python</h1>
+        <div class="meta">فصل ۷ · بخش ۴ از ۴</div>
+    </div>
+</div>
+
+<blockquote class="lesson-goal">
+    <strong class="goal-title">هدف جلسه</strong>
+    <p>در پایان این جلسه می‌توانی:</p>
+    <ul>
+        <li>تفاوت <code>List</code>، <code>Tuple</code>، <code>Set</code> و <code>Dictionary</code> را سریع تشخیص بدهی.</li>
+        <li>بر اساس نوع داده و نیاز برنامه، ساختار مناسب را انتخاب کنی.</li>
+        <li>دسترسی، تغییر، اضافه و حذف داده‌ها را مرور کنی.</li>
+        <li>مفهوم <strong>Unpacking</strong> و <strong>Nested Data Structures</strong> را به‌درستی استفاده کنی.</li>
+        <li>نکات مهم و خطاهای رایج این فصل را به خاطر بسپاری.</li>
+    </ul>
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">1. چهار ساختار اصلی در یک نگاه</h2>
+
+<p>
+    در این فصل با چهار ساختار اصلی برای نگهداری و سازمان‌دهی داده‌ها آشنا شدیم:
+    <code>List</code>،
+    <code>Tuple</code>،
+    <code>Set</code> و
+    <code>Dictionary</code>.
+</p>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ساختار</th>
+                <th>Syntax</th>
+                <th>قابل تغییر؟</th>
+                <th>دسترسی</th>
+                <th>ویژگی اصلی</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>List</code></td>
+                <td><code>[]</code></td>
+                <td>بله</td>
+                <td>Index</td>
+                <td>مرتب و قابل تغییر</td>
+            </tr>
+            <tr>
+                <td><code>Tuple</code></td>
+                <td><code>()</code></td>
+                <td>خیر</td>
+                <td>Index</td>
+                <td>مرتب و ثابت</td>
+            </tr>
+            <tr>
+                <td><code>Set</code></td>
+                <td><code>{...}</code></td>
+                <td>بله</td>
+                <td>Index ندارد</td>
+                <td>بدون مقدار تکراری</td>
+            </tr>
+            <tr>
+                <td><code>Dictionary</code></td>
+                <td><code>{key: value}</code></td>
+                <td>بله</td>
+                <td>Key</td>
+                <td><code>Key → Value</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>انتخاب سریع:</strong>
+    <code>List</code> → داده مرتب و قابل تغییر |
+    <code>Tuple</code> → داده مرتب و ثابت |
+    <code>Set</code> → داده‌های یکتا |
+    <code>Dictionary</code> → داده به شکل <code>Key → Value</code>
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">2. چه زمانی از کدام ساختار استفاده کنیم؟</h2>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>نیاز</th>
+                <th>انتخاب مناسب</th>
+                <th>دلیل</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>لیستی از داده‌های قابل تغییر</td>
+                <td><code>List</code></td>
+                <td>قابل تغییر و دارای Index</td>
+            </tr>
+            <tr>
+                <td>داده مرتب ولی غیرقابل تغییر</td>
+                <td><code>Tuple</code></td>
+                <td>Immutable</td>
+            </tr>
+            <tr>
+                <td>حذف داده‌های تکراری</td>
+                <td><code>Set</code></td>
+                <td>فقط مقادیر یکتا را نگه می‌دارد</td>
+            </tr>
+            <tr>
+                <td>اطلاعات با نام مشخص</td>
+                <td><code>Dictionary</code></td>
+                <td>دسترسی با Key</td>
+            </tr>
+            <tr>
+                <td>چند رکورد مشابه</td>
+                <td><code>List of Dictionaries</code></td>
+                <td>هر عنصر یک Dictionary است</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Example</span>
+    <div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]       # List
+location = (35.7, 51.4)                 # Tuple
+unique_ids = {101, 102, 103}            # Set
+
+student = {
+    "name": "Ali",
+    "age": 20
+}                                       # Dictionary</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">3. List — مرور سریع</h2>
+
+<p>
+    <code>List</code> برای داده‌های مرتب و قابل تغییر استفاده می‌شود.
+    Index از <code>0</code> شروع می‌شود و آخرین عنصر با <code>[-1]</code> قابل دسترسی است.
+</p>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>نیاز</th>
+                <th>دستور</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>دسترسی</td>
+                <td><code>items[0]</code></td>
+            </tr>
+            <tr>
+                <td>آخرین عنصر</td>
+                <td><code>items[-1]</code></td>
+            </tr>
+            <tr>
+                <td>تعداد</td>
+                <td><code>len(items)</code></td>
+            </tr>
+            <tr>
+                <td>اضافه به انتها</td>
+                <td><code>append(x)</code></td>
+            </tr>
+            <tr>
+                <td>اضافه در Index</td>
+                <td><code>insert(i, x)</code></td>
+            </tr>
+            <tr>
+                <td>حذف بر اساس مقدار</td>
+                <td><code>remove(x)</code></td>
+            </tr>
+            <tr>
+                <td>حذف بر اساس Index</td>
+                <td><code>pop(i)</code></td>
+            </tr>
+            <tr>
+                <td>مرتب‌سازی</td>
+                <td><code>sort()</code></td>
+            </tr>
+            <tr>
+                <td>بررسی وجود</td>
+                <td><code>x in items</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>نکته:</strong>
+    <code>remove()</code> بر اساس <strong>Value</strong> حذف می‌کند،
+    اما <code>pop()</code> بر اساس <strong>Index</strong> حذف می‌کند و مقدار حذف‌شده را برمی‌گرداند.
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">4. Tuple — مرور سریع</h2>
+
+<p>
+    <code>Tuple</code> شبیه List است، اما پس از ساخته شدن قابل تغییر نیست.
+    بنابراین برای داده‌های مرتب و ثابت مناسب است.
+</p>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ویژگی</th>
+                <th>Tuple</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ساخت</td>
+                <td><code>(1, 2, 3)</code></td>
+            </tr>
+            <tr>
+                <td>Indexing</td>
+                <td>دارد</td>
+            </tr>
+            <tr>
+                <td>Slicing</td>
+                <td>دارد</td>
+            </tr>
+            <tr>
+                <td>تغییر عنصر</td>
+                <td>❌ ندارد</td>
+            </tr>
+            <tr>
+                <td><code>count()</code></td>
+                <td>دارد</td>
+            </tr>
+            <tr>
+                <td><code>index()</code></td>
+                <td>دارد</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">colors = ("red", "green", "blue")
+
+print(colors[0])
+print(colors[-1])</div>
+</div>
+
+<blockquote>
+    <strong>نکته امتحانی:</strong>
+    <code>List = Mutable</code> |
+    <code>Tuple = Immutable</code>
+</blockquote>
+
+<h3>Tuple تک‌عضوی</h3>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>کد</th>
+                <th>نوع</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>(10)</code></td>
+                <td><code>int</code></td>
+            </tr>
+            <tr>
+                <td><code>(10,)</code></td>
+                <td><code>tuple</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">5. Set — مرور سریع</h2>
+
+<p>
+    <code>Set</code> برای نگهداری مقادیر یکتا استفاده می‌شود و Index ندارد.
+    یکی از کاربردهای مهم آن حذف داده‌های تکراری است.
+</p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">numbers = [10, 20, 10, 30, 20]
+
+unique_numbers = set(numbers)
+
+print(unique_numbers)</div>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>دستور</th>
+                <th>کاربرد</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>set()</code></td>
+                <td>ساخت Set خالی</td>
+            </tr>
+            <tr>
+                <td><code>add(x)</code></td>
+                <td>اضافه کردن مقدار</td>
+            </tr>
+            <tr>
+                <td><code>remove(x)</code></td>
+                <td>حذف مقدار؛ در صورت نبودن خطا</td>
+            </tr>
+            <tr>
+                <td><code>discard(x)</code></td>
+                <td>حذف مقدار بدون خطا در صورت نبودن</td>
+            </tr>
+            <tr>
+                <td><code>x in data</code></td>
+                <td>بررسی وجود مقدار</td>
+            </tr>
+            <tr>
+                <td><code>a &amp; b</code></td>
+                <td>Intersection — اشتراک</td>
+            </tr>
+            <tr>
+                <td><code>a | b</code></td>
+                <td>Union — اجتماع</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>نکته امتحانی:</strong>
+    <code>{}</code> یک Dictionary خالی است؛
+    برای ساخت <strong>Set خالی</strong> از <code>set()</code> استفاده کن.
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">6. Dictionary — مرور سریع</h2>
+
+<p>
+    <code>Dictionary</code> داده‌ها را به صورت
+    <strong>Key → Value</strong>
+    نگهداری می‌کند و دسترسی معمولاً با Key انجام می‌شود.
+</p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">student = {
+    "name": "Ali",
+    "age": 20
+}
+
+print(student["name"])</div>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>نیاز</th>
+                <th>دستور</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>دسترسی</td>
+                <td><code>data[key]</code></td>
+            </tr>
+            <tr>
+                <td>دسترسی امن</td>
+                <td><code>data.get(key)</code></td>
+            </tr>
+            <tr>
+                <td>اضافه / تغییر</td>
+                <td><code>data[key] = value</code></td>
+            </tr>
+            <tr>
+                <td>حذف</td>
+                <td><code>del data[key]</code></td>
+            </tr>
+            <tr>
+                <td>حذف و دریافت Value</td>
+                <td><code>data.pop(key)</code></td>
+            </tr>
+            <tr>
+                <td>پاک کردن محتوا</td>
+                <td><code>data.clear()</code></td>
+            </tr>
+            <tr>
+                <td>Keyها</td>
+                <td><code>data.keys()</code></td>
+            </tr>
+            <tr>
+                <td>Valueها</td>
+                <td><code>data.values()</code></td>
+            </tr>
+            <tr>
+                <td>Key + Value</td>
+                <td><code>data.items()</code></td>
+            </tr>
+            <tr>
+                <td>چند تغییر</td>
+                <td><code>data.update(...)</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>دسترسی معمولی در برابر get()</h3>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>روش</th>
+                <th>Key موجود</th>
+                <th>Key ناموجود</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>data[key]</code></td>
+                <td>Value</td>
+                <td><code>KeyError</code></td>
+            </tr>
+            <tr>
+                <td><code>data.get(key)</code></td>
+                <td>Value</td>
+                <td><code>None</code></td>
+            </tr>
+            <tr>
+                <td><code>data.get(key, default)</code></td>
+                <td>Value</td>
+                <td>مقدار پیش‌فرض</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>نکته مهم:</strong>
+    در Dictionary، عبارت <code>key in data</code> معمولاً وجود <strong>Key</strong> را بررسی می‌کند، نه Value را.
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">7. Unpacking — مرور سریع</h2>
+
+<p>
+    در <strong>Unpacking</strong> چند مقدار مستقیماً بین چند متغیر توزیع می‌شوند.
+</p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">person = ("Ali", 20, "Tehran")
+
+name, age, city = person
+
+print(name)
+print(age)
+print(city)</div>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>مفهوم</th>
+                <th>مثال</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Unpacking معمولی</td>
+                <td><code>a, b, c = data</code></td>
+            </tr>
+            <tr>
+                <td>گرفتن بقیه مقادیر</td>
+                <td><code>first, *rest = data</code></td>
+            </tr>
+            <tr>
+                <td>تعداد برابر</td>
+                <td>تعداد متغیرها = تعداد مقادیر</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>نکته امتحانی:</strong>
+    در Unpacking معمولی اگر تعداد متغیرها و مقادیر برابر نباشد، خطا ایجاد می‌شود.
+</blockquote>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">numbers = [10, 20, 30, 40]
+
+first, *rest = numbers
+
+print(first)
+print(rest)</div>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Output</span>
+    <div class="code-block no-prompt">10
+[20, 30, 40]</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">8. Nested Data Structures</h2>
+
+<p>
+    <strong>Nested</strong> یعنی یک ساختار داده داخل ساختار داده دیگری قرار گرفته باشد.
+    این روش برای نمایش داده‌های واقعی و پیچیده‌تر بسیار کاربردی است.
+</p>
+
+<h3>List داخل Dictionary</h3>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">student = {
+    "name": "Ali",
+    "scores": [18, 20, 19]
+}</div>
+</div>
+
+<h3>Dictionary داخل Dictionary</h3>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">student = {
+    "name": "Ali",
+    "scores": {
+        "python": 20,
+        "math": 18
+    }
+}
+
+print(student["scores"]["python"])</div>
+</div>
+
+<h3>List of Dictionaries</h3>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">students = [
+    {"name": "Ali", "age": 20},
+    {"name": "Sara", "age": 21}
+]
+
+print(students[1]["name"])</div>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Output</span>
+    <div class="code-block no-prompt">Sara</div>
+</div>
+
+<blockquote>
+    <strong>مدل ذهنی:</strong>
+    ابتدا ساختار بیرونی را انتخاب کن، سپس مرحله‌به‌مرحله وارد ساختار داخلی شو.
+    <br><br>
+    <code>students[1]</code> → دومین Dictionary
+    <br>
+    <code>["name"]</code> → مقدار Key موردنظر
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">9. مقایسه نهایی عملیات مهم</h2>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>عملیات</th>
+                <th>List</th>
+                <th>Tuple</th>
+                <th>Set</th>
+                <th>Dictionary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Index</td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>❌</td>
+                <td>❌</td>
+            </tr>
+            <tr>
+                <td>دسترسی با Key</td>
+                <td>❌</td>
+                <td>❌</td>
+                <td>❌</td>
+                <td>✅</td>
+            </tr>
+            <tr>
+                <td>قابل تغییر</td>
+                <td>✅</td>
+                <td>❌</td>
+                <td>✅</td>
+                <td>✅</td>
+            </tr>
+            <tr>
+                <td>مقدار تکراری</td>
+                <td>✅</td>
+                <td>✅</td>
+                <td>❌</td>
+                <td>Key تکراری ❌</td>
+            </tr>
+            <tr>
+                <td><code>len()</code></td>
+                <td>تعداد عناصر</td>
+                <td>تعداد عناصر</td>
+                <td>تعداد عناصر یکتا</td>
+                <td>تعداد Keyها</td>
+            </tr>
+            <tr>
+                <td><code>in</code></td>
+                <td>Value</td>
+                <td>Value</td>
+                <td>Value</td>
+                <td>Key</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">10. نکات طلایی فصل ۷</h2>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>مفهوم</th>
+                <th>نکته مهم</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>List</td>
+                <td>Mutable + Index + امکان تکرار</td>
+            </tr>
+            <tr>
+                <td>Tuple</td>
+                <td>Immutable + Index</td>
+            </tr>
+            <tr>
+                <td>Set</td>
+                <td>Unique + No Index</td>
+            </tr>
+            <tr>
+                <td>Dictionary</td>
+                <td>Key → Value</td>
+            </tr>
+            <tr>
+                <td>Set خالی</td>
+                <td><code>set()</code> نه <code>{}</code></td>
+            </tr>
+            <tr>
+                <td>Tuple تک‌عضوی</td>
+                <td><code>(10,)</code> دارای ویرگول است</td>
+            </tr>
+            <tr>
+                <td>Unpacking</td>
+                <td>تعداد متغیرها و مقادیر باید هماهنگ باشد</td>
+            </tr>
+            <tr>
+                <td>Dictionary</td>
+                <td>Keyها باید یکتا باشند</td>
+            </tr>
+            <tr>
+                <td>Dictionary ناموجود</td>
+                <td><code>d[key]</code> → <code>KeyError</code> | <code>d.get(key)</code> → <code>None</code></td>
+            </tr>
+            <tr>
+                <td>Nested</td>
+                <td>برای دسترسی، ساختارها را مرحله‌به‌مرحله دنبال کن</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">11. مثال ترکیبی نهایی</h2>
+
+<p>
+    در یک برنامه واقعی ممکن است چند Data Structure را هم‌زمان استفاده کنیم.
+    مثال زیر اطلاعات چند دانشجو را در یک <code>List of Dictionaries</code> نگهداری می‌کند.
+</p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">students = [
+    {
+        "name": "Ali",
+        "scores": [18, 20, 19]
+    },
+    {
+        "name": "Sara",
+        "scores": [20, 19, 18]
+    }
+]
+
+print(students[0]["name"])
+print(students[0]["scores"][-1])
+
+students[1]["scores"].append(20)
+
+print(students[1]["scores"])</div>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Output</span>
+    <div class="code-block no-prompt">Ali
+19
+[20, 19, 18, 20]</div>
+</div>
+
+<p>
+    در این مثال چند مفهوم فصل با هم ترکیب شده‌اند:
+</p>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>بخش</th>
+                <th>ساختار / مفهوم</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>مجموعه دانشجویان</td>
+                <td><code>List</code></td>
+            </tr>
+            <tr>
+                <td>اطلاعات هر دانشجو</td>
+                <td><code>Dictionary</code></td>
+            </tr>
+            <tr>
+                <td>نمرات</td>
+                <td><code>List</code></td>
+            </tr>
+            <tr>
+                <td>دسترسی به دانشجوی اول</td>
+                <td><code>[0]</code></td>
+            </tr>
+            <tr>
+                <td>دسترسی به نام</td>
+                <td><code>["name"]</code></td>
+            </tr>
+            <tr>
+                <td>دسترسی به آخرین نمره</td>
+                <td><code>[-1]</code></td>
+            </tr>
+            <tr>
+                <td>اضافه کردن نمره</td>
+                <td><code>append()</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">جمع‌بندی نهایی</h2>
+
+<p>
+    در فصل ۷ یاد گرفتیم که انتخاب Data Structure باید بر اساس نوع داده و کاری که می‌خواهیم
+    روی آن انجام دهیم باشد.
+</p>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>اگر می‌خواهی...</th>
+                <th>استفاده کن از...</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>داده مرتب و قابل تغییر داشته باشی</td>
+                <td><code>List</code></td>
+            </tr>
+            <tr>
+                <td>داده مرتب ولی ثابت داشته باشی</td>
+                <td><code>Tuple</code></td>
+            </tr>
+            <tr>
+                <td>تکراری‌ها را حذف کنی</td>
+                <td><code>Set</code></td>
+            </tr>
+            <tr>
+                <td>داده را با یک نام مشخص پیدا کنی</td>
+                <td><code>Dictionary</code></td>
+            </tr>
+            <tr>
+                <td>چند مقدار را بین چند متغیر تقسیم کنی</td>
+                <td><code>Unpacking</code></td>
+            </tr>
+            <tr>
+                <td>داده پیچیده و چندلایه بسازی</td>
+                <td><code>Nested Data Structures</code></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<blockquote>
+    <strong>یادآوری نهایی:</strong>
+    <code>List → Index + Mutable</code>
+    <br>
+    <code>Tuple → Index + Immutable</code>
+    <br>
+    <code>Set → Unique + No Index</code>
+    <br>
+    <code>Dictionary → Key → Value</code>
+    <br>
+    <code>Unpacking → چند مقدار → چند متغیر</code>
+</blockquote>
+
+<p>
+    با پایان این فصل، اکنون می‌توانی داده‌ها را در ساختارهای مختلف ذخیره، سازمان‌دهی و
+    مدیریت کنی. در فصل‌های بعدی این ساختارها را با
+    <strong>Control Flow</strong> و منطق برنامه ترکیب خواهیم کرد.
 </p>`
 ,
 "ch8-1": `<div class="section-header">

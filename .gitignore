@@ -1,9 +1,9 @@
 test.py
-.vscode/
+.vscode/*
 # ====================
 # VSCode
 # ====================
-.vscode/
+vscode/*
 *.code-workspace
 
 # ====================
