@@ -19575,155 +19575,138 @@ False → End</div>
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>مفهوم حلقه <code>for</code> و کاربرد آن را توضیح بدهی.</li>
-<li>تفاوت اصلی <code>for</code> و <code>while</code> را تشخیص بدهی.</li>
-<li>روی عناصر یک <code>list</code>، <code>string</code> و سایر داده‌های قابل پیمایش حرکت کنی.</li>
-<li>با <code>range()</code> یک دنباله عددی یا تعداد مشخصی تکرار ایجاد کنی.</li>
-<li>تفاوت <code>range(start, stop)</code> و <code>range(start, stop, step)</code> را درک کنی.</li>
-<li>با <code>enumerate()</code> هم‌زمان به <strong>Index</strong> و <strong>Value</strong> دسترسی داشته باشی.</li>
+<li>منطق حلقه <code>for</code> را درک کنی و آن را برای پیمایش داده‌ها به‌کار ببری.</li>
+<li>تفاوت کاربردی <code>for</code> و <code>while</code> را تشخیص بدهی.</li>
+<li>روی <code>list</code> و <code>string</code> با <code>for</code> پیمایش کنی.</li>
+<li>با <code>range()</code> دنباله‌های عددی و تعداد مشخصی تکرار ایجاد کنی.</li>
+<li>قانون <code>start</code>، <code>stop</code> و <code>step</code> را در <code>range()</code> به‌درستی به‌کار ببری.</li>
+<li>با <code>enumerate()</code> هم‌زمان <strong>Index</strong> و <strong>Value</strong> را دریافت کنی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. از <code>while</code> به <code>for</code></h2>
+<h2 class="lesson-title">1. ایده اصلی حلقه <code>for</code></h2>
 
-<p>در جلسه قبل با <code>while</code> آشنا شدیم. یکی از کاربردهای آن اجرای چندباره یک قطعه کد است.</p>
+<p>تا اینجا با <code>while</code> یاد گرفتیم چگونه یک قطعه کد را تا زمانی که یک شرط برقرار است، چند بار اجرا کنیم.</p>
 
-<p>مثلاً برای چاپ اعداد 1 تا 5:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">number = 1
-
-while number <= 5:
-    print(number)
-    number += 1</div></div>
-
-<p>در این روش خودمان باید:</p>
-
-<ul>
-<li>متغیر شمارنده را ایجاد کنیم.</li>
-<li>شرط ادامه حلقه را بنویسیم.</li>
-<li>در هر مرحله شمارنده را تغییر دهیم.</li>
-</ul>
-
-<p>اما اگر از قبل بدانیم می‌خواهیم روی یک دنباله مشخص حرکت کنیم، <code>for</code> معمولاً ساده‌تر است:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(1, 6):
-    print(number)</div></div>
-
-<p>خروجی هر دو روش:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1
-2
-3
-4
-5</div></div>
-
-<p>تفاوت اصلی این است که در <code>for</code> معمولاً خود حلقه مسئول حرکت روی داده‌هاست و لازم نیست شمارنده را دستی مدیریت کنیم.</p>
+<p>اما همیشه مسئله ما این نیست که «تا چه زمانی؟». گاهی مسئله ساده‌تر است:</p>
 
 <blockquote>
-<strong>ایده اصلی:</strong> اگر می‌خواهی «برای هر مورد» کاری انجام دهی، معمولاً <code>for</code> انتخاب طبیعی‌تری است.
+<strong>برای هر عنصر یک کار مشخص انجام بده.</strong>
 </blockquote>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">2. <code>for</code> چیست؟</h2>
-
-<p>حلقه <code>for</code> برای <strong>پیمایش (Iteration)</strong> روی یک داده قابل پیمایش و اجرای یک قطعه کد برای هر مقدار استفاده می‌شود.</p>
-
-<p>مثلاً:</p>
+<p>مثلاً فرض کن سه نام داریم و می‌خواهیم همه آن‌ها را چاپ کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
 
 for name in names:
     print(name)</div></div>
 
-<p>خروجی:</p>
+<p>اینجا لازم نیست خودمان شمارنده بسازیم یا مشخص کنیم چند بار حلقه اجرا شود. Python خودش عناصر <code>names</code> را یکی‌یکی در اختیار حلقه قرار می‌دهد.</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Ali
-Sara
-Reza</div></div>
-
-<p>در هر بار اجرای حلقه، یک عنصر از <code>names</code> در متغیر <code>name</code> قرار می‌گیرد:</p>
+<p>می‌توانیم اجرای ذهنی کد را این‌طور تصور کنیم:</p>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>مرحله</th><th><code>name</code></th></tr>
+<tr><th>مرحله</th><th>مقدار <code>name</code></th><th>دستور اجراشده</th></tr>
 </thead>
 <tbody>
-<tr><td>اول</td><td><code>"Ali"</code></td></tr>
-<tr><td>دوم</td><td><code>"Sara"</code></td></tr>
-<tr><td>سوم</td><td><code>"Reza"</code></td></tr>
+<tr><td>۱</td><td><code>"Ali"</code></td><td><code>print(name)</code></td></tr>
+<tr><td>۲</td><td><code>"Sara"</code></td><td><code>print(name)</code></td></tr>
+<tr><td>۳</td><td><code>"Reza"</code></td><td><code>print(name)</code></td></tr>
 </tbody>
 </table></div>
 
-<p>بنابراین می‌توانی <code>for</code> را ساده این‌طور بخوانی:</p>
+<p>پس مهم‌ترین چیزی که باید از <code>for</code> بفهمی این است:</p>
 
-<blockquote><strong>برای هر عنصر، این کار را انجام بده.</strong></blockquote>
+<blockquote>
+<strong><code>for</code> یعنی: یک داده را یکی‌یکی دریافت کن و برای هر مورد، این کد را اجرا کن.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. Syntax حلقه <code>for</code></h2>
+<h2 class="lesson-title">2. ساختار حلقه <code>for</code></h2>
 
-<p>ساختار اصلی:</p>
+<p>ساختار کلی حلقه به این شکل است:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for variable in iterable:
     code</div></div>
 
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in numbers:
-    print(number)</div></div>
+<p>در این ساختار:</p>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>بخش</th><th>وظیفه</th></tr>
+<tr><th>بخش</th><th>معنی</th></tr>
 </thead>
 <tbody>
 <tr><td><code>for</code></td><td>شروع حلقه</td></tr>
-<tr><td><code>variable</code></td><td>دریافت مقدار فعلی</td></tr>
-<tr><td><code>in</code></td><td>مشخص کردن داده‌ای که روی آن پیمایش می‌کنیم</td></tr>
-<tr><td><code>iterable</code></td><td>داده‌ای که می‌توان عناصر آن را یکی‌یکی دریافت کرد</td></tr>
+<tr><td><code>variable</code></td><td>متغیری که مقدار فعلی را دریافت می‌کند</td></tr>
+<tr><td><code>in</code></td><td>مشخص می‌کند از کدام داده مقدار بگیریم</td></tr>
+<tr><td><code>iterable</code></td><td>داده‌ای که می‌توانیم روی عناصر آن یکی‌یکی حرکت کنیم</td></tr>
 <tr><td><code>:</code></td><td>شروع بدنه حلقه</td></tr>
-<tr><td>کد Indented</td><td>دستورات تکرارشونده</td></tr>
+<tr><td>کد Indented</td><td>دستوری که برای هر عنصر اجرا می‌شود</td></tr>
 </tbody>
 </table></div>
 
-<p>در سطح Python Basic، کافی است <code>iterable</code> را به‌عنوان چیزی در نظر بگیری که می‌توانیم روی آن یکی‌یکی حرکت کنیم؛ مثل <code>list</code> و <code>string</code>.</p>
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [10, 20, 30]
+
+for number in numbers:
+    print(number)</div></div>
+
+<p>خواندن این کد بسیار مهم است:</p>
+
+<blockquote>
+<strong>برای هر <code>number</code> داخل <code>numbers</code>، آن را چاپ کن.</strong>
+</blockquote>
+
+<p>نکته مهم این است که <code>number</code> را ما مقداردهی نکرده‌ایم. در هر دور حلقه، Python مقدار بعدی را در آن قرار می‌دهد.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. <code>for</code> روی List</h2>
+<h2 class="lesson-title">3. اولین کاربرد مهم: پیمایش <code>list</code></h2>
 
-<p>یکی از رایج‌ترین کاربردهای <code>for</code> پیمایش یک <code>list</code> است.</p>
+<p>رایج‌ترین استفاده از <code>for</code>، پیمایش عناصر یک <code>list</code> است.</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">fruits = ["apple", "banana", "orange"]
+<p>فرض کن قیمت چند محصول را داریم:</p>
 
-for fruit in fruits:
-    print(fruit)</div></div>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">prices = [100, 250, 80, 400]
 
-<p>خروجی:</p>
+for price in prices:
+    print(price)</div></div>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">apple
-banana
-orange</div></div>
+<p>حلقه چهار بار اجرا می‌شود؛ چون لیست چهار عنصر دارد.</p>
 
-<p>نکته مهم: اگر فقط خود مقادیر را می‌خواهیم، نیازی نیست Indexها را مدیریت کنیم.</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">100
+250
+80
+400</div></div>
 
-<p>Python خودش عناصر را یکی‌یکی در متغیر <code>fruit</code> قرار می‌دهد.</p>
+<p>در اینجا اصلاً لازم نیست بدانیم Index هر عنصر چیست. چون مسئله فقط می‌گوید:</p>
+
+<blockquote>
+<strong>برای هر قیمت، آن را چاپ کن.</strong>
+</blockquote>
+
+<p>بنابراین وقتی فقط خود مقدارها را لازم داری، ساده‌ترین الگو همین است:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for item in items:
+    print(item)</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. <code>for</code> روی String</h2>
+<h2 class="lesson-title">4. پیمایش <code>string</code> با <code>for</code></h2>
 
-<p><code>for</code> فقط برای <code>list</code> نیست. می‌توانیم روی یک <code>string</code> نیز حرکت کنیم.</p>
+<p><code>for</code> فقط برای <code>list</code> نیست. یک <code>string</code> نیز از کاراکترهایی تشکیل شده که می‌توانیم آن‌ها را یکی‌یکی دریافت کنیم.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">word = "Python"
 
 for letter in word:
     print(letter)</div></div>
 
-<p>خروجی:</p>
+<p>در هر دور حلقه، یک کاراکتر در <code>letter</code> قرار می‌گیرد.</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">P
 y
@@ -19732,71 +19715,63 @@ h
 o
 n</div></div>
 
-<p>در اینجا هر بار یک کاراکتر از رشته در متغیر <code>letter</code> قرار می‌گیرد.</p>
-
-<p>بنابراین:</p>
+<p>پس مفهوم <code>for</code> به نوع خاصی از داده محدود نیست. کافی است داده بتواند عناصرش را یکی‌یکی در اختیار حلقه قرار دهد.</p>
 
 <blockquote>
-<code>for</code> می‌تواند روی داده‌هایی حرکت کند که عناصرشان را می‌توان یکی‌یکی دریافت کرد.
+<strong>List → عنصر به عنصر</strong><br>
+<strong>String → کاراکتر به کاراکتر</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. <code>for</code> در برابر <code>while</code></h2>
+<h2 class="lesson-title">5. <code>for</code> یا <code>while</code>؟</h2>
 
-<p>یکی از مهم‌ترین تصمیم‌ها هنگام کار با حلقه‌ها این است که از <code>for</code> استفاده کنیم یا <code>while</code>.</p>
+<p>حالا که منطق <code>for</code> را فهمیدیم، تفاوت آن با <code>while</code> بسیار ساده‌تر می‌شود.</p>
 
-<h3><code>for</code></h3>
+<p>به این دو سؤال دقت کن:</p>
 
-<p>وقتی معمولاً می‌خواهیم روی مجموعه‌ای از داده‌ها یا یک دنباله مشخص حرکت کنیم.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr><th>سؤال مسئله</th><th>حلقه مناسب</th></tr>
+</thead>
+<tbody>
+<tr><td>برای هر عنصر چه کاری انجام بدهم؟</td><td><code>for</code></td></tr>
+<tr><td>تا زمانی که شرط برقرار است چه کاری انجام بدهم؟</td><td><code>while</code></td></tr>
+</tbody>
+</table></div>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
+<p>مثلاً اگر لیست کاربران را داشته باشیم:</p>
 
-for name in names:
-    print(name)</div></div>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">users = ["Ali", "Sara", "Reza"]
 
-<p>یعنی:</p>
+for user in users:
+    print(user)</div></div>
 
-<blockquote>برای هر نام موجود در لیست، آن را چاپ کن.</blockquote>
+<p>مسئله درباره پیمایش عناصر یک لیست است، بنابراین <code>for</code> انتخاب طبیعی است.</p>
 
-<h3><code>while</code></h3>
-
-<p>وقتی ادامه تکرار به یک <strong>شرط یا وضعیت</strong> وابسته است و ممکن است تعداد تکرار از قبل مشخص نباشد.</p>
+<p>اما اگر بخواهیم تا زمانی که کاربر رمز درست را وارد نکرده، دوباره ورودی بگیریم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">password = ""
 
 while password != "1234":
     password = input("Password: ")</div></div>
 
-<p>یعنی:</p>
-
-<blockquote>تا زمانی که رمز صحیح نشده، دوباره رمز بگیر.</blockquote>
-
-<div class="table-wrap"><table>
-<thead>
-<tr><th><code>for</code></th><th><code>while</code></th></tr>
-</thead>
-<tbody>
-<tr><td>پیمایش روی داده‌ها</td><td>تکرار بر اساس شرط</td></tr>
-<tr><td>مناسب دنباله یا تعداد مشخص</td><td>مناسب وضعیت یا شرط</td></tr>
-<tr><td>معمولاً نیاز به شمارنده دستی ندارد</td><td>ممکن است نیاز به تغییر وضعیت داشته باشد</td></tr>
-<tr><td><code>for x in items</code></td><td><code>while condition</code></td></tr>
-</tbody>
-</table></div>
+<p>اینجا تعداد دفعات تکرار از قبل مشخص نیست و ادامه حلقه به یک شرط وابسته است؛ بنابراین <code>while</code> مناسب‌تر است.</p>
 
 <blockquote>
-<strong>قانون ساده:</strong><br>
-«برای هر عنصر...» → <code>for</code><br>
-«تا زمانی که...» → <code>while</code>
+<strong>«برای هر...» → <code>for</code></strong><br>
+<strong>«تا زمانی که...» → <code>while</code></strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. <code>range()</code> چیست؟</h2>
+<h2 class="lesson-title">6. وقتی به عددها نیاز داریم: <code>range()</code></h2>
 
-<p>وقتی می‌خواهیم یک دنباله عددی داشته باشیم، <code>range()</code> یکی از مهم‌ترین ابزارهای همراه <code>for</code> است.</p>
+<p>تا اینجا <code>for</code> را روی داده‌های واقعی مثل <code>list</code> و <code>string</code> اجرا کردیم.</p>
 
-<p>مثلاً:</p>
+<p>اما اگر بخواهیم مثلاً اعداد <code>0</code> تا <code>4</code> را یکی‌یکی داشته باشیم، چه کنیم؟</p>
+
+<p>اینجاست که <code>range()</code> وارد می‌شود.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(5):
     print(number)</div></div>
@@ -19809,23 +19784,25 @@ while password != "1234":
 3
 4</div></div>
 
-<p>نکته بسیار مهم:</p>
+<p><code>range(5)</code> یعنی یک دنباله از <code>0</code> شروع کن و تا قبل از <code>5</code> ادامه بده.</p>
 
 <blockquote>
-در <code>range(5)</code>، عدد <code>5</code> شامل نمی‌شود.
+<strong>مهم‌ترین قانون <code>range()</code>:</strong><br>
+<code>start</code> شامل می‌شود، اما <code>stop</code> شامل نمی‌شود.
 </blockquote>
 
-<p>پس <code>range(5)</code> یعنی:</p>
+<p>پس:</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0, 1, 2, 3, 4</div></div>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">range(5)
+→ 0, 1, 2, 3, 4</div></div>
 
-<p>وقتی فقط یک مقدار به <code>range()</code> می‌دهیم، آن مقدار به‌عنوان <code>stop</code> در نظر گرفته می‌شود و شروع به‌صورت پیش‌فرض <code>0</code> است.</p>
+<p>وقتی فقط یک عدد می‌دهیم، آن عدد <code>stop</code> است و <code>start</code> به‌صورت پیش‌فرض <code>0</code> خواهد بود.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. <code>range(start, stop)</code></h2>
+<h2 class="lesson-title">7. <code>range(start, stop)</code></h2>
 
-<p>می‌توانیم نقطه شروع را نیز مشخص کنیم:</p>
+<p>اگر نخواهیم از صفر شروع کنیم، می‌توانیم <code>start</code> را مشخص کنیم.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(2, 6):
     print(number)</div></div>
@@ -19837,35 +19814,40 @@ while password != "1234":
 4
 5</div></div>
 
-<p>در اینجا:</p>
+<p>اینجا:</p>
 
-<ul>
-<li><code>start = 2</code> → شامل می‌شود.</li>
-<li><code>stop = 6</code> → شامل نمی‌شود.</li>
-</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr><th>پارامتر</th><th>مقدار</th><th>وضعیت</th></tr>
+</thead>
+<tbody>
+<tr><td><code>start</code></td><td><code>2</code></td><td>شامل می‌شود</td></tr>
+<tr><td><code>stop</code></td><td><code>6</code></td><td>شامل نمی‌شود</td></tr>
+</tbody>
+</table></div>
 
-<blockquote>
-<strong>قانون طلایی:</strong> در <code>range()</code>، <code>start</code> شامل می‌شود اما <code>stop</code> شامل نمی‌شود.
-</blockquote>
-
-<p>به همین دلیل برای چاپ اعداد 1 تا 5 باید بنویسیم:</p>
+<p>بنابراین اگر بخواهیم اعداد 1 تا 5 را چاپ کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(1, 6):
     print(number)</div></div>
 
-<p>چون <code>6</code> بیرون بازه است.</p>
+<p>دلیل استفاده از <code>6</code> این است که <code>6</code> باید خارج از دنباله باشد.</p>
+
+<blockquote>
+<strong>هنگام نوشتن <code>range()</code> همیشه از خودت بپرس: «آخرین عددی که می‌خواهم چیست؟» سپس <code>stop</code> را یک مرحله بعد از آن قرار بده.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. <code>range(start, stop, step)</code></h2>
+<h2 class="lesson-title">8. <code>step</code>: با چه فاصله‌ای حرکت کنیم؟</h2>
 
-<p>پارامتر سوم <code>range()</code> یعنی <code>step</code> مشخص می‌کند در هر مرحله چه مقدار تغییر کنیم.</p>
+<p>گاهی نمی‌خواهیم هر بار فقط یک واحد جلو برویم. برای این کار از <code>step</code> استفاده می‌کنیم.</p>
 
-<p>ساختار:</p>
+<p>ساختار کامل:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">range(start, stop, step)</div></div>
 
-<p>مثلاً:</p>
+<p>مثلاً برای چاپ اعداد زوج از 0 تا 8:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(0, 10, 2):
     print(number)</div></div>
@@ -19878,26 +19860,30 @@ while password != "1234":
 6
 8</div></div>
 
-<p>در این مثال:</p>
+<p>در اینجا Python از <code>0</code> شروع می‌کند و هر بار <code>2</code> واحد جلو می‌رود:</p>
+
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0 → 2 → 4 → 6 → 8 → 10</div></div>
+
+<p>اما چون <code>10</code> همان <code>stop</code> است، وارد خروجی نمی‌شود.</p>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>پارامتر</th><th>مقدار</th></tr>
+<tr><th>پارامتر</th><th>نقش</th></tr>
 </thead>
 <tbody>
-<tr><td><code>start</code></td><td><code>0</code></td></tr>
-<tr><td><code>stop</code></td><td><code>10</code></td></tr>
-<tr><td><code>step</code></td><td><code>2</code></td></tr>
+<tr><td><code>start</code></td><td>از کجا شروع کنیم؟</td></tr>
+<tr><td><code>stop</code></td><td>قبل از کجا متوقف شویم؟</td></tr>
+<tr><td><code>step</code></td><td>هر بار چقدر تغییر کنیم؟</td></tr>
 </tbody>
 </table></div>
 
-<p>یعنی از <code>0</code> شروع کن، هر بار <code>2</code> واحد جلو برو و قبل از رسیدن به <code>10</code> متوقف شو.</p>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. <code>step</code> منفی و حرکت معکوس</h2>
+<h2 class="lesson-title">9. حرکت معکوس با <code>step</code> منفی</h2>
 
-<p>اگر بخواهیم از عدد بزرگ‌تر به عدد کوچک‌تر حرکت کنیم، به یک <code>step</code> منفی نیاز داریم.</p>
+<p>اگر بخواهیم از یک عدد بزرگ‌تر به سمت عدد کوچک‌تر حرکت کنیم، باید <code>step</code> منفی باشد.</p>
+
+<p>مثلاً شمارش معکوس از 5 تا 1:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(5, 0, -1):
     print(number)</div></div>
@@ -19910,27 +19896,61 @@ while password != "1234":
 2
 1</div></div>
 
-<p>در اینجا:</p>
+<p>حرکت را می‌توان این‌طور تصور کرد:</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">start = 5
-stop  = 0
-step  = -1</div></div>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">5 → 4 → 3 → 2 → 1 → 0</div></div>
 
-<p>دوباره <code>stop</code> شامل نمی‌شود؛ بنابراین <code>0</code> چاپ نمی‌شود.</p>
+<p>ولی <code>0</code> چاپ نمی‌شود، چون <code>stop</code> است.</p>
+
+<blockquote>
+<strong>اگر جهت حرکت رو به پایین است، <code>step</code> باید منفی باشد.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. خلاصه کاربردی <code>range()</code></h2>
+<h2 class="lesson-title">10. <code>range()</code> برای تعداد مشخصی تکرار</h2>
+
+<p>گاهی هدف ما استفاده از خود عددها نیست؛ فقط می‌خواهیم یک قطعه کد تعداد مشخصی بار اجرا شود.</p>
+
+<p>مثلاً چاپ <code>Hello</code> پنج بار:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for _ in range(5):
+    print("Hello")</div></div>
+
+<p>خروجی:</p>
+
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello
+Hello
+Hello
+Hello
+Hello</div></div>
+
+<p>در اینجا عددهای <code>0</code> تا <code>4</code> برای ما مهم نیستند؛ فقط پنج بار اجرای حلقه مهم است. به همین دلیل از <code>_</code> استفاده می‌کنیم.</p>
+
+<blockquote>
+<code>_</code> یعنی: <strong>این مقدار را لازم ندارم.</strong>
+</blockquote>
+
+<p>بنابراین:</p>
+
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">for _ in range(3):
+    ...
+    
+→ یعنی این کار را 3 بار انجام بده.</div></div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">11. جمع‌بندی <code>range()</code></h2>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>Syntax</th><th>نتیجه</th><th>کاربرد</th></tr>
+<tr><th>Syntax</th><th>دنباله</th><th>کاربرد</th></tr>
 </thead>
 <tbody>
 <tr>
 <td><code>range(5)</code></td>
 <td><code>0, 1, 2, 3, 4</code></td>
-<td>از صفر تا قبل از 5</td>
+<td>شروع از صفر</td>
 </tr>
 <tr>
 <td><code>range(2, 6)</code></td>
@@ -19950,53 +19970,54 @@ step  = -1</div></div>
 </tbody>
 </table></div>
 
-<p>مهم‌ترین نکته‌ای که باید به خاطر بسپاری:</p>
+<p>سه نکته را همیشه کنار هم ببین:</p>
 
-<blockquote><strong><code>stop</code> همیشه خارج از بازه است.</strong></blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">12. استفاده از <code>range()</code> برای تعداد مشخصی تکرار</h2>
-
-<p>گاهی به خود عددهای <code>range()</code> نیاز نداریم و فقط می‌خواهیم یک کد تعداد مشخصی بار اجرا شود.</p>
-
-<p>مثلاً چاپ <code>Hello</code> پنج بار:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for _ in range(5):
-    print("Hello")</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello
-Hello
-Hello
-Hello
-Hello</div></div>
-
-<p>در اینجا از <code>_</code> استفاده کرده‌ایم، چون مقدار تولیدشده برای ما مهم نیست.</p>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">range(start, stop, step)
+      ↓       ↓      ↓
+    شروع    پایان   فاصله</div></div>
 
 <blockquote>
-<code>_</code> در این کاربرد یعنی «این مقدار را لازم ندارم».
+<strong><code>stop</code> همیشه خارج از بازه است.</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. <code>enumerate()</code> چیست؟</h2>
+<h2 class="lesson-title">12. یک سؤال مهم: اگر Index را هم بخواهیم چه؟</h2>
 
-<p>گاهی هنگام پیمایش یک لیست، فقط مقدار عنصر کافی نیست و هم‌زمان به <strong>Index</strong> آن نیز نیاز داریم.</p>
+<p>تا اینجا وقتی روی لیست حرکت می‌کردیم، فقط خود مقدار را دریافت می‌کردیم:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
+
+for name in names:
+    print(name)</div></div>
+
+<p>اما گاهی مسئله می‌گوید:</p>
+
+<blockquote>
+<strong>شماره عنصر و خود عنصر را با هم می‌خواهم.</strong>
+</blockquote>
 
 <p>مثلاً:</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]</div></div>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0 Ali
+1 Sara
+2 Reza</div></div>
 
-<p>اگر فقط مقدارها را بخواهیم:</p>
+<p>در این حالت می‌توانیم از <code>enumerate()</code> استفاده کنیم.</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for name in names:
-    print(name)</div></div>
+<hr class="lesson-divider">
 
-<p>اما اگر هم Index و هم Value لازم باشد، می‌توانیم از <code>enumerate()</code> استفاده کنیم:</p>
+<h2 class="lesson-title">13. <code>enumerate()</code>: Index + Value</h2>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, name in enumerate(names):
+<p><code>enumerate()</code> هنگام پیمایش یک داده، برای هر عنصر دو مقدار در اختیار ما قرار می‌دهد:</p>
+
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Index + Value</div></div>
+
+<p>مثلاً:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
+
+for index, name in enumerate(names):
     print(index, name)</div></div>
 
 <p>خروجی:</p>
@@ -20005,55 +20026,65 @@ Hello</div></div>
 1 Sara
 2 Reza</div></div>
 
-<p>یعنی <code>enumerate()</code> هنگام پیمایش، اطلاعات هر عنصر را به شکل <strong>Index + Value</strong> در اختیار حلقه قرار می‌دهد.</p>
+<p>در هر دور حلقه:</p>
+
+<div class="table-wrap"><table>
+<thead>
+<tr><th>مرحله</th><th><code>index</code></th><th><code>name</code></th></tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td><code>0</code></td><td><code>"Ali"</code></td></tr>
+<tr><td>۲</td><td><code>1</code></td><td><code>"Sara"</code></td></tr>
+<tr><td>۳</td><td><code>2</code></td><td><code>"Reza"</code></td></tr>
+</tbody>
+</table></div>
+
+<p>پس الگوی اصلی <code>enumerate()</code> را این‌طور حفظ کن:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, value in enumerate(items):
+    ...</div></div>
+
+<blockquote>
+<strong>فقط مقدار می‌خواهی؟</strong> → <code>for value in items</code><br>
+<strong>Index و مقدار را با هم می‌خواهی؟</strong> → <code>for index, value in enumerate(items)</code>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. چرا <code>enumerate()</code> مفید است؟</h2>
+<h2 class="lesson-title">14. چرا <code>enumerate()</code> بهتر از <code>range(len())</code> است؟</h2>
 
-<p>بدون <code>enumerate()</code> ممکن است برای دسترسی به Index به این شکل عمل کنیم:</p>
+<p>یک روش دیگر برای دسترسی هم‌زمان به Index و Value این است:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
 
 for i in range(len(names)):
     print(i, names[i])</div></div>
 
-<p>این کد درست است، اما وقتی هدف ما فقط دریافت <strong>Index و Value</strong> است، <code>enumerate()</code> خواناتر است:</p>
+<p>این روش قابل استفاده است، اما وقتی هدف فقط دریافت Index و Value باشد، <code>enumerate()</code> مستقیم‌تر و خواناتر است:</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
-
-for index, name in enumerate(names):
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, name in enumerate(names):
     print(index, name)</div></div>
 
-<p>روش دوم مستقیماً هدف کد را نشان می‌دهد:</p>
+<p>در روش دوم، خود کد دقیقاً چیزی را بیان می‌کند که ما می‌خواهیم:</p>
 
 <blockquote>
-برای هر عنصر، Index و Value آن را در اختیارم قرار بده.
+<strong>برای هر عنصر، Index و Value آن را بده.</strong>
 </blockquote>
 
-<p>بنابراین یک الگوی مهم را به خاطر بسپار:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, value in enumerate(items):
-    ...</div></div>
+<p>بنابراین در Python معمولاً وقتی به هر دو مقدار نیاز داری، <code>enumerate()</code> انتخاب بهتری است.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">15. تغییر نقطه شروع <code>enumerate()</code></h2>
+<h2 class="lesson-title">15. شروع شماره‌گذاری از <code>1</code></h2>
 
-<p>به‌صورت پیش‌فرض Index از <code>0</code> شروع می‌شود:</p>
+<p>به‌صورت پیش‌فرض <code>enumerate()</code> از <code>0</code> شروع می‌کند:</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]
-
-for index, name in enumerate(names):
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, name in enumerate(names):
     print(index, name)</div></div>
 
-<p>خروجی:</p>
+<p>اما گاهی برای نمایش به کاربر می‌خواهیم شماره‌ها از <code>1</code> شروع شوند.</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">0 Ali
-1 Sara
-2 Reza</div></div>
-
-<p>اگر بخواهیم شماره‌گذاری از <code>1</code> شروع شود، از پارامتر <code>start</code> استفاده می‌کنیم:</p>
+<p>در این حالت از <code>start=1</code> استفاده می‌کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, name in enumerate(names, start=1):
     print(index, name)</div></div>
@@ -20064,15 +20095,15 @@ for index, name in enumerate(names):
 2 Sara
 3 Reza</div></div>
 
-<p>نکته مهم: <code>start=1</code> فقط شماره‌ای را که <code>enumerate()</code> تولید می‌کند تغییر می‌دهد؛ Index واقعی لیست همچنان از <code>0</code> شروع می‌شود.</p>
+<p>دقت کن: این کار Index واقعی <code>list</code> را تغییر نمی‌دهد؛ فقط عددی که <code>enumerate()</code> در اختیار حلقه می‌گذارد از <code>1</code> شروع می‌شود.</p>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">16. ترکیب <code>for</code> و <code>if</code></h2>
 
-<p>حلقه‌ها معمولاً همراه شرط‌ها استفاده می‌شوند.</p>
+<p>حالا یک قدم جلوتر برویم. می‌توانیم در هر دور حلقه، روی مقدار فعلی شرط هم بررسی کنیم.</p>
 
-<p>مثلاً می‌خواهیم فقط اعداد زوج یک لیست را چاپ کنیم:</p>
+<p>مثلاً فقط اعداد زوج یک لیست را چاپ کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6]
 
@@ -20086,27 +20117,28 @@ for number in numbers:
 4
 6</div></div>
 
-<p>نحوه اجرای برنامه ساده است:</p>
+<p>ترتیب اجرای برنامه را مرحله‌به‌مرحله ببین:</p>
 
 <ol>
-<li><code>for</code> عناصر لیست را یکی‌یکی دریافت می‌کند.</li>
-<li><code>if</code> هر عنصر را بررسی می‌کند.</li>
+<li><code>for</code> یک عدد را از لیست می‌گیرد.</li>
+<li><code>if</code> آن عدد را بررسی می‌کند.</li>
 <li>اگر شرط درست باشد، <code>print()</code> اجرا می‌شود.</li>
+<li>حلقه سراغ عنصر بعدی می‌رود.</li>
 </ol>
 
-<p>این ترکیب یکی از الگوهای بسیار مهم در برنامه‌نویسی است:</p>
+<p>این الگو بسیار مهم است:</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">for item in items:
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for item in items:
     if condition:
         do_something()</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">17. <code>for</code> روی String همراه شرط</h2>
+<h2 class="lesson-title">17. یک مثال روی String</h2>
 
-<p>همین الگو را می‌توان روی String نیز استفاده کرد.</p>
+<p>همین منطق را می‌توان روی رشته نیز استفاده کرد.</p>
 
-<p>مثلاً می‌خواهیم حروف <code>a</code> موجود در کلمه <code>banana</code> را چاپ کنیم:</p>
+<p>مثلاً می‌خواهیم فقط حرف <code>a</code> را از کلمه <code>banana</code> پیدا کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">word = "banana"
 
@@ -20120,81 +20152,48 @@ for letter in word:
 a
 a</div></div>
 
-<p>در اینجا <code>for</code> کاراکترها را یکی‌یکی دریافت می‌کند و <code>if</code> بررسی می‌کند که آیا کاراکتر فعلی برابر <code>"a"</code> است یا خیر.</p>
+<p>پس یک بار دیگر همان الگو را می‌بینیم:</p>
+
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">داده
+ ↓
+for
+ ↓
+عنصر فعلی
+ ↓
+if
+ ↓
+بررسی شرط
+ ↓
+دستور</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">18. تفاوت <code>range()</code> و <code>list</code></h2>
+<h2 class="lesson-title">18. <code>range()</code> و <code>list</code> چه تفاوتی دارند؟</h2>
 
-<p>ممکن است <code>range()</code> و <code>list</code> را به دلیل استفاده مشابه در <code>for</code> با هم اشتباه بگیریم.</p>
+<p>ممکن است چون هر دو را می‌توان داخل <code>for</code> استفاده کرد، تصور کنیم <code>list</code> و <code>range()</code> یک مفهوم هستند؛ اما این‌طور نیست.</p>
 
-<p>مثلاً:</p>
+<p>یک <code>list</code> داده‌های واقعی را نگه می‌دارد:</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4]</div></div>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza"]</div></div>
 
-<p>و:</p>
+<p>اما <code>range()</code> برای ساخت یک دنباله عددی مناسب است:</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">range(1, 5)</div></div>
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">range(1, 4)</div></div>
 
-<p>هر دو را می‌توان در حلقه استفاده کرد:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in numbers:
-    print(number)</div></div>
-
-<p>و:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(1, 5):
-    print(number)</div></div>
-
-<p>اما مفهوم آن‌ها یکی نیست:</p>
-
-<ul>
-<li><code>list</code> یک مجموعه از مقادیر است.</li>
-<li><code>range()</code> یک دنباله عددی قابل پیمایش ایجاد می‌کند.</li>
-</ul>
-
-<p>پس:</p>
-
-<blockquote>
-اگر داده‌های واقعی را داری → مستقیماً روی داده پیمایش کن.<br>
-اگر به یک دنباله عددی نیاز داری → <code>range()</code> انتخاب مناسبی است.
-</blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">19. انتخاب درست بین <code>for</code>، <code>range()</code> و <code>enumerate()</code></h2>
+<p>بنابراین:</p>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>نیاز</th><th>الگوی مناسب</th></tr>
+<tr><th>اگر...</th><th>استفاده کن</th></tr>
 </thead>
 <tbody>
-<tr>
-<td>پیمایش مقدارهای یک لیست</td>
-<td><code>for item in items</code></td>
-</tr>
-<tr>
-<td>پیمایش کاراکترهای String</td>
-<td><code>for char in text</code></td>
-</tr>
-<tr>
-<td>تعداد مشخصی تکرار</td>
-<td><code>for _ in range(n)</code></td>
-</tr>
-<tr>
-<td>دنباله عددی</td>
-<td><code>range()</code></td>
-</tr>
-<tr>
-<td>Index + Value</td>
-<td><code>enumerate()</code></td>
-</tr>
-<tr>
-<td>تکرار وابسته به شرط</td>
-<td><code>while</code></td>
-</tr>
+<tr><td>داده‌های واقعی در اختیار داری</td><td><code>for item in items</code></td></tr>
+<tr><td>به دنباله‌ای از عددها نیاز داری</td><td><code>for number in range(...)</code></td></tr>
+<tr><td>فقط تعداد دفعات اجرا مهم است</td><td><code>for _ in range(n)</code></td></tr>
 </tbody>
 </table></div>
+
+<p>نکته مهم: برای پیمایش یک لیست، فقط به خاطر اینکه Index می‌خواهی سراغ <code>range(len(...))</code> نرو؛ در چنین حالتی معمولاً <code>enumerate()</code> خواناتر است.</p>
 
 <hr class="lesson-divider">
 
@@ -20214,9 +20213,9 @@ a</div></div>
 3
 4</div></div>
 
-<p>دلیلش این است که <code>stop</code> در <code>range()</code> شامل نمی‌شود.</p>
+<p>چون <code>stop</code> در <code>range()</code> شامل نمی‌شود.</p>
 
-<p>برای چاپ 1 تا 5:</p>
+<p>برای چاپ 1 تا 5 باید بنویسیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for i in range(1, 6):
     print(i)</div></div>
@@ -20228,32 +20227,32 @@ a</div></div>
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for i in range(5, 0):
     print(i)</div></div>
 
-<p>خروجی ندارد؛ چون <code>range()</code> به‌صورت پیش‌فرض <code>step=1</code> دارد، در حالی که برای حرکت از 5 به 1 باید به سمت پایین حرکت کنیم.</p>
+<p>خروجی ندارد؛ چون <code>step</code> به‌صورت پیش‌فرض <code>1</code> است. یعنی Python تلاش می‌کند از 5 به سمت عددهای بزرگ‌تر حرکت کند، در حالی که <code>stop</code> برابر 0 است.</p>
 
-<p>راه درست:</p>
+<p>برای حرکت رو به عقب:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for i in range(5, 0, -1):
     print(i)</div></div>
 
-<h3>مشکل ۳ — چرا <code>enumerate()</code> خروجی مورد انتظار را نمی‌دهد؟</h3>
+<h3>مشکل ۳ — چرا <code>enumerate()</code> خروجی عجیبی دارد؟</h3>
 
-<p>ترتیب مقادیر <code>enumerate()</code> این است:</p>
+<p>ترتیب مقادیری که <code>enumerate()</code> در اختیار حلقه قرار می‌دهد این است:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Index, Value</div></div>
 
-<p>پس الگوی معمول:</p>
+<p>بنابراین الگوی درست:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, value in enumerate(items):
     print(index, value)</div></div>
 
-<p>اگر برعکس بنویسیم:</p>
+<p>اگر ترتیب نام متغیرها را جابه‌جا کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for value, index in enumerate(items):
     print(index, value)</div></div>
 
-<p>از نظر Syntax خطایی رخ نمی‌دهد، اما نام‌گذاری متغیرها باعث می‌شود مقدارها در متغیر نامناسب قرار بگیرند و خروجی مورد انتظار را نگیریم.</p>
+<p>خطای Syntax رخ نمی‌دهد، اما نام‌گذاری متغیرها با مقداری که دریافت می‌کنند هماهنگ نیست و نتیجه اشتباه خواهد بود.</p>
 
-<h3>مشکل ۴ — آیا همیشه باید از <code>range()</code> استفاده کنیم؟</h3>
+<h3>مشکل ۴ — آیا برای هر حلقه‌ای باید <code>range()</code> استفاده کنیم؟</h3>
 
 <p>خیر.</p>
 
@@ -20266,45 +20265,45 @@ for name in names:
 
 <p>نیازی به <code>range()</code> نداریم.</p>
 
-<p><code>range()</code> زمانی مناسب‌تر است که به یک دنباله عددی یا تعداد مشخصی تکرار نیاز داریم.</p>
+<p><code>range()</code> زمانی مناسب است که به یک دنباله عددی یا تعداد مشخصی تکرار نیاز داریم.</p>
 
 <hr class="lesson-divider">
 
 <h1 class="lesson-title section-scenario">سناریوی ترکیبی — نمایش نمرات دانش‌آموزان</h1>
 
-<p>حالا مفاهیم این جلسه را در یک مثال واقعی‌تر ترکیب کنیم.</p>
+<p>حالا تمام مفاهیم اصلی این جلسه را در یک مسئله واقعی‌تر کنار هم قرار می‌دهیم.</p>
 
-<p>فرض کن نمرات چند دانش‌آموز را داریم:</p>
+<p>فرض کن نمرات چند دانش‌آموز در یک لیست قرار دارد:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">scores = [18, 12, 20, 9, 15]</div></div>
 
-<p>می‌خواهیم:</p>
+<p>می‌خواهیم برای هر دانش‌آموز:</p>
 
 <ol>
-<li>شماره هر دانش‌آموز را نمایش دهیم.</li>
-<li>نمره او را نمایش دهیم.</li>
+<li>شماره دانش‌آموز را نمایش دهیم.</li>
+<li>نمره را نمایش دهیم.</li>
 <li>مشخص کنیم قبول شده یا مردود.</li>
 </ol>
 
-<p>قانون:</p>
+<p>قانون قبولی:</p>
 
 <blockquote>
-نمره 10 یا بیشتر → <strong>Pass</strong><br>
-نمره کمتر از 10 → <strong>Fail</strong>
+نمره <code>&gt;= 10</code> → <strong>Pass</strong><br>
+نمره <code>&lt; 10</code> → <strong>Fail</strong>
 </blockquote>
 
-<h3>مرحله ۱ — پیمایش نمرات</h3>
+<h3>مرحله ۱ — فقط پیمایش نمرات</h3>
 
-<p>اگر فقط نمره‌ها را بخواهیم:</p>
+<p>ابتدا مسئله را ساده می‌کنیم. فقط می‌خواهیم نمره‌ها را یکی‌یکی دریافت کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for score in scores:
     print(score)</div></div>
 
-<p>اما شماره دانش‌آموز را نداریم.</p>
+<p>حالا نمره را داریم، اما شماره دانش‌آموز را نداریم.</p>
 
 <h3>مرحله ۲ — اضافه کردن <code>enumerate()</code></h3>
 
-<p>برای دریافت شماره و نمره هم‌زمان:</p>
+<p>چون هم Index و هم Value لازم داریم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, score in enumerate(scores, start=1):
     print(index, score)</div></div>
@@ -20319,7 +20318,7 @@ for name in names:
 
 <h3>مرحله ۳ — اضافه کردن شرط</h3>
 
-<p>حالا می‌توانیم وضعیت قبولی را مشخص کنیم:</p>
+<p>حالا برای هر نمره بررسی می‌کنیم که قبول شده یا خیر:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">scores = [18, 12, 20, 9, 15]
 
@@ -20340,21 +20339,19 @@ for index, score in enumerate(scores, start=1):
 4 9 Fail
 5 15 Pass</div></div>
 
-<p>در این مثال چند مفهوم را کنار هم قرار دادیم:</p>
+<p>دقت کن که مسئله را یک‌باره حل نکردیم. آن را به چند مرحله کوچک تقسیم کردیم:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">List
-  ↓
+ ↓
 for
-  ↓
+ ↓
 enumerate()
-  ↓
+ ↓
 if / else
-  ↓
-Comparison
-  ↓
+ ↓
 print()</div></div>
 
-<p>این دقیقاً یکی از مهارت‌های مهم در یادگیری Python است: به‌جای اینکه یک مسئله را یک‌باره حل کنیم، آن را به چند مرحله ساده تقسیم می‌کنیم و مفاهیمی را که یاد گرفته‌ایم کنار هم قرار می‌دهیم.</p>
+<p>این روش یکی از مهم‌ترین مهارت‌ها در برنامه‌نویسی است: هر مسئله را به چند قدم ساده تبدیل کن و سپس مفاهیمی را که یاد گرفته‌ای کنار هم قرار بده.</p>
 
 <h3>تمرین سناریو 🧑‍💻</h3>
 
@@ -20365,7 +20362,7 @@ print()</div></div>
 <p>برنامه‌ای بنویس که برای هر دانش‌آموز:</p>
 
 <ul>
-<li>شماره دانش‌آموز را نمایش دهد.</li>
+<li>شماره دانش‌آموز را از <code>1</code> نمایش دهد.</li>
 <li>نمره را نمایش دهد.</li>
 <li>اگر نمره <code>&gt;= 10</code> بود، <code>Pass</code> چاپ کند.</li>
 <li>اگر نمره <code>&lt; 10</code> بود، <code>Fail</code> چاپ کند.</li>
@@ -20402,14 +20399,14 @@ for index, score in enumerate(scores, start=1):
 <p>هر سؤال را پاسخ بده و سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.</p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — مفهومی: کدام گزینه بهترین کاربرد <code>for</code> را نشان می‌دهد؟</p>
+<p>❓ سؤال ۱ — مفهومی: کدام جمله بهترین توصیف برای <code>for</code> است؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) اجرای کد تا زمانی که یک شرط برقرار باشد</button>
-<button onclick="selectOption(this)">ب) پیمایش روی عناصر یک لیست</button>
-<button onclick="selectOption(this)">ج) تعریف یک تابع</button>
-<button onclick="selectOption(this)">د) مدیریت خطا</button>
+<button onclick="selectOption(this)">الف) تا زمانی که یک شرط برقرار است، تکرار کن</button>
+<button onclick="selectOption(this)">ب) برای هر عنصر، یک کار مشخص انجام بده</button>
+<button onclick="selectOption(this)">ج) فقط برای محاسبات عددی استفاده می‌شود</button>
+<button onclick="selectOption(this)">د) برای تعریف تابع استفاده می‌شود</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>for</code> برای پیمایش روی عناصر داده و اجرای کد برای هر عنصر مناسب است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>for</code> معمولاً برای پیمایش عناصر یک داده و اجرای کد برای هر عنصر استفاده می‌شود.</div>
 </div>
 
 <div class="quiz-card">
@@ -20418,31 +20415,31 @@ for index, score in enumerate(scores, start=1):
 <button onclick="selectOption(this)">الف) <code>1<br>2<br>3<br>4<br>5</code></button>
 <button onclick="selectOption(this)">ب) <code>0<br>1<br>2<br>3<br>4</code></button>
 <button onclick="selectOption(this)">ج) <code>0<br>1<br>2<br>3<br>4<br>5</code></button>
-<button onclick="selectOption(this)">د) <code>5</code></button>
+<button onclick="selectOption(this)">د) فقط <code>5</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>range(5)</code> از <code>0</code> شروع می‌شود و <code>5</code> را شامل نمی‌کند.</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۳ — <code>range()</code>: خروجی کد زیر چیست؟<br><code>for i in range(2, 10, 2):<br>    print(i)</code></p>
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>2<br>4<br>6<br>8</code></button>
-<button onclick="selectOption(this)">ب) <code>2<br>4<br>6<br>8<br>10</code></button>
-<button onclick="selectOption(this)">ج) <code>0<br>2<br>4<br>6<br>8</code></button>
-<button onclick="selectOption(this)">د) <code>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>از 2 شروع می‌کنیم، هر بار 2 واحد جلو می‌رویم و قبل از 10 متوقف می‌شویم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در <code>range(5)</code> از <code>0</code> شروع می‌شود و <code>5</code> شامل نمی‌شود.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۴ — تشخیص منطق: کدام گزینه برای چاپ اعداد 5 تا 1 صحیح است؟</p>
+<p>❓ سؤال ۳ — <code>range()</code>: کدام کد اعداد زوج 2 تا 8 را چاپ می‌کند؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>for i in range(5, 0):<br>    print(i)</code></button>
-<button onclick="selectOption(this)">ب) <code>for i in range(5, 1):<br>    print(i)</code></button>
-<button onclick="selectOption(this)">ج) <code>for i in range(5, 0, -1):<br>    print(i)</code></button>
-<button onclick="selectOption(this)">د) <code>for i in range(0, 5, -1):<br>    print(i)</code></button>
+<button onclick="selectOption(this)">الف) <code>range(2, 8, 2)</code></button>
+<button onclick="selectOption(this)">ب) <code>range(2, 9, 2)</code></button>
+<button onclick="selectOption(this)">ج) <code>range(0, 8, 2)</code></button>
+<button onclick="selectOption(this)">د) <code>range(2, 10, 1)</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>برای حرکت از عدد بزرگ‌تر به کوچک‌تر باید از <code>step</code> منفی استفاده کنیم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>چون <code>stop</code> شامل نمی‌شود، برای رسیدن به 8 باید <code>stop=9</code> باشد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۴ — خروجی: نتیجه کد زیر چیست؟<br><code>for i in range(5, 0, -1):<br>    print(i)</code></p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>0<br>1<br>2<br>3<br>4</code></button>
+<button onclick="selectOption(this)">ب) <code>5<br>4<br>3<br>2<br>1</code></button>
+<button onclick="selectOption(this)">ج) <code>5<br>4<br>3<br>2<br>1<br>0</code></button>
+<button onclick="selectOption(this)">د) هیچ خروجی ندارد</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>-1</code> باعث حرکت معکوس می‌شود و <code>0</code> چون <code>stop</code> است، چاپ نمی‌شود.</div>
 </div>
 
 <div class="quiz-card">
@@ -20451,95 +20448,93 @@ for index, score in enumerate(scores, start=1):
 <button onclick="selectOption(this)">الف) <code>1 Ali<br>2 Sara</code></button>
 <button onclick="selectOption(this)">ب) <code>0 Ali<br>1 Sara</code></button>
 <button onclick="selectOption(this)">ج) <code>Ali 0<br>Sara 1</code></button>
-<button onclick="selectOption(this)">د) فقط نام‌ها چاپ می‌شوند.</button>
+<button onclick="selectOption(this)">د) فقط نام‌ها چاپ می‌شوند</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>enumerate()</code> به‌صورت پیش‌فرض شماره‌گذاری را از <code>0</code> شروع می‌کند و Index و Value را به همین ترتیب در اختیار حلقه قرار می‌دهد.</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۶ — سناریویی: اگر بخواهیم فقط اعداد زوج موجود در یک لیست را چاپ کنیم، کدام کد درست است؟</p>
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>for number in numbers:<br>    if number % 2 == 0:<br>        print(number)</code></button>
-<button onclick="selectOption(this)">ب) <code>for number in numbers:<br>    if number % 2 == 1:<br>        print(number)</code></button>
-<button onclick="selectOption(this)">ج) <code>while number % 2 == 0:<br>    print(number)</code></button>
-<button onclick="selectOption(this)">د) <code>for number in range(numbers):<br>    print(number)</code></button>
-</div>
-<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>عددهای زوج هنگام تقسیم بر 2 باقی‌مانده صفر دارند؛ بنابراین شرط <code>% 2 == 0</code> آن‌ها را انتخاب می‌کند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>enumerate()</code> به‌صورت پیش‌فرض شماره‌گذاری را از <code>0</code> شروع می‌کند و ابتدا Index و سپس Value را می‌دهد.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۷ — انتخاب حلقه: «نام تمام کاربران موجود در یک لیست را یکی‌یکی چاپ کن.» کدام گزینه مناسب‌تر است؟</p>
+<p>❓ سؤال ۶ — کدام گزینه برای شماره‌گذاری لیست از 1 مناسب‌تر است؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>while</code>، چون باید تکرار انجام شود.</button>
-<button onclick="selectOption(this)">ب) <code>for</code>، چون روی عناصر یک لیست پیمایش می‌کنیم.</button>
-<button onclick="selectOption(this)">ج) <code>if</code>، چون باید تصمیم بگیریم.</button>
-<button onclick="selectOption(this)">د) <code>range()</code> به‌تنهایی.</button>
+<button onclick="selectOption(this)">الف) <code>enumerate(names)</code></button>
+<button onclick="selectOption(this)">ب) <code>enumerate(names, start=1)</code></button>
+<button onclick="selectOption(this)">ج) <code>range(names, 1)</code></button>
+<button onclick="selectOption(this)">د) <code>for start in names</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>وقتی مسئله درباره پیمایش عناصر یک مجموعه است، <code>for</code> انتخاب طبیعی و خواناتری است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>با <code>start=1</code> عدد تولیدشده توسط <code>enumerate()</code> از 1 شروع می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۷ — سناریویی: اگر فقط مقدارهای یک لیست را بخواهیم، کدام الگو مناسب‌تر است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>for item in items:</code></button>
+<button onclick="selectOption(this)">ب) <code>for i in range(len(items)):</code></button>
+<button onclick="selectOption(this)">ج) <code>while items:</code></button>
+<button onclick="selectOption(this)">د) <code>enumerate(items, start=1)</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>وقتی فقط مقدار هر عنصر را لازم داریم، مستقیم روی خود داده پیمایش می‌کنیم و نیازی به Index نداریم.</div>
 </div>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
-<p>در جلسه قبل با <code>while</code> آشنا شدیم؛ یعنی:</p>
+<p>در این جلسه یک مسیر مشخص را طی کردیم:</p>
 
-<blockquote>
-<strong>تا زمانی که شرط برقرار است، تکرار کن.</strong>
-</blockquote>
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">for
+ ↓
+پیمایش داده
+ ↓
+range()
+ ↓
+دنباله عددی / تعداد مشخص تکرار
+ ↓
+enumerate()
+ ↓
+Index + Value</div></div>
 
-<p>در این جلسه <code>for</code> را یاد گرفتیم:</p>
-
-<blockquote>
-<strong>برای هر عنصر، این کار را انجام بده.</strong>
-</blockquote>
-
-<p>اگر یک لیست داشته باشیم و فقط مقدارهای آن را بخواهیم:</p>
+<p>اول یاد گرفتیم <code>for</code> زمانی مناسب است که بخواهیم روی عناصر یک داده حرکت کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for value in items:
     print(value)</div></div>
 
-<p>اگر به یک دنباله عددی یا تعداد مشخصی تکرار نیاز داشته باشیم:</p>
+<p>اگر به یک دنباله عددی نیاز داشته باشیم، از <code>range()</code> استفاده می‌کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for number in range(1, 6):
     print(number)</div></div>
 
-<p>و اگر هم Index و هم Value را بخواهیم:</p>
+<p>و اگر تعداد مشخصی تکرار بخواهیم و خود عدد مهم نباشد:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for _ in range(5):
+    print("Hello")</div></div>
+
+<p>در نهایت، اگر هم Index و هم Value لازم باشد:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">for index, value in enumerate(items):
     print(index, value)</div></div>
 
 <div class="table-wrap"><table>
 <thead>
-<tr><th>مسئله</th><th>ابزار مناسب</th></tr>
+<tr><th>اگر مسئله می‌گوید...</th><th>ابزار مناسب</th></tr>
 </thead>
 <tbody>
-<tr><td>تکرار وابسته به یک شرط</td><td><code>while</code></td></tr>
-<tr><td>پیمایش عناصر List</td><td><code>for</code></td></tr>
-<tr><td>پیمایش کاراکترهای String</td><td><code>for</code></td></tr>
-<tr><td>تعداد مشخصی تکرار</td><td><code>for</code> + <code>range()</code></td></tr>
-<tr><td>دنباله عددی</td><td><code>range()</code></td></tr>
-<tr><td>Index + Value</td><td><code>enumerate()</code></td></tr>
+<tr><td>برای هر عنصر...</td><td><code>for</code></td></tr>
+<tr><td>تا زمانی که...</td><td><code>while</code></td></tr>
+<tr><td>از یک عدد تا عدد دیگر...</td><td><code>range()</code></td></tr>
+<tr><td>این کار را N بار انجام بده...</td><td><code>for _ in range(n)</code></td></tr>
+<tr><td>Index و Value را با هم بده...</td><td><code>enumerate()</code></td></tr>
 </tbody>
 </table></div>
 
-<p>سه نکته اصلی این جلسه را حتماً به خاطر بسپار:</p>
-
-<ol>
-<li><strong><code>for</code> برای پیمایش است.</strong> اگر مسئله می‌گوید «برای هر عنصر»، به <code>for</code> فکر کن.</li>
-<li><strong><code>range()</code> برای دنباله‌های عددی و تکرار مشخص است.</strong> مهم‌ترین قانون آن این است که <code>stop</code> شامل نمی‌شود.</li>
-<li><strong><code>enumerate()</code> برای Index + Value است.</strong> به‌صورت پیش‌فرض Index از <code>0</code> شروع می‌شود و با <code>start=</code> می‌توان نقطه شروع را تغییر داد.</li>
-</ol>
-
 <blockquote>
-<strong>فرمول ساده جلسه:</strong><br><br>
-«تا وقتی...» → <code>while</code><br>
+<strong>چهار جمله‌ای که باید از این جلسه به خاطر بسپاری:</strong><br><br>
 «برای هر عنصر...» → <code>for</code><br>
-«از یک عدد تا یک عدد دیگر...» → <code>range()</code><br>
-«Index و Value با هم...» → <code>enumerate()</code>
+«تا زمانی که...» → <code>while</code><br>
+«یک دنباله عددی می‌خواهم...» → <code>range()</code><br>
+«Index و Value را با هم می‌خواهم...» → <code>enumerate()</code>
 </blockquote>
 
-<p>در جلسه بعد می‌رویم سراغ <strong><code>break</code>، <code>continue</code>، <code>pass</code>، حلقه‌های تو‌در‌تو و <code>zip()</code></strong>؛ یعنی یاد می‌گیریم چگونه اجرای حلقه را کنترل کنیم و چند داده را هم‌زمان پیمایش کنیم.</p>`
+<p>در جلسه بعد سراغ کنترل دقیق‌تر حلقه‌ها می‌رویم: <strong><code>break</code>، <code>continue</code>، <code>pass</code>، حلقه‌های تو‌در‌تو و <code>zip()</code></strong>؛ یعنی یاد می‌گیریم چگونه اجرای حلقه را متوقف یا کنترل کنیم و چند داده را هم‌زمان پیمایش کنیم.</p>`
 ,
 "ch9-3": `<div class="section-header">
     <div class="section-badge">۹</div>
