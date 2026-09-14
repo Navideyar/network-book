@@ -24293,12 +24293,12 @@ zip       → Valueهای چند مجموعه</div>
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>مفهوم <strong>Function</strong> و دلیل استفاده از آن را توضیح بدهی.</li>
-<li>با <code>def</code> یک تابع تعریف و با <code>()</code> آن را فراخوانی کنی.</li>
-<li>برای تابع <strong>Parameter</strong> تعریف و هنگام فراخوانی <strong>Argument</strong> ارسال کنی.</li>
-<li>تفاوت <code>print()</code> و <code>return</code> را توضیح بدهی.</li>
-<li>نتیجه یک تابع را با <code>return</code> دریافت و در بخش دیگری از برنامه استفاده کنی.</li>
-<li>Function را با شرط‌ها، حلقه‌ها و مفاهیم قبلی ترکیب کنی.</li>
+    <li>مفهوم Function و دلیل استفاده از آن را توضیح بدهی.</li>
+    <li>با <code>def</code> یک تابع تعریف و آن را فراخوانی کنی.</li>
+    <li>با Parameter و Argument کار کنی.</li>
+    <li>تفاوت <code>print()</code> و <code>return</code> را درک کنی.</li>
+    <li>نتیجه یک Function را در متغیر، شرط و محاسبات دیگر استفاده کنی.</li>
+    <li>Function را با <code>input()</code>، شرط و حلقه ترکیب کنی.</li>
 </ol>
 </blockquote>
 
@@ -24306,7 +24306,7 @@ zip       → Valueهای چند مجموعه</div>
 
 <h2 class="lesson-title">1. چرا به Function نیاز داریم؟</h2>
 
-<p>فرض کن یک عملیات مشخص چند بار در برنامه تکرار شود. مثلاً می‌خواهیم مربع چند عدد را محاسبه کنیم:</p>
+<p>فرض کن یک عملیات مشخص را چند بار در برنامه انجام می‌دهیم. مثلاً می‌خواهیم مربع چند عدد را محاسبه کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">number = 10
 result = number * number
@@ -24320,61 +24320,25 @@ number = 30
 result = number * number
 print(result)</div></div>
 
-<p>در اینجا یک الگوی مشخص داریم:</p>
+<p>در هر سه قسمت، منطق اصلی یکسان است:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">عدد
- ↓
+  ↓
 ضرب در خودش
- ↓
-نمایش نتیجه</div></div>
+  ↓
+نتیجه</div></div>
 
-<p>اگر همین منطق در قسمت‌های مختلف برنامه تکرار شود، مجبور می‌شویم کد را چند بار بنویسیم.</p>
+<p>اگر این منطق بارها در برنامه تکرار شود، کد طولانی‌تر و نگهداری آن سخت‌تر می‌شود.</p>
 
-<p>این کار باعث می‌شود:</p>
-
-<ul>
-<li>کد طولانی‌تر شود.</li>
-<li>تغییر دادن منطق سخت‌تر شود.</li>
-<li>احتمال خطا افزایش پیدا کند.</li>
-<li>خوانایی و مدیریت برنامه کاهش پیدا کند.</li>
-</ul>
-
-<p>راه‌حل این است که منطق تکراری را یک بار در یک بخش نام‌گذاری‌شده قرار دهیم و هر زمان لازم بود آن را اجرا کنیم.</p>
-
-<blockquote><strong>این بخش نام‌گذاری‌شده همان Function است.</strong></blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">2. Function چیست؟</h2>
-
-<p>در ساده‌ترین تعریف:</p>
+<p>راه‌حل این است که منطق موردنظر را یک بار در یک بخش نام‌گذاری‌شده قرار دهیم و هر زمان لازم بود آن را اجرا کنیم.</p>
 
 <blockquote>
-<strong>Function بخشی از کد است که برای انجام یک وظیفه مشخص تعریف می‌شود و می‌توانیم آن را چندین بار استفاده کنیم.</strong>
+<strong>Function یعنی یک بخش مستقل از کد برای انجام یک وظیفه مشخص که می‌توانیم آن را دوباره استفاده کنیم.</strong>
 </blockquote>
-
-<p>مثلاً به جای اینکه منطق محاسبه مربع را چند بار بنویسیم، آن را داخل یک تابع قرار می‌دهیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
-    return number * number</div></div>
-
-<p>حالا هر زمان که به محاسبه مربع نیاز داشته باشیم، تابع را فراخوانی می‌کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">square(5)
-square(10)
-square(20)</div></div>
-
-<p>پس ایده اصلی Function این است:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">یک منطق مشخص
-      ↓
-قرار گرفتن داخل Function
-      ↓
-استفاده مجدد در بخش‌های مختلف برنامه</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. تعریف اولین Function</h2>
+<h2 class="lesson-title">2. تعریف و اجرای اولین Function</h2>
 
 <p>برای تعریف تابع در Python از کلمه کلیدی <code>def</code> استفاده می‌کنیم.</p>
 
@@ -24383,11 +24347,7 @@ square(20)</div></div>
 
 <p>در اینجا تابعی به نام <code>say_hello</code> ساخته‌ایم.</p>
 
-<p>اما یک نکته بسیار مهم وجود دارد:</p>
-
-<blockquote><strong>تعریف تابع با اجرای تابع یکی نیست.</strong></blockquote>
-
-<p>کد بالا فقط تابع را تعریف می‌کند. برای اجرای آن باید تابع را فراخوانی کنیم:</p>
+<p>نکته مهم این است که <strong>تعریف Function با اجرای آن متفاوت است.</strong> تعریف تابع فقط مشخص می‌کند که تابع چه کاری انجام دهد. برای اجرای آن باید تابع را فراخوانی کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">say_hello()</div></div>
 
@@ -24398,49 +24358,58 @@ square(20)</div></div>
 
 say_hello()</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello!</div></div>
+
+<p>می‌توانیم یک Function را هر چند بار که لازم است فراخوانی کنیم:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
+    print("Hello!")
+
+say_hello()
+say_hello()
+say_hello()</div></div>
+
+<p>پس یک اصل مهم داریم:</p>
+
+<blockquote><strong>Function را یک بار تعریف می‌کنیم و می‌توانیم بارها از آن استفاده کنیم.</strong></blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. ساختار Function</h2>
+<h2 class="lesson-title">3. ساختار Function</h2>
 
-<p>ساختار پایه یک تابع به شکل زیر است:</p>
+<p>ساختار پایه یک Function به شکل زیر است:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def function_name():
     # function body</div></div>
-
-<p>اجزای اصلی:</p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>بخش</th>
-<th>وظیفه</th>
+    <th>بخش</th>
+    <th>وظیفه</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>def</code></td>
-<td>اعلام می‌کند که می‌خواهیم یک تابع تعریف کنیم.</td>
+    <td><code>def</code></td>
+    <td>برای تعریف Function استفاده می‌شود.</td>
 </tr>
 <tr>
-<td><code>function_name</code></td>
-<td>نام تابع است.</td>
+    <td><code>function_name</code></td>
+    <td>نام تابع است.</td>
 </tr>
 <tr>
-<td><code>()</code></td>
-<td>محل قرارگیری پارامترهاست.</td>
+    <td><code>()</code></td>
+    <td>محل قرارگیری Parameterهاست.</td>
 </tr>
 <tr>
-<td><code>:</code></td>
-<td>شروع بدنه تابع را مشخص می‌کند.</td>
+    <td><code>:</code></td>
+    <td>شروع بدنه Function را مشخص می‌کند.</td>
 </tr>
 <tr>
-<td>Indentation</td>
-<td>کد داخل تابع را مشخص می‌کند.</td>
+    <td>Indentation</td>
+    <td>مشخص می‌کند کدام کد داخل Function قرار دارد.</td>
 </tr>
 </tbody>
 </table>
@@ -24451,141 +24420,82 @@ say_hello()</div></div>
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
     print("Hello")</div></div>
 
-<p>دستور <code>print()</code> به دلیل Indentation بخشی از بدنه تابع است.</p>
+<p>به دلیل Indentation، دستور <code>print()</code> بخشی از بدنه تابع است.</p>
 
-<hr class="lesson-divider">
+<p>هنگام فراخوانی نیز معمولاً از نام تابع همراه با <code>()</code> استفاده می‌کنیم:</p>
 
-<h2 class="lesson-title">5. Function Call چیست؟</h2>
-
-<p>وقتی تابع را برای اجرا می‌کنیم، آن را <strong>Call</strong> یا <strong>فراخوانی</strong> می‌کنیم.</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
-    print("Hello!")
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">say_hello
+    ↓
+خود Function
 
 say_hello()
-say_hello()
-say_hello()</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello!
-Hello!
-Hello!</div></div>
-
-<p>تابع فقط یک بار تعریف شده، اما سه بار استفاده شده است.</p>
-
-<blockquote><strong>یک بار تعریف کن، هر چند بار که لازم است استفاده کن.</strong></blockquote>
+    ↓
+فراخوانی و اجرای Function</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. Function بدون ورودی</h2>
+<h2 class="lesson-title">4. Function با ورودی؛ Parameter و Argument</h2>
 
-<p>یک تابع می‌تواند هیچ ورودی‌ای دریافت نکند.</p>
+<p>تا اینجا تابع ما همیشه یک کار ثابت انجام می‌داد. اما معمولاً می‌خواهیم یک Function را با داده‌های مختلف اجرا کنیم.</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def show_menu():
-    print("1. Start")
-    print("2. Exit")
-
-show_menu()</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">1. Start
-2. Exit</div></div>
-
-<p>این نوع تابع برای کارهایی که ورودی متغیر ندارند مناسب است.</p>
-
-<p>اما معمولاً می‌خواهیم یک تابع را روی داده‌های مختلف اجرا کنیم. مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Hello Ali
-Hello Sara
-Hello Reza</div></div>
-
-<p>برای این کار باید بتوانیم داده را به تابع بدهیم.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">7. Parameter چیست؟</h2>
-
-<p><strong>Parameter</strong> متغیری است که هنگام تعریف تابع برای دریافت ورودی مشخص می‌کنیم.</p>
-
-<p>مثلاً:</p>
+<p>مثلاً می‌خواهیم برای افراد مختلف پیام سلام نمایش دهیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello(name):
     print("Hello", name)</div></div>
 
-<p>در اینجا <code>name</code> یک Parameter است.</p>
+<p>در اینجا <code>name</code> یک <strong>Parameter</strong> است؛ یعنی متغیری که در تعریف Function برای دریافت ورودی قرار داده‌ایم.</p>
 
-<p>حالا می‌توانیم تابع را با داده‌های مختلف فراخوانی کنیم:</p>
+<p>حالا می‌توانیم هنگام فراخوانی، مقدارهای مختلفی ارسال کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">say_hello("Ali")
 say_hello("Sara")
 say_hello("Reza")</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello Ali
 Hello Sara
 Hello Reza</div></div>
 
-<p>پس Parameter مانند یک جای خالی برای دریافت داده است.</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">def say_hello(name):
-                 ↑
-             جای ورودی</div></div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">8. Argument چیست؟</h2>
-
-<p>حالا باید تفاوت <strong>Parameter</strong> و <strong>Argument</strong> را دقیق بدانیم.</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello(name):
-    print("Hello", name)</div></div>
-
-<p>در تعریف تابع، <code>name</code> یک <strong>Parameter</strong> است.</p>
-
-<p>اما هنگام فراخوانی:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">say_hello("Ali")</div></div>
-
-<p><code>"Ali"</code> یک <strong>Argument</strong> است.</p>
+<p>مقداری که هنگام فراخوانی به Function می‌دهیم، <strong>Argument</strong> نام دارد.</p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مفهوم</th>
-<th>زمان استفاده</th>
-<th>مثال</th>
+    <th>مفهوم</th>
+    <th>کجا قرار می‌گیرد؟</th>
+    <th>مثال</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Parameter</td>
-<td>هنگام تعریف تابع</td>
-<td><code>name</code></td>
+    <td>Parameter</td>
+    <td>هنگام تعریف Function</td>
+    <td><code>name</code></td>
 </tr>
 <tr>
-<td>Argument</td>
-<td>هنگام فراخوانی تابع</td>
-<td><code>"Ali"</code></td>
+    <td>Argument</td>
+    <td>هنگام فراخوانی Function</td>
+    <td><code>"Ali"</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>برای حفظ کردن:</p>
+<p>پس به‌صورت ساده:</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Parameter → در تعریف Function
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">def say_hello(name):
+                 ↑
+             Parameter
 
-Argument → در Function Call</div></div>
+say_hello("Ali")
+           ↑
+       Argument</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. چند Parameter</h2>
+<h2 class="lesson-title">5. چند Parameter و ترتیب Argumentها</h2>
 
-<p>یک تابع می‌تواند چند Parameter داشته باشد.</p>
+<p>یک Function می‌تواند چند Parameter داشته باشد:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def introduce(name, age):
     print("Name:", name)
@@ -24595,98 +24505,62 @@ Argument → در Function Call</div></div>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce("Ali", 20)</div></div>
 
-<p>در اینجا:</p>
+<p>Python مقدارها را به ترتیب به Parameterهای متناظر اختصاص می‌دهد:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name → "Ali"
 age  → 20</div></div>
 
-<p>هر دو مقدار، Argument هستند و به Parameter متناظر خود اختصاص داده می‌شوند.</p>
-
-<p>ترتیب آن‌ها مهم است:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce("Ali", 20)</div></div>
-
-<p>یعنی:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name = "Ali"
-age = 20</div></div>
-
-<p>اما اگر ترتیب را عوض کنیم:</p>
+<p>بنابراین در این نوع فراخوانی، ترتیب Argumentها مهم است:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">introduce(20, "Ali")</div></div>
 
-<p>Python مقدارها را بر اساس موقعیت به پارامترها اختصاص می‌دهد:</p>
+<p>در این حالت Python بر اساس موقعیت مقدارها را اختصاص می‌دهد:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">name = 20
 age = "Ali"</div></div>
 
-<blockquote><strong>در این مرحله، ترتیب Argumentها باید با ترتیب Parameterها هماهنگ باشد.</strong></blockquote>
+<p>همچنین تعداد Argumentها باید با Parameterهای موردنیاز هماهنگ باشد. برای مثال:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
+    return a + b
+
+add(2, 3)       # درست
+add(2)          # خطا
+add(2, 3, 4)    # خطا</div></div>
+
+<blockquote>
+<strong>در یک Function معمولی، تعداد و ترتیب Argumentها باید با Parameterهای آن هماهنگ باشد.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. Function برای انجام محاسبه</h2>
+<h2 class="lesson-title">6. Function چگونه نتیجه را به برنامه برمی‌گرداند؟</h2>
 
-<p>حالا یک تابع کاربردی‌تر بسازیم:</p>
+<p>حالا یک Function برای محاسبه مربع عدد می‌سازیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
-    result = number * number
-    print(result)</div></div>
+    print(number * number)
 
-<p>می‌توانیم آن را با عددهای مختلف فراخوانی کنیم:</p>
+square(5)</div></div>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">square(5)
-square(10)</div></div>
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">25</div></div>
 
-<p>خروجی:</p>
+<p>این Function نتیجه را <strong>نمایش</strong> می‌دهد؛ اما اگر بخواهیم نتیجه را در ادامه برنامه استفاده کنیم، <code>print()</code> کافی نیست.</p>
 
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">25
-100</div></div>
-
-<p>تا اینجا تابع محاسبه را انجام داده و نتیجه را <strong>نمایش</strong> داده است.</p>
-
-<p>اما اگر بخواهیم نتیجه را در ادامه برنامه استفاده کنیم چه؟</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">11. چرا فقط <code>print()</code> کافی نیست؟</h2>
-
-<p>به این تابع نگاه کن:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
-    print(number * number)</div></div>
-
-<p>اگر بنویسیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = square(5)</div></div>
-
-<p>ممکن است انتظار داشته باشیم <code>result</code> برابر <code>25</code> شود؛ اما این اتفاق نمی‌افتد.</p>
-
-<p>چون <code>print()</code> فقط نتیجه را روی خروجی نمایش می‌دهد.</p>
-
-<p>برای تحویل دادن نتیجه به بخش دیگری از برنامه به <code>return</code> نیاز داریم.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">12. <code>return</code> چیست؟</h2>
-
-<p><code>return</code> مقدار را از تابع به محل فراخوانی برمی‌گرداند.</p>
-
-<p>مثلاً:</p>
+<p>برای این کار از <code>return</code> استفاده می‌کنیم.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
     return number * number</div></div>
 
-<p>حالا می‌توانیم نتیجه را دریافت کنیم:</p>
+<p>حالا مقدار برگشتی تابع را می‌توانیم در یک متغیر ذخیره کنیم:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = square(5)
 
 print(result)</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">25</div></div>
 
-<p>اتفاقی که افتاده:</p>
+<p>مسیر اجرای Function را می‌توان این‌طور دید:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">square(5)
    ↓
@@ -24696,95 +24570,66 @@ print(result)</div></div>
    ↓
 result</div></div>
 
-<p>یعنی مقدار برگشتی تابع می‌تواند در یک متغیر ذخیره شود یا در بخش دیگری از برنامه استفاده شود.</p>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. تفاوت مهم <code>print()</code> و <code>return</code></h2>
+<h2 class="lesson-title">7. تفاوت <code>print()</code> و <code>return</code></h2>
 
-<p>این تفاوت را باید کاملاً درک کنی:</p>
+<p>این دو دستور را نباید با هم اشتباه بگیریم:</p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th><code>print()</code></th>
-<th><code>return</code></th>
+    <th><code>print()</code></th>
+    <th><code>return</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>مقدار را نمایش می‌دهد.</td>
-<td>مقدار را از تابع برمی‌گرداند.</td>
+    <td>مقدار را نمایش می‌دهد.</td>
+    <td>مقدار را از Function برمی‌گرداند.</td>
 </tr>
 <tr>
-<td>برای نمایش نتیجه مناسب است.</td>
-<td>برای استفاده مجدد از نتیجه مناسب است.</td>
+    <td>برای نمایش نتیجه مناسب است.</td>
+    <td>برای استفاده مجدد از نتیجه مناسب است.</td>
 </tr>
 <tr>
-<td>به‌تنهایی مقدار را برای ادامه محاسبات تحویل نمی‌دهد.</td>
-<td>مقدار را می‌توان در متغیر، شرط، محاسبه و... استفاده کرد.</td>
+    <td>نتیجه را برای ادامه محاسبات تحویل نمی‌دهد.</td>
+    <td>نتیجه را می‌توان در متغیر، شرط و محاسبات استفاده کرد.</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مثال با <code>print()</code>:</p>
+<p>مثلاً:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
     print(a + b)</div></div>
 
-<p>مثال با <code>return</code>:</p>
+<p>این تابع نتیجه را فقط نمایش می‌دهد.</p>
+
+<p>اما:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
     return a + b</div></div>
 
-<p>قانون ساده:</p>
+<p>نتیجه را به محل فراخوانی برمی‌گرداند و می‌توانیم از آن استفاده کنیم:</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">print()
-↓
-نتیجه را نشان بده
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = add(10, 20)
+print(result)</div></div>
 
-return
-↓
-نتیجه را به برنامه برگردان</div></div>
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">30</div></div>
+
+<blockquote>
+<strong>print() → نمایش نتیجه</strong><br>
+<strong>return → برگرداندن نتیجه برای استفاده در برنامه</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. اگر تابع <code>return</code> نداشته باشد چه می‌شود؟</h2>
+<h2 class="lesson-title">8. رفتار <code>return</code></h2>
 
-<p>اگر تابعی مقدار مشخصی را <code>return</code> نکند، مقدار برگشتی آن <code>None</code> است.</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    print(a + b)
-
-result = add(3, 4)
-print(result)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">7
-None</div></div>
-
-<p>تابع عدد <code>7</code> را چاپ کرده، اما آن را برنگردانده است.</p>
-
-<p>اگر بخواهیم مقدار <code>7</code> را دریافت کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b
-
-result = add(3, 4)
-print(result)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">7</div></div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">15. <code>return</code> اجرای Function را متوقف می‌کند</h2>
-
-<p>وقتی Python به <code>return</code> می‌رسد، اجرای همان تابع پایان پیدا می‌کند.</p>
+<p><code>return</code> علاوه بر برگرداندن مقدار، اجرای همان Function را نیز متوقف می‌کند.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def test():
     print("A")
@@ -24793,29 +24638,49 @@ print(result)</div></div>
 
 test()</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">A</div></div>
 
-<p>دستور <code>print("B")</code> اجرا نمی‌شود، چون تابع قبل از رسیدن به آن با <code>return</code> پایان یافته است.</p>
+<p>وقتی Python به <code>return</code> می‌رسد، Function تمام می‌شود؛ بنابراین دستورهای بعد از آن اجرا نمی‌شوند.</p>
 
-<p>همچنین <code>return</code> می‌تواند یک مقدار داشته باشد:</p>
+<p><code>return</code> می‌تواند یک مقدار نیز برگرداند:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b</div></div>
+    return a + b
 
-<p>یا:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def is_adult(age):
+def is_adult(age):
     return age >= 18</div></div>
 
-<p>در مثال دوم، مقدار برگشتی می‌تواند <code>True</code> یا <code>False</code> باشد.</p>
+<p>در مثال دوم، نتیجه Function یک مقدار منطقی یعنی <code>True</code> یا <code>False</code> است.</p>
+
+<p>اگر Function هیچ مقدار مشخصی را با <code>return</code> برنگرداند، مقدار برگشتی آن <code>None</code> خواهد بود:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
+    print(a + b)
+
+result = add(3, 4)
+print(result)</div></div>
+
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">7
+None</div></div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">16. استفاده از مقدار برگشتی در شرط</h2>
+<h2 class="lesson-title">9. استفاده از مقدار برگشتی Function</h2>
 
-<p>یکی از مزیت‌های مهم <code>return</code> این است که نتیجه تابع را می‌توان مستقیماً در شرط استفاده کرد.</p>
+<p>یکی از مهم‌ترین مزیت‌های <code>return</code> این است که نتیجه Function را می‌توان در بخش‌های مختلف برنامه استفاده کرد.</p>
+
+<h3>استفاده در متغیر</h3>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
+    return price * quantity
+
+total = calculate_total(100, 3)
+
+print(total)</div></div>
+
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">300</div></div>
+
+<h3>استفاده در شرط</h3>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def is_adult(age):
     return age >= 18
@@ -24827,7 +24692,9 @@ if is_adult(age):
 else:
     print("Not adult")</div></div>
 
-<p>در اینجا:</p>
+<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Adult</div></div>
+
+<p>اینجا نتیجه Function مستقیماً وارد شرط شده است:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">is_adult(20)
      ↓
@@ -24835,73 +24702,17 @@ else:
      ↓
 True
      ↓
-if True
-     ↓
-Adult</div></div>
+if True</div></div>
 
-<p>پس نتیجه Function فقط برای ذخیره در متغیر نیست؛ می‌توان آن را در شرط، محاسبه یا سایر بخش‌های برنامه نیز استفاده کرد.</p>
+<p>پس نتیجه Function می‌تواند در متغیر، شرط، محاسبات یا Functionهای دیگر استفاده شود.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">17. استفاده از نتیجه Function در متغیر</h2>
+<h2 class="lesson-title">10. ترکیب Function با مفاهیم قبلی</h2>
 
-<p>یک مثال واقعی‌تر:</p>
+<p>Function یک مفهوم جدا از مباحث قبلی نیست؛ بلکه می‌توانیم آن را با <code>input()</code>، شرط‌ها و حلقه‌ها ترکیب کنیم.</p>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return price * quantity
-
-total = calculate_total(100, 3)
-
-print(total)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">300</div></div>
-
-<p>مسیر داده:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">price = 100
-quantity = 3
-       ↓
-calculate_total()
-       ↓
-100 × 3
-       ↓
-300
-       ↓
-total</div></div>
-
-<p>حالا می‌توانیم از <code>total</code> در قسمت‌های دیگر برنامه استفاده کنیم.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">18. یک Function را چند بار استفاده کنیم</h2>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return price * quantity
-
-total1 = calculate_total(100, 2)
-total2 = calculate_total(50, 4)
-
-print(total1)
-print(total2)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">200
-200</div></div>
-
-<p>منطق محاسبه فقط یک بار نوشته شده است:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">return price * quantity</div></div>
-
-<p>اما همان منطق چند بار با داده‌های مختلف استفاده شده است.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">19. ترکیب Function با <code>input()</code></h2>
-
-<p>حالا Function را با مفاهیمی که قبلاً یاد گرفته‌ایم ترکیب کنیم:</p>
+<h3>Function + input()</h3>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
     return number * number
@@ -24916,7 +24727,7 @@ print("Result:", result)</div></div>
 
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Result: 25</div></div>
 
-<p>اینجا چند مفهوم قبلی با هم ترکیب شده‌اند:</p>
+<p>جریان داده در این برنامه:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">input()
    ↓
@@ -24930,129 +24741,9 @@ return
    ↓
 print()</div></div>
 
-<p>این همان چیزی است که در برنامه‌نویسی واقعی اتفاق می‌افتد: مفاهیم مختلف جدا از هم باقی نمی‌مانند، بلکه با یکدیگر ترکیب می‌شوند.</p>
+<h3>Function + Loop</h3>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">20. یک Function خوب چه ویژگی‌ای دارد؟</h2>
-
-<p>در سطح Python Basic، یک اصل مهم را حفظ کن:</p>
-
-<blockquote><strong>هر Function بهتر است یک وظیفه مشخص داشته باشد.</strong></blockquote>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_area(width, height):
-    return width * height</div></div>
-
-<p>نام تابع مشخص است و وظیفه آن نیز مشخص است: محاسبه مساحت.</p>
-
-<p>در مقابل، تابعی با نامی مانند:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def do_everything():
-    ...</div></div>
-
-<p>معمولاً وظیفه مشخصی را بیان نمی‌کند.</p>
-
-<p>فعلاً لازم نیست وارد طراحی پیشرفته Functionها شویم؛ فقط این اصل را در ذهن داشته باش:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">یک Function
-     ↓
-یک وظیفه مشخص</div></div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">21. نام‌گذاری Function</h2>
-
-<p>نام تابع باید تا حد امکان نشان دهد که تابع چه کاری انجام می‌دهد.</p>
-
-<p>در Python معمولاً برای نام Function از سبک <code>snake_case</code> استفاده می‌کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate_total()
-get_name()
-print_result()
-check_age()
-calculate_average()</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_area():</div></div>
-
-<p>از نامی مانند:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def x():</div></div>
-
-<p>خواناتر است، چون وظیفه تابع را مشخص می‌کند.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">22. فراموش کردن <code>()</code> هنگام Call</h2>
-
-<p>برای اجرای تابع معمولاً باید آن را با پرانتز فراخوانی کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
-    print("Hello")
-
-say_hello()</div></div>
-
-<p>تفاوت این دو را بدان:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">say_hello
-↓
-خود تابع
-
-say_hello()
-↓
-فراخوانی تابع</div></div>
-
-<p>در این جلسه برای اجرای Function از شکل <code>function_name()</code> استفاده می‌کنیم.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">23. Syntax و Indentation در Function</h2>
-
-<p>بعد از تعریف تابع باید <code>:</code> قرار بگیرد:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
-    print("Hello")</div></div>
-
-<p>بدنه تابع نیز باید با Indentation مشخص شود:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def say_hello():
-    print("Hello")</div></div>
-
-<p>اگر بدنه تابع داخل آن قرار نگیرد، Python با خطای Syntax یا Indentation مواجه می‌شود.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">24. تعداد Argumentها باید درست باشد</h2>
-
-<p>اگر تابع دو Parameter داشته باشد:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def add(a, b):
-    return a + b</div></div>
-
-<p>در حالت معمول باید دو Argument ارسال کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">add(2, 3)</div></div>
-
-<p>اگر فقط یک مقدار ارسال کنیم:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">add(2)</div></div>
-
-<p>یکی از Parameterهای موردنیاز مقدار ندارد و Python خطا می‌دهد.</p>
-
-<p>همین‌طور:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">add(2, 3, 4)</div></div>
-
-<p>نیز با این تعریف سازگار نیست، چون سه Argument برای تابعی با دو Parameter ارسال شده است.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">25. ترکیب Function و Loop</h2>
-
-<p>حالا Function را با حلقه‌ای که در فصل قبل یاد گرفتیم ترکیب کنیم:</p>
+<p>یک Function می‌تواند در هر تکرار حلقه با یک مقدار جدید اجرا شود:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def square(number):
     return number * number
@@ -25060,15 +24751,13 @@ say_hello()
 for number in range(1, 6):
     print(square(number))</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">1
 4
 9
 16
 25</div></div>
 
-<p>در هر تکرار، مقدار <code>number</code> به Function ارسال می‌شود و نتیجه برمی‌گردد.</p>
+<p>در هر تکرار، مقدار جدید به Function ارسال می‌شود و نتیجه آن برمی‌گردد.</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">1 → square(1) → 1
 2 → square(2) → 4
@@ -25076,80 +24765,68 @@ for number in range(1, 6):
 4 → square(4) → 16
 5 → square(5) → 25</div></div>
 
-<p>این ترکیب بسیار مهم است:</p>
+<h3>Function + Condition</h3>
 
-<blockquote><strong>Loop می‌تواند Function را چندین بار با داده‌های مختلف اجرا کند.</strong></blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">26. ترکیب Function و Condition</h2>
-
-<p>Function می‌تواند داخل خودش از شرط نیز استفاده کند.</p>
+<p>شرط نیز می‌تواند داخل Function قرار بگیرد:</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def check_score(score):
     if score >= 10:
         return "Pass"
     else:
-        return "Fail"</div></div>
+        return "Fail"
 
-<p>حالا:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">print(check_score(18))
+print(check_score(18))
 print(check_score(7))</div></div>
-
-<p>خروجی:</p>
 
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Pass
 Fail</div></div>
 
-<p>در این مثال:</p>
+<p>در اینجا Function یک ورودی دریافت می‌کند، آن را بررسی می‌کند و نتیجه مناسب را برمی‌گرداند.</p>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">score
-  ↓
-Function
-  ↓
-if
-  ↓
-return
-  ↓
-نتیجه</div></div>
+<hr class="lesson-divider">
 
-<p>یعنی Function می‌تواند منطق مشخصی را در خودش قرار دهد و نتیجه را در اختیار بخش دیگری از برنامه بگذارد.</p>
+<h2 class="lesson-title">11. اصول ساده برای نوشتن Function بهتر</h2>
+
+<p>در سطح Python Basic لازم نیست وارد طراحی پیشرفته Functionها شویم. فعلاً چند اصل ساده کافی است.</p>
+
+<h3>هر Function یک وظیفه مشخص</h3>
+
+<p>بهتر است هر تابع روی یک کار مشخص تمرکز کند:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_area(width, height):
+    return width * height</div></div>
+
+<p>نام تابع نیز بهتر است وظیفه آن را مشخص کند.</p>
+
+<h3>نام‌گذاری مناسب</h3>
+
+<p>در Python معمولاً نام Functionها را با سبک <code>snake_case</code> می‌نویسیم:</p>
+
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">calculate_total()
+get_name()
+check_age()
+calculate_average()</div></div>
+
+<p>نامی مانند <code>calculate_area</code> از نامی مثل <code>x</code> خواناتر است، چون هدف Function را مشخص می‌کند.</p>
+
+<blockquote>
+<strong>یک Function خوب در سطح مقدماتی، نام مشخص و یک وظیفه مشخص دارد.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
 <h1 class="lesson-title section-scenario">سناریوی ترکیبی</h1>
 
-<p>فرض کن می‌خواهیم یک برنامه ساده برای یک فروشگاه بنویسیم.</p>
+<p>حالا مفاهیمی که یاد گرفتیم را در یک مثال واقعی‌تر کنار هم قرار می‌دهیم.</p>
 
-<p>قیمت محصول و تعداد خرید را داریم. ابتدا مبلغ کل را محاسبه می‌کنیم و سپس اگر مبلغ خرید حداقل <code>500</code> باشد، ۱۰٪ تخفیف می‌دهیم.</p>
+<p>فرض کن در یک فروشگاه، قیمت محصول و تعداد خرید را داریم. ابتدا مبلغ کل را محاسبه می‌کنیم و اگر مبلغ خرید حداقل <code>500</code> باشد، ۱۰٪ تخفیف می‌دهیم.</p>
 
-<p>در این مسئله چند مفهوم را کنار هم قرار می‌دهیم:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Function
-   +
-Parameter
-   +
-return
-   +
-if
-   +
-Arithmetic</div></div>
+<p>بهتر است این مسئله را به چند وظیفه کوچک تقسیم کنیم.</p>
 
 <h3>مرحله ۱ — محاسبه مبلغ کل</h3>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
     return price * quantity</div></div>
-
-<p>مثلاً:</p>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">total = calculate_total(200, 3)
-
-print(total)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">600</div></div>
 
 <h3>مرحله ۲ — محاسبه تخفیف</h3>
 
@@ -25159,40 +24836,9 @@ print(total)</div></div>
     else:
         return 0</div></div>
 
-<p>حالا:</p>
+<h3>مرحله ۳ — استفاده از Functionها</h3>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">discount = calculate_discount(600)
-
-print(discount)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">60.0</div></div>
-
-<h3>مرحله ۳ — محاسبه مبلغ نهایی</h3>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">final_price = total - discount
-
-print(final_price)</div></div>
-
-<p>خروجی:</p>
-
-<div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">540.0</div></div>
-
-<h3>مرحله ۴ — نسخه کامل</h3>
-
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def calculate_total(price, quantity):
-    return price * quantity
-
-
-def calculate_discount(total):
-    if total >= 500:
-        return total * 0.10
-    else:
-        return 0
-
-
-price = 200
+<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">price = 200
 quantity = 3
 
 total = calculate_total(price, quantity)
@@ -25204,13 +24850,11 @@ print("Total:", total)
 print("Discount:", discount)
 print("Final price:", final_price)</div></div>
 
-<p>خروجی:</p>
-
 <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Total: 600
 Discount: 60.0
 Final price: 540.0</div></div>
 
-<p>مزیت Function در این مثال مشخص است. برنامه به قسمت‌های کوچک‌تر تقسیم شده است:</p>
+<p>ساختار برنامه اکنون واضح‌تر است:</p>
 
 <div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">calculate_total()
         ↓
@@ -25224,157 +24868,7 @@ calculate_discount()
         ↓
 ترکیب نتایج</div></div>
 
-<p>هر تابع یک وظیفه مشخص دارد و بخش اصلی برنامه فقط این وظایف را با هم ترکیب می‌کند.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">🧪 تمرین‌های جلسه</h2>
-
-<p>ابتدا خودت کد را بنویس و اجرا کن. پاسخ هر تمرین عمداً مخفی است تا قبل از تلاش، راه‌حل را نبینی.</p>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۱</span><div><strong>اولین Function</strong><small>تابعی بساز که یک پیام چاپ کند.</small></div></div>
-  <p>تابعی به نام <code>show_message</code> بساز که عبارت <code>Python is easy!</code> را چاپ کند.</p>
-
-  <div class="python-playground" data-playground="ex15-1">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 1 · First Function</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-1"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۱</button>
-  <div class="exercise-solution" id="sol15-1"><strong>پاسخ:</strong><pre>def show_message():
-    print("Python is easy!")
-
-show_message()</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۲</span><div><strong>Function با Parameter</strong><small>نام را دریافت کن و سلام بگو.</small></div></div>
-  <p>تابعی بنویس که نام را دریافت کند و مثلاً برای ورودی <code>Ali</code> خروجی <code>Hello Ali</code> تولید کند.</p>
-
-  <div class="python-playground" data-playground="ex15-2">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 2 · Function with Parameter</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-2"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۲</button>
-  <div class="exercise-solution" id="sol15-2"><strong>پاسخ:</strong><pre>def say_hello(name):
-    print("Hello", name)
-
-say_hello("Ali")</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۳</span><div><strong>دو Parameter</strong><small>نام و سن را دریافت و نمایش بده.</small></div></div>
-  <p>تابعی به نام <code>introduce</code> بنویس که <code>name</code> و <code>age</code> را دریافت کند و هر دو را چاپ کند.</p>
-
-  <div class="python-playground" data-playground="ex15-3">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 3 · Two Parameters</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-3"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۳</button>
-  <div class="exercise-solution" id="sol15-3"><strong>پاسخ:</strong><pre>def introduce(name, age):
-    print("Name:", name)
-    print("Age:", age)
-
-introduce("Sara", 22)</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۴</span><div><strong>استفاده از return</strong><small>مجموع دو عدد را برگردان.</small></div></div>
-  <p>تابعی بنویس که دو عدد را دریافت کند و مجموع آن‌ها را با <code>return</code> برگرداند.</p>
-
-  <div class="python-playground" data-playground="ex15-4">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 4 · Using return</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-4"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۴</button>
-  <div class="exercise-solution" id="sol15-4"><strong>پاسخ:</strong><pre>def add(a, b):
-    return a + b
-
-result = add(10, 20)
-print(result)</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۵</span><div><strong>تشخیص زوج یا فرد</strong><small>با return وضعیت عدد را برگردان.</small></div></div>
-  <p>تابعی بنویس که یک عدد دریافت کند و <code>Even</code> یا <code>Odd</code> را برگرداند.</p>
-
-  <div class="python-playground" data-playground="ex15-5">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 5 · Even or Odd Detection</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-5"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۵</button>
-  <div class="exercise-solution" id="sol15-5"><strong>پاسخ:</strong><pre>def check_number(number):
-    if number % 2 == 0:
-        return "Even"
-    else:
-        return "Odd"
-
-print(check_number(8))
-print(check_number(7))</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۶</span><div><strong>Function + Loop</strong><small>مربع اعداد 1 تا 5 را چاپ کن.</small></div></div>
-  <p>تابعی به نام <code>square</code> بنویس و با استفاده از <code>for</code> مربع اعداد 1 تا 5 را چاپ کن.</p>
-
-  <div class="python-playground" data-playground="ex15-6">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 6 · Function + Loop</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-6"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۶</button>
-  <div class="exercise-solution" id="sol15-6"><strong>پاسخ:</strong><pre>def square(number):
-    return number * number
-
-for number in range(1, 6):
-    print(square(number))</pre></div>
-</div>
-
-<div class="exercise-card">
-  <div class="exercise-head"><span class="exercise-num">۷</span><div><strong>Function + Condition</strong><small>با return وضعیت قبولی را برگردان.</small></div></div>
-  <p>تابعی بنویس که نمره را دریافت کند و <code>Pass</code> یا <code>Fail</code> را برگرداند. نمره <code>&gt;= 10</code> قبول است.</p>
-
-  <div class="python-playground" data-playground="ex15-7">
-    <div class="playground-header"><div class="playground-title"><i class="fas fa-code"></i><span>Exercise 7 · Function + Condition</span></div><div class="playground-status"></div><div class="playground-actions"><button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button><button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button></div></div>
-    <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
-
-</textarea></div>
-    <div class="playground-output">▶ Output will be shown here...</div>
-  </div>
-
-  <button class="solution-toggle" type="button" data-solution="sol15-7"><i class="fas fa-eye"></i> نمایش پاسخ تمرین ۷</button>
-  <div class="exercise-solution" id="sol15-7"><strong>پاسخ:</strong><pre>def check_score(score):
-    if score >= 10:
-        return "Pass"
-    else:
-        return "Fail"
-
-print(check_score(18))
-print(check_score(7))</pre></div>
-</div>
+<p>مزیت Function اینجا به‌خوبی مشخص است: برنامه به بخش‌های کوچک‌تر و قابل‌فهم تقسیم شده و هر Function یک وظیفه مشخص دارد.</p>
 
 <hr class="lesson-divider">
 
@@ -25390,29 +24884,36 @@ print(check_score(7))</pre></div>
 <button onclick="selectOption(this)">ج) هر تابع حتماً باید <code>input()</code> داشته باشد.</button>
 <button onclick="selectOption(this)">د) هر تابع حتماً باید حلقه داشته باشد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Function برای سازمان‌دهی و استفاده مجدد از یک منطق مشخص در برنامه استفاده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Function برای انجام یک وظیفه مشخص و استفاده مجدد از یک منطق در برنامه به کار می‌رود.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — Parameter و Argument: در کد زیر کدام گزینه درست است؟ <br><code>def greet(name):<br>    print("Hello", name)<br>greet("Ali")</code></p>
+<p>❓ سؤال ۲ — Parameter و Argument: در کد زیر کدام گزینه درست است؟<br>
+<code>def greet(name):<br>
+    print("Hello", name)<br>
+greet("Ali")</code></p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>name</code> آرگومان و <code>"Ali"</code> پارامتر است.</button>
 <button onclick="selectOption(this)">ب) <code>name</code> پارامتر و <code>"Ali"</code> آرگومان است.</button>
 <button onclick="selectOption(this)">ج) هر دو پارامتر هستند.</button>
 <button onclick="selectOption(this)">د) هر دو آرگومان هستند.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>name</code> هنگام تعریف تابع Parameter است و <code>"Ali"</code> هنگام فراخوانی Argument است.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>name</code> هنگام تعریف Function یک Parameter است و <code>"Ali"</code> هنگام فراخوانی یک Argument است.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — خروجی: خروجی چیست؟ <br><code>def add(a, b):<br>    return a + b<br>result = add(4, 6)<br>print(result)</code></p>
+<p>❓ سؤال ۳ — خروجی: خروجی چیست؟<br>
+<code>def add(a, b):<br>
+    return a + b<br>
+result = add(4, 6)<br>
+print(result)</code></p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>4</code></button>
 <button onclick="selectOption(this)">ب) <code>6</code></button>
 <button onclick="selectOption(this)">ج) <code>10</code></button>
 <button onclick="selectOption(this)">د) <code>None</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>تابع مقدار <code>4 + 6</code> را محاسبه و با <code>return</code> مقدار <code>10</code> را برمی‌گرداند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>تابع مقدار <code>4 + 6</code> را با <code>return</code> برمی‌گرداند؛ بنابراین مقدار <code>result</code> برابر ۱۰ است.</div>
 </div>
 
 <div class="quiz-card">
@@ -25423,63 +24924,76 @@ print(check_score(7))</pre></div>
 <button onclick="selectOption(this)">ج) <code>def add(a, b):<br>    input(a + b)</code></button>
 <button onclick="selectOption(this)">د) <code>def add(a, b):<br>    pass</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>return</code> مقدار را از تابع به محل فراخوانی برمی‌گرداند.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>return</code> مقدار را از Function به محل فراخوانی برمی‌گرداند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۵ — <code>return</code>: خروجی کد زیر چیست؟ <br><code>def test():<br>    print("A")<br>    return<br>    print("B")<br>test()</code></p>
+<p>❓ سؤال ۵ — <code>return</code>: خروجی کد زیر چیست؟<br>
+<code>def test():<br>
+    print("A")<br>
+    return<br>
+    print("B")<br>
+test()</code></p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>A<br>B</code></button>
 <button onclick="selectOption(this)">ب) <code>B</code></button>
 <button onclick="selectOption(this)">ج) <code>A</code></button>
 <button onclick="selectOption(this)">د) هیچ خروجی ندارد.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>بعد از اجرای <code>return</code>، تابع پایان پیدا می‌کند؛ بنابراین <code>print("B")</code> اجرا نمی‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>بعد از اجرای <code>return</code>، Function پایان پیدا می‌کند؛ بنابراین <code>print("B")</code> اجرا نمی‌شود.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — تعداد Argument: تابع زیر چند Argument لازم دارد؟ <br><code>def calculate(a, b, c):<br>    return a + b + c</code></p>
+<p>❓ سؤال ۶ — تعداد Argument: تابع زیر چند Argument لازم دارد؟<br>
+<code>def calculate(a, b, c):<br>
+    return a + b + c</code></p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) صفر</button>
 <button onclick="selectOption(this)">ب) یک</button>
 <button onclick="selectOption(this)">ج) دو</button>
 <button onclick="selectOption(this)">د) سه</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: د</strong><br>سه Parameter داریم: <code>a</code>، <code>b</code> و <code>c</code>.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: د</strong><br>تابع سه Parameter دارد و در حالت معمول به سه Argument نیاز دارد.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۷ — ترکیبی: خروجی کد زیر چیست؟ <br><code>def check_score(score):<br>    if score >= 10:<br>        return "Pass"<br>    else:<br>        return "Fail"<br>for score in [8, 12, 15]:<br>    print(check_score(score))</code></p>
+<p>❓ سؤال ۷ — ترکیبی: خروجی کد زیر چیست؟<br>
+<code>def check_score(score):<br>
+    if score >= 10:<br>
+        return "Pass"<br>
+    else:<br>
+        return "Fail"<br>
+for score in [8, 12, 15]:<br>
+    print(check_score(score))</code></p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>Fail<br>Pass<br>Pass</code></button>
 <button onclick="selectOption(this)">ب) <code>Pass<br>Fail<br>Fail</code></button>
 <button onclick="selectOption(this)">ج) <code>8<br>12<br>15</code></button>
 <button onclick="selectOption(this)">د) خطا ایجاد می‌شود.</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>برای <code>8</code> مقدار <code>Fail</code> و برای <code>12</code> و <code>15</code> مقدار <code>Pass</code> برگردانده می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>عدد ۸ کمتر از ۱۰ است و <code>Fail</code> برمی‌گرداند؛ اعداد ۱۲ و ۱۵ نیز <code>Pass</code> برمی‌گردانند.</div>
 </div>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
-<p>در این جلسه از مشکل <strong>تکرار کد</strong> شروع کردیم و دیدیم که Function به ما کمک می‌کند یک منطق مشخص را یک بار تعریف و چند بار استفاده کنیم.</p>
-
-<p>ساختار اصلی Function:</p>
+<p>در این جلسه یاد گرفتیم که <strong>Function</strong> راهی برای قرار دادن یک وظیفه مشخص در یک بخش مستقل از برنامه است؛ به این ترتیب می‌توانیم همان منطق را بدون تکرار کد، چندین بار استفاده کنیم.</p>
 
 <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">def function_name(parameter):
-    # processing
-    return result</div></div>
+    return result
 
-<p>هنگام استفاده از Function، مقدار موردنیاز را به‌صورت Argument ارسال می‌کنیم:</p>
+result = function_name(argument)</div></div>
 
-<div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">result = function_name(argument)</div></div>
+<p>برای درک Function، این مسیر را به خاطر بسپار:</p>
 
-<p>سه مفهوم اصلی این جلسه را از هم جدا نگه دار:</p>
-
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">Parameter
+<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">def
 ↓
-ورودی تعریف‌شده در Function
+تعریف Function
+
+Parameter
+↓
+ورودی مورد انتظار Function
 
 Argument
 ↓
@@ -25487,35 +25001,61 @@ Argument
 
 return
 ↓
-مقداری که Function برمی‌گرداند</div></div>
+نتیجه‌ای که Function برمی‌گرداند</div></div>
 
-<p>و مهم‌ترین تفاوت جلسه:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+    <th>مفهوم</th>
+    <th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><code>def</code></td>
+    <td>تعریف Function</td>
+</tr>
+<tr>
+    <td><code>()</code></td>
+    <td>فراخوانی Function یا محل Parameterها</td>
+</tr>
+<tr>
+    <td>Parameter</td>
+    <td>دریافت ورودی در تعریف Function</td>
+</tr>
+<tr>
+    <td>Argument</td>
+    <td>مقدار ارسالی هنگام فراخوانی</td>
+</tr>
+<tr>
+    <td><code>return</code></td>
+    <td>برگرداندن نتیجه به محل فراخوانی</td>
+</tr>
+<tr>
+    <td><code>print()</code></td>
+    <td>نمایش نتیجه</td>
+</tr>
+</tbody>
+</table>
+</div>
 
-<div class="code-container"><span class="code-label">Code</span><div class="code-block no-prompt">print()
-↓
-نمایش نتیجه
+<p>دو نکته بسیار مهم این جلسه:</p>
 
-return
-↓
-برگرداندن نتیجه برای استفاده در برنامه</div></div>
+<blockquote>
+<strong>1. تعریف Function به‌تنهایی باعث اجرای آن نمی‌شود؛ باید آن را Call کنیم.</strong><br><br>
+<strong>2. print() نتیجه را نمایش می‌دهد، اما return نتیجه را برای استفاده در ادامه برنامه برمی‌گرداند.</strong>
+</blockquote>
 
-<p>همچنین یاد گرفتیم که:</p>
+<p>همچنین دیدیم که Functionها می‌توانند با مفاهیم قبلی مثل <code>input()</code>، <code>if</code> و <code>for</code> ترکیب شوند. در نتیجه، Function فقط یک مبحث جداگانه نیست؛ بلکه ابزاری برای ساختن برنامه‌های منظم‌تر و قابل‌استفاده‌تر است.</p>
 
-<ul>
-<li>Function با <code>def</code> تعریف می‌شود.</li>
-<li>تعریف Function به‌تنهایی باعث اجرای آن نمی‌شود.</li>
-<li>برای اجرای Function از Call مانند <code>say_hello()</code> استفاده می‌کنیم.</li>
-<li>Parameter هنگام تعریف Function مشخص می‌شود.</li>
-<li>Argument هنگام فراخوانی Function ارسال می‌شود.</li>
-<li>تعداد و ترتیب Argumentها اهمیت دارد.</li>
-<li><code>return</code> مقدار را به محل فراخوانی برمی‌گرداند.</li>
-<li>رسیدن به <code>return</code> اجرای همان Function را متوقف می‌کند.</li>
-<li>اگر تابع مقدار مشخصی را <code>return</code> نکند، مقدار برگشتی آن <code>None</code> است.</li>
-<li>Functionها می‌توانند با <code>if</code>، <code>for</code>، <code>input()</code> و سایر مفاهیم ترکیب شوند.</li>
-<li>بهتر است هر Function یک وظیفه مشخص داشته باشد.</li>
-</ul>
+<p>در طراحی Functionهای ساده نیز بهتر است هر تابع <strong>یک وظیفه مشخص</strong> داشته باشد و نام آن تا حد امکان هدفش را نشان دهد.</p>
 
-<p>در <strong>جلسه ۲ فصل ۱۰</strong> همین مفهوم را یک مرحله جلوتر می‌بریم و با <strong>انواع آرگومان‌ها، Scope متغیرها و اصول بهتر کار کردن با Functionها</strong> آشنا می‌شویم.</p>`
+<blockquote>
+<strong>یک Function خوب در سطح مقدماتی = نام مشخص + وظیفه مشخص + ورودی مناسب + نتیجه قابل‌استفاده</strong>
+</blockquote>
+
+<p>در <strong>جلسه ۲ فصل ۱۰</strong> همین مسیر را ادامه می‌دهیم و با <strong>انواع آرگومان‌ها، Scope متغیرها و اصول بهتر طراحی Functionها</strong> آشنا می‌شویم.</p>`
 ,
 
 "ch10-2": `<div class="section-header">
