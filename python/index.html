@@ -30798,6 +30798,646 @@ print()</div>
 و به شکل حرفه‌ای با ساختار پروژه کار کنیم.
 </p>`
 ,
+"ch13-2": `<div class="section-header">
+    <div class="section-badge">۱۳</div>
+    <div>
+        <h1>کار با مسیر فایل‌ها، pathlib و os</h1>
+        <div class="meta">فصل ۱۳ · بخش ۲ از ۲</div>
+    </div>
+</div>
+
+<blockquote class="lesson-goal">
+<strong class="goal-title">هدف جلسه</strong>
+<p>در پایان این جلسه باید بتوانی:</p>
+<ol>
+<li>مفهوم <strong>Path</strong> و تفاوت مسیر <strong>مطلق</strong> و <strong>نسبی</strong> را توضیح بدهی.</li>
+<li>با ماژول <code>os</code> مسیر فعلی، لیست فایل‌ها و ساخت پوشه را مدیریت کنی.</li>
+<li>وجود یک فایل یا پوشه را بررسی کنی.</li>
+<li>مسیرها را با <code>os.path.join()</code> به شکل درست بسازی.</li>
+<li>با <code>pathlib</code> و کلاس <code>Path</code> کار کنی.</li>
+<li>با <code>Path</code> فایل بخوانی، بنویسی، پوشه بسازی و روی فایل‌ها پیمایش کنی.</li>
+<li>یک پروژه ساده بسازی که فایل‌ها را در پوشه‌ها سازمان‌دهی کند.</li>
+</ol>
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">داستان این جلسه</h2>
+
+<p>
+در جلسه قبل یاد گرفتیم فایل را باز کنیم، بخوانیم و بنویسیم. اما در پروژه‌های
+واقعی، فایل‌ها داخل <strong>پوشه‌ها</strong> قرار می‌گیرند و مسیر مشخصی دارند:
+</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">project/
+├── data/
+│   ├── users.txt
+│   └── scores.txt
+├── output/
+│   └── report.txt
+└── main.py</div>
+</div>
+
+<p>
+اگر بخواهیم <code>users.txt</code> را باز کنیم، فقط نوشتن <code>"users.txt"</code>
+کافی نیست — باید مسیر آن را هم مشخص کنیم. اینجاست که مفهوم <strong>Path</strong> وارد می‌شود.
+</p>
+
+<p>در این جلسه دو ابزار برای کار با مسیرها یاد می‌گیریم:</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>#</th><th>گام</th><th>ابزار</th></tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td>مفهوم Path</td><td>—</td></tr>
+<tr><td>۲</td><td>کار با <code>os</code></td><td>ماژول قدیمی و پرکاربرد</td></tr>
+<tr><td>۳</td><td>ساخت مسیر درست</td><td><code>os.path.join()</code></td></tr>
+<tr><td>۴</td><td>کار با <code>pathlib</code></td><td>ماژول مدرن و شیء‌گرا</td></tr>
+<tr><td>۵</td><td>انتخاب بین <code>os</code> و <code>pathlib</code></td><td>مقایسه</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">گام ۱ — Path چیست؟</h2>
+
+<p>
+<strong>Path</strong> یعنی <strong>مسیر</strong>؛ آدرسی که محل یک فایل یا پوشه را
+روی سیستم نشان می‌دهد. مثلاً <code>project/data/users.txt</code> می‌گوید:
+</p>
+
+<div class="code-container">
+<span class="code-label">Recall</span>
+<div class="code-block no-prompt">وارد project شو → وارد data شو → فایل users.txt را باز کن</div>
+</div>
+
+<h3>دو نوع مسیر</h3>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>نوع</th><th>معنی</th><th>مثال</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Absolute</strong></td>
+<td>مسیر کامل از ریشه سیستم</td>
+<td><code>C:\\Users\\Ali\\project\\main.py</code></td>
+</tr>
+<tr>
+<td><strong>Relative</strong></td>
+<td>نسبت به محل فعلی برنامه</td>
+<td><code>data/users.txt</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="lesson-note">
+<strong>نکته:</strong>
+در پروژه‌ها همیشه از مسیر <strong>نسبی</strong> استفاده کن، چون پروژه
+روی هر سیستمی (ویندوز، لینوکس، مک) کار می‌کند.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">گام ۲ — کار با ماژول <code>os</code></h2>
+
+<p>
+<code>os</code> یکی از ماژول‌های استاندارد Python است و نیازی به نصب ندارد:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">import os</div>
+</div>
+
+<h3>پرتکرارترین توابع <code>os</code></h3>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>تابع</th><th>کار</th></tr>
+</thead>
+<tbody>
+<tr><td><code>os.getcwd()</code></td><td>مسیر پوشه‌ای که برنامه در آن اجرا می‌شود</td></tr>
+<tr><td><code>os.listdir(path)</code></td><td>لیست فایل‌ها و پوشه‌های یک مسیر</td></tr>
+<tr><td><code>os.path.exists(path)</code></td><td>آیا فایل یا پوشه وجود دارد؟</td></tr>
+<tr><td><code>os.path.isfile(path)</code></td><td>آیا فایل است؟</td></tr>
+<tr><td><code>os.path.isdir(path)</code></td><td>آیا پوشه است؟</td></tr>
+<tr><td><code>os.mkdir(name)</code></td><td>ساخت پوشه جدید</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>نمونه — مسیر فعلی</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">import os
+
+print(os.getcwd())
+# C:\\Users\\Ali\\project</div>
+</div>
+
+<h3>نمونه — لیست فایل‌های یک پوشه</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">files = os.listdir(".")
+print(files)
+# ['main.py', 'data', 'output']</div>
+</div>
+
+<div class="lesson-note">
+<strong>نکته:</strong> <code>"."</code> یعنی پوشه فعلی و <code>".."</code> یعنی پوشه والد.
+</div>
+
+<h3>نمونه — بررسی وجود و ساخت پوشه</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">if not os.path.exists("new_folder"):
+    os.mkdir("new_folder")
+    print("Folder created")
+else:
+    print("Folder already exists")</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">گام ۳ — ساخت مسیر درست با <code>os.path.join()</code></h2>
+
+<p>
+هرگز مسیر را با <code>+</code> و <code>"/"</code> دستی نساز — چون جداکننده مسیر
+در ویندوز (<code>\\</code>) و لینوکس (<code>/</code>) فرق دارد.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>روش</th><th>کد</th><th>نتیجه</th></tr>
+</thead>
+<tbody>
+<tr><td>❌ اشتباه</td><td><code>"data" + "/" + "users.txt"</code></td><td>روی ویندوز ممکن است مشکل بدهد</td></tr>
+<tr><td>✅ درست</td><td><code>os.path.join("data", "users.txt")</code></td><td>جداکننده مناسب سیستم را انتخاب می‌کند</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">import os
+
+path = os.path.join("data", "users.txt")
+print(path)
+# ویندوز:  data\\users.txt
+# لینوکس:  data/users.txt</div>
+</div>
+
+<p>حالا می‌توانی این مسیر را به <code>open()</code> بدهی:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">with open(path, "r") as file:
+    content = file.read()</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">گام ۴ — <code>pathlib</code>: روش مدرن کار با مسیرها</h2>
+
+<p>
+<code>pathlib</code> ماژول جدیدتر Python است که کار با مسیرها را
+<strong>ساده‌تر، خواناتر و شیء‌گرا</strong> می‌کند.
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">from pathlib import Path</div>
+</div>
+
+<h3>ساخت مسیر با عملگر <code>/</code></h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">path = Path("data") / "users.txt"
+print(path)
+# data/users.txt</div>
+</div>
+
+<div class="lesson-note">
+<strong>نکته:</strong> عملگر <code>/</code> در <code>pathlib</code>
+جداکننده مسیر را خودش انتخاب می‌کند؛ نیازی به <code>os.path.join</code> نیست.
+</div>
+
+<h3>متدهای پرکاربرد <code>Path</code></h3>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>متد</th><th>کار</th></tr>
+</thead>
+<tbody>
+<tr><td><code>path.exists()</code></td><td>آیا مسیر وجود دارد؟</td></tr>
+<tr><td><code>path.is_file()</code></td><td>آیا فایل است؟</td></tr>
+<tr><td><code>path.is_dir()</code></td><td>آیا پوشه است؟</td></tr>
+<tr><td><code>path.read_text()</code></td><td>خواندن محتوای فایل (به صورت <code>str</code>)</td></tr>
+<tr><td><code>path.write_text(text)</code></td><td>نوشتن متن در فایل (محتوای قبلی جایگزین می‌شود)</td></tr>
+<tr><td><code>path.mkdir(exist_ok=True)</code></td><td>ساخت پوشه — بدون خطا اگر وجود داشته باشد</td></tr>
+<tr><td><code>path.iterdir()</code></td><td>پیمایش محتوای پوشه</td></tr>
+<tr><td><code>path.name</code></td><td>نام فایل یا پوشه</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>نمونه — خواندن و نوشتن ساده</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">path = Path("data") / "notes.txt"
+
+path.write_text("Hello Python\\n")
+content = path.read_text()
+
+print(content)</div>
+</div>
+
+<h3>نمونه — ساخت پوشه به همراه زیرپوشه</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">folder = Path("project/data/logs")
+folder.mkdir(parents=True, exist_ok=True)</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>پارامتر</th><th>کار</th></tr>
+</thead>
+<tbody>
+<tr><td><code>parents=True</code></td><td>زیرپوشه‌های میانی را هم می‌سازد</td></tr>
+<tr><td><code>exist_ok=True</code></td><td>اگر پوشه وجود داشته باشد خطا نمی‌دهد</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>نمونه — پیمایش فایل‌های یک پوشه</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">folder = Path("data")
+
+for item in folder.iterdir():
+    if item.is_file():
+        print(item.name)</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">گام ۵ — <code>os</code> یا <code>pathlib</code>؟</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>ویژگی</th><th><code>os</code></th><th><code>pathlib</code></th></tr>
+</thead>
+<tbody>
+<tr><td>سبک</td><td>تابع‌محور</td><td>شیء‌گرا</td></tr>
+<tr><td>خوانایی</td><td>متوسط</td><td>بالا</td></tr>
+<tr><td>ساخت مسیر</td><td><code>os.path.join()</code></td><td><code>Path() / "file"</code></td></tr>
+<tr><td>خواندن فایل</td><td><code>open()</code></td><td><code>read_text()</code></td></tr>
+<tr><td>وضعیت امروز</td><td>در پروژه‌های قدیمی</td><td>توصیه‌شده در پروژه‌های جدید</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="lesson-important">
+<strong>جمع‌بندی:</strong>
+<code>pathlib</code> را یاد بگیر و در پروژه‌های جدید از آن استفاده کن.
+<code>os</code> را هم بشناس، چون در پروژه‌های قدیمی زیاد می‌بینی‌اش.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">مدل ذهنی</h2>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">Path
+  │
+  ├── ساخت مسیر       → Path("data") / "file.txt"
+  │
+  ├── بررسی وجود      → exists() ، is_file() ، is_dir()
+  │
+  ├── ساخت پوشه       → mkdir(exist_ok=True)
+  │
+  ├── خواندن / نوشتن  → read_text() ، write_text()
+  │
+  └── پیمایش          → iterdir()</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">نکات کلیدی جلسه</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>مفهوم</th><th>نکته اصلی</th></tr>
+</thead>
+<tbody>
+<tr><td>Path</td><td>مسیر فایل یا پوشه</td></tr>
+<tr><td>Absolute</td><td>مسیر کامل از ریشه سیستم</td></tr>
+<tr><td>Relative</td><td>نسبت به محل فعلی — <strong>توصیه‌شده در پروژه‌ها</strong></td></tr>
+<tr><td><code>os.getcwd()</code></td><td>مسیر پوشه فعلی</td></tr>
+<tr><td><code>os.path.join()</code></td><td>ساخت مسیر درست و سازگار با سیستم‌عامل</td></tr>
+<tr><td><code>os.path.exists()</code></td><td>بررسی وجود فایل یا پوشه</td></tr>
+<tr><td><code>Path()</code></td><td>کلاس اصلی در <code>pathlib</code></td></tr>
+<tr><td><code>read_text()</code> / <code>write_text()</code></td><td>خواندن و نوشتن ساده فایل</td></tr>
+<tr><td><code>mkdir(exist_ok=True)</code></td><td>ساخت پوشه بدون خطای تکراری</td></tr>
+<tr><td><code>iterdir()</code></td><td>پیمایش محتوای پوشه</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">🔄 Recall سریع</h2>
+
+<p>بدون نگاه کردن به درس جواب بده:</p>
+
+<ol>
+<li>Path چیست و چه تفاوتی با نام ساده فایل دارد؟</li>
+<li>تفاوت مسیر مطلق و نسبی چیست؟ کدام در پروژه بهتر است؟</li>
+<li><code>os.getcwd()</code> چه چیزی برمی‌گرداند؟</li>
+<li>چرا از <code>os.path.join()</code> استفاده می‌کنیم؟</li>
+<li>چگونه وجود یک فایل را بررسی می‌کنیم؟</li>
+<li>با <code>pathlib</code> چگونه مسیر می‌سازیم؟</li>
+<li><code>read_text()</code> و <code>write_text()</code> چه کاری انجام می‌دهند؟</li>
+<li>چگونه پوشه بسازیم بدون خطای پوشه تکراری؟</li>
+<li><code>iterdir()</code> چه کاری انجام می‌دهد؟</li>
+<li>در پروژه‌های جدید کدام روش را انتخاب می‌کنیم؟ چرا؟</li>
+</ol>
+
+<hr class="lesson-divider">
+
+<h1 class="lesson-title section-scenario">
+سناریوی ترکیبی — ذخیره گزارش در پوشه جداگانه
+</h1>
+
+<p>
+می‌خواهیم برنامه‌ای بسازیم که:
+</p>
+
+<ul>
+<li>بررسی کند پوشه <code>reports</code> وجود دارد یا نه.</li>
+<li>اگر نبود، آن را بسازد.</li>
+<li>از کاربر یک متن بگیرد.</li>
+<li>متن را در <code>reports/report.txt</code> ذخیره کند.</li>
+<li>سپس محتوای فایل را نمایش دهد.</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>مرحله</th><th>کار</th><th>ابزار</th></tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td>ساخت پوشه در صورت نیاز</td><td><code>Path.mkdir(exist_ok=True)</code></td></tr>
+<tr><td>۲</td><td>ساخت مسیر فایل</td><td><code>folder / "report.txt"</code></td></tr>
+<tr><td>۳</td><td>ذخیره متن کاربر</td><td><code>write_text()</code></td></tr>
+<tr><td>۴</td><td>خواندن و نمایش</td><td><code>read_text()</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>برنامه کامل</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">from pathlib import Path
+
+folder = Path("reports")
+folder.mkdir(exist_ok=True)
+
+file_path = folder / "report.txt"
+
+text = input("Write report: ")
+file_path.write_text(text)
+
+print()
+print("----- Report -----")
+print(file_path.read_text())</div>
+</div>
+
+<h3>اجرای نمونه</h3>
+
+<div class="code-container">
+<span class="code-label">Input</span>
+<div class="code-block no-prompt">Everything works fine.</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">----- Report -----
+Everything works fine.</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Code — ساختار پروژه بعد از اجرا</span>
+<div class="code-block no-prompt">project/
+└── reports/
+    └── report.txt</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Final Flow</span>
+<div class="code-block no-prompt">Path
+  ↓
+mkdir(exist_ok=True)
+  ↓
+folder / "report.txt"
+  ↓
+write_text()
+  ↓
+read_text()
+  ↓
+print()</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
+
+<p>
+هر سؤال را ابتدا خودت حل کن، سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.
+</p>
+
+<div class="quiz-card">
+<p>❓ سؤال ۱ — کدام روش برای ساخت مسیر توصیه می‌شود؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>"data" + "/" + "file.txt"</code></button>
+<button onclick="selectOption(this)">ب) <code>os.path.join("data", "file.txt")</code></button>
+<button onclick="selectOption(this)">ج) <code>"data/file.txt"</code></button>
+<button onclick="selectOption(this)">د) هر سه مورد یکسان‌اند</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+<code>os.path.join()</code> جداکننده مناسب سیستم‌عامل را انتخاب می‌کند
+و در <code>pathlib</code> معادل آن عملگر <code>/</code> است.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۲ — خروجی کد زیر چیست؟<br>
+<code>from pathlib import Path<br>
+path = Path("data") / "file.txt"<br>
+print(path)</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>data</code></button>
+<button onclick="selectOption(this)">ب) <code>file.txt</code></button>
+<button onclick="selectOption(this)">ج) <code>data/file.txt</code></button>
+<button onclick="selectOption(this)">د) خطا</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong>
+<br>
+عملگر <code>/</code> در <code>pathlib</code> برای ترکیب مسیرها استفاده می‌شود.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۳ — کدام متد وجود یک فایل را بررسی می‌کند؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>is_file()</code></button>
+<button onclick="selectOption(this)">ب) <code>exists()</code></button>
+<button onclick="selectOption(this)">ج) <code>is_dir()</code></button>
+<button onclick="selectOption(this)">د) هر سه مورد</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: د</strong>
+<br>
+هر سه متد در <code>Path</code> وجود دارند و کاربرد متفاوتی دارند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۴ — تفاوت اصلی <code>os</code> و <code>pathlib</code> چیست؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>os</code> فقط برای Windows است</button>
+<button onclick="selectOption(this)">ب) <code>pathlib</code> جدیدتر و شیء‌گراست</button>
+<button onclick="selectOption(this)">ج) <code>os</code> باید نصب شود</button>
+<button onclick="selectOption(this)">د) <code>pathlib</code> فقط خواندن دارد</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+<code>pathlib</code> مدرن‌تر و شیء‌گراست؛ <code>os</code> قدیمی‌تر و تابع‌محور است.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۵ — خروجی کد زیر چیست؟<br>
+<code>from pathlib import Path<br>
+path = Path("data.txt")<br>
+path.write_text("Hi")</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) یک فایل با محتوای Hi ساخته می‌شود</button>
+<button onclick="selectOption(this)">ب) خطا می‌دهد</button>
+<button onclick="selectOption(this)">ج) محتوای فایل چاپ می‌شود</button>
+<button onclick="selectOption(this)">د) فایل حذف می‌شود</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: الف</strong>
+<br>
+<code>write_text()</code> یک فایل می‌سازد یا محتوای آن را جایگزین می‌کند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۶ — کدام گزینه پوشه را بدون خطا می‌سازد، حتی اگر وجود داشته باشد؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>Path("x").mkdir()</code></button>
+<button onclick="selectOption(this)">ب) <code>Path("x").mkdir(exist_ok=True)</code></button>
+<button onclick="selectOption(this)">ج) <code>os.mkdir("x")</code></button>
+<button onclick="selectOption(this)">د) <code>Path("x").create()</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+<code>exist_ok=True</code> از خطای پوشه تکراری جلوگیری می‌کند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۷ — کدام متد برای پیمایش فایل‌های داخل یک پوشه با <code>pathlib</code> استفاده می‌شود؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>list()</code></button>
+<button onclick="selectOption(this)">ب) <code>iterdir()</code></button>
+<button onclick="selectOption(this)">ج) <code>scan()</code></button>
+<button onclick="selectOption(this)">د) <code>files()</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+<code>iterdir()</code> روی محتوای یک پوشه پیمایش می‌کند.
+</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
+
+<p>
+در این جلسه یاد گرفتیم چگونه مسیر فایل‌ها و پوشه‌ها را مدیریت کنیم
+و با ساختار پروژه به‌صورت حرفه‌ای کار کنیم. مهم‌ترین الگوی این جلسه:
+</p>
+
+<div class="code-container">
+<span class="code-label">Core Pattern</span>
+<div class="code-block no-prompt">from pathlib import Path
+
+folder = Path("data")
+folder.mkdir(exist_ok=True)
+
+file_path = folder / "info.txt"
+
+file_path.write_text("Hello")
+print(file_path.read_text())</div>
+</div>
+
+<p>
+با این جلسه، فصل ۱۳ — کار با فایل‌ها را کامل کردیم. اکنون می‌توانیم
+فایل‌ها و پوشه‌ها را در پروژه‌های واقعی به شکل درست مدیریت کنیم.
+</p>
+
+<p>
+در <strong>فصل ۱۴ — Error Handling</strong> یاد می‌گیریم چگونه خطاها را
+کنترل کنیم و جلوی crash شدن برنامه را بگیریم.
+</p>`
+,
 
 "ch14-1": `<div class="section-header">
     <div class="section-badge">۱۴</div>
@@ -31812,987 +32452,6 @@ finally:
 چگونه در پروژه‌های واقعی از Error Handling استفاده کنیم،
 با فایل‌ها و ورودی‌های کاربری به شکل حرفه‌ای کار کنیم
 و برنامه‌هایی بنویسیم که در برابر هر شرایطی مقاوم باشند.
-</p>`
-,
-"ch13-2": `<div class="section-header">
-    <div class="section-badge">۱۳</div>
-    <div>
-        <h1>کار با مسیر فایل‌ها، pathlib و os</h1>
-        <div class="meta">فصل ۱۳ · بخش ۲ از ۲</div>
-    </div>
-</div>
-
-<blockquote class="lesson-goal">
-<strong class="goal-title">هدف جلسه</strong>
-<p>در پایان این جلسه باید بتوانی:</p>
-<ol>
-<li>مفهوم <strong>Path</strong> و تفاوت مسیر <strong>مطلق</strong> و <strong>نسبی</strong> را توضیح بدهی.</li>
-<li>با ماژول <code>os</code> مسیر فعلی، لیست فایل‌ها و ساخت پوشه را مدیریت کنی.</li>
-<li>وجود داشتن یک فایل یا پوشه را بررسی کنی.</li>
-<li>مسیرها را با <code>os.path.join()</code> به شکل درست بسازی.</li>
-<li>با <code>pathlib</code> و کلاس <code>Path</code> کار کنی.</li>
-<li>با <code>Path</code> فایل بخوانی، بنویسی، پوشه بسازی و روی فایل‌ها پیمایش کنی.</li>
-<li>تفاوت سبک <code>os</code> و <code>pathlib</code> را تشخیص بدهی.</li>
-<li>یک پروژه ساده بسازی که فایل‌ها را در پوشه‌ها سازمان‌دهی کند.</li>
-</ol>
-</blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">معرفی جلسه</h2>
-
-<p>
-در جلسه قبل یاد گرفتیم چگونه فایل را باز کنیم، بخوانیم و بنویسیم.
-</p>
-
-<p>
-اما در پروژه‌های واقعی، فایل‌ها فقط یک اسم ساده نیستند.
-آن‌ها داخل <strong>پوشه‌ها</strong> قرار می‌گیرند و مسیر مشخصی دارند.
-</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">project/
-├── data/
-│   ├── users.txt
-│   └── scores.txt
-├── output/
-│   └── report.txt
-└── main.py</div>
-</div>
-
-<p>
-اگر بخواهیم فایل <code>users.txt</code> را باز کنیم،
-نمی‌توانیم فقط بنویسیم <code>"users.txt"</code>؛
-باید مسیر آن را هم مشخص کنیم.
-</p>
-
-<p>
-در این جلسه با دو ابزار مهم کار می‌کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">os       → ابزار قدیمی و پرکاربرد
-pathlib  → ابزار جدید و مدرن</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">1. Path چیست؟</h2>
-
-<p>
-<strong>Path</strong> یعنی <strong>مسیر</strong>؛ آدرسی که محل یک فایل یا پوشه
-را روی سیستم نشان می‌دهد.
-</p>
-
-<div class="code-container">
-<span class="code-label">Example</span>
-<div class="code-block no-prompt">project/data/users.txt</div>
-</div>
-
-<p>
-این مسیر می‌گوید:
-</p>
-
-<ul>
-<li>وارد پوشه <code>project</code> شو</li>
-<li>سپس وارد پوشه <code>data</code> شو</li>
-<li>و فایل <code>users.txt</code> را باز کن</li>
-</ul>
-
-<p>
-مسیر می‌تواند شامل پوشه‌ها، زیرپوشه‌ها و نام فایل باشد.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">2. مسیر مطلق و مسیر نسبی</h2>
-
-<p>
-دو نوع مسیر داریم: <strong>Absolute</strong> و <strong>Relative</strong>.
-</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>نوع</th>
-<th>معنی</th>
-<th>مثال</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Absolute</td>
-<td>مسیر کامل از ریشه سیستم</td>
-<td><code>C:\\Users\\Ali\\project\\data.txt</code></td>
-</tr>
-<tr>
-<td>Relative</td>
-<td>نسبت به محل فعلی برنامه</td>
-<td><code>data/data.txt</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<h3>مسیر مطلق (Absolute)</h3>
-
-<div class="code-container">
-<span class="code-label">Windows</span>
-<div class="code-block no-prompt">C:\\Users\\Ali\\project\\main.py</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Linux / macOS</span>
-<div class="code-block no-prompt">/home/ali/project/main.py</div>
-</div>
-
-<h3>مسیر نسبی (Relative)</h3>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">data/users.txt
-../config.txt
-./main.py</div>
-</div>
-
-<div class="lesson-note">
-<strong>نکته:</strong>
-استفاده از مسیر نسبی در پروژه‌ها بهتر است، چون پروژه روی هر سیستمی کار می‌کند.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">3. ماژول <code>os</code></h2>
-
-<p>
-ماژول <code>os</code> یکی از ماژول‌های استاندارد Python است
-که برای کار با سیستم‌عامل و مسیرها استفاده می‌شود.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os</div>
-</div>
-
-<p>
-این ماژول به صورت پیش‌فرض نصب است و نیازی به <code>pip</code> ندارد.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">4. مسیر فعلی با <code>os.getcwd()</code></h2>
-
-<p>
-<code>getcwd</code> یعنی «Get Current Working Directory»؛
-یعنی مسیر پوشه‌ای که برنامه در آن اجرا می‌شود.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-print(os.getcwd())</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">C:\\Users\\Ali\\project</div>
-</div>
-
-<p>
-این مسیر به ما می‌گوید که برنامه از کجا دارد اجرا می‌شود.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">5. لیست فایل‌های یک پوشه با <code>os.listdir()</code></h2>
-
-<p>
-با <code>os.listdir()</code> می‌توانیم فایل‌ها و پوشه‌های یک مسیر را ببینیم.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-files = os.listdir(".")
-
-print(files)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">['main.py', 'data', 'output']</div>
-</div>
-
-<p>
-نقطه <code>"."</code> یعنی پوشه فعلی.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. بررسی وجود فایل یا پوشه</h2>
-
-<p>
-قبل از باز کردن فایل، بهتر است بررسی کنیم که آیا وجود دارد یا نه.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-print(os.path.exists("data.txt"))
-print(os.path.exists("data"))</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">True
-False</div>
-</div>
-
-<p>
-همچنین می‌توانیم دقیق‌تر بررسی کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-print(os.path.isfile("data.txt"))
-print(os.path.isdir("data"))</div>
-</div>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>تابع</th>
-<th>کار</th>
-</tr>
-</thead>
-<tbody>
-<tr><td><code>os.path.exists()</code></td><td>وجود فایل یا پوشه</td></tr>
-<tr><td><code>os.path.isfile()</code></td><td>آیا فایل است؟</td></tr>
-<tr><td><code>os.path.isdir()</code></td><td>آیا پوشه است؟</td></tr>
-</tbody>
-</table>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">7. ساخت پوشه با <code>os.mkdir()</code></h2>
-
-<p>
-برای ساخت پوشه جدید:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-os.mkdir("new_folder")</div>
-</div>
-
-<p>
-اگر پوشه قبلاً وجود داشته باشد، خطا می‌دهد.
-پس بهتر است اول بررسی کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-if not os.path.exists("new_folder"):
-    os.mkdir("new_folder")
-    print("Folder created")
-else:
-    print("Folder already exists")</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">8. ساخت مسیر با <code>os.path.join()</code></h2>
-
-<p>
-برای ساختن مسیر، هرگز با <code>+</code> و <code>"/"</code> دستی مسیر نساز.
-</p>
-
-<p>روش اشتباه:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">path = "data" + "/" + "users.txt"</div>
-</div>
-
-<p>
-روش درست:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-path = os.path.join("data", "users.txt")
-
-print(path)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">data\\users.txt   # در Windows
-data/users.txt   # در Linux/macOS</div>
-</div>
-
-<p>
-مزیت <code>os.path.join()</code> این است که خودش جداکننده مناسب سیستم‌عامل
-را انتخاب می‌کند.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">9. مثال: خواندن فایل داخل یک پوشه</h2>
-
-<p>
-فرض کن ساختار پروژه این‌طور است:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">project/
-├── data/
-│   └── users.txt
-└── main.py</div>
-</div>
-
-<p>
-برای خواندن فایل:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import os
-
-path = os.path.join("data", "users.txt")
-
-with open(path, "r") as file:
-    content = file.read()
-
-print(content)</div>
-</div>
-
-<p>
-این الگو در تمام پروژه‌های واقعی استفاده می‌شود.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">10. معرفی <code>pathlib</code></h2>
-
-<p>
-<code>pathlib</code> ماژول جدیدتر Python است که کار با مسیرها را
-ساده‌تر و خواناتر می‌کند.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path</div>
-</div>
-
-<p>
-کلاس اصلی آن <code>Path</code> است که نماینده یک مسیر می‌باشد.
-</p>
-
-<div class="lesson-note">
-<strong>نکته:</strong>
-<code>pathlib</code> روش <strong>مدرن و توصیه‌شده</strong> است،
-ولی <code>os</code> همچنان در پروژه‌های قدیمی زیاد دیده می‌شود.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">11. ساخت یک Path</h2>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-path = Path("data") / "users.txt"
-
-print(path)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">data/users.txt</div>
-</div>
-
-<p>
-نکته جالب: در <code>pathlib</code> از عملگر <code>/</code> برای ساختن مسیر
-استفاده می‌کنیم. این کار مسیر را خواناتر می‌کند.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">12. بررسی وجود مسیر با <code>Path</code></h2>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-path = Path("data/users.txt")
-
-print(path.exists())
-print(path.is_file())
-print(path.is_dir())</div>
-</div>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>متد</th>
-<th>کار</th>
-</tr>
-</thead>
-<tbody>
-<tr><td><code>exists()</code></td><td>وجود داشتن</td></tr>
-<tr><td><code>is_file()</code></td><td>فایل بودن</td></tr>
-<tr><td><code>is_dir()</code></td><td>پوشه بودن</td></tr>
-</tbody>
-</table>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">13. خواندن و نوشتن با <code>Path</code></h2>
-
-<p>
-<code>pathlib</code> دو متد ساده برای خواندن و نوشتن دارد.
-</p>
-
-<h3>خواندن</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-path = Path("data/users.txt")
-
-content = path.read_text()
-
-print(content)</div>
-</div>
-
-<h3>نوشتن</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-path = Path("data/notes.txt")
-
-path.write_text("Hello Python\n")</div>
-</div>
-
-<div class="lesson-important">
-<strong>توجه:</strong>
-<code>write_text()</code> محتوای قبلی را پاک می‌کند و محتوای جدید می‌نویسد.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">14. ساخت پوشه با <code>Path.mkdir()</code></h2>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("new_folder")
-
-folder.mkdir(exist_ok=True)</div>
-</div>
-
-<p>
-<code>exist_ok=True</code> باعث می‌شود اگر پوشه از قبل وجود داشت،
-خطا رخ ندهد.
-</p>
-
-<p>
-برای ساخت چند پوشه تو در تو:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("project/data/logs")
-
-folder.mkdir(parents=True, exist_ok=True)</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">15. پیمایش فایل‌های یک پوشه با <code>Path.iterdir()</code></h2>
-
-<p>
-برای دیدن فایل‌های داخل یک پوشه:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("data")
-
-for item in folder.iterdir():
-    print(item)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">data/users.txt
-data/scores.txt
-data/notes.txt</div>
-</div>
-
-<p>
-اگر فقط فایل‌ها را می‌خواهیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">for item in folder.iterdir():
-    if item.is_file():
-        print(item.name)</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">16. <code>os</code> یا <code>pathlib</code>؟</h2>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>ویژگی</th>
-<th><code>os</code></th>
-<th><code>pathlib</code></th>
-</tr>
-</thead>
-<tbody>
-<tr><td>سبک</td><td>تابع‌محور</td><td>شیء‌گرا</td></tr>
-<tr><td>خوانایی</td><td>متوسط</td><td>بالا</td></tr>
-<tr><td>ساخت مسیر</td><td><code>os.path.join()</code></td><td><code>Path() / "file"</code></td></tr>
-<tr><td>خواندن فایل</td><td><code>open()</code></td><td><code>read_text()</code></td></tr>
-<tr><td>توصیه‌شده امروز</td><td>در پروژه‌های قدیمی</td><td>در پروژه‌های جدید</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>
-در این دوره هر دو را یاد می‌گیریم، اما در پروژه‌های جدید
-<code>pathlib</code> انتخاب بهتر است.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">17. مدل ذهنی کار با مسیر</h2>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Path
-  │
-  ├── ساخت مسیر       → os.path.join / Path() / ...
-  │
-  ├── بررسی وجود      → exists / is_file / is_dir
-  │
-  ├── ساخت پوشه       → mkdir
-  │
-  ├── خواندن فایل     → read_text / open
-  │
-  └── پیمایش          → listdir / iterdir</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">نکات مهم جلسه</h2>
-
-<ul>
-<li>Path یعنی مسیر یک فایل یا پوشه.</li>
-<li>مسیر مطلق کامل است، مسیر نسبی از محل فعلی شروع می‌شود.</li>
-<li>در پروژه‌ها از مسیرهای نسبی استفاده کن.</li>
-<li><code>os.getcwd()</code> مسیر پوشه فعلی را برمی‌گرداند.</li>
-<li><code>os.listdir()</code> فایل‌های یک پوشه را لیست می‌کند.</li>
-<li><code>os.path.exists()</code> وجود فایل یا پوشه را بررسی می‌کند.</li>
-<li><code>os.path.join()</code> مسیر را به شکل درست می‌سازد.</li>
-<li><code>pathlib.Path</code> روش مدرن کار با مسیرهاست.</li>
-<li>با <code>/</code> می‌توان مسیر ساخت: <code>Path("data") / "file.txt"</code>.</li>
-<li><code>read_text()</code> و <code>write_text()</code> برای خواندن و نوشتن ساده‌اند.</li>
-<li><code>mkdir(exist_ok=True)</code> خطای پوشه تکراری را حذف می‌کند.</li>
-<li><code>iterdir()</code> برای پیمایش فایل‌های یک پوشه استفاده می‌شود.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">🔄 Recall سریع</h2>
-
-<p>بدون نگاه کردن به درس جواب بده:</p>
-
-<ol>
-<li>Path چیست؟</li>
-<li>تفاوت مسیر مطلق و نسبی چیست؟</li>
-<li><code>os.getcwd()</code> چه چیزی برمی‌گرداند؟</li>
-<li>با <code>os.listdir()</code> چه کاری انجام می‌دهیم؟</li>
-<li>چگونه وجود یک فایل را بررسی می‌کنیم؟</li>
-<li>چرا از <code>os.path.join()</code> استفاده می‌کنیم؟</li>
-<li><code>pathlib.Path</code> چه تفاوتی با <code>os</code> دارد؟</li>
-<li>چگونه با <code>Path</code> مسیر می‌سازیم؟</li>
-<li><code>read_text()</code> و <code>write_text()</code> چه کاری انجام می‌دهند؟</li>
-<li>چگونه پوشه جدید با <code>Path</code> بسازیم بدون خطای پوشه تکراری؟</li>
-<li><code>iterdir()</code> چه کاری انجام می‌دهد؟</li>
-</ol>
-
-<hr class="lesson-divider">
-
-<h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — ذخیره گزارش در پوشه جداگانه
-</h1>
-
-<p>
-می‌خواهیم برنامه‌ای بسازیم که:
-</p>
-
-<ul>
-<li>بررسی کند که پوشه <code>reports</code> وجود دارد یا نه.</li>
-<li>اگر نبود، آن را بسازد.</li>
-<li>درخواست یک متن از کاربر بگیرد.</li>
-<li>متن را در فایل <code>reports/report.txt</code> ذخیره کند.</li>
-<li>سپس محتوای فایل را نمایش دهد.</li>
-</ul>
-
-<h3>مرحله ۱ — ساخت پوشه (در صورت نیاز)</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("reports")
-
-folder.mkdir(exist_ok=True)</div>
-</div>
-
-<h3>مرحله ۲ — ساخت مسیر فایل</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file_path = folder / "report.txt"</div>
-</div>
-
-<h3>مرحله ۳ — دریافت متن از کاربر و ذخیره</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">text = input("Write report: ")
-
-file_path.write_text(text)</div>
-</div>
-
-<h3>مرحله ۴ — خواندن و نمایش نتیجه</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">print()
-print("----- Report -----")
-print(file_path.read_text())</div>
-</div>
-
-<h3>برنامه کامل</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("reports")
-folder.mkdir(exist_ok=True)
-
-file_path = folder / "report.txt"
-
-text = input("Write report: ")
-file_path.write_text(text)
-
-print()
-print("----- Report -----")
-print(file_path.read_text())</div>
-</div>
-
-<p>اگر کاربر بنویسد:</p>
-
-<div class="code-container">
-<span class="code-label">Input</span>
-<div class="code-block no-prompt">Everything works fine.</div>
-</div>
-
-<p>خروجی:</p>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">----- Report -----
-Everything works fine.</div>
-</div>
-
-<p>و فایل در این مسیر ذخیره می‌شود:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">project/
-└── reports/
-    └── report.txt</div>
-</div>
-
-<p>در این برنامه همه مفاهیم جلسه به هم متصل شدند:</p>
-
-<div class="code-container">
-<span class="code-label">Final Flow</span>
-<div class="code-block no-prompt">Path
-  ↓
-mkdir
-  ↓
-Path / "file.txt"
-  ↓
-write_text
-  ↓
-read_text
-  ↓
-print()</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
-
-<p>
-هر سؤال را ابتدا خودت حل کن، سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.
-</p>
-
-<div class="quiz-card">
-<p>❓ سؤال ۱ — کدام گزینه برای ساخت مسیر درست است؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>"data" + "/" + "file.txt"</code></button>
-<button onclick="selectOption(this)">ب) <code>os.path.join("data", "file.txt")</code></button>
-<button onclick="selectOption(this)">ج) <code>"data/file.txt"</code></button>
-<button onclick="selectOption(this)">د) همه موارد کار می‌کنند، اما روش ب بهتر است</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: د</strong>
-<br>
-هر سه خروجی مشابه می‌دهند، اما <code>os.path.join()</code> بهترین روش است،
-چون جداکننده مناسب سیستم‌عامل را انتخاب می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۲ — خروجی کد زیر چیست؟<br>
-<code>from pathlib import Path<br>
-path = Path("data") / "file.txt"<br>
-print(path)</code></p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>data</code></button>
-<button onclick="selectOption(this)">ب) <code>file.txt</code></button>
-<button onclick="selectOption(this)">ج) <code>data/file.txt</code></button>
-<button onclick="selectOption(this)">د) خطا</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-عملگر <code>/</code> در <code>pathlib</code> برای ترکیب مسیرها استفاده می‌شود.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۳ — کدام متد وجود یک فایل را بررسی می‌کند؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>is_file()</code></button>
-<button onclick="selectOption(this)">ب) <code>exists()</code></button>
-<button onclick="selectOption(this)">ج) <code>is_dir()</code></button>
-<button onclick="selectOption(this)">د) هر سه مورد</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: د</strong>
-<br>
-هر سه متد در <code>Path</code> وجود دارند: <code>exists()</code>،
-<code>is_file()</code> و <code>is_dir()</code>.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۴ — تفاوت اصلی <code>os</code> و <code>pathlib</code> چیست؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>os</code> فقط برای Windows است</button>
-<button onclick="selectOption(this)">ب) <code>pathlib</code> جدیدتر و شیء‌گراست</button>
-<button onclick="selectOption(this)">ج) <code>os</code> باید نصب شود</button>
-<button onclick="selectOption(this)">د) <code>pathlib</code> فقط خواندن دارد</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>pathlib</code> مدرن‌تر و شیء‌گراست؛ <code>os</code> قدیمی‌تر و تابع‌محور است.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۵ — خروجی کد زیر چیست؟<br>
-<code>from pathlib import Path<br>
-path = Path("data.txt")<br>
-path.write_text("Hi")</code></p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) یک فایل با محتوای Hi ساخته می‌شود</button>
-<button onclick="selectOption(this)">ب) خطا می‌دهد</button>
-<button onclick="selectOption(this)">ج) محتوای فایل چاپ می‌شود</button>
-<button onclick="selectOption(this)">د) فایل حذف می‌شود</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: الف</strong>
-<br>
-<code>write_text()</code> یک فایل می‌سازد یا محتوای آن را جایگزین می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۶ — کدام گزینه پوشه را بدون خطا می‌سازد، حتی اگر وجود داشته باشد؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>Path("x").mkdir()</code></button>
-<button onclick="selectOption(this)">ب) <code>Path("x").mkdir(exist_ok=True)</code></button>
-<button onclick="selectOption(this)">ج) <code>os.mkdir("x")</code></button>
-<button onclick="selectOption(this)">د) <code>Path("x").create()</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>exist_ok=True</code> از خطای پوشه تکراری جلوگیری می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۷ — کدام متد برای پیمایش فایل‌های داخل یک پوشه با <code>pathlib</code> استفاده می‌شود؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>list()</code></button>
-<button onclick="selectOption(this)">ب) <code>iterdir()</code></button>
-<button onclick="selectOption(this)">ج) <code>scan()</code></button>
-<button onclick="selectOption(this)">د) <code>files()</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>iterdir()</code> روی محتوای یک پوشه پیمایش می‌کند.
-</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
-
-<p>
-در این جلسه یاد گرفتیم چگونه مسیر فایل‌ها و پوشه‌ها را مدیریت کنیم
-و با ساختار پروژه حرفه‌ای‌تر کار کنیم.
-</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>مفهوم</th>
-<th>نکته اصلی</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Path</td>
-<td>مسیر فایل یا پوشه</td>
-</tr>
-<tr>
-<td>Absolute Path</td>
-<td>مسیر کامل از ریشه سیستم</td>
-</tr>
-<tr>
-<td>Relative Path</td>
-<td>مسیر نسبت به محل فعلی</td>
-</tr>
-<tr>
-<td><code>os.getcwd()</code></td>
-<td>مسیر پوشه فعلی</td>
-</tr>
-<tr>
-<td><code>os.listdir()</code></td>
-<td>لیست محتوای پوشه</td>
-</tr>
-<tr>
-<td><code>os.path.join()</code></td>
-<td>ساخت مسیر درست</td>
-</tr>
-<tr>
-<td><code>os.path.exists()</code></td>
-<td>بررسی وجود</td>
-</tr>
-<tr>
-<td><code>Path</code></td>
-<td>کلاس اصلی در pathlib</td>
-</tr>
-<tr>
-<td><code>read_text()</code></td>
-<td>خواندن ساده فایل</td>
-</tr>
-<tr>
-<td><code>write_text()</code></td>
-<td>نوشتن ساده فایل</td>
-</tr>
-<tr>
-<td><code>mkdir()</code></td>
-<td>ساخت پوشه</td>
-</tr>
-<tr>
-<td><code>iterdir()</code></td>
-<td>پیمایش محتوای پوشه</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<p>مهم‌ترین الگوی این جلسه را حفظ کن:</p>
-
-<div class="code-container">
-<span class="code-label">Core Pattern</span>
-<div class="code-block no-prompt">from pathlib import Path
-
-folder = Path("data")
-folder.mkdir(exist_ok=True)
-
-file_path = folder / "info.txt"
-
-file_path.write_text("Hello")
-print(file_path.read_text())</div>
-</div>
-
-<p>
-با این جلسه، فصل ۱۳ — Work With Files را کامل کردیم.
-از این پس می‌توانیم فایل‌ها و پوشه‌ها را در پروژه‌های واقعی به شکل درست مدیریت کنیم.
-</p>
-
-<p>
-در <strong>فصل ۱۴ — Error Handling</strong> یاد می‌گیریم چگونه خطاها را
-کنترل کنیم و جلوی crash شدن برنامه را بگیریم.
 </p>`
 ,
 "ch14-2": `<div class="section-header">
