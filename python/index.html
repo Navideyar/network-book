@@ -33538,29 +33538,33 @@ except PermissionError:
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>مفهوم <strong>OOP</strong> و دلیل استفاده از آن را توضیح بدهی.</li>
-<li>تفاوت <strong>Class</strong> و <strong>Object</strong> را تشخیص بدهی.</li>
-<li>یک کلاس ساده تعریف کنی.</li>
-<li>از کلاس، <strong>Object</strong> بسازی.</li>
-<li>به Objectها <strong>Attribute</strong> بدهی.</li>
-<li>برای کلاس <strong>Method</strong> بنویسی.</li>
-<li>نقش <code>self</code> را بفهمی.</li>
-<li>چند Object مستقل از یک کلاس بسازی.</li>
+<li>مفهوم <strong>OOP</strong> و ایده اصلی آن را توضیح بدهی.</li>
+<li>تفاوت <strong>Class</strong> و <strong>Object</strong> را درک کنی.</li>
+<li>یک <strong>Class</strong> ساده در Python تعریف کنی.</li>
+<li>از یک Class چند <strong>Object</strong> بسازی.</li>
+<li>برای Objectها <strong>Attribute</strong> تعریف و استفاده کنی.</li>
+<li>برای Class، <strong>Method</strong> بنویسی.</li>
+<li>نقش <code>self</code> را در Methodها درک کنی.</li>
+<li>ارتباط بین Attribute و Method را در یک مثال واقعی تشخیص بدهی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">معرفی جلسه</h2>
+<h2 class="lesson-title">1. OOP چرا به وجود آمد؟</h2>
 
 <p>
-تا اینجا تقریباً همه برنامه‌هایمان را با <strong>Variable</strong>،
-<strong>Function</strong> و ساختارهای ساده مثل List و Dictionary می‌نوشتیم.
+تا اینجا بیشتر برنامه‌ها را با <strong>Variable</strong>، <strong>Function</strong>،
+List، Dictionary و ساختارهای پایه Python نوشته‌ایم.
 </p>
 
 <p>
-اما هرچه برنامه بزرگ‌تر می‌شود، مدیریت داده‌ها سخت‌تر می‌شود.
-مثلاً فرض کن می‌خواهیم اطلاعات چند دانش‌آموز را نگه داریم:
+این روش برای برنامه‌های کوچک کاملاً مناسب است؛ اما وقتی برنامه بزرگ‌تر می‌شود،
+ممکن است تعداد زیادی داده و تابع داشته باشیم که ارتباط بین آن‌ها مشخص نباشد.
+</p>
+
+<p>
+فرض کن می‌خواهیم اطلاعات چند دانش‌آموز را نگه داریم:
 </p>
 
 <div class="code-container">
@@ -33575,37 +33579,47 @@ score2 = 19</div>
 </div>
 
 <p>
-این روش کار می‌کند، اما چند مشکل دارد:
+با زیاد شدن تعداد دانش‌آموزها، تعداد متغیرها هم زیاد می‌شود.
+ضمن اینکه اطلاعات مربوط به هر دانش‌آموز پراکنده است.
 </p>
 
-<ul>
-<li>تعداد متغیرها زیاد می‌شود.</li>
-<li>ارتباط اطلاعات به هم مشخص نیست.</li>
-<li>اضافه کردن دانش‌آموز جدید سخت می‌شود.</li>
-</ul>
-
 <p>
-<strong>OOP</strong> راه‌حل این مشکل است.
+OOP کمک می‌کند <strong>داده‌ها و رفتارهای مرتبط</strong> را در یک ساختار مشخص
+کنار هم قرار دهیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">روش قدیمی: داده‌ها پراکنده
-روش OOP:   داده‌ها + رفتار در یک بسته</div>
+<div class="code-block no-prompt">روش ساده:
+داده‌ها + توابع پراکنده
+
+OOP:
+داده‌ها + رفتارهای مرتبط
+        ↓
+      Object</div>
+</div>
+
+<div class="lesson-note">
+<strong>نکته:</strong>
+OOP فقط برای برنامه‌های بزرگ نیست؛ هدف آن سازمان‌دهی بهتر داده‌ها و رفتارهای مرتبط است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. OOP چیست؟</h2>
+<h2 class="lesson-title">2. OOP چیست؟</h2>
 
 <p>
-<strong>OOP</strong> مخفف <strong>Object-Oriented Programming</strong> است؛
-یعنی «برنامه‌نویسی شیء‌گرا».
+<strong>OOP</strong> مخفف <strong>Object-Oriented Programming</strong>
+و به معنی «برنامه‌نویسی شیءگرا» است.
 </p>
 
 <p>
-در OOP به جای اینکه همه چیز را به صورت جداگانه بنویسیم،
-داده‌ها و رفتارها را داخل یک ساختار به نام <strong>Class</strong> قرار می‌دهیم.
+در OOP برنامه را حول <strong>Object</strong>ها طراحی می‌کنیم.
+هر Object می‌تواند داده‌هایی داشته باشد و رفتارهایی را انجام دهد.
+</p>
+
+<p>
+برای ساخت Objectها معمولاً ابتدا یک <strong>Class</strong> تعریف می‌کنیم.
 </p>
 
 <div class="table-wrap">
@@ -33613,54 +33627,59 @@ score2 = 19</div>
 <thead>
 <tr>
 <th>مفهوم</th>
-<th>توضیح</th>
+<th>معنی ساده</th>
+<th>مثال</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><strong>Class</strong></td><td>الگو یا قالب برای ساخت شیء</td></tr>
-<tr><td><strong>Object</strong></td><td>نمونه ساخته‌شده از یک Class</td></tr>
-<tr><td><strong>Attribute</strong></td><td>داده‌ای که به Object وصل است</td></tr>
-<tr><td><strong>Method</strong></td><td>تابعی که داخل Class تعریف می‌شود</td></tr>
+<tr>
+<td><strong>Class</strong></td>
+<td>قالب یا نقشه ساخت Object</td>
+<td><code>Student</code></td>
+</tr>
+<tr>
+<td><strong>Object</strong></td>
+<td>نمونه‌ای ساخته‌شده از Class</td>
+<td><code>student1</code></td>
+</tr>
+<tr>
+<td><strong>Attribute</strong></td>
+<td>داده یا ویژگی Object</td>
+<td><code>name</code>، <code>age</code></td>
+</tr>
+<tr>
+<td><strong>Method</strong></td>
+<td>رفتاری که Object انجام می‌دهد</td>
+<td><code>show_info()</code></td>
+</tr>
 </tbody>
 </table>
 </div>
 
 <p>
-بگذارید با یک مثال ساده شروع کنیم.
+برای درک بهتر، یک مثال ساده در نظر بگیر:
 </p>
+
+<div class="code-container">
+<span class="code-label">مدل ذهنی</span>
+<div class="code-block no-prompt">Class  →  نقشه ساختمان
+Object →  ساختمان ساخته‌شده
+
+Attribute → ویژگی‌های ساختمان
+Method    → کارهایی که ساختمان/سیستم انجام می‌دهد</div>
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. Class چیست؟</h2>
+<h2 class="lesson-title">3. Class چیست؟</h2>
 
 <p>
-<strong>Class</strong> یک <strong>قالب</strong> است که می‌گوید
-شیءهای ساخته‌شده از آن، چه ویژگی‌ها و رفتارهایی دارند.
+<strong>Class</strong> یک قالب یا نقشه برای ساخت Objectهاست.
+Class مشخص می‌کند Objectهای ساخته‌شده از آن چه داده‌ها و چه رفتارهایی می‌توانند داشته باشند.
 </p>
 
 <p>
-مثلاً فرض کن می‌خواهیم برنامه‌ای برای مدیریت ماشین‌ها بنویسیم.
-همه ماشین‌ها ویژگی‌های مشترکی دارند:
-</p>
-
-<ul>
-<li>برند</li>
-<li>رنگ</li>
-<li>سرعت</li>
-</ul>
-
-<p>
-و رفتارهای مشترکی دارند:
-</p>
-
-<ul>
-<li>روشن شدن</li>
-<li>حرکت کردن</li>
-<li>توقف</li>
-</ul>
-
-<p>
-خوب است یک Class به نام <code>Car</code> تعریف کنیم.
+ساختار کلی یک Class:
 </p>
 
 <div class="code-container">
@@ -33669,30 +33688,26 @@ score2 = 19</div>
     # بدنه کلاس</div>
 </div>
 
-<div class="lesson-important">
-<strong>نکته:</strong>
-نام کلاس‌ها معمولاً با حرف بزرگ شروع می‌شود؛
-مثل <code>Car</code>، <code>Student</code>، <code>User</code>.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">3. اولین Class</h2>
-
 <p>
-ساده‌ترین کلاس ممکن:
+مثلاً یک Class برای دانش‌آموز:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
+<div class="code-block no-prompt">class Student:
     pass</div>
 </div>
 
 <p>
-کلمه <code>pass</code> یعنی «این کلاس هنوز هیچ محتوایی ندارد».
-این کلاس فعلاً هیچ ویژگی و رفتاری ندارد، اما معتبر است.
+کلمه <code>pass</code> یعنی فعلاً بدنه کلاس کاری انجام نمی‌دهد.
+با این حال، Class معتبر است و می‌توان از آن Object ساخت.
 </p>
+
+<div class="lesson-important">
+<strong>نکته نام‌گذاری:</strong>
+در Python معمولاً نام Classها با سبک <strong>PascalCase</strong> نوشته می‌شود؛
+مثل <code>Student</code>، <code>Car</code> و <code>BankAccount</code>.
+</div>
 
 <hr class="lesson-divider">
 
@@ -33703,283 +33718,319 @@ score2 = 19</div>
 </p>
 
 <p>
-اگر Class قالب باشد، Object یک شیء واقعی ساخته‌شده از آن قالب است.
-</p>
-
-<div class="code-container">
-<span class="code-label">مثال</span>
-<div class="code-block no-prompt">Class = نقشه ساختمان
-Object = ساختمان ساخته‌شده</div>
-</div>
-
-<p>
-ساخت Object از یک Class:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1 = Car()
-car2 = Car()</div>
-</div>
-
-<p>
-اینجا <code>car1</code> و <code>car2</code> دو Object مستقل هستند
-که از Class <code>Car</code> ساخته شده‌اند.
-</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Car (Class)
-   │
-   ├── car1 (Object)
-   └── car2 (Object)</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">5. Attribute — ویژگی‌های Object</h2>
-
-<p>
-به داده‌هایی که داخل Object ذخیره می‌کنیم <strong>Attribute</strong> می‌گوییم.
-</p>
-
-<p>
-می‌توانیم بعد از ساخت Object، به آن Attribute اضافه کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1 = Car()
-
-car1.brand = "Toyota"
-car1.color = "Red"
-car1.speed = 0</div>
-</div>
-
-<p>
-دسترسی به Attributeها:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">print(car1.brand)
-print(car1.color)
-print(car1.speed)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Toyota
-Red
-0</div>
-</div>
-
-<p>
-هر Object Attributeهای مستقل خودش را دارد:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car2 = Car()
-
-car2.brand = "BMW"
-car2.color = "Black"
-car2.speed = 0
-
-print(car1.brand)
-print(car2.brand)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Toyota
-BMW</div>
-</div>
-
-<div class="lesson-note">
-<strong>نکته مهم:</strong>
-هر Object یک نسخه جداگانه از Attributeهای خودش دارد.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. Method — رفتارهای Object</h2>
-
-<p>
-به توابعی که داخل یک Class تعریف می‌شوند <strong>Method</strong> می‌گوییم.
-</p>
-
-<p>ساختار یک Method:</p>
-
-<div class="code-container">
-<span class="code-label">Syntax</span>
-<div class="code-block no-prompt">class ClassName:
-    def method_name(self):
-        # بدنه</div>
-</div>
-
-<p>مثلاً:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
-    def start(self):
-        print("Car started.")</div>
-</div>
-
-<p>
-حالا می‌توانیم این Method را روی Object صدا بزنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1 = Car()
-car1.start()</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Car started.</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">7. نقش <code>self</code></h2>
-
-<p>
-<code>self</code> یکی از مفاهیم کلیدی OOP است.
-</p>
-
-<p>
-<code>self</code> به معنی «خودِ Object» است.
-وقتی یک Method را صدا می‌زنیم، Python خود Object را به عنوان
-اولین پارامتر به Method می‌فرستد.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
-    def start(self):
-        print("Car started.")</div>
-</div>
-
-<p>
-وقتی می‌نویسیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1.start()</div>
-</div>
-
-<p>
-در واقع Python این کار را می‌کند:
-</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Car.start(car1)</div>
-</div>
-
-<p>
-پس <code>self</code> همان <code>car1</code> است.
-</p>
-
-<div class="lesson-important">
-<strong>قانون طلایی:</strong>
-همیشه اولین پارامتر هر Method داخل Class، <code>self</code> است.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">8. دسترسی به Attribute از داخل Method</h2>
-
-<p>
-با استفاده از <code>self</code> می‌توانیم داخل Method به Attributeها
-دسترسی داشته باشیم.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
-    def start(self):
-        print(f"{self.brand} started.")</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1 = Car()
-car1.brand = "Toyota"
-
-car1.start()</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Toyota started.</div>
-</div>
-
-<p>
-این یعنی Method می‌تواند روی داده‌های Object کار کند.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">9. Method با پارامتر</h2>
-
-<p>
-Methodها می‌توانند پارامتر بگیرند، دقیقاً مثل توابع معمولی.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
-    def drive(self, speed):
-        self.speed = speed
-        print(f"Driving at {self.speed} km/h")</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">car1 = Car()
-
-car1.drive(60)
-car1.drive(80)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Driving at 60 km/h
-Driving at 80 km/h</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">10. یک Class کامل‌تر</h2>
-
-<p>
-حالا یک Class کامل‌تر بنویسیم که هم Attribute دارد، هم Method.
+بعد از تعریف Class می‌توانیم از آن Object بسازیم:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">class Student:
-    def set_info(self, name, age):
-        self.name = name
-        self.age = age
+    pass
 
-    def show_info(self):
-        print(f"Name: {self.name}")
-        print(f"Age: {self.age}")</div>
+
+student1 = Student()
+student2 = Student()</div>
 </div>
 
 <p>
-استفاده از این کلاس:</p>
+اینجا <code>Student</code> یک Class است و
+<code>student1</code> و <code>student2</code> دو Object هستند.
+</p>
+
+<div class="code-container">
+<span class="code-label">ساختار</span>
+<div class="code-block no-prompt">Student (Class)
+     │
+     ├── student1 (Object)
+     │
+     └── student2 (Object)</div>
+</div>
+
+<p>
+هر دو Object از یک Class ساخته شده‌اند، اما خودشان Objectهای جداگانه هستند.
+</p>
+
+<div class="lesson-important">
+<strong>به خاطر بسپار:</strong>
+Class = قالب
+<br>
+Object = نمونه‌ای از قالب
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">5. Attribute چیست؟</h2>
+
+<p>
+<strong>Attribute</strong> داده یا ویژگی‌ای است که به یک Object مربوط می‌شود.
+</p>
+
+<p>
+مثلاً یک دانش‌آموز می‌تواند ویژگی‌هایی مانند نام، سن و نمره داشته باشد.
+</p>
+
+<p>
+می‌توانیم بعد از ساخت Object، Attribute ایجاد کنیم:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    pass
+
+
+student1 = Student()
+
+student1.name = "Ali"
+student1.age = 20
+student1.score = 18</div>
+</div>
+
+<p>
+حالا می‌توانیم به Attributeها دسترسی داشته باشیم:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">print(student1.name)
+print(student1.age)
+print(student1.score)</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Ali
+20
+18</div>
+</div>
+
+<p>
+دقت کن که با استفاده از نقطه <code>.</code> به Attribute دسترسی پیدا می‌کنیم:
+</p>
+
+<div class="code-container">
+<span class="code-label">Pattern</span>
+<div class="code-block no-prompt">object.attribute</div>
+</div>
+
+<p>
+مثلاً:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student1.name
+student1.age
+student1.score</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">6. Attributeهای Objectها مستقل هستند</h2>
+
+<p>
+یکی از ویژگی‌های مهم Objectها این است که هر Object می‌تواند داده‌های خودش را داشته باشد.
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    pass
+
+
+student1 = Student()
+student1.name = "Ali"
+student1.age = 20
+
+student2 = Student()
+student2.name = "Sara"
+student2.age = 22
+
+
+print(student1.name)
+print(student2.name)</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Ali
+Sara</div>
+</div>
+
+<p>
+هر دو Object از یک Class ساخته شده‌اند، اما مقدار Attributeهایشان مستقل است.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th><code>name</code></th>
+<th><code>age</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>student1</code></td>
+<td>Ali</td>
+<td>20</td>
+</tr>
+<tr>
+<td><code>student2</code></td>
+<td>Sara</td>
+<td>22</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="lesson-note">
+<strong>نکته مهم:</strong>
+چند Object می‌توانند از یک Class ساخته شوند، اما هر Object می‌تواند
+مقادیر مخصوص خودش را داشته باشد.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">7. Method چیست؟</h2>
+
+<p>
+<strong>Method</strong> تابعی است که داخل یک Class تعریف می‌شود
+و معمولاً رفتاری را برای Object مشخص می‌کند.
+</p>
+
+<p>
+ساختار یک Method:
+</p>
+
+<div class="code-container">
+<span class="code-label">Syntax</span>
+<div class="code-block no-prompt">class ClassName:
+    def method_name(self):
+        # دستورات</div>
+</div>
+
+<p>
+مثلاً دانش‌آموز می‌تواند اطلاعات خودش را نمایش دهد:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print("Student information")</div>
+</div>
+
+<p>
+برای اجرای Method روی یک Object از نقطه <code>.</code> استفاده می‌کنیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">student1 = Student()
 
-student1.set_info("Ali", 20)
+student1.show_info()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Student information</div>
+</div>
+
+<p>
+الگوی کلی:
+</p>
+
+<div class="code-container">
+<span class="code-label">Pattern</span>
+<div class="code-block no-prompt">object.method()</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">8. نقش <code>self</code></h2>
+
+<p>
+یکی از مهم‌ترین مفاهیم اولیه OOP در Python، <code>self</code> است.
+</p>
+
+<p>
+در یک <strong>instance method</strong>، <code>self</code> به Objectای اشاره می‌کند
+که Method روی آن اجرا شده است.
+</p>
+
+<p>
+مثلاً:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print("Student information")</div>
+</div>
+
+<p>
+وقتی می‌نویسیم:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student1.show_info()</div>
+</div>
+
+<p>
+Python Object مربوط به <code>student1</code> را به عنوان اولین آرگومان
+این Method در اختیار آن قرار می‌دهد.
+برای همین داخل تعریف Method پارامتر <code>self</code> را می‌نویسیم.
+</p>
+
+<div class="code-container">
+<span class="code-label">مدل ساده</span>
+<div class="code-block no-prompt">student1.show_info()
+
+        ↓
+
+show_info(student1)</div>
+</div>
+
+<p>
+بنابراین در این مثال:
+</p>
+
+<div class="code-container">
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">self  →  student1</div>
+</div>
+
+<div class="lesson-important">
+<strong>قانون مهم:</strong>
+در Methodهای نمونه‌ای، <code>self</code> به Object فعلی اشاره می‌کند.
+نام <code>self</code> قرارداد استاندارد Python است و باید همان‌طور نوشته شود.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">9. استفاده از <code>self</code> برای دسترسی به Attribute</h2>
+
+<p>
+حالا می‌توانیم Attributeهای Object را از داخل Method استفاده کنیم.
+برای این کار از <code>self.attribute</code> استفاده می‌کنیم.
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(f"Name: {self.name}")
+        print(f"Age: {self.age}")
+
+
+student1 = Student()
+
+student1.name = "Ali"
+student1.age = 20
+
 student1.show_info()</div>
 </div>
 
@@ -33990,117 +34041,359 @@ Age: 20</div>
 </div>
 
 <p>
-این روش کار می‌کند، اما یک مشکل دارد:
-ما مجبوریم همیشه اول <code>set_info</code> را صدا بزنیم.
-راه‌حل بهتر: <strong>Constructor</strong>.
+در اینجا <code>self.name</code> یعنی Attribute مربوط به همان Objectی
+که Method را اجرا کرده است.
 </p>
 
 <p>
-Constructor موضوع جلسه بعدی است. در این جلسه با روش ساده شروع کردیم
-تا مفهوم Class و Object را خوب بفهمی.
+اگر Object دیگری داشته باشیم، <code>self</code> به Object دیگری اشاره خواهد کرد:
 </p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student2 = Student()
+
+student2.name = "Sara"
+student2.age = 22
+
+student2.show_info()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Name: Sara
+Age: 22</div>
+</div>
+
+<div class="lesson-note">
+<strong>نتیجه:</strong>
+یک Method مشترک می‌تواند روی Objectهای مختلف اجرا شود و با کمک
+<code>self</code> به داده‌های همان Object دسترسی پیدا کند.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. چند Object از یک Class</h2>
+<h2 class="lesson-title">10. Method با پارامتر</h2>
 
 <p>
-یکی از مزایای OOP این است که می‌توانیم چند Object مستقل بسازیم
-که هرکدام داده‌های خودش را دارد.
+Methodها می‌توانند علاوه بر <code>self</code> پارامترهای دیگری هم دریافت کنند؛
+درست مانند Functionهای معمولی.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">class Student:
-    def set_info(self, name, age):
-        self.name = name
-        self.age = age
+    def say_hello(self, message):
+        print(f"{self.name}: {message}")</div>
+</div>
 
-    def show_info(self):
-        print(f"{self.name} - {self.age}")
+<p>
+استفاده:
+</p>
 
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student1 = Student()
+student1.name = "Ali"
 
-s1 = Student()
-s1.set_info("Ali", 20)
-
-s2 = Student()
-s2.set_info("Sara", 22)
-
-s3 = Student()
-s3.set_info("Reza", 19)
-
-s1.show_info()
-s2.show_info()
-s3.show_info()</div>
+student1.say_hello("Hello!")</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt">Ali - 20
-Sara - 22
-Reza - 19</div>
+<div class="code-block no-prompt">Ali: Hello!</div>
 </div>
 
 <p>
-هر Object اطلاعات خودش را نگه می‌دارد.
-</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Student (Class)
-   │
-   ├── s1  → Ali, 20
-   ├── s2  → Sara, 22
-   └── s3  → Reza, 19</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">12. Class و OOP در برنامه‌های واقعی</h2>
-
-<p>
-OOP فقط یک مفهوم تئوری نیست؛ در تمام برنامه‌های واقعی استفاده می‌شود.
+اینجا:
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مثال</th>
+<th>پارامتر</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>self</code></td>
+<td>Object فعلی</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>داده‌ای که هنگام فراخوانی Method ارسال می‌شود</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">11. Attribute و Method در کنار هم</h2>
+
+<p>
+حالا مفاهیم اصلی جلسه را در یک مثال کنار هم قرار می‌دهیم.
+</p>
+
+<p>
+یک <code>Student</code> داریم که:
+</p>
+
+<ul>
+<li>Attributeهای <code>name</code> و <code>score</code> دارد.</li>
+<li>Methodای برای نمایش اطلاعات دارد.</li>
+<li>Methodای برای نمایش وضعیت قبولی دارد.</li>
+</ul>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(f"Name: {self.name}")
+        print(f"Score: {self.score}")
+
+    def show_status(self):
+        if self.score >= 10:
+            print("Passed")
+        else:
+            print("Failed")
+
+
+student1 = Student()
+
+student1.name = "Ali"
+student1.score = 18
+
+student1.show_info()
+student1.show_status()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Name: Ali
+Score: 18
+Passed</div>
+</div>
+
+<p>
+در این مثال:
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>در مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class</td>
+<td><code>Student</code></td>
+</tr>
+<tr>
+<td>Object</td>
+<td><code>student1</code></td>
+</tr>
+<tr>
+<td>Attribute</td>
+<td><code>name</code> و <code>score</code></td>
+</tr>
+<tr>
+<td>Method</td>
+<td><code>show_info()</code> و <code>show_status()</code></td>
+</tr>
+<tr>
+<td><code>self</code></td>
+<td>اشاره به <code>student1</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">12. چند Object از یک Class</h2>
+
+<p>
+حالا می‌توانیم از یک Class چند Object بسازیم.
+هر Object اطلاعات مخصوص خودش را خواهد داشت.
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(f"{self.name} - {self.score}")
+
+
+student1 = Student()
+student1.name = "Ali"
+student1.score = 18
+
+student2 = Student()
+student2.name = "Sara"
+student2.score = 19
+
+student3 = Student()
+student3.name = "Reza"
+student3.score = 14
+
+
+student1.show_info()
+student2.show_info()
+student3.show_info()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Ali - 18
+Sara - 19
+Reza - 14</div>
+</div>
+
+<p>
+ساختار برنامه را می‌توان این‌طور دید:
+</p>
+
+<div class="code-container">
+<span class="code-label">مدل ذهنی</span>
+<div class="code-block no-prompt">Student (Class)
+      │
+      ├── student1 → Ali, 18
+      │
+      ├── student2 → Sara, 19
+      │
+      └── student3 → Reza, 14</div>
+</div>
+
+<p>
+Class مشخص می‌کند Objectها چه ساختاری داشته باشند،
+اما هر Object داده‌های خودش را نگه می‌دارد.
+</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">13. یک نکته مهم درباره Attributeها</h2>
+
+<p>
+در مثال‌های این جلسه Attributeها را بعد از ساخت Object ایجاد کردیم:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student = Student()
+
+student.name = "Ali"
+student.age = 20</div>
+</div>
+
+<p>
+این روش برای یادگیری مفهوم Attribute مناسب است، اما در برنامه‌های واقعی
+معمولاً می‌خواهیم هنگام ساخت Object، اطلاعات اولیه آن را مشخص کنیم.
+</p>
+
+<p>
+مثلاً به جای اینکه ابتدا Object بسازیم و بعد چند خط برای مقداردهی بنویسیم،
+می‌توانیم اطلاعات را هنگام ساخت Object ارسال کنیم.
+</p>
+
+<div class="code-container">
+<span class="code-label">Preview</span>
+<div class="code-block no-prompt">student = Student("Ali", 20)</div>
+</div>
+
+<p>
+برای انجام این کار به <strong>Constructor</strong> و متد
+<code>__init__()</code> نیاز داریم.
+</p>
+
+<div class="lesson-note">
+<strong>این موضوع را در جلسه بعد یاد می‌گیریم.</strong>
+در این جلسه هدف ما این بود که ابتدا رابطه بین Class، Object،
+Attribute و Method را به‌خوبی درک کنیم.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">14. OOP در برنامه‌های واقعی</h2>
+
+<p>
+در پروژه‌های واقعی، معمولاً موجودیت‌های مختلف برنامه را می‌توان به صورت
+Class مدل کرد.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>حوزه</th>
 <th>Class</th>
 <th>Object</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>بازی</td><td>Player</td><td>player1, player2</td></tr>
-<tr><td>فروشگاه</td><td>Product</td><td>product1, product2</td></tr>
-<tr><td>شبکه اجتماعی</td><td>User</td><td>user1, user2</td></tr>
-<tr><td>مدرسه</td><td>Student</td><td>student1, student2</td></tr>
+<tr>
+<td>فروشگاه</td>
+<td><code>Product</code></td>
+<td><code>product1</code></td>
+</tr>
+<tr>
+<td>مدرسه</td>
+<td><code>Student</code></td>
+<td><code>student1</code></td>
+</tr>
+<tr>
+<td>شبکه اجتماعی</td>
+<td><code>User</code></td>
+<td><code>user1</code></td>
+</tr>
+<tr>
+<td>بازی</td>
+<td><code>Player</code></td>
+<td><code>player1</code></td>
+</tr>
+<tr>
+<td>بانک</td>
+<td><code>BankAccount</code></td>
+<td><code>account1</code></td>
+</tr>
 </tbody>
 </table>
 </div>
 
 <p>
-در واقع تقریباً همه کتابخانه‌های بزرگ Python از OOP استفاده می‌کنند.
+مثلاً یک <code>BankAccount</code> می‌تواند Attributeهایی مثل
+<code>owner</code> و <code>balance</code> و Methodهایی مثل
+<code>deposit()</code> و <code>withdraw()</code> داشته باشد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. مدل ذهنی OOP</h2>
+<h2 class="lesson-title">مدل ذهنی کل جلسه</h2>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Class
-  │
-  ├── قالب برای ساخت Object
-  │
-  ├── Attribute  → داده‌ها
-  └── Method     → رفتارها
+<span class="code-label">OOP Structure</span>
+<div class="code-block no-prompt">OOP
+ │
+ └── Class
+      │
+      ├── Attribute → داده / ویژگی
+      │
+      └── Method    → رفتار
+             │
+             ↓
+          Object
+             │
+             ├── Attributeهای خودش
+             └── Methodهای Class
 
-Object
-  │
-  ├── نمونه واقعی از Class
-  └── داده و رفتار مستقل</div>
+self
+ ↓
+اشاره به Object فعلی</div>
 </div>
 
 <hr class="lesson-divider">
@@ -34108,122 +34401,197 @@ Object
 <h2 class="lesson-title">نکات مهم جلسه</h2>
 
 <ul>
-<li>OOP یعنی برنامه‌نویسی شیء‌گرا.</li>
-<li>Class یک قالب برای ساخت Objectهاست.</li>
-<li>Object یک نمونه واقعی از Class است.</li>
-<li>Attribute داده‌های Object را نگه می‌دارد.</li>
-<li>Method رفتار Object را مشخص می‌کند.</li>
-<li><code>self</code> به خود Object اشاره می‌کند.</li>
-<li>همیشه اولین پارامتر Method، <code>self</code> است.</li>
-<li>هر Object نسخه مستقل خودش را از Attributeها دارد.</li>
-<li>می‌توان از یک Class چندین Object ساخت.</li>
-<li>نام کلاس‌ها با حرف بزرگ شروع می‌شود.</li>
+<li><strong>OOP</strong> یعنی Object-Oriented Programming.</li>
+<li><strong>Class</strong> یک قالب برای ساخت Objectهاست.</li>
+<li><strong>Object</strong> یک نمونه از Class است.</li>
+<li><strong>Attribute</strong> داده یا ویژگی مربوط به Object است.</li>
+<li><strong>Method</strong> تابعی است که داخل Class تعریف می‌شود.</li>
+<li><code>self</code> در Methodهای نمونه‌ای به Object فعلی اشاره می‌کند.</li>
+<li>با <code>self.attribute</code> می‌توان به Attributeهای Object از داخل Method دسترسی داشت.</li>
+<li>چند Object می‌توانند از یک Class ساخته شوند.</li>
+<li>هر Object می‌تواند مقادیر مستقل خودش را برای Attributeها داشته باشد.</li>
+<li>برای مقداردهی اولیه هنگام ساخت Object از <code>__init__()</code> استفاده می‌کنیم که در جلسه بعد یاد می‌گیریم.</li>
 </ul>
 
 <hr class="lesson-divider">
 
 <h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — سیستم ثبت اطلاعات کتاب
+سناریوی ترکیبی — مدیریت دانش‌آموزان
 </h1>
 
 <p>
-می‌خواهیم یک کلاس <code>Book</code> بسازیم که:
+می‌خواهیم یک Class به نام <code>Student</code> طراحی کنیم که:
 </p>
 
 <ul>
-<li>اطلاعات کتاب (عنوان، نویسنده، سال) را نگه دارد.</li>
-<li>اطلاعات را نمایش دهد.</li>
-<li>وضعیت خوانده شدن را مشخص کند.</li>
+<li>نام و نمره دانش‌آموز را نگه دارد.</li>
+<li>اطلاعات دانش‌آموز را نمایش دهد.</li>
+<li>وضعیت قبولی او را مشخص کند.</li>
+<li>برای چند دانش‌آموز قابل استفاده باشد.</li>
 </ul>
 
-<h3>مرحله ۱ — تعریف Class</h3>
+<h3>مرحله ۱ — تعریف Class و Methodها</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">class Book:
-    def set_info(self, title, author, year):
-        self.title = title
-        self.author = author
-        self.year = year
-        self.read = False</div>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(f"Name: {self.name}")
+        print(f"Score: {self.score}")
+
+    def show_status(self):
+        if self.score >= 10:
+            print("Passed")
+        else:
+            print("Failed")</div>
 </div>
 
-<h3>مرحله ۲ — Method نمایش اطلاعات</h3>
+<h3>مرحله ۲ — ساخت Object و Attributeها</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">    def show_info(self):
-        print(f"Title: {self.title}")
-        print(f"Author: {self.author}")
-        print(f"Year: {self.year}")
-        print(f"Read: {self.read}")</div>
+<div class="code-block no-prompt">student1 = Student()
+
+student1.name = "Ali"
+student1.score = 18</div>
 </div>
 
-<h3>مرحله ۳ — Method علامت‌گذاری به‌عنوان خوانده‌شده</h3>
+<h3>مرحله ۳ — اجرای Methodها</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">    def mark_as_read(self):
-        self.read = True</div>
+<div class="code-block no-prompt">student1.show_info()
+student1.show_status()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Name: Ali
+Score: 18
+Passed</div>
+</div>
+
+<h3>مرحله ۴ — ساخت Object دوم</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student2 = Student()
+
+student2.name = "Sara"
+student2.score = 8
+
+student2.show_info()
+student2.show_status()</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Name: Sara
+Score: 8
+Failed</div>
 </div>
 
 <h3>برنامه کامل</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">class Book:
-    def set_info(self, title, author, year):
-        self.title = title
-        self.author = author
-        self.year = year
-        self.read = False
-
+<div class="code-block no-prompt">class Student:
     def show_info(self):
-        print(f"Title: {self.title}")
-        print(f"Author: {self.author}")
-        print(f"Year: {self.year}")
-        print(f"Read: {self.read}")
+        print(f"Name: {self.name}")
+        print(f"Score: {self.score}")
 
-    def mark_as_read(self):
-        self.read = True
+    def show_status(self):
+        if self.score >= 10:
+            print("Passed")
+        else:
+            print("Failed")
 
 
-book1 = Book()
-book1.set_info("Python 101", "Ali", 2023)
-book1.show_info()
+student1 = Student()
+student1.name = "Ali"
+student1.score = 18
+
+student2 = Student()
+student2.name = "Sara"
+student2.score = 8
+
+
+student1.show_info()
+student1.show_status()
 
 print("-----")
 
-book1.mark_as_read()
-book1.show_info()</div>
+student2.show_info()
+student2.show_status()</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt">Title: Python 101
-Author: Ali
-Year: 2023
-Read: False
+<div class="code-block no-prompt">Name: Ali
+Score: 18
+Passed
 -----
-Title: Python 101
-Author: Ali
-Year: 2023
-Read: True</div>
+Name: Sara
+Score: 8
+Failed</div>
 </div>
 
-<p>در این برنامه همه مفاهیم جلسه به هم متصل شدند:</p>
+<p>
+در این مثال تمام مفاهیم اصلی جلسه کنار هم قرار گرفتند:
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class</td>
+<td><code>Student</code></td>
+</tr>
+<tr>
+<td>Object</td>
+<td><code>student1</code> و <code>student2</code></td>
+</tr>
+<tr>
+<td>Attribute</td>
+<td><code>name</code> و <code>score</code></td>
+</tr>
+<tr>
+<td>Method</td>
+<td><code>show_info()</code> و <code>show_status()</code></td>
+</tr>
+<tr>
+<td><code>self</code></td>
+<td>Object فعلی هنگام اجرای Method</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <div class="code-container">
 <span class="code-label">Final Flow</span>
-<div class="code-block no-prompt">class Book
+<div class="code-block no-prompt">Class
   ↓
-Book() → ساخت Object
+Student
   ↓
-set_info() → مقداردهی به Attributeها
+ساخت Object
   ↓
-show_info() → نمایش
+student1 / student2
   ↓
-mark_as_read() → تغییر Attribute</div>
+Attribute
+  ↓
+name / score
+  ↓
+Method
+  ↓
+show_info() / show_status()
+  ↓
+self → Object فعلی</div>
 </div>
 
 <hr class="lesson-divider">
@@ -34231,141 +34599,152 @@ mark_as_read() → تغییر Attribute</div>
 <h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
 
 <p>
-هر سؤال را ابتدا خودت حل کن، سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.
+هر سؤال را ابتدا خودت حل کن، سپس گزینه مناسب را انتخاب کن.
 </p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — تفاوت Class و Object چیست؟</p>
+<p>❓ سؤال ۱ — در OOP، Class چه نقشی دارد؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) هیچ تفاوتی ندارند</button>
-<button onclick="selectOption(this)">ب) Class قالب است و Object نمونه ساخته‌شده از آن</button>
-<button onclick="selectOption(this)">ج) Object قالب است و Class نمونه</button>
-<button onclick="selectOption(this)">د) هر دو یکسان هستند</button>
+<button onclick="selectOption(this)">الف) یک Object ساخته‌شده است</button>
+<button onclick="selectOption(this)">ب) قالبی برای ساخت Objectهاست</button>
+<button onclick="selectOption(this)">ج) یک Variable است</button>
+<button onclick="selectOption(this)">د) یک نوع حلقه است</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-Class به‌عنوان قالب و Object به‌عنوان نمونه واقعی ساخته‌شده از آن قالب شناخته می‌شود.
+Class یک قالب یا نقشه برای ساخت Objectهاست.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — کدام گزینه برای تعریف یک Class درست است؟</p>
+<p>❓ سؤال ۲ — خروجی کد زیر چیست؟<br>
+<code>class Student:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pass<br>
+<br>
+s = Student()<br>
+print(type(s).__name__)</code></p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>class car:</code></button>
-<button onclick="selectOption(this)">ب) <code>Class Car:</code></button>
-<button onclick="selectOption(this)">ج) <code>class Car:</code></button>
-<button onclick="selectOption(this)">د) <code>def Car:</code></button>
+<button onclick="selectOption(this)">الف) <code>Student</code></button>
+<button onclick="selectOption(this)">ب) <code>Object</code></button>
+<button onclick="selectOption(this)">ج) <code>Class</code></button>
+<button onclick="selectOption(this)">د) خطا</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: الف</strong>
+<br>
+<code>s</code> یک Object ساخته‌شده از Class <code>Student</code> است و نام نوع آن <code>Student</code> خواهد بود.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۳ — کدام گزینه یک Attribute برای Object <code>student</code> ایجاد می‌کند؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>student.name = "Ali"</code></button>
+<button onclick="selectOption(this)">ب) <code>student.name()</code></button>
+<button onclick="selectOption(this)">ج) <code>class student.name</code></button>
+<button onclick="selectOption(this)">د) <code>def student.name</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: الف</strong>
+<br>
+دستور <code>student.name = "Ali"</code> یک Attribute به نام <code>name</code> برای Object ایجاد یا مقداردهی می‌کند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۴ — Method چیست؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) داده داخل Object</button>
+<button onclick="selectOption(this)">ب) تابعی که داخل Class تعریف می‌شود</button>
+<button onclick="selectOption(this)">ج) نام Class</button>
+<button onclick="selectOption(this)">د) نوعی Variable</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+Method تابعی است که داخل Class تعریف می‌شود و معمولاً رفتاری برای Object فراهم می‌کند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۵ — <code>self</code> در کد زیر به چه چیزی اشاره می‌کند؟<br>
+<code>class Student:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def show(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(self.name)</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) خود Class</button>
+<button onclick="selectOption(this)">ب) Object فعلی</button>
+<button onclick="selectOption(this)">ج) نام Method</button>
+<button onclick="selectOption(this)">د) ماژول Python</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+در یک instance method، <code>self</code> به Object فعلی اشاره می‌کند.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۶ — خروجی کد زیر چیست؟<br>
+<code>class Student:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def show(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(self.name)<br>
+<br>
+s = Student()<br>
+s.name = "Ali"<br>
+s.show()</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>Student</code></button>
+<button onclick="selectOption(this)">ب) <code>self</code></button>
+<button onclick="selectOption(this)">ج) <code>Ali</code></button>
+<button onclick="selectOption(this)">د) خطا می‌دهد</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ج</strong>
 <br>
-کلمه کلیدی <code>class</code> با حروف کوچک و نام کلاس با حرف بزرگ نوشته می‌شود.
+<code>self.name</code> به Attribute <code>name</code> مربوط به Object <code>s</code> اشاره می‌کند که مقدار آن <code>Ali</code> است.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — <code>self</code> در Method به چه چیزی اشاره می‌کند؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) به کلاس</button>
-<button onclick="selectOption(this)">ب) به خود Object</button>
-<button onclick="selectOption(this)">ج) به تابع اصلی</button>
-<button onclick="selectOption(this)">د) به ماژول</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>self</code> به خود Object اشاره می‌کند و به Method اجازه می‌دهد
-به داده‌های Object دسترسی داشته باشد.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۴ — خروجی کد زیر چیست؟<br>
-<code>class Car:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def start(self):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Go")<br>
-<br>
-c = Car()<br>
-c.start()</code></p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) خطا می‌دهد</button>
-<button onclick="selectOption(this)">ب) <code>Go</code></button>
-<button onclick="selectOption(this)">ج) <code>Car</code></button>
-<button onclick="selectOption(this)">د) هیچ چیز چاپ نمی‌کند</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-Method <code>start</code> با دستور <code>print("Go")</code>، عبارت <code>Go</code>
-را چاپ می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۵ — Attribute چیست؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) تابعی داخل Class</button>
-<button onclick="selectOption(this)">ب) داده‌ای که به Object وصل است</button>
-<button onclick="selectOption(this)">ج) نوعی حلقه</button>
-<button onclick="selectOption(this)">د) نوعی ماژول</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-Attribute داده‌ای است که داخل Object ذخیره می‌شود.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۶ — کدام گزینه درست است؟<br>
+<p>❓ سؤال ۷ — خروجی کد زیر چیست؟<br>
 <code>class Student:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def set_name(self, name):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.name = name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def show(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(self.name)<br>
 <br>
-s = Student()<br>
-s.set_name("Ali")<br>
-print(s.name)</code></p>
+s1 = Student()<br>
+s1.name = "Ali"<br>
+<br>
+s2 = Student()<br>
+s2.name = "Sara"<br>
+<br>
+s1.show()<br>
+s2.show()</code></p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) خطا می‌دهد</button>
-<button onclick="selectOption(this)">ب) <code>Ali</code> چاپ می‌شود</button>
-<button onclick="selectOption(this)">ج) <code>name</code> چاپ می‌شود</button>
-<button onclick="selectOption(this)">د) <code>Student</code> چاپ می‌شود</button>
+<button onclick="selectOption(this)">الف) Ali و Ali</button>
+<button onclick="selectOption(this)">ب) Sara و Sara</button>
+<button onclick="selectOption(this)">ج) Ali و Sara</button>
+<button onclick="selectOption(this)">د) خطا می‌دهد</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
+<strong>✅ پاسخ: ج</strong>
 <br>
-داخل Method، <code>self.name</code> مقدار <code>"Ali"</code> را می‌گیرد و
-با <code>s.name</code> قابل دسترسی است.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۷ — کدام گزینه صحیح است؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) از یک Class فقط یک Object می‌توان ساخت</button>
-<button onclick="selectOption(this)">ب) هر Object نسخه مستقل خودش را از Attributeها دارد</button>
-<button onclick="selectOption(this)">ج) Object بدون Class هم می‌توان ساخت</button>
-<button onclick="selectOption(this)">د) Method همان Attribute است</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-هر Object داده‌های مستقل خودش را دارد؛ حتی اگر از یک Class ساخته شده باشد.
+<code>s1</code> و <code>s2</code> دو Object مستقل هستند و هرکدام Attribute <code>name</code> مخصوص خودشان را دارند.
 </div>
 </div>
 
@@ -34374,8 +34753,9 @@ print(s.name)</code></p>
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه اولین قدم را در دنیای OOP برداشتیم:
-یاد گرفتیم Class، Object، Attribute و Method چیست.
+در این جلسه با پایه‌ای‌ترین مفاهیم OOP در Python آشنا شدیم.
+هدف اصلی این بود که رابطه بین <strong>Class</strong>، <strong>Object</strong>،
+<strong>Attribute</strong> و <strong>Method</strong> را درک کنیم.
 </p>
 
 <div class="table-wrap">
@@ -34383,62 +34763,80 @@ print(s.name)</code></p>
 <thead>
 <tr>
 <th>مفهوم</th>
-<th>نکته اصلی</th>
+<th>نقش</th>
+<th>مثال</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Class</td>
 <td>قالب ساخت Object</td>
+<td><code>Student</code></td>
 </tr>
 <tr>
 <td>Object</td>
-<td>نمونه ساخته‌شده از Class</td>
+<td>نمونه‌ای از Class</td>
+<td><code>student1</code></td>
 </tr>
 <tr>
 <td>Attribute</td>
-<td>داده‌های Object</td>
+<td>داده یا ویژگی Object</td>
+<td><code>student1.name</code></td>
 </tr>
 <tr>
 <td>Method</td>
 <td>رفتار Object</td>
+<td><code>student1.show_info()</code></td>
 </tr>
 <tr>
 <td><code>self</code></td>
-<td>اشاره به خود Object</td>
+<td>اشاره به Object فعلی</td>
+<td><code>self.name</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مهم‌ترین الگوی این جلسه را حفظ کن:</p>
+<p>
+مهم‌ترین الگوی این جلسه:
+</p>
 
 <div class="code-container">
 <span class="code-label">Core Pattern</span>
 <div class="code-block no-prompt">class ClassName:
     def method(self):
-        ...
+        print(self.attribute)
+
 
 obj = ClassName()
+obj.attribute = "value"
+
 obj.method()</div>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثلاً:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">class Car:
-    def start(self):
-        print("Car started.")
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(self.name)
 
-car1 = Car()
-car1.start()</div>
+
+student = Student()
+student.name = "Ali"
+
+student.show_info()</div>
 </div>
 
 <p>
-در <strong>جلسه ۲۶ — Constructor، <code>__init__()</code> و Instance/Class Attributes</strong>
-یاد می‌گیریم چگونه هنگام ساخت Object، داده‌ها را مستقیم به آن بدهیم
-و کلاس‌ها را حرفه‌ای‌تر طراحی کنیم.
+در <strong>جلسه ۲</strong> سراغ مرحله بعد می‌رویم:
+یاد می‌گیریم چگونه هنگام ساخت Object، اطلاعات اولیه را مستقیماً ارسال کنیم
+و با <code>__init__()</code>، <strong>Constructor</strong> و
+تفاوت <strong>Instance Attribute</strong> و <strong>Class Attribute</strong>
+آشنا می‌شویم.
 </p>`
 ,
 "ch15-2": `<div class="section-header">
@@ -34454,67 +34852,75 @@ car1.start()</div>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
 <li>مفهوم <strong>Constructor</strong> را توضیح بدهی.</li>
-<li>متد <code>__init__()</code> را در کلاس تعریف کنی.</li>
+<li>متد <code>__init__()</code> را در یک Class تعریف کنی.</li>
 <li>هنگام ساخت Object، مقدار اولیه به آن بدهی.</li>
-<li>تفاوت <strong>Instance Attribute</strong> و <strong>Class Attribute</strong> را تشخیص بدهی.</li>
-<li>Attributeها را داخل <code>__init__</code> مقداردهی کنی.</li>
-<li>بتوانی کلاس‌ها را با پارامتر بسازی و استفاده کنی.</li>
-<li>مقدار پیش‌فرض برای پارامترهای <code>__init__</code> تعیین کنی.</li>
-<li>کلاس‌های واقعی‌تر مثل <code>User</code>، <code>Product</code> و <code>Student</code> طراحی کنی.</li>
+<li>Attributeهای Object را داخل <code>__init__()</code> مقداردهی کنی.</li>
+<li>مفهوم <strong>Instance Attribute</strong> را درک کنی.</li>
+<li>مفهوم <strong>Class Attribute</strong> را درک کنی.</li>
+<li>تفاوت Instance Attribute و Class Attribute را تشخیص بدهی.</li>
+<li>برای پارامترهای Constructor مقدار پیش‌فرض تعیین کنی.</li>
+<li>کلاس‌های واقعی‌تر و قابل استفاده مجدد طراحی کنی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">معرفی جلسه</h2>
+<h2 class="lesson-title">1. مشکل روش جلسه قبل</h2>
 
 <p>
-در جلسه قبل یاد گرفتیم <strong>Class</strong> و <strong>Object</strong> چیست
-و چطور با <code>self</code> به Attributeها دسترسی داشته باشیم.
+در جلسه قبل یاد گرفتیم چگونه Class و Object بسازیم و Attributeها را به Object
+اضافه کنیم.
 </p>
 
 <p>
-اما یک مشکل داشتیم: هر بار باید Object را می‌ساختیم و بعد
-با یک Method جداگانه مثل <code>set_info</code> داده‌ها را وارد می‌کردیم.
+اما برای مقداردهی Object مجبور بودیم ابتدا آن را بسازیم و سپس Attributeها را
+جداگانه مقداردهی کنیم:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">student1 = Student()
-student1.set_info("Ali", 20)</div>
+<div class="code-block no-prompt">class Student:
+    def show_info(self):
+        print(self.name, self.age)
+
+
+student1 = Student()
+
+student1.name = "Ali"
+student1.age = 20</div>
 </div>
 
 <p>
-این روش چند مشکل دارد:
+این روش برای یادگیری مناسب است، اما در برنامه واقعی بهتر است Object از همان
+لحظه ساخت، اطلاعات اولیه موردنیاز خود را داشته باشد.
 </p>
 
-<ul>
-<li>کاربر ممکن است فراموش کند <code>set_info</code> را صدا بزند.</li>
-<li>Object بدون داده ساخته می‌شود.</li>
-<li>خوانایی کد کم است.</li>
-</ul>
-
 <p>
-راه‌حل: <strong>Constructor</strong>.
+می‌خواهیم به جای چند خط بالا بتوانیم بنویسیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">جلسه قبل: Object + جداگانه مقداردهی
-این جلسه:  Object + مقداردهی در همان لحظه ساخت</div>
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">student1 = Student("Ali", 20)</div>
 </div>
+
+<p>
+برای این کار از <strong>Constructor</strong> و متد <code>__init__()</code>
+استفاده می‌کنیم.
+</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. Constructor چیست؟</h2>
+<h2 class="lesson-title">2. Constructor چیست؟</h2>
 
 <p>
-<strong>Constructor</strong> یک متد خاص است که <strong>به‌طور خودکار</strong>
-هنگام ساخت Object اجرا می‌شود.
+<strong>Constructor</strong> بخشی از طراحی Class است که هنگام ایجاد یک Object
+برای انجام مقداردهی اولیه اجرا می‌شود.
 </p>
 
 <p>
-کار آن این است که Object تازه‌ساخته‌شده را آماده کند.
+در Python، متدی که معمولاً برای این کار استفاده می‌شود
+<strong><code>__init__()</code></strong> است.
 </p>
 
 <div class="table-wrap">
@@ -34526,20 +34932,39 @@ student1.set_info("Ali", 20)</div>
 </tr>
 </thead>
 <tbody>
-<tr><td>Constructor</td><td>متدی که هنگام ساخت Object اجرا می‌شود</td></tr>
-<tr><td>کار آن</td><td>مقداردهی اولیه به Attributeها</td></tr>
-<tr><td>نام آن در Python</td><td><code>__init__</code></td></tr>
+<tr>
+<td><strong>Constructor</strong></td>
+<td>برای آماده‌سازی Object هنگام ایجاد آن استفاده می‌شود.</td>
+</tr>
+<tr>
+<td><code>__init__()</code></td>
+<td>متدی ویژه در Python برای مقداردهی اولیه Object</td>
+</tr>
+<tr>
+<td>زمان اجرا</td>
+<td>هنگام ساخت Object</td>
+</tr>
+<tr>
+<td>کاربرد اصلی</td>
+<td>قرار دادن وضعیت اولیه Object</td>
+</tr>
 </tbody>
 </table>
 </div>
 
-<p>
-در Python به Constructor می‌گوییم <code>__init__()</code>.
-</p>
+<div class="lesson-important">
+<strong>نکته:</strong>
+در سطح این دوره، <code>__init__()</code> را به‌عنوان متدی در نظر بگیر که
+هنگام ساخت Object برای مقداردهی اولیه آن اجرا می‌شود.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. ساختار <code>__init__()</code></h2>
+<h2 class="lesson-title">3. اولین <code>__init__()</code></h2>
+
+<p>
+ساختار ساده Constructor:
+</p>
 
 <div class="code-container">
 <span class="code-label">Syntax</span>
@@ -34548,7 +34973,9 @@ student1.set_info("Ali", 20)</div>
         # مقداردهی اولیه</div>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثلاً:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -34558,7 +34985,7 @@ student1.set_info("Ali", 20)</div>
 </div>
 
 <p>
-حالا هر بار که یک Object بسازیم:
+حالا با ساخت هر Object، <code>__init__()</code> اجرا می‌شود:
 </p>
 
 <div class="code-container">
@@ -34573,18 +35000,23 @@ car2 = Car()</div>
 A new car is created.</div>
 </div>
 
-<div class="lesson-important">
+<p>
+ما فقط <code>Car()</code> را صدا زدیم؛ Python در فرایند ساخت Object،
+<code>__init__()</code> را برای مقداردهی اولیه اجرا کرد.
+</p>
+
+<div class="lesson-note">
 <strong>نکته:</strong>
-هیچ‌وقت <code>__init__</code> را مستقیم صدا نمی‌زنیم؛
-Python خودش هنگام ساخت Object آن را اجرا می‌کند.
+در استفاده معمول، نیازی نیست <code>__init__()</code> را مستقیم صدا بزنی.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. مقداردهی Attributeها در Constructor</h2>
+<h2 class="lesson-title">4. مقداردهی Attributeها در <code>__init__()</code></h2>
 
 <p>
-پرکاربردترین کاربرد Constructor، مقداردهی اولیه به Attributeهاست.
+مهم‌ترین کاربرد <code>__init__()</code> این است که Attributeهای اولیه Object
+را همان ابتدا ایجاد و مقداردهی کنیم.
 </p>
 
 <div class="code-container">
@@ -34597,7 +35029,7 @@ Python خودش هنگام ساخت Object آن را اجرا می‌کند.
 </div>
 
 <p>
-حالا هر Object ساخته‌شده، این مقادیر را دارد:
+حالا هر Object جدید، این Attributeها را خواهد داشت:
 </p>
 
 <div class="code-container">
@@ -34617,16 +35049,41 @@ Red
 </div>
 
 <p>
-اما هنوز یک مشکل هست: همه Objectها یکسان ساخته می‌شوند.
+در این مثال:
 </p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>مقدار اولیه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>brand</code></td>
+<td><code>"Toyota"</code></td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td><code>"Red"</code></td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. Constructor با پارامتر</h2>
+<h2 class="lesson-title">5. Constructor با پارامتر</h2>
 
 <p>
-می‌توانیم <code>__init__</code> را طوری بنویسیم که هنگام ساخت Object
-مقدار بگیرد.
+اگر بخواهیم Objectهای مختلف با اطلاعات مختلف ساخته شوند،
+می‌توانیم برای <code>__init__()</code> پارامتر تعریف کنیم.
 </p>
 
 <div class="code-container">
@@ -34637,7 +35094,9 @@ Red
         self.attr2 = param2</div>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثلاً:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -34649,7 +35108,7 @@ Red
 </div>
 
 <p>
-حالا هنگام ساخت Object، مقدارها را می‌فرستیم:
+حالا هنگام ساخت Object، مقدارهای موردنیاز را ارسال می‌کنیم:
 </p>
 
 <div class="code-container">
@@ -34667,52 +35126,90 @@ print(car2.brand, car2.color)</div>
 BMW Black</div>
 </div>
 
+<p>
+فرایند را می‌توان این‌طور تصور کرد:
+</p>
+
 <div class="code-container">
 <span class="code-label">Flow</span>
 <div class="code-block no-prompt">Car("Toyota", "Red")
-   ↓
-__init__ به‌صورت خودکار اجرا می‌شود
-   ↓
+        ↓
+ساخت Object
+        ↓
+اجرای __init__()
+        ↓
 self.brand = "Toyota"
 self.color = "Red"</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. مقایسه با جلسه قبل</h2>
+<h2 class="lesson-title">6. ارتباط پارامترها با <code>self</code></h2>
 
 <p>
-حالا مقایسه کنیم که چقدر کد خواناتر شده است.
+در Constructor معمولاً یک پارامتر ورودی را در Attribute مربوط به Object ذخیره می‌کنیم.
 </p>
-
-<h3>روش قدیمی</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">student1 = Student()
-student1.set_info("Ali", 20)</div>
-</div>
-
-<h3>روش Constructor</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">student1 = Student("Ali", 20)</div>
+<div class="code-block no-prompt">class Student:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age</div>
 </div>
 
 <p>
-روش دوم:
+در اینجا دو مفهوم متفاوت داریم:
 </p>
 
-<ul>
-<li>کوتاه‌تر است.</li>
-<li>معلوم است که Object بدون داده ساخته نمی‌شود.</li>
-<li>کاربر فراموش نمی‌کند که داده وارد کند.</li>
-</ul>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>عبارت</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>پارامتری که هنگام ساخت Object دریافت می‌شود</td>
+</tr>
+<tr>
+<td><code>self.name</code></td>
+<td>Attribute مربوط به Object</td>
+</tr>
+<tr>
+<td><code>age</code></td>
+<td>پارامتر ورودی</td>
+</tr>
+<tr>
+<td><code>self.age</code></td>
+<td>Attribute مربوط به Object</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+پس:
+</p>
+
+<div class="code-container">
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">self.name = name
+     ↑          ↑
+ Attribute    Parameter</div>
+</div>
+
+<div class="lesson-important">
+<strong>نکته کلیدی:</strong>
+سمت راست، مقدار ورودی را نشان می‌دهد و سمت چپ، Attribute مربوط به Object را مشخص می‌کند.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. یک کلاس کامل با Constructor</h2>
+<h2 class="lesson-title">7. یک Class کامل با Constructor</h2>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -34726,7 +35223,9 @@ student1.set_info("Ali", 20)</div>
         print(f"Age: {self.age}")</div>
 </div>
 
-<p>استفاده:</p>
+<p>
+حالا می‌توانیم Objectها را مستقیماً با اطلاعات اولیه بسازیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -34746,25 +35245,28 @@ Age: 22</div>
 </div>
 
 <p>
-این ساختار، الگوی استاندارد کلاس‌ها در Python است:
+این ساختار یکی از الگوهای اصلی طراحی Class در Python است:
 </p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">class X:
-    def __init__(self, ...):   ← مقداردهی اولیه
+<span class="code-label">Pattern</span>
+<div class="code-block no-prompt">class ClassName:
+
+    def __init__(self, ...):
+        # مقداردهی اولیه
         ...
 
-    def some_method(self):     ← رفتارها
+    def method(self):
+        # رفتار Object
         ...</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. مقدار پیش‌فرض در <code>__init__</code></h2>
+<h2 class="lesson-title">8. مقدار پیش‌فرض در Constructor</h2>
 
 <p>
-می‌توانیم برای پارامترهای Constructor مقدار پیش‌فرض تعیین کنیم.
+می‌توانیم برای پارامترهای <code>__init__()</code> مقدار پیش‌فرض تعیین کنیم.
 </p>
 
 <div class="code-container">
@@ -34776,7 +35278,7 @@ Age: 22</div>
 </div>
 
 <p>
-حالا اگر رنگ ندهیم، مقدار پیش‌فرض استفاده می‌شود:
+اگر هنگام ساخت Object رنگ را مشخص نکنیم، مقدار <code>"White"</code> استفاده می‌شود:
 </p>
 
 <div class="code-container">
@@ -34794,41 +35296,58 @@ print(car2.color)</div>
 Black</div>
 </div>
 
-<div class="lesson-note">
-<strong>نکته:</strong>
-پارامترهایی که مقدار پیش‌فرض دارند، باید <strong>بعد از</strong>
-پارامترهای بدون مقدار پیش‌فرض بیایند.
+<div class="lesson-important">
+<strong>قانون:</strong>
+پارامترهای بدون مقدار پیش‌فرض باید قبل از پارامترهای دارای مقدار پیش‌فرض قرار بگیرند.
+</div>
+
+<div class="code-container">
+<span class="code-label">Correct</span>
+<div class="code-block no-prompt">def __init__(self, name, age=18):
+    ...</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Incorrect</span>
+<div class="code-block no-prompt">def __init__(self, age=18, name):
+    ...</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. Instance Attribute چیست؟</h2>
+<h2 class="lesson-title">9. Instance Attribute چیست؟</h2>
 
 <p>
-Attributeهایی که داخل <code>__init__</code> با <code>self.</code>
-تعریف می‌شوند، <strong>Instance Attribute</strong> نام دارند.
+Attributeهایی که متعلق به یک Object مشخص هستند،
+<strong>Instance Attribute</strong> نام دارند.
+</p>
+
+<p>
+معمولاً این Attributeها را داخل <code>__init__()</code> و با <code>self</code>
+تعریف می‌کنیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">class Car:
     def __init__(self, brand):
-        self.brand = brand   # Instance Attribute</div>
+        self.brand = brand</div>
 </div>
 
 <p>
-ویژگی Instance Attribute این است که <strong>هر Object نسخه مستقل خودش را دارد</strong>.
+در اینجا <code>self.brand</code> یک Instance Attribute است.
+هر Object مقدار مستقل خودش را دارد.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">c1 = Car("Toyota")
-c2 = Car("BMW")
+<div class="code-block no-prompt">car1 = Car("Toyota")
+car2 = Car("BMW")
 
-c1.brand = "Honda"
+car1.brand = "Honda"
 
-print(c1.brand)
-print(c2.brand)</div>
+print(car1.brand)
+print(car2.brand)</div>
 </div>
 
 <div class="code-container">
@@ -34838,38 +35357,70 @@ BMW</div>
 </div>
 
 <p>
-تغییر <code>c1.brand</code> هیچ تأثیری روی <code>c2</code> ندارد.
+تغییر Attribute در <code>car1</code> روی <code>car2</code> تأثیری ندارد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. Class Attribute چیست؟</h2>
+<h2 class="lesson-title">10. Class Attribute چیست؟</h2>
 
 <p>
-اگر یک Attribute را <strong>خارج از <code>__init__</code></strong>
-و مستقیماً داخل Class تعریف کنیم، <strong>Class Attribute</strong> است.
+گاهی یک داده بین تمام Objectهای یک Class مشترک است.
+در این حالت می‌توان آن را مستقیماً داخل Class و بیرون از متدها تعریف کرد.
+</p>
+
+<p>
+به این نوع داده <strong>Class Attribute</strong> می‌گوییم.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">class Car:
-    wheels = 4   # Class Attribute
+    wheels = 4
 
     def __init__(self, brand):
         self.brand = brand</div>
 </div>
 
 <p>
-Class Attribute بین تمام Objectها <strong>مشترک</strong> است:
+در این مثال:
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>نوع</th>
+<th>دلیل</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wheels</code></td>
+<td>Class Attribute</td>
+<td>داخل Class و خارج از متد تعریف شده است</td>
+</tr>
+<tr>
+<td><code>self.brand</code></td>
+<td>Instance Attribute</td>
+<td>برای هر Object مقدار مستقل دارد</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+دسترسی به Class Attribute:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">c1 = Car("Toyota")
-c2 = Car("BMW")
+<div class="code-block no-prompt">car1 = Car("Toyota")
+car2 = Car("BMW")
 
-print(c1.wheels)
-print(c2.wheels)
+print(car1.wheels)
+print(car2.wheels)
 print(Car.wheels)</div>
 </div>
 
@@ -34882,7 +35433,7 @@ print(Car.wheels)</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. تفاوت Instance و Class Attribute</h2>
+<h2 class="lesson-title">11. تفاوت Instance و Class Attribute</h2>
 
 <div class="table-wrap">
 <table>
@@ -34894,49 +35445,131 @@ print(Car.wheels)</div>
 </tr>
 </thead>
 <tbody>
-<tr><td>کجا تعریف می‌شود؟</td><td>داخل <code>__init__</code></td><td>داخل Class، بیرون از متدها</td></tr>
-<tr><td>مقدار</td><td>برای هر Object جداگانه</td><td>مشترک بین همه Objectها</td></tr>
-<tr><td>مثال</td><td><code>self.brand</code></td><td><code>wheels</code></td></tr>
-<tr><td>تغییر روی یک Object</td><td>فقط همان Object تغییر می‌کند</td><td>روی همه اثر می‌گذارد (در صورت تغییر از طریق Class)</td></tr>
+<tr>
+<td>محل تعریف معمول</td>
+<td>داخل <code>__init__()</code></td>
+<td>مستقیماً داخل Class</td>
+</tr>
+<tr>
+<td>وابستگی</td>
+<td>مخصوص هر Object</td>
+<td>متعلق به Class</td>
+</tr>
+<tr>
+<td>مقدار</td>
+<td>می‌تواند برای هر Object متفاوت باشد</td>
+<td>معمولاً بین Objectها مشترک است</td>
+</tr>
+<tr>
+<td>مثال</td>
+<td><code>self.brand</code></td>
+<td><code>wheels</code></td>
+</tr>
+<tr>
+<td>دسترسی</td>
+<td><code>car1.brand</code></td>
+<td><code>Car.wheels</code></td>
+</tr>
 </tbody>
 </table>
 </div>
 
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">class Car:
-    wheels = 4               ← Class Attribute
+<p>
+یک مثال کامل:
+</p>
 
-    def __init__(self, brand):
-        self.brand = brand   ← Instance Attribute</div>
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Car:
+    wheels = 4
+
+    def __init__(self, brand, color):
+        self.brand = brand
+        self.color = color
+
+
+car1 = Car("Toyota", "Red")
+car2 = Car("BMW", "Black")</div>
 </div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>brand</th>
+<th>color</th>
+<th>wheels</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>car1</code></td>
+<td>Toyota</td>
+<td>Red</td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>car2</code></td>
+<td>BMW</td>
+<td>Black</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+در اینجا <code>brand</code> و <code>color</code> برای هر Object جدا هستند،
+اما <code>wheels</code> یک ویژگی مشترک Class است.
+</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. چه زمانی از Class Attribute استفاده کنیم؟</h2>
+<h2 class="lesson-title">12. چه زمانی از Class Attribute استفاده کنیم؟</h2>
 
 <p>
-وقتی داده‌ای بین همه Objectها مشترک است، از Class Attribute استفاده می‌کنیم.
+وقتی یک مقدار برای همه Objectهای یک Class یکسان و مشترک است،
+Class Attribute می‌تواند انتخاب مناسبی باشد.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مثال</th>
+<th>Class</th>
 <th>Class Attribute</th>
+<th>Instance Attribute</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>ماشین</td><td>تعداد چرخ‌ها</td></tr>
-<tr><td>دانش‌آموز</td><td>نام مدرسه</td></tr>
-<tr><td>کارمند</td><td>نام شرکت</td></tr>
-<tr><td>محصول</td><td>واحد پول</td></tr>
+<tr>
+<td><code>Car</code></td>
+<td><code>wheels</code></td>
+<td><code>brand</code></td>
+</tr>
+<tr>
+<td><code>Student</code></td>
+<td><code>school</code></td>
+<td><code>name</code></td>
+</tr>
+<tr>
+<td><code>Employee</code></td>
+<td><code>company</code></td>
+<td><code>name</code></td>
+</tr>
+<tr>
+<td><code>Product</code></td>
+<td><code>tax_rate</code></td>
+<td><code>name</code> و <code>price</code></td>
+</tr>
 </tbody>
 </table>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثلاً:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -34944,12 +35577,10 @@ print(Car.wheels)</div>
     company = "OpenAI"
 
     def __init__(self, name):
-        self.name = name</div>
-</div>
+        self.name = name
 
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">e1 = Employee("Ali")
+
+e1 = Employee("Ali")
 e2 = Employee("Sara")
 
 print(e1.company, e1.name)
@@ -34964,10 +35595,10 @@ OpenAI Sara</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. دسترسی به Class Attribute از داخل متد</h2>
+<h2 class="lesson-title">13. دسترسی به Class Attribute داخل Method</h2>
 
 <p>
-می‌توانیم از داخل متد هم به Class Attribute دسترسی داشته باشیم.
+Class Attribute را می‌توان از داخل Method نیز استفاده کرد.
 </p>
 
 <div class="code-container">
@@ -34985,6 +35616,7 @@ OpenAI Sara</div>
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">e1 = Employee("Ali")
+
 e1.show()</div>
 </div>
 
@@ -34993,33 +35625,35 @@ e1.show()</div>
 <div class="code-block no-prompt">Ali works at OpenAI</div>
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">13. الگوی حرفه‌ای طراحی کلاس</h2>
-
 <p>
-ساختار استانداردی که در تمام کلاس‌ها می‌بینی:
+در اینجا:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class ClassName:
-    # Class Attribute (اختیاری)
-    common_data = ...
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">self.name
+   ↓
+Instance Attribute
 
-    # Constructor
-    def __init__(self, ...):
-        self.attr = ...
-
-    # Methods
-    def method1(self):
-        ...
-
-    def method2(self):
-        ...</div>
+self.company
+   ↓
+Class Attribute</div>
 </div>
 
-<p>مثال کامل:</p>
+<div class="lesson-note">
+<strong>نکته:</strong>
+برای این جلسه کافی است بدانیم Python هنگام جست‌وجوی Attribute از روی Object،
+می‌تواند Attribute مربوط به Class را نیز پیدا کند.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">14. یک Class واقعی‌تر</h2>
+
+<p>
+حالا مفاهیم Constructor، Instance Attribute، Class Attribute و Method را
+در یک مثال ترکیبی استفاده می‌کنیم.
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35031,88 +35665,6 @@ e1.show()</div>
         self.price = price
 
     def final_price(self):
-        return self.price * (1 + self.tax_rate)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">p = Product("Mouse", 100)
-print(p.final_price())</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">109.0</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">14. مدل ذهنی Constructor و Attributeها</h2>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Class
-  │
-  ├── Class Attribute    → مشترک بین همه Objectها
-  │
-  ├── __init__()         → هنگام ساخت Object اجرا می‌شود
-  │       │
-  │       └── Instance Attribute → مخصوص هر Object
-  │
-  └── Methods            → رفتارها</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">نکات مهم جلسه</h2>
-
-<ul>
-<li>Constructor متدی است که هنگام ساخت Object خودکار اجرا می‌شود.</li>
-<li>نام Constructor در Python <code>__init__</code> است.</li>
-<li>اولین پارامتر <code>__init__</code> همیشه <code>self</code> است.</li>
-<li>Constructor را مستقیم صدا نمی‌زنیم.</li>
-<li>Attributeهای داخل <code>__init__</code> را Instance Attribute می‌گویند.</li>
-<li>هر Object نسخه مستقل Instance Attributeهایش را دارد.</li>
-<li>Attributeهای داخل Class (بیرون از متدها) Class Attribute هستند.</li>
-<li>Class Attribute بین همه Objectها مشترک است.</li>
-<li>می‌توان به Class Attribute از طریق <code>self</code> یا نام Class دسترسی داشت.</li>
-<li>مقدار پیش‌فرض پارامترها باید بعد از پارامترهای بدون مقدار پیش‌فرض بیاید.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — سیستم مدیریت محصولات فروشگاه
-</h1>
-
-<p>
-می‌خواهیم کلاسی به نام <code>Product</code> بسازیم که:
-</p>
-
-<ul>
-<li>هنگام ساخت، نام و قیمت بگیرد.</li>
-<li>مالیات را به‌عنوان Class Attribute نگه دارد.</li>
-<li>قیمت نهایی با مالیات را حساب کند.</li>
-<li>اطلاعات محصول را نمایش دهد.</li>
-</ul>
-
-<h3>مرحله ۱ — تعریف Class با Constructor</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Product:
-    tax_rate = 0.09   # Class Attribute
-
-    def __init__(self, name, price):
-        self.name = name
-        self.price = price</div>
-</div>
-
-<h3>مرحله ۲ — اضافه کردن Methodها</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">    def final_price(self):
         return self.price * (1 + self.tax_rate)
 
     def show_info(self):
@@ -35121,7 +35673,9 @@ print(p.final_price())</div>
         print(f"Final Price: {self.final_price():.2f}")</div>
 </div>
 
-<h3>مرحله ۳ — استفاده از Class</h3>
+<p>
+ساخت Object:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35129,7 +35683,9 @@ print(p.final_price())</div>
 p2 = Product("Keyboard", 250)
 
 p1.show_info()
+
 print("-----")
+
 p2.show_info()</div>
 </div>
 
@@ -35142,6 +35698,137 @@ Final Price: 109.00
 Product: Keyboard
 Price: 250
 Final Price: 272.50</div>
+</div>
+
+<p>
+در این مثال:
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>در مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class</td>
+<td><code>Product</code></td>
+</tr>
+<tr>
+<td>Class Attribute</td>
+<td><code>tax_rate</code></td>
+</tr>
+<tr>
+<td>Constructor</td>
+<td><code>__init__()</code></td>
+</tr>
+<tr>
+<td>Instance Attribute</td>
+<td><code>name</code> و <code>price</code></td>
+</tr>
+<tr>
+<td>Method</td>
+<td><code>final_price()</code> و <code>show_info()</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">15. مدل ذهنی کل جلسه</h2>
+
+<div class="code-container">
+<span class="code-label">OOP Structure</span>
+<div class="code-block no-prompt">Class
+ │
+ ├── Class Attribute
+ │       ↓
+ │    داده مشترک
+ │
+ ├── __init__()
+ │       ↓
+ │    مقداردهی اولیه
+ │       ↓
+ │    self.attribute
+ │       ↓
+ │    Instance Attribute
+ │
+ └── Methods
+         ↓
+       رفتار Object</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">نکات مهم جلسه</h2>
+
+<ul>
+<li><code>__init__()</code> متد ویژه‌ای است که هنگام ساخت Object برای مقداردهی اولیه اجرا می‌شود.</li>
+<li>در Constructor، اولین پارامتر <code>self</code> است.</li>
+<li>برای دریافت اطلاعات هنگام ساخت Object می‌توان پارامترهای بیشتری به <code>__init__()</code> اضافه کرد.</li>
+<li><code>self.name = name</code> مقدار پارامتر <code>name</code> را در Attribute مربوط به Object ذخیره می‌کند.</li>
+<li>Instance Attribute معمولاً داخل <code>__init__()</code> با <code>self</code> تعریف می‌شود.</li>
+<li>هر Object مقدار مستقل خودش را از Instance Attributeها دارد.</li>
+<li>Class Attribute مستقیماً داخل Class و خارج از متدها تعریف می‌شود.</li>
+<li>Class Attribute معمولاً برای داده‌های مشترک بین Objectها استفاده می‌شود.</li>
+<li>پارامترهای دارای مقدار پیش‌فرض باید بعد از پارامترهای بدون مقدار پیش‌فرض قرار بگیرند.</li>
+</ul>
+
+<hr class="lesson-divider">
+
+<h1 class="lesson-title section-scenario">
+سناریوی ترکیبی — سیستم مدیریت محصولات فروشگاه
+</h1>
+
+<p>
+می‌خواهیم یک Class به نام <code>Product</code> طراحی کنیم که:
+</p>
+
+<ul>
+<li>نام و قیمت محصول را هنگام ساخت دریافت کند.</li>
+<li>نام و قیمت را به‌عنوان Instance Attribute ذخیره کند.</li>
+<li>درصد مالیات را به‌عنوان Class Attribute نگه دارد.</li>
+<li>قیمت نهایی محصول را محاسبه کند.</li>
+<li>اطلاعات محصول را نمایش دهد.</li>
+</ul>
+
+<h3>مرحله ۱ — تعریف Class Attribute</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Product:
+    tax_rate = 0.09</div>
+</div>
+
+<h3>مرحله ۲ — اضافه کردن Constructor</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">    def __init__(self, name, price):
+        self.name = name
+        self.price = price</div>
+</div>
+
+<h3>مرحله ۳ — اضافه کردن Method محاسبه قیمت</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">    def final_price(self):
+        return self.price * (1 + self.tax_rate)</div>
+</div>
+
+<h3>مرحله ۴ — اضافه کردن Method نمایش اطلاعات</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">    def show_info(self):
+        print(f"Product: {self.name}")
+        print(f"Price: {self.price}")
+        print(f"Final Price: {self.final_price():.2f}")</div>
 </div>
 
 <h3>برنامه کامل</h3>
@@ -35168,23 +35855,41 @@ p1 = Product("Mouse", 100)
 p2 = Product("Keyboard", 250)
 
 p1.show_info()
+
 print("-----")
+
 p2.show_info()</div>
 </div>
 
-<p>در این برنامه همه مفاهیم جلسه به هم متصل شدند:</p>
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Product: Mouse
+Price: 100
+Final Price: 109.00
+-----
+Product: Keyboard
+Price: 250
+Final Price: 272.50</div>
+</div>
+
+<p>
+جریان ساخت و استفاده از Objectها:
+</p>
 
 <div class="code-container">
 <span class="code-label">Final Flow</span>
-<div class="code-block no-prompt">class Product
-  ↓
-tax_rate → Class Attribute
-  ↓
-__init__ → Instance Attribute: name, price
-  ↓
-final_price() → استفاده از Class Attribute
-  ↓
-show_info() → نمایش</div>
+<div class="code-block no-prompt">Product("Mouse", 100)
+        ↓
+__init__()
+        ↓
+self.name = "Mouse"
+self.price = 100
+        ↓
+p1.show_info()
+        ↓
+final_price()
+        ↓
+استفاده از tax_rate مشترک</div>
 </div>
 
 <hr class="lesson-divider">
@@ -35192,140 +35897,155 @@ show_info() → نمایش</div>
 <h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
 
 <p>
-هر سؤال را ابتدا خودت حل کن، سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.
+هر سؤال را ابتدا خودت حل کن، سپس گزینه مناسب را انتخاب کن.
 </p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — Constructor در Python چه نام دارد؟</p>
+<p>❓ سؤال ۱ — در Python، متد <code>__init__()</code> معمولاً چه نقشی دارد؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>__start__</code></button>
-<button onclick="selectOption(this)">ب) <code>__init__</code></button>
-<button onclick="selectOption(this)">ج) <code>__constructor__</code></button>
-<button onclick="selectOption(this)">د) <code>__new__</code></button>
+<button onclick="selectOption(this)">الف) حذف Object</button>
+<button onclick="selectOption(this)">ب) مقداردهی اولیه Object هنگام ساخت</button>
+<button onclick="selectOption(this)">ج) اجرای برنامه Python</button>
+<button onclick="selectOption(this)">د) تعریف یک Module</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-Constructor در Python متد <code>__init__</code> است که هنگام ساخت Object خودکار اجرا می‌شود.
+<code>__init__()</code> هنگام ساخت Object اجرا می‌شود و معمولاً برای مقداردهی اولیه آن استفاده می‌شود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — Constructor چه زمانی اجرا می‌شود؟</p>
+<p>❓ سؤال ۲ — خروجی کد زیر چیست؟<br>
+<code>class Student:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, name):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.name = name<br>
+<br>
+s = Student("Ali")<br>
+print(s.name)</code></p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) هنگام import کردن کلاس</button>
-<button onclick="selectOption(this)">ب) هنگام ساخت Object</button>
-<button onclick="selectOption(this)">ج) هنگام صدا زدن متد</button>
-<button onclick="selectOption(this)">د) هرگز اجرا نمی‌شود</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-به‌محض ساخت Object، <code>__init__</code> به صورت خودکار اجرا می‌شود.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۳ — خروجی کد زیر چیست؟<br>
-<code>class Car:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, brand):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.brand = brand<br>
-<br>
-c = Car("Toyota")<br>
-print(c.brand)</code></p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) خطا می‌دهد</button>
-<button onclick="selectOption(this)">ب) <code>Toyota</code></button>
-<button onclick="selectOption(this)">ج) <code>brand</code></button>
-<button onclick="selectOption(this)">د) <code>None</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-مقدار <code>"Toyota"</code> در <code>self.brand</code> ذخیره شده و از طریق
-<code>c.brand</code> قابل دسترسی است.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۴ — تفاوت Instance Attribute و Class Attribute چیست؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) هیچ تفاوتی ندارند</button>
-<button onclick="selectOption(this)">ب) Instance Attribute برای هر Object جداست، Class Attribute بین همه مشترک است</button>
-<button onclick="selectOption(this)">ج) Class Attribute فقط در Constructor تعریف می‌شود</button>
-<button onclick="selectOption(this)">د) Instance Attribute قابل تغییر نیست</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-Instance Attribute مخصوص هر Object است، اما Class Attribute بین همه Objectها مشترک است.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۵ — Class Attribute کجا تعریف می‌شود؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) داخل <code>__init__</code></button>
-<button onclick="selectOption(this)">ب) داخل هر متد</button>
-<button onclick="selectOption(this)">ج) داخل Class و بیرون از متدها</button>
-<button onclick="selectOption(this)">د) بیرون از Class</button>
+<button onclick="selectOption(this)">الف) <code>name</code></button>
+<button onclick="selectOption(this)">ب) <code>Student</code></button>
+<button onclick="selectOption(this)">ج) <code>Ali</code></button>
+<button onclick="selectOption(this)">د) خطا می‌دهد</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ج</strong>
 <br>
-Class Attribute مستقیماً داخل کلاس و بیرون از هر متد تعریف می‌شود.
+مقدار <code>"Ali"</code> به پارامتر <code>name</code> داده شده و در <code>self.name</code> ذخیره می‌شود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — در تعریف <code>__init__</code>، شرط درست برای پارامترها کدام است؟</p>
+<p>❓ سؤال ۳ — در عبارت زیر، <code>self.name</code> چه چیزی است؟<br>
+<code>self.name = name</code></p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) پارامتر پیش‌فرض اول بیاید</button>
-<button onclick="selectOption(this)">ب) پارامترهای پیش‌فرض بعد از پارامترهای بدون پیش‌فرض بیایند</button>
-<button onclick="selectOption(this)">ج) ترتیب مهم نیست</button>
-<button onclick="selectOption(this)">د) همه پارامترها باید پیش‌فرض داشته باشند</button>
+<button onclick="selectOption(this)">الف) یک Class Attribute</button>
+<button onclick="selectOption(this)">ب) یک Instance Attribute</button>
+<button onclick="selectOption(this)">ج) یک Function</button>
+<button onclick="selectOption(this)">د) یک Class</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-در Python پارامترهای دارای مقدار پیش‌فرض باید بعد از پارامترهای بدون پیش‌فرض قرار بگیرند.
+<code>self.name</code> Attribute مربوط به Object فعلی است و برای هر Object می‌تواند مقدار متفاوتی داشته باشد.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۷ — خروجی کد زیر چیست؟<br>
-<code>class Student:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;school = "A"<br>
+<p>❓ سؤال ۴ — کدام گزینه یک Class Attribute است؟<br>
+<code>class Car:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wheels = 4<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, brand):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.brand = brand</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>self.brand</code></button>
+<button onclick="selectOption(this)">ب) <code>brand</code></button>
+<button onclick="selectOption(this)">ج) <code>wheels</code></button>
+<button onclick="selectOption(this)">د) <code>self</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong>
+<br>
+<code>wheels</code> مستقیماً داخل Class و خارج از متدها تعریف شده، بنابراین Class Attribute است.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۵ — خروجی کد زیر چیست؟<br>
+<code>class Car:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wheels = 4<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, brand):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.brand = brand<br>
+<br>
+c1 = Car("Toyota")<br>
+c2 = Car("BMW")<br>
+<br>
+c1.brand = "Honda"<br>
+<br>
+print(c1.brand)<br>
+print(c2.brand)</code></p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Honda و Honda</button>
+<button onclick="selectOption(this)">ب) Toyota و BMW</button>
+<button onclick="selectOption(this)">ج) Honda و BMW</button>
+<button onclick="selectOption(this)">د) خطا می‌دهد</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong>
+<br>
+<code>brand</code> یک Instance Attribute است؛ بنابراین تغییر آن در <code>c1</code> روی <code>c2</code> تأثیری ندارد.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۶ — کدام تعریف صحیح است؟</p>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>def __init__(self, age=18, name):</code></button>
+<button onclick="selectOption(this)">ب) <code>def __init__(self, name, age=18):</code></button>
+<button onclick="selectOption(this)">ج) <code>def __init__(self, name=, age):</code></button>
+<button onclick="selectOption(this)">د) <code>def __init__(self=, name, age):</code></button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ب</strong>
+<br>
+پارامتر دارای مقدار پیش‌فرض باید بعد از پارامتر بدون مقدار پیش‌فرض قرار بگیرد.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۷ — در کد زیر کدام گزینه درست است؟<br>
+<code>class Employee:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;company = "ABC"<br>
+<br>
 &nbsp;&nbsp;&nbsp;&nbsp;def __init__(self, name):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.name = name<br>
-<br>
-s1 = Student("Ali")<br>
-s2 = Student("Sara")<br>
-print(s1.school, s2.school)</code></p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self.name = name</code></p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) خطا می‌دهد</button>
-<button onclick="selectOption(this)">ب) <code>A A</code></button>
-<button onclick="selectOption(this)">ج) <code>Ali Sara</code></button>
-<button onclick="selectOption(this)">د) <code>None None</code></button>
+<button onclick="selectOption(this)">الف) <code>company</code> و <code>name</code> هر دو Class Attribute هستند</button>
+<button onclick="selectOption(this)">ب) <code>company</code> Instance Attribute و <code>name</code> Class Attribute است</button>
+<button onclick="selectOption(this)">ج) <code>company</code> Class Attribute و <code>self.name</code> Instance Attribute است</button>
+<button onclick="selectOption(this)">د) هر دو فقط متعلق به اولین Object هستند</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
+<strong>✅ پاسخ: ج</strong>
 <br>
-<code>school</code> یک Class Attribute است و بین همه Objectها مشترک است.
+<code>company</code> مستقیماً داخل Class تعریف شده و <code>self.name</code> داخل Constructor برای هر Object ایجاد می‌شود.
 </div>
 </div>
 
@@ -35334,8 +36054,9 @@ print(s1.school, s2.school)</code></p>
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم چگونه به کمک <code>__init__</code> کلاس‌ها را
-حرفه‌ای‌تر طراحی کنیم و Objectها را با داده‌های اولیه بسازیم.
+در این جلسه یاد گرفتیم چگونه با <code>__init__()</code> Objectها را هنگام ساخت
+مقداردهی کنیم و تفاوت بین Attributeهای مخصوص Object و Attributeهای مشترک
+Class را تشخیص دهیم.
 </p>
 
 <div class="table-wrap">
@@ -35349,46 +36070,50 @@ print(s1.school, s2.school)</code></p>
 <tbody>
 <tr>
 <td>Constructor</td>
-<td>متد اجراشونده هنگام ساخت Object</td>
+<td>برای آماده‌سازی Object هنگام ساخت استفاده می‌شود.</td>
 </tr>
 <tr>
 <td><code>__init__()</code></td>
-<td>نام Constructor در Python</td>
+<td>متد ویژه برای مقداردهی اولیه Object</td>
 </tr>
 <tr>
 <td>Instance Attribute</td>
-<td>مخصوص هر Object، داخل <code>__init__</code></td>
+<td>مخصوص هر Object؛ معمولاً با <code>self</code> در <code>__init__()</code></td>
 </tr>
 <tr>
 <td>Class Attribute</td>
-<td>مشترک بین همه Objectها، داخل Class</td>
+<td>متعلق به Class و معمولاً مشترک بین Objectها</td>
 </tr>
 <tr>
-<td>مقدار پیش‌فرض</td>
-<td>قابل تعیین برای پارامترهای <code>__init__</code></td>
+<td>Default Parameter</td>
+<td>مقدار پیش‌فرض برای پارامترهای Constructor</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مهم‌ترین الگوی این جلسه را حفظ کن:</p>
+<p>
+مهم‌ترین الگوی این جلسه:
+</p>
 
 <div class="code-container">
 <span class="code-label">Core Pattern</span>
 <div class="code-block no-prompt">class ClassName:
-    shared = ...   # Class Attribute
+    shared = ...              # Class Attribute
 
-    def __init__(self, attr1, attr2):
-        self.attr1 = attr1
-        self.attr2 = attr2
+    def __init__(self, value):
+        self.value = value    # Instance Attribute
 
     def method(self):
         ...
 
-obj = ClassName(v1, v2)</div>
+
+obj = ClassName(value)</div>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثال:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35408,10 +36133,11 @@ s1.show()</div>
 </div>
 
 <p>
-در <strong>جلسه ۲۷ — Inheritance، <code>super()</code> و Method Overriding</strong>
-یاد می‌گیریم چگونه کلاس‌ها را از یکدیگر ارث‌بری کنیم و کلاس‌های
-تخصصی‌تر بسازیم.
-</p>` , 
+در <strong>جلسه ۳ — Inheritance، <code>super()</code> و Method Overriding</strong>
+یاد می‌گیریم چگونه یک Class را از Class دیگر به ارث ببریم،
+رفتارهای موجود را تغییر دهیم و بین Classهای والد و فرزند ارتباط ایجاد کنیم.
+</p>`
+,
 "ch15-3": `<div class="section-header">
     <div class="section-badge">۱۵</div>
     <div>
@@ -35426,54 +36152,82 @@ s1.show()</div>
 <ol>
 <li>مفهوم <strong>Inheritance</strong> (ارث‌بری) را توضیح بدهی.</li>
 <li>یک کلاس فرزند از کلاس والد بسازی.</li>
-<li>Attributeها و Methodهای والد را در فرزند استفاده کنی.</li>
-<li>متد <code>super()</code> را برای فراخوانی والد به کار ببری.</li>
+<li>Attributeها و Methodهای والد را در کلاس فرزند استفاده کنی.</li>
+<li>با <code>super()</code> به رفتارهای والد دسترسی پیدا کنی.</li>
+<li>Constructor والد را در کلاس فرزند مقداردهی اولیه کنی.</li>
 <li>مفهوم <strong>Method Overriding</strong> را توضیح بدهی.</li>
-<li>یک متد والد را در فرزند بازنویسی کنی.</li>
-<li>تفاوت «استفاده از متد والد» و «بازنویسی متد والد» را تشخیص بدهی.</li>
-<li>ساختار کلاس‌های واقعی را با Inheritance طراحی کنی.</li>
+<li>تفاوت ارث‌بری، گسترش کلاس و Override را تشخیص بدهی.</li>
+<li>یک ساختار ساده و کاربردی با Inheritance طراحی کنی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">معرفی جلسه</h2>
+<h2 class="lesson-title">مقدمه — چرا Inheritance (ارث بری)؟</h2>
 
 <p>
-تا اینجا کلاس‌هایی ساختیم که از صفر شروع می‌شدند:
-هر کلاس، <code>__init__</code> خودش و متدهای خودش را داشت.
+تا اینجا یاد گرفتیم چگونه کلاس و Object بسازیم و ویژگی‌ها و رفتارهای هر کلاس را تعریف کنیم.
+اما در پروژه‌های واقعی، معمولاً چند کلاس داریم که بخش زیادی از ویژگی‌ها و رفتارهایشان مشترک است.
 </p>
 
 <p>
-اما در برنامه‌های واقعی، کلاس‌ها اغلب <strong>شبیه هم</strong> هستند.
-مثلاً فرض کن می‌خواهیم برای یک فروشگاه کلاس‌های زیر را بسازیم:
+مثلاً در یک فروشگاه ممکن است کلاس‌های زیر را داشته باشیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">- Book       (کتاب)
-- Magazine   (مجله)
-- DVD        (دیسک)</div>
+<span class="code-label">Example</span>
+<div class="code-block no-prompt">Book
+Magazine
+DVD</div>
 </div>
 
 <p>
-همه این‌ها <strong>محصول</strong> هستند:
+هر سه مورد یک <strong>Product</strong> هستند و می‌توانند ویژگی‌های مشترکی مثل
+نام و قیمت داشته باشند.
 </p>
 
-<ul>
-<li>همه نام دارند.</li>
-<li>همه قیمت دارند.</li>
-<li>همه قیمت نهایی دارند.</li>
-</ul>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>کلاس</th>
+<th>ویژگی‌های مشترک</th>
+<th>ویژگی اختصاصی</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Book</td>
+<td>name, price</td>
+<td>author</td>
+</tr>
+<tr>
+<td>Magazine</td>
+<td>name, price</td>
+<td>issue</td>
+</tr>
+<tr>
+<td>DVD</td>
+<td>name, price</td>
+<td>duration</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 <p>
-اگر برای هر کدام یک کلاس کامل بنویسیم، کد تکراری زیادی می‌نویسیم.
+اگر ویژگی‌های مشترک را در هر سه کلاس دوباره بنویسیم، کد تکراری ایجاد می‌شود.
+Inheritance به ما اجازه می‌دهد ویژگی‌ها و رفتارهای مشترک را در یک کلاس پایه قرار دهیم
+و کلاس‌های تخصصی‌تر را از آن بسازیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">کد تکراری در چند کلاس ← مشکل
-راه‌حل: Inheritance (ارث‌بری)</div>
+<span class="code-label">Mental Model</span>
+<div class="code-block no-prompt">Product
+   │
+   ├── Book
+   ├── Magazine
+   └── DVD</div>
 </div>
 
 <hr class="lesson-divider">
@@ -35481,8 +36235,8 @@ s1.show()</div>
 <h2 class="lesson-title">1. Inheritance چیست؟</h2>
 
 <p>
-<strong>Inheritance</strong> یا <strong>ارث‌بری</strong> به این معناست که
-یک کلاس جدید، ویژگی‌ها و رفتارهای یک کلاس دیگر را به ارث می‌برد.
+<strong>Inheritance</strong> یا <strong>ارث‌بری</strong> یعنی یک کلاس جدید
+بر اساس یک کلاس موجود ساخته شود و بتواند ویژگی‌ها و رفتارهای آن را استفاده کند.
 </p>
 
 <div class="table-wrap">
@@ -35490,40 +36244,49 @@ s1.show()</div>
 <thead>
 <tr>
 <th>مفهوم</th>
-<th>توضیح</th>
+<th>معنی</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><strong>Parent Class</strong></td><td>کلاس والد یا پایه که ویژگی‌ها را می‌دهد</td></tr>
-<tr><td><strong>Child Class</strong></td><td>کلاس فرزند که ویژگی‌ها را به ارث می‌برد</td></tr>
-<tr><td><strong>Inheritance</strong></td><td>ارث‌بری ویژگی‌ها از والد</td></tr>
+<tr>
+<td><strong>Parent Class</strong></td>
+<td>کلاس والد یا پایه</td>
+</tr>
+<tr>
+<td><strong>Child Class</strong></td>
+<td>کلاس فرزند یا مشتق‌شده</td>
+</tr>
+<tr>
+<td><strong>Inheritance</strong></td>
+<td>رابطه ارث‌بری بین فرزند و والد</td>
+</tr>
 </tbody>
 </table>
 </div>
 
-<div class="code-container">
-<span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">Parent Class
-      │
-      ▼
-Child Class (همه چیز والد را دارد + چیزهای جدید خودش)</div>
-</div>
-
 <p>
-مزایای Inheritance:
+کلاس فرزند می‌تواند:
 </p>
 
 <ul>
-<li>جلوگیری از تکرار کد.</li>
-<li>استفاده مجدد از کد.</li>
-<li>ساختار خواناتر.</li>
+<li>از ویژگی‌ها و متدهای والد استفاده کند.</li>
+<li>ویژگی‌ها و متدهای جدید اضافه کند.</li>
+<li>برخی متدهای والد را Override کند.</li>
 </ul>
+
+<div class="lesson-important">
+<strong>نکته:</strong>
+Inheritance به معنی کپی کردن کد والد نیست؛ کلاس فرزند در ساختار کلاس‌ها
+با والد رابطه ارث‌بری دارد و می‌تواند رفتارهای والد را استفاده یا تغییر دهد.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. ساختار Inheritance</h2>
+<h2 class="lesson-title">2. ساختار Inheritance در Python</h2>
 
-<p>ساختار کلی:</p>
+<p>
+برای ساخت کلاس فرزند، نام کلاس والد را داخل پرانتز بعد از نام کلاس فرزند می‌نویسیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Syntax</span>
@@ -35532,10 +36295,8 @@ Child Class (همه چیز والد را دارد + چیزهای جدید خود
 </div>
 
 <p>
-نام کلاس والد داخل پرانتز بعد از نام کلاس فرزند نوشته می‌شود.
+مثال ساده:
 </p>
-
-<p>مثال:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35550,29 +36311,30 @@ class Dog(Animal):
 </div>
 
 <p>
-در این کد:
+در این مثال:
 </p>
 
 <ul>
 <li><code>Animal</code> کلاس والد است.</li>
 <li><code>Dog</code> کلاس فرزند است.</li>
-<li><code>Dog</code> متد <code>eat</code> را از <code>Animal</code> به ارث می‌برد.</li>
+<li><code>Dog</code> متد <code>eat()</code> را از والد می‌تواند استفاده کند.</li>
+<li><code>Dog</code> متد جدید <code>bark()</code> را خودش تعریف کرده است.</li>
 </ul>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. استفاده از کلاس فرزند</h2>
+<h2 class="lesson-title">3. استفاده از Object کلاس فرزند</h2>
 
 <p>
-حالا که کلاس فرزند ساختیم، می‌توانیم از آن Object بسازیم.
+از کلاس فرزند می‌توان Object ساخت و هم از متدهای خودش و هم از متدهای به‌ارث‌رسیده استفاده کرد.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">d = Dog()
+<div class="code-block no-prompt">dog1 = Dog()
 
-d.eat()    # از والد
-d.bark()   # از فرزند</div>
+dog1.eat()
+dog1.bark()</div>
 </div>
 
 <div class="code-container">
@@ -35582,24 +36344,31 @@ Woof!</div>
 </div>
 
 <p>
-متد <code>eat</code> در کلاس <code>Dog</code> وجود ندارد،
-اما چون از <code>Animal</code> ارث برده، قابل استفاده است.
+اگر Python متدی را در <code>Dog</code> پیدا نکند، در کلاس والد یعنی <code>Animal</code>
+به دنبال آن می‌گردد.
 </p>
 
 <div class="code-container">
-<span class="code-label">Flow</span>
-<div class="code-block no-prompt">Dog  →  Animal
-         │
-         └── eat()  → به Dog به ارث رسیده</div>
+<span class="code-label">Lookup</span>
+<div class="code-block no-prompt">dog1.eat()
+   │
+   ▼
+Dog
+   │
+   │ eat() پیدا نشد
+   ▼
+Animal
+   │
+   └── eat() پیدا شد و اجرا شد</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. ارث‌بری Constructor</h2>
+<h2 class="lesson-title">4. ارث‌بری <code>__init__()</code></h2>
 
 <p>
-اگر کلاس والد <code>__init__</code> داشته باشد،
-کلاس فرزند هم می‌تواند از آن استفاده کند.
+کلاس فرزند می‌تواند از <code>__init__()</code> والد استفاده کند؛
+البته اگر خودش <code>__init__()</code> تعریف نکند.
 </p>
 
 <div class="code-container">
@@ -35610,25 +36379,22 @@ Woof!</div>
         self.age = age
 
     def show(self):
-        print(f"{self.name} - {self.age}")</div>
-</div>
+        print(f"{self.name} - {self.age}")
 
-<p>
-حالا کلاس فرزند:</p>
 
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Student(Person):
+class Student(Person):
     pass</div>
 </div>
 
 <p>
-<code>Student</code> همه چیز <code>Person</code> را به ارث می‌برد:
+چون <code>Student</code> خودش <code>__init__()</code> ندارد،
+می‌توانیم از <code>__init__()</code> والد استفاده کنیم:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">s = Student("Ali", 20)
+
 s.show()</div>
 </div>
 
@@ -35637,16 +36403,22 @@ s.show()</div>
 <div class="code-block no-prompt">Ali - 20</div>
 </div>
 
-<p>
-Constructor والد به صورت خودکار در فرزند استفاده می‌شود.
-</p>
+<div class="lesson-note">
+اگر کلاس فرزند <code>__init__()</code> خودش را تعریف نکند،
+Python می‌تواند از Initializer قابل‌استفاده در کلاس والد استفاده کند.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. اضافه کردن ویژگی جدید به فرزند</h2>
+<h2 class="lesson-title">5. وقتی فرزند <code>__init__()</code> خودش را دارد</h2>
 
 <p>
-کلاس فرزند می‌تواند علاوه بر ویژگی‌های والد، ویژگی‌های جدید هم داشته باشد.
+فرض کن <code>Student</code> علاوه بر <code>name</code> و <code>age</code>،
+یک <code>student_id</code> هم داشته باشد.
+</p>
+
+<p>
+در این حالت باید <code>__init__()</code> جدیدی برای فرزند تعریف کنیم:
 </p>
 
 <div class="code-container">
@@ -35665,13 +36437,8 @@ class Student(Person):
 </div>
 
 <p>
-این کد کار می‌کند، اما یک مشکل دارد:
-ما دوباره <code>name</code> و <code>age</code> را نوشتیم، در حالی که
-والد همین کار را انجام داده بود.
-</p>
-
-<p>
-راه‌حل: استفاده از <code>super()</code>.
+این کد درست است، اما <code>name</code> و <code>age</code> را دوباره نوشته‌ایم.
+این همان جایی است که <code>super()</code> مفید می‌شود.
 </p>
 
 <hr class="lesson-divider">
@@ -35679,8 +36446,8 @@ class Student(Person):
 <h2 class="lesson-title">6. <code>super()</code> چیست؟</h2>
 
 <p>
-<code>super()</code> به معنی «والد» است.
-با <code>super()</code> می‌توانیم از داخل کلاس فرزند، متدهای والد را صدا بزنیم.
+<code>super()</code> راهی برای دسترسی به پیاده‌سازی کلاس والد از داخل کلاس فرزند است.
+در Inheritance معمولاً از آن برای اجرای <code>__init__()</code> یا یک متد والد استفاده می‌کنیم.
 </p>
 
 <div class="table-wrap">
@@ -35692,11 +36459,21 @@ class Student(Person):
 </tr>
 </thead>
 <tbody>
-<tr><td><code>super().__init__(...)</code></td><td>اجرای Constructor والد</td></tr>
-<tr><td><code>super().method()</code></td><td>اجرای Method والد</td></tr>
+<tr>
+<td><code>super().__init__(...)</code></td>
+<td>فراخوانی <code>__init__()</code> والد</td>
+</tr>
+<tr>
+<td><code>super().method()</code></td>
+<td>فراخوانی متد والد</td>
+</tr>
 </tbody>
 </table>
 </div>
+
+<p>
+مثال:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35713,19 +36490,35 @@ class Student(Person):
 </div>
 
 <p>
-حالا کلاس فرزند:
+در اینجا:
 </p>
 
 <ul>
-<li>Constructor والد را اجرا می‌کند (name و age را مقداردهی می‌کند).</li>
-<li>سپس ویژگی جدید <code>student_id</code> را اضافه می‌کند.</li>
+<li><code>super().__init__(name, age)</code> بخش مربوط به والد را مقداردهی می‌کند.</li>
+<li><code>self.student_id = student_id</code> ویژگی مخصوص <code>Student</code> را اضافه می‌کند.</li>
 </ul>
+
+<div class="code-container">
+<span class="code-label">Flow</span>
+<div class="code-block no-prompt">Student(...)
+      │
+      ▼
+super().__init__(name, age)
+      │
+      ├── self.name
+      └── self.age
+      │
+      ▼
+self.student_id
+      │
+      └── ویژگی مخصوص Student</div>
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. مقایسه دو روش</h2>
+<h2 class="lesson-title">7. چرا <code>super()</code> بهتر از تکرار کد است؟</h2>
 
-<h3>روش بدون <code>super()</code></h3>
+<h3>بدون <code>super()</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35737,10 +36530,11 @@ class Student(Person):
 </div>
 
 <p>
-مشکل: تکرار کد والد.
+در این روش منطق مقداردهی <code>Person</code> دوباره در <code>Student</code> نوشته شده است.
+اگر منطق والد تغییر کند، ممکن است مجبور شویم چند کلاس فرزند را نیز تغییر دهیم.
 </p>
 
-<h3>روش با <code>super()</code></h3>
+<h3>با <code>super()</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35751,13 +36545,14 @@ class Student(Person):
 </div>
 
 <p>
-مزیت: بدون تکرار، از همان Constructor والد استفاده می‌کنیم.
+در این روش، مسئولیت مقداردهی ویژگی‌های مشترک در کلاس والد باقی می‌ماند
+و کلاس فرزند فقط بخش مخصوص خودش را اضافه می‌کند.
 </p>
 
 <div class="lesson-important">
-<strong>قانون طلایی:</strong>
-در هر کلاس فرزند، هنگام تعریف <code>__init__</code>،
-اول <code>super().__init__(...)</code> را صدا بزن.
+<strong>الگوی مناسب:</strong>
+اگر کلاس فرزند <code>__init__()</code> خودش را دارد و لازم است بخش مربوط به والد نیز اجرا شود،
+معمولاً از <code>super().__init__(...)</code> استفاده می‌کنیم.
 </div>
 
 <hr class="lesson-divider">
@@ -35765,18 +36560,13 @@ class Student(Person):
 <h2 class="lesson-title">8. Method Overriding چیست؟</h2>
 
 <p>
-<strong>Method Overriding</strong> یعنی:
-وقتی کلاس فرزند متدی با همان نام متد والد تعریف می‌کند،
-متد فرزند جای متد والد را می‌گیرد.
+<strong>Method Overriding</strong> یعنی کلاس فرزند متدی با همان نام یک متد والد تعریف کند
+تا رفتار آن متد برای Objectهای فرزند متفاوت شود.
 </p>
 
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">والد: متد show()
-فرزند: متد show()  ← جایگزین می‌شود</div>
-</div>
-
-<p>مثال:</p>
+<p>
+مثال:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35789,6 +36579,10 @@ class Dog(Animal):
     def speak(self):
         print("Woof!")</div>
 </div>
+
+<p>
+هر دو کلاس متد <code>speak()</code> دارند، اما پیاده‌سازی آن‌ها متفاوت است.
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35806,18 +36600,64 @@ Woof!</div>
 </div>
 
 <p>
-حتی با اینکه <code>Dog</code> از <code>Animal</code> ارث برده،
-وقتی <code>speak</code> را روی <code>Dog</code> صدا می‌زنیم،
-متد فرزند اجرا می‌شود.
+وقتی <code>d.speak()</code> اجرا می‌شود، Python ابتدا متد را در کلاس <code>Dog</code>
+پیدا می‌کند و همان نسخه را اجرا می‌کند.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. دسترسی به متد والد بعد از Override</h2>
+<h2 class="lesson-title">9. تفاوت استفاده از متد والد و Override</h2>
 
 <p>
-اگر متد والد را Override کردیم و باز هم می‌خواهیم آن را صدا بزنیم،
-از <code>super()</code> استفاده می‌کنیم.
+این دو مفهوم را با هم اشتباه نکن:
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>اتفاقی که می‌افتد</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inheritance</td>
+<td>فرزند می‌تواند رفتارهای والد را استفاده کند.</td>
+</tr>
+<tr>
+<td>Override</td>
+<td>فرزند نسخه خودش از یک متد والد را تعریف می‌کند.</td>
+</tr>
+<tr>
+<td><code>super().method()</code></td>
+<td>فرزند می‌تواند پیاده‌سازی والد را نیز فراخوانی کند.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="code-container">
+<span class="code-label">Mental Model</span>
+<div class="code-block no-prompt">Parent
+   │
+   ├── method()
+   │
+   ▼
+Child
+   │
+   ├── استفاده از method() والد
+   │
+   └── یا Override کردن method()</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">10. استفاده از <code>super()</code> بعد از Override</h2>
+
+<p>
+گاهی نمی‌خواهیم رفتار والد را کاملاً کنار بگذاریم.
+می‌خواهیم ابتدا منطق والد اجرا شود و سپس رفتار جدیدی به آن اضافه کنیم.
 </p>
 
 <div class="code-container">
@@ -35846,45 +36686,74 @@ Woof!</div>
 </div>
 
 <p>
-این الگو خیلی رایج است:
+در اینجا:
 </p>
 
 <ul>
-<li>متد والد کار پایه را انجام می‌دهد.</li>
-<li>متد فرزند بعد از آن، کار تخصصی‌تر را انجام می‌دهد.</li>
+<li><code>super().speak()</code> نسخه والد را اجرا می‌کند.</li>
+<li><code>print("Woof!")</code> رفتار جدید کلاس فرزند است.</li>
 </ul>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">10. چرا Method Overriding مفید است؟</h2>
-
-<p>
-در برنامه‌های واقعی، کلاس فرزند معمولاً می‌خواهد
-رفتار والد را کمی تغییر بدهد.
-</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>موقعیت</th>
-<th>Override</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>محصول با مالیات متفاوت</td><td>متد <code>final_price</code></td></tr>
-<tr><td>حساب بانکی با سود ویژه</td><td>متد <code>calculate_interest</code></td></tr>
-<tr><td>کارمند با حقوق متفاوت</td><td>متد <code>salary</code></td></tr>
-</tbody>
-</table>
+<div class="lesson-note">
+Override می‌تواند رفتار والد را کاملاً جایگزین کند یا با کمک <code>super()</code>
+آن رفتار را حفظ کرده و گسترش دهد.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. یک مثال واقعی — Product و DigitalProduct</h2>
+<h2 class="lesson-title">11. Inheritance فقط برای Methodها نیست</h2>
 
 <p>
-فرض کن کلاس پایه <code>Product</code> داریم:
+کلاس فرزند می‌تواند Attributeهای تعریف‌شده در والد را نیز از طریق Object به ارث ببرد.
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Person:
+    def __init__(self, name):
+        self.name = name
+
+
+class Student(Person):
+    pass
+
+
+s = Student("Ali")
+
+print(s.name)</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Ali</div>
+</div>
+
+<p>
+همچنین فرزند می‌تواند Attribute جدید خودش را اضافه کند:
+</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Student(Person):
+    def __init__(self, name, student_id):
+        super().__init__(name)
+        self.student_id = student_id</div>
+</div>
+
+<p>
+در نتیجه Object ساخته‌شده از <code>Student</code> هم اطلاعات والد را دارد و هم اطلاعات مخصوص خودش را.
+</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">12. مثال واقعی — Product و DigitalProduct</h2>
+
+<p>
+فرض کنیم یک فروشگاه داریم. همه محصولات نام، قیمت و روش محاسبه قیمت نهایی دارند.
+</p>
+
+<p>
+ابتدا کلاس پایه را می‌سازیم:
 </p>
 
 <div class="code-container">
@@ -35904,7 +36773,8 @@ Woof!</div>
 </div>
 
 <p>
-حالا محصول دیجیتالی می‌سازیم که <strong>مالیات ندارد</strong>:
+حالا فرض کنیم محصولات دیجیتال مالیات ندارند.
+می‌توانیم فقط مقدار <code>tax_rate</code> را در کلاس فرزند تغییر دهیم:
 </p>
 
 <div class="code-container">
@@ -35914,9 +36784,8 @@ Woof!</div>
 </div>
 
 <p>
-بدون نوشتن هیچ متدی، <code>DigitalProduct</code> همه چیز را
-از <code>Product</code> گرفته، اما چون <code>tax_rate</code> را تغییر داده،
-<code>final_price</code> رفتار جدیدی دارد.
+لازم نیست <code>final_price()</code> را دوباره بنویسیم.
+متد والد هنگام اجرا از <code>tax_rate</code> مربوط به Object استفاده می‌کند.
 </p>
 
 <div class="code-container">
@@ -35935,12 +36804,16 @@ E-Book - 100.00</div>
 </div>
 
 <p>
-این یک نمونه عالی از <strong>استفاده مجدد کد</strong> با Inheritance است.
+این مثال نشان می‌دهد که فرزند می‌تواند از کد والد استفاده کند و فقط بخشی از رفتار یا داده موردنیاز خود را تغییر دهد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. مثال کامل با <code>super()</code> و Override</h2>
+<h2 class="lesson-title">13. مثال کامل — <code>super()</code> + Override</h2>
+
+<p>
+حالا سه مفهوم اصلی را در یک مثال ترکیب کنیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -35977,82 +36850,53 @@ Age: 20
 Student ID: S1001</div>
 </div>
 
-<p>
-در این کد:
-</p>
-
-<ul>
-<li><code>super().__init__(...)</code> از Constructor والد استفاده می‌کند.</li>
-<li><code>super().show()</code> از متد والد استفاده می‌کند و بعد اطلاعات جدید را اضافه می‌کند.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">13. مدل ذهنی Inheritance</h2>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Parent
-  │
-  ├── Attributes
-  ├── Methods
-  └── Constructor
-        │
-        ▼
-Child
-  │
-  ├── به ارث می‌برد (inheritance)
-  ├── اضافه می‌کند (extend)
-  ├── جایگزین می‌کند (override)
-  └── با super() به والد دسترسی دارد</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>خط کد</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class Student(Person)</code></td>
+<td>Inheritance</td>
+</tr>
+<tr>
+<td><code>super().__init__(name, age)</code></td>
+<td>اجرای <code>__init__()</code> والد</td>
+</tr>
+<tr>
+<td><code>self.student_id = student_id</code></td>
+<td>افزودن Attribute جدید</td>
+</tr>
+<tr>
+<td><code>def show(self)</code></td>
+<td>Override کردن متد والد</td>
+</tr>
+<tr>
+<td><code>super().show()</code></td>
+<td>اجرای متد والد</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. چند نکته مهم</h2>
-
-<ul>
-<li>کلاس فرزند همه چیز والد را به ارث می‌برد.</li>
-<li>کلاس فرزند می‌تواند ویژگی جدید اضافه کند.</li>
-<li>در <code>__init__</code> فرزند، اول <code>super().__init__(...)</code> را صدا بزن.</li>
-<li>Method Overriding یعنی تعریف متدی با همان نام در فرزند.</li>
-<li>با <code>super().method()</code> می‌توان متد والد را بعد از Override صدا زد.</li>
-<li>استفاده از Inheritance باعث کاهش کد تکراری می‌شود.</li>
-<li>اگر کلاس فرزند منطق جدیدی ندارد، می‌تواند فقط <code>pass</code> داشته باشد.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">نکات مهم جلسه</h2>
-
-<ul>
-<li>Inheritance یعنی ارث‌بری یک کلاس از کلاس دیگر.</li>
-<li>کلاس والد را با <code>class Child(Parent):</code> ارث می‌بریم.</li>
-<li>کلاس فرزند تمام متدها و Attributeهای والد را دارد.</li>
-<li>Constructor والد را با <code>super().__init__(...)</code> صدا می‌زنیم.</li>
-<li>Method Overriding یعنی جایگزینی متد والد با متد فرزند.</li>
-<li><code>super().method()</code> برای فراخوانی متد والد استفاده می‌شود.</li>
-<li>استفاده از Inheritance باعث کاهش تکرار کد می‌شود.</li>
-<li>کلاس فرزند می‌تواند Attribute جدید اضافه کند.</li>
-<li>Class Attribute والد در فرزند قابل تغییر است.</li>
-<li>Inheritance یکی از پایه‌های اصلی OOP است.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — سیستم کارمندان شرکت
-</h1>
+<h2 class="lesson-title">14. سناریوی کاربردی — سیستم کارمندان</h2>
 
 <p>
-می‌خواهیم یک سیستم ساده برای کارمندان شرکت طراحی کنیم.
+می‌خواهیم یک سیستم ساده برای مدیریت کارمندان شرکت طراحی کنیم.
 </p>
 
-<p>نیازها:</p>
+<p>نیازهای سیستم:</p>
 
 <ul>
-<li>همه کارمندان نام و حقوق پایه دارند.</li>
-<li>مدیرها پاداش هم می‌گیرند.</li>
+<li>هر کارمند نام و حقوق پایه دارد.</li>
+<li>حقوق معمولی برابر حقوق پایه است.</li>
+<li>مدیر علاوه بر حقوق پایه، پاداش دریافت می‌کند.</li>
 <li>اطلاعات هر کارمند باید نمایش داده شود.</li>
 </ul>
 
@@ -36090,6 +36934,15 @@ Child
         print(f"Bonus: {self.bonus}")</div>
 </div>
 
+<p>
+در <code>Manager</code> دو متد والد را Override کرده‌ایم:
+</p>
+
+<ul>
+<li><code>calculate_salary()</code> برای محاسبه حقوق مدیر.</li>
+<li><code>show()</code> برای نمایش اطلاعات اضافه.</li>
+</ul>
+
 <h3>مرحله ۳ — استفاده از کلاس‌ها</h3>
 
 <div class="code-container">
@@ -36098,7 +36951,9 @@ Child
 e2 = Manager("Sara", 6000, 2000)
 
 e1.show()
+
 print("-----")
+
 e2.show()</div>
 </div>
 
@@ -36146,27 +37001,140 @@ e1 = Employee("Ali", 5000)
 e2 = Manager("Sara", 6000, 2000)
 
 e1.show()
+
 print("-----")
+
 e2.show()</div>
 </div>
-
-<p>در این برنامه همه مفاهیم جلسه به هم متصل شدند:</p>
 
 <div class="code-container">
 <span class="code-label">Final Flow</span>
 <div class="code-block no-prompt">Employee (Parent)
    │
-   ├── __init__
+   ├── __init__()
    ├── calculate_salary()
    └── show()
         │
         ▼
 Manager (Child)
    │
-   ├── super().__init__()  → به ارث می‌برد
-   ├── calculate_salary()  → Override
-   └── show()              → Override + super()</div>
+   ├── super().__init__()   → استفاده از منطق والد
+   ├── calculate_salary()   → Override
+   └── show()               → Override + super()</div>
 </div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">15. سه مفهوم اصلی را با هم مقایسه کنیم</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>مفهوم</th>
+<th>کار اصلی</th>
+<th>مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Inheritance</strong></td>
+<td>ساخت کلاس جدید بر اساس کلاس موجود</td>
+<td><code>class Manager(Employee)</code></td>
+</tr>
+<tr>
+<td><strong>super()</strong></td>
+<td>دسترسی به پیاده‌سازی والد</td>
+<td><code>super().__init__(...)</code></td>
+</tr>
+<tr>
+<td><strong>Override</strong></td>
+<td>تعریف نسخه جدید از متد والد</td>
+<td><code>def show(self)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="code-container">
+<span class="code-label">Quick Mental Model</span>
+<div class="code-block no-prompt">Inheritance
+    ↓
+فرزند از والد استفاده می‌کند
+
+super()
+    ↓
+فرزند به پیاده‌سازی والد دسترسی پیدا می‌کند
+
+Override
+    ↓
+فرزند رفتار یک متد را تغییر می‌دهد</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">16. چه زمانی از Inheritance استفاده کنیم؟</h2>
+
+<p>
+Inheritance زمانی مناسب است که بین دو کلاس یک رابطه منطقی
+<strong>«یک نوع از» (is-a)</strong> وجود داشته باشد.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>رابطه</th>
+<th>Inheritance مناسب است؟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dog یک Animal است</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>Manager یک Employee است</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>Car یک Vehicle است</td>
+<td>بله</td>
+</tr>
+<tr>
+<td>Engine یک Car است</td>
+<td>معمولاً خیر</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>
+در مثال آخر، موتور <strong>بخشی از</strong> خودرو است، نه یک نوع خودرو.
+این تفاوت در طراحی کلاس‌ها اهمیت زیادی دارد.
+</p>
+
+<div class="lesson-important">
+<strong>قاعده ساده:</strong>
+اگر بتوانی جمله «X یک نوع Y است» را منطقی بگویی،
+Inheritance می‌تواند گزینه مناسبی باشد.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">17. نکات کلیدی جلسه</h2>
+
+<ul>
+<li><strong>Inheritance</strong> یعنی ساخت یک کلاس بر اساس کلاس والد.</li>
+<li>ساختار ارث‌بری به صورت <code>class Child(Parent):</code> است.</li>
+<li>کلاس فرزند می‌تواند متدها و Attributeهای والد را استفاده کند.</li>
+<li>کلاس فرزند می‌تواند ویژگی‌ها و متدهای جدید اضافه کند.</li>
+<li>اگر فرزند <code>__init__()</code> خودش را داشته باشد، می‌تواند با <code>super().__init__()</code> منطق والد را اجرا کند.</li>
+<li><code>super().method()</code> برای دسترسی به پیاده‌سازی متد والد استفاده می‌شود.</li>
+<li><strong>Method Overriding</strong> یعنی فرزند متدی با همان نام متد والد تعریف کند.</li>
+<li>Override می‌تواند رفتار والد را کاملاً تغییر دهد یا با <code>super()</code> آن را گسترش دهد.</li>
+<li>Inheritance برای کاهش تکرار کد و مدل‌سازی رابطه‌های منطقی بین کلاس‌ها مفید است.</li>
+</ul>
 
 <hr class="lesson-divider">
 
@@ -36177,24 +37145,24 @@ Manager (Child)
 </p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — Inheritance چه معنایی دارد؟</p>
+<p>❓ سؤال ۱ — کدام گزینه Inheritance را درست توضیح می‌دهد؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) ساختن چند Object از یک Class</button>
-<button onclick="selectOption(this)">ب) ارث‌بری ویژگی‌های یک کلاس توسط کلاس دیگر</button>
-<button onclick="selectOption(this)">ج) حذف یک کلاس</button>
-<button onclick="selectOption(this)">د) کپی کردن کد به صورت دستی</button>
+<button onclick="selectOption(this)">الف) ساخت چند Object از یک Class</button>
+<button onclick="selectOption(this)">ب) ساخت یک کلاس بر اساس کلاس والد و استفاده از ویژگی‌ها و رفتارهای آن</button>
+<button onclick="selectOption(this)">ج) حذف متدهای یک کلاس</button>
+<button onclick="selectOption(this)">د) کپی دستی کدهای یک کلاس در کلاس دیگر</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-Inheritance یعنی کلاس فرزند ویژگی‌ها و متدهای کلاس والد را به ارث می‌برد.
+در Inheritance، کلاس فرزند بر اساس کلاس والد ساخته می‌شود و می‌تواند از ویژگی‌ها و رفتارهای آن استفاده کند.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — کدام گزینه یک کلاس فرزند را تعریف می‌کند؟</p>
+<p>❓ سؤال ۲ — کدام گزینه یک کلاس فرزند را به‌درستی تعریف می‌کند؟</p>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>class Child extends Parent:</code></button>
@@ -36206,39 +37174,45 @@ Inheritance یعنی کلاس فرزند ویژگی‌ها و متدهای کل�
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-در Python کلاس والد داخل پرانتز بعد از نام کلاس فرزند نوشته می‌شود.
+در Python نام کلاس والد داخل پرانتز بعد از نام کلاس فرزند نوشته می‌شود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — <code>super()</code> چه کاری انجام می‌دهد؟</p>
+<p>❓ سؤال ۳ — کاربرد اصلی <code>super().__init__(...)</code> چیست؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) یک کلاس جدید می‌سازد</button>
-<button onclick="selectOption(this)">ب) به والد دسترسی می‌دهد</button>
-<button onclick="selectOption(this)">ج) Attributeها را پاک می‌کند</button>
-<button onclick="selectOption(this)">د) کلاس فرزند را حذف می‌کند</button>
+<button onclick="selectOption(this)">الف) ساخت یک Object جدید</button>
+<button onclick="selectOption(this)">ب) اجرای <code>__init__()</code> کلاس والد</button>
+<button onclick="selectOption(this)">ج) حذف Constructor فرزند</button>
+<button onclick="selectOption(this)">د) ایجاد یک کلاس جدید</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-<code>super()</code> به ما اجازه می‌دهد متدها و Constructor والد را از داخل فرزند صدا بزنیم.
+<code>super().__init__(...)</code> برای اجرای Initializer والد از داخل کلاس فرزند استفاده می‌شود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۴ — خروجی کد زیر چیست؟<br>
-<code>class Animal:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def speak(self):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Sound")<br>
-<br>
-class Dog(Animal):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def speak(self):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("Woof")<br>
-<br>
-d = Dog()<br>
-d.speak()</code></p>
+<p>❓ سؤال ۴ — خروجی کد زیر چیست؟</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Animal:
+    def speak(self):
+        print("Sound")
+
+
+class Dog(Animal):
+    def speak(self):
+        print("Woof")
+
+
+d = Dog()
+d.speak()</div>
+</div>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>Sound</code></button>
@@ -36250,69 +37224,94 @@ d.speak()</code></p>
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-متد <code>speak</code> در فرزند، متد والد را Override کرده است.
+متد <code>speak()</code> در <code>Dog</code> متد والد را Override کرده است.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۵ — Method Overriding چیست؟</p>
+<p>❓ سؤال ۵ — کدام گزینه Method Overriding را نشان می‌دهد؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) تعریف متدی با نام جدید</button>
+<button onclick="selectOption(this)">الف) تعریف یک متد جدید با نام متفاوت در فرزند</button>
 <button onclick="selectOption(this)">ب) تعریف متدی با همان نام متد والد در کلاس فرزند</button>
-<button onclick="selectOption(this)">ج) حذف متد والد</button>
-<button onclick="selectOption(this)">د) ارث‌بری متد والد</button>
+<button onclick="selectOption(this)">ج) ساخت Object از کلاس والد</button>
+<button onclick="selectOption(this)">د) استفاده از یک Attribute والد</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ب</strong>
 <br>
-در Method Overriding، کلاس فرزند متدی با همان نام متد والد تعریف می‌کند
-و جایگزین آن می‌شود.
+در Override، کلاس فرزند متدی با همان نام متد والد تعریف می‌کند و پیاده‌سازی موردنظر خودش را ارائه می‌دهد.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — کدام گزینه Constructor والد را در فرزند صدا می‌زند؟</p>
+<p>❓ سؤال ۶ — خروجی کد زیر چیست؟</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class A:
+    def hello(self):
+        print("A")
+
+
+class B(A):
+    def hello(self):
+        super().hello()
+        print("B")
+
+
+B().hello()</div>
+</div>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>super().__init__(...)</code></button>
-<button onclick="selectOption(this)">ب) <code>parent().__init__(...)</code></button>
-<button onclick="selectOption(this)">ج) <code>self.__init__(...)</code></button>
-<button onclick="selectOption(this)">د) <code>base().__init__(...)</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: الف</strong>
-<br>
-<code>super().__init__(...)</code> Constructor کلاس والد را فراخوانی می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۷ — خروجی کد زیر چیست؟<br>
-<code>class A:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def hello(self):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("A")<br>
-<br>
-class B(A):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def hello(self):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;super().hello()<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("B")<br>
-<br>
-B().hello()</code></p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>A</code></button>
-<button onclick="selectOption(this)">ب) <code>B</code></button>
-<button onclick="selectOption(this)">ج) <code>A</code> و <code>B</code></button>
+<button onclick="selectOption(this)">الف) فقط <code>A</code></button>
+<button onclick="selectOption(this)">ب) فقط <code>B</code></button>
+<button onclick="selectOption(this)">ج) ابتدا <code>A</code> و سپس <code>B</code></button>
 <button onclick="selectOption(this)">د) خطا</button>
 </div>
 
 <div class="quiz-answer">
 <strong>✅ پاسخ: ج</strong>
 <br>
-ابتدا متد والد اجرا می‌شود (<code>A</code>) و سپس متد فرزند (<code>B</code>).
+<code>super().hello()</code> ابتدا متد والد را اجرا می‌کند و سپس دستور بعدی در متد فرزند اجرا می‌شود.
+</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ سؤال ۷ — خروجی کد زیر چیست؟</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">class Employee:
+    def calculate_salary(self):
+        return 5000
+
+
+class Manager(Employee):
+    def calculate_salary(self):
+        return 8000
+
+
+e = Employee()
+m = Manager()
+
+print(e.calculate_salary())
+print(m.calculate_salary())</div>
+</div>
+
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>5000</code> و <code>5000</code></button>
+<button onclick="selectOption(this)">ب) <code>8000</code> و <code>8000</code></button>
+<button onclick="selectOption(this)">ج) <code>5000</code> و <code>8000</code></button>
+<button onclick="selectOption(this)">د) خطا</button>
+</div>
+
+<div class="quiz-answer">
+<strong>✅ پاسخ: ج</strong>
+<br>
+Object مربوط به <code>Employee</code> متد والد را اجرا می‌کند،
+اما <code>Manager</code> نسخه Override شده خودش را اجرا می‌کند.
 </div>
 </div>
 
@@ -36321,8 +37320,8 @@ B().hello()</code></p>
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم چگونه با Inheritance کلاس‌های تخصصی‌تر
-از کلاس‌های پایه بسازیم و کد را بدون تکرار، سازمان‌دهی کنیم.
+در این جلسه یاد گرفتیم چگونه با Inheritance یک کلاس عمومی را به کلاس‌های تخصصی‌تر تبدیل کنیم
+و بدون تکرار کد، رفتارهای جدید به آن‌ها اضافه یا رفتارهای قبلی را تغییر دهیم.
 </p>
 
 <div class="table-wrap">
@@ -36336,37 +37335,41 @@ B().hello()</code></p>
 <tbody>
 <tr>
 <td>Inheritance</td>
-<td>ارث‌بری ویژگی‌ها از کلاس والد</td>
+<td>ساخت کلاس فرزند بر اساس کلاس والد</td>
 </tr>
 <tr>
-<td>Parent / Child</td>
-<td>کلاس پایه و کلاس مشتق‌شده</td>
+<td>Parent</td>
+<td>کلاس پایه</td>
+</tr>
+<tr>
+<td>Child</td>
+<td>کلاس مشتق‌شده</td>
 </tr>
 <tr>
 <td><code>class Child(Parent)</code></td>
-<td>ساختار تعریف کلاس فرزند</td>
+<td>ساختار تعریف ارث‌بری</td>
 </tr>
 <tr>
 <td><code>super()</code></td>
-<td>دسترسی به والد از داخل فرزند</td>
+<td>دسترسی به پیاده‌سازی والد</td>
 </tr>
 <tr>
-<td><code>super().__init__</code></td>
-<td>فراخوانی Constructor والد</td>
+<td><code>super().__init__()</code></td>
+<td>اجرای Initializer والد</td>
 </tr>
 <tr>
 <td>Method Overriding</td>
-<td>جایگزینی متد والد در فرزند</td>
+<td>تعریف نسخه جدید یک متد در فرزند</td>
 </tr>
 <tr>
 <td>Extend</td>
-<td>اضافه کردن ویژگی جدید به فرزند</td>
+<td>اضافه کردن ویژگی یا رفتار جدید به فرزند</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مهم‌ترین الگوی این جلسه را حفظ کن:</p>
+<p>الگوی اصلی این جلسه:</p>
 
 <div class="code-container">
 <span class="code-label">Core Pattern</span>
@@ -36385,39 +37388,28 @@ class Child(Parent):
 
     def method(self):
         super().method()
-        ...   # رفتار جدید</div>
-</div>
-
-<p>مثلاً:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">class Person:
-    def __init__(self, name):
-        self.name = name
-
-    def show(self):
-        print(f"Name: {self.name}")
-
-
-class Student(Person):
-    def __init__(self, name, sid):
-        super().__init__(name)
-        self.sid = sid
-
-    def show(self):
-        super().show()
-        print(f"ID: {self.sid}")
-
-
-s = Student("Ali", "S1")
-s.show()</div>
+        ...</div>
 </div>
 
 <p>
-در <strong>جلسه ۲۸ — Encapsulation و طراحی کلاس</strong> یاد می‌گیریم چگونه
-دسترسی به Attributeها را کنترل کنیم، اطلاعات حساس را مخفی کنیم
-و کلاس‌ها را به شکل حرفه‌ای طراحی کنیم.
+این الگو را می‌توان به صورت ساده این‌طور به خاطر سپرد:
+</p>
+
+<div class="code-container">
+<span class="code-label">Remember</span>
+<div class="code-block no-prompt">Inheritance → استفاده از قابلیت‌های والد
+
+super() → دسترسی به پیاده‌سازی والد
+
+Override → تغییر یا گسترش رفتار والد
+
+Child = Parent + قابلیت‌های جدید</div>
+</div>
+
+<p>
+در <strong>بخش ۴ فصل ۱۵ — Encapsulation و طراحی کلاس</strong> یاد می‌گیریم
+چگونه دسترسی به داده‌های داخل کلاس را کنترل کنیم، Attributeها را مدیریت کنیم
+و کلاس‌ها را با ساختار مناسب‌تری طراحی کنیم.
 </p>`
 ,
 "ch15-4": `<div class="section-header">
