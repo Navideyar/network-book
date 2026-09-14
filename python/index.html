@@ -30014,8 +30014,8 @@ score = 18
 </div>
 
 <p>
-اما برنامه‌های واقعی باید داده‌ها را <strong>ذخیره</strong> کنند تا دفعه بعد که اجرا شدند،
-همچنان در دسترس باشند. برای این کار از <strong>File</strong> استفاده می‌کنیم:
+اما برنامه‌های واقعی باید داده‌ها را <strong>ذخیره</strong> کنند تا دفعه بعد
+که اجرا شدند، همچنان در دسترس باشند. برای این کار از <strong>File</strong> استفاده می‌کنیم:
 </p>
 
 <div class="code-container">
@@ -30025,23 +30025,30 @@ score = 18
    └── خواندن از فایل → بازیابی اطلاعات</div>
 </div>
 
-<p>
-در این جلسه، <strong>در سه مرحله</strong> این مسیر را یاد می‌گیریم:
-</p>
+<p>در این جلسه این مسیر را در <strong>پنج گام</strong> یاد می‌گیریم:</p>
 
-<ol>
-<li>چطور فایل را باز کنیم و <em>بخوانیم</em>.</li>
-<li>چطور در فایل <em>بنویسیم</em>.</li>
-<li>چطور این کار را <em>ایمن</em> انجام دهیم (با <code>with</code>).</li>
-</ol>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>#</th><th>گام</th><th>مفهوم اصلی</th></tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td>باز کردن فایل</td><td><code>open()</code> و حالت‌ها</td></tr>
+<tr><td>۲</td><td>خواندن محتوا</td><td><code>read()</code> ، <code>readline()</code> ، <code>readlines()</code></td></tr>
+<tr><td>۳</td><td>نوشتن در فایل</td><td><code>write()</code> با حالت‌های <code>w</code> و <code>a</code></td></tr>
+<tr><td>۴</td><td>مدیریت ایمن</td><td><code>with open(...) as file:</code></td></tr>
+<tr><td>۵</td><td>ترکیب همه</td><td>خواندن → پردازش → نوشتن</td></tr>
+</tbody>
+</table>
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۱ — باز کردن فایل</h2>
+<h2 class="lesson-title">گام ۱ — باز کردن فایل با <code>open()</code></h2>
 
 <p>
-هر کار با فایل با یک قدم شروع می‌شود: <strong>باز کردن فایل</strong>.
-برای این کار از تابع <code>open()</code> استفاده می‌کنیم.
+هر کار با فایل با یک قدم شروع می‌شود: باز کردن فایل. برای این کار از
+تابع <code>open()</code> استفاده می‌کنیم.
 </p>
 
 <div class="code-container">
@@ -30052,26 +30059,60 @@ score = 18
 <div class="code-container">
 <span class="code-label">Recall</span>
 <div class="code-block no-prompt">"data.txt"  → نام فایل
-"r"         → حالت باز کردن (نوع دسترسی)</div>
+"r"         → حالت دسترسی (mode)</div>
 </div>
 
 <p>
-<code>open()</code> یک <strong>File Object</strong> برمی‌گرداند. این شیء
-مثل یک «کلید» به فایل است — با آن می‌خوانیم، می‌نویسیم و در پایان می‌بندیم.
+خروجی <code>open()</code> یک <strong>File Object</strong> است. این شیء مثل
+یک «کلید» به فایل عمل می‌کند — با آن می‌خوانیم، می‌نویسیم و در پایان می‌بندیم.
 </p>
 
-<div class="lesson-note">
-<strong>پارامتر mode</strong> تعیین می‌کند چه کاری با فایل داریم.
-سه حالت مهم را در ادامه می‌بینیم، اما ابتدا سراغ حالت پیش‌فرض می‌رویم: خواندن.
+<h3>حالت‌های مهم <code>open()</code></h3>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Mode</th><th>نام</th><th>کار</th><th>اگر فایل نباشد</th><th>محتوای قبلی</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"r"</code></td>
+<td>Read</td>
+<td>فقط خواندن</td>
+<td>خطا</td>
+<td>دست‌نخورده</td>
+</tr>
+<tr>
+<td><code>"w"</code></td>
+<td>Write</td>
+<td>نوشتن</td>
+<td>ساخته می‌شود</td>
+<td><strong>پاک می‌شود</strong></td>
+</tr>
+<tr>
+<td><code>"a"</code></td>
+<td>Append</td>
+<td>اضافه به انتها</td>
+<td>ساخته می‌شود</td>
+<td>حفظ می‌شود</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="lesson-important">
+<strong>هشدار:</strong>
+حالت <code>"w"</code> بدون هیچ اخطاری کل محتوای فایل را پاک می‌کند.
+قبل از استفاده مطمئن شو که می‌خواهی این کار را انجام دهی.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۲ — خواندن فایل</h2>
+<h2 class="lesson-title">گام ۲ — خواندن محتوا</h2>
 
 <p>
-رایج‌ترین کار با فایل، خواندن محتوای آن است. فرض کن فایل <code>data.txt</code>
-این محتوا را دارد:
+حالت پیش‌فرض و پرکاربردترین کار با فایل، خواندن است. فرض کن فایل
+<code>data.txt</code> این محتوا را دارد:
 </p>
 
 <div class="code-container">
@@ -30080,16 +30121,23 @@ score = 18
 Welcome to Files</div>
 </div>
 
-<p>
-برای خواندن با حالت <code>"r"</code> (Read) فایل را باز می‌کنیم.
-سه روش برای خواندن داریم که هر کدام کاربرد خودش را دارد:
-</p>
+<p>چهار روش برای خواندن داریم که هر کدام کاربرد خودشان را دارند:</p>
 
-<h3>۲-۱. خواندن کل محتوا با <code>read()</code></h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>روش</th><th>خروجی</th><th>کاربرد</th></tr>
+</thead>
+<tbody>
+<tr><td><code>read()</code></td><td>یک <code>str</code></td><td>خواندن کل محتوا یکجا</td></tr>
+<tr><td><code>readline()</code></td><td>یک <code>str</code> (یک خط)</td><td>خواندن یک خط مشخص</td></tr>
+<tr><td><code>readlines()</code></td><td>یک <code>list</code></td><td>داشتن همه خطوط به صورت لیست</td></tr>
+<tr><td>پیمایش مستقیم</td><td>—</td><td>خواندن خط به خط با حافظه کم</td></tr>
+</tbody>
+</table>
+</div>
 
-<p>
-وقتی می‌خواهی کل فایل را یکجا داشته باشی:
-</p>
+<h3>۲-۱. خواندن کل محتوا — <code>read()</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30105,15 +30153,9 @@ file.close()</div>
 Welcome to Files</div>
 </div>
 
-<p>
-<code>read()</code> کل محتوا را به صورت <strong>یک رشته</strong> (<code>str</code>) برمی‌گرداند.
-</p>
+<p><code>read()</code> کل محتوا را به صورت <strong>یک رشته</strong> برمی‌گرداند.</p>
 
-<h3>۲-۲. خواندن خط به خط با <code>readline()</code></h3>
-
-<p>
-اگر فقط یک خط لازم داری:
-</p>
+<h3>۲-۲. خواندن یک خط — <code>readline()</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30125,16 +30167,12 @@ print(line2)
 file.close()</div>
 </div>
 
-<p>
-نکته مهم: <code>readline()</code> کاراکتر <code>"\n"</code> انتهای خط را
-هم برمی‌گرداند.
-</p>
+<div class="lesson-note">
+<strong>نکته:</strong>
+<code>readline()</code> کاراکتر <code>"\n"</code> انتهای خط را هم برمی‌گرداند.
+</div>
 
-<h3>۲-۳. خواندن همه خطوط با <code>readlines()</code></h3>
-
-<p>
-اگر می‌خواهی همه خطوط را در قالب یک لیست داشته باشی:
-</p>
+<h3>۲-۳. خواندن همه خطوط — <code>readlines()</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30149,9 +30187,7 @@ file.close()</div>
 <div class="code-block no-prompt">['Hello Python\n', 'Welcome to Files']</div>
 </div>
 
-<p>
-حالا می‌توانی روی این لیست پیمایش کنی:
-</p>
+<p>حالا می‌توانی روی این لیست پیمایش کنی:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30160,15 +30196,14 @@ file.close()</div>
 </div>
 
 <div class="lesson-note">
-<strong>نکته:</strong> <code>strip()</code> کاراکتر <code>"\n"</code> را از
-انتهای هر خط حذف می‌کند.
+<strong>نکته:</strong>
+<code>strip()</code> کاراکتر <code>"\n"</code> را از انتهای هر خط حذف می‌کند.
 </div>
 
-<h3>۲-۴. بهترین روش: پیمایش مستقیم روی فایل</h3>
+<h3>۲-۴. بهترین روش — پیمایش مستقیم روی فایل</h3>
 
 <p>
-اگر می‌خواهی خط به خط فایل را پردازش کنی، به‌جای
-<code>readlines()</code> که همه فایل را در حافظه می‌ریزد،
+به‌جای <code>readlines()</code> که همه فایل را یکجا در حافظه می‌ریزد،
 مستقیماً روی خود File Object پیمایش کن:
 </p>
 
@@ -30186,52 +30221,25 @@ file.close()</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۳ — بستن فایل با <code>close()</code></h2>
+<h2 class="lesson-title">گام ۳ — نوشتن در فایل</h2>
 
 <p>
-در همه مثال‌های بالا، در پایان <code>file.close()</code> را صدا زدیم.
-چرا این کار لازم است؟
-</p>
-
-<ul>
-<li>منابع سیستم آزاد می‌شوند.</li>
-<li>ممکن است داده‌ها به درستی روی دیسک ذخیره نشوند اگر فایل باز بماند.</li>
-<li>در برنامه‌های بزرگ، فایل‌های بازِ زیاد باعث مشکل می‌شوند.</li>
-</ul>
-
-<div class="lesson-note">
-<strong>نکته:</strong>
-هر <code>open()</code> باید یک <code>close()</code> متناظر داشته باشد.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">مرحله ۴ — نوشتن در فایل</h2>
-
-<p>
-حالا که خواندن را بلدیم، سراغ نوشتن می‌رویم.
-برای نوشتن دو حالت داریم که تفاوتشان حیاتی است:
+حالا که خواندن را بلدیم، سراغ نوشتن می‌رویم. برای نوشتن دو حالت داریم:
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
-<tr><th>Mode</th><th>معنی</th><th>توضیح</th></tr>
+<tr><th>Mode</th><th>نام</th><th>رفتار</th></tr>
 </thead>
 <tbody>
-<tr><td><code>"w"</code></td><td>Write</td><td>می‌نویسد — <strong>محتوای قبلی پاک می‌شود</strong></td></tr>
-<tr><td><code>"a"</code></td><td>Append</td><td>به <strong>انتهای فایل</strong> اضافه می‌کند (محتوای قبلی حفظ می‌شود)</td></tr>
+<tr><td><code>"w"</code></td><td>Write</td><td>محتوای قبلی پاک، سپس نوشتن</td></tr>
+<tr><td><code>"a"</code></td><td>Append</td><td>نوشتن در انتهای فایل</td></tr>
 </tbody>
 </table>
 </div>
 
-<div class="lesson-important">
-<strong>هشدار:</strong>
-حالت <code>"w"</code> بدون هیچ هشداری کل محتوای فایل را پاک می‌کند.
-قبل از استفاده مطمئن شو که می‌خواهی این کار را انجام دهی.
-</div>
-
-<h3>۴-۱. نوشتن با حالت <code>"w"</code></h3>
+<h3>۳-۱. نوشتن با حالت <code>"w"</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30242,15 +30250,10 @@ file.close()</div>
 </div>
 
 <p>
-اگر <code>output.txt</code> وجود نداشته باشد ساخته می‌شود؛
-اگر وجود داشته باشد، محتوایش پاک و از نو نوشته می‌شود.
+اگر فایل نباشد ساخته می‌شود؛ اگر باشد، محتوایش پاک و از نو نوشته می‌شود.
 </p>
 
-<h3>۴-۲. اضافه کردن با حالت <code>"a"</code></h3>
-
-<p>
-اگر نمی‌خواهی محتوای قبلی پاک شود، از <code>"a"</code> استفاده کن:
-</p>
+<h3>۳-۲. اضافه کردن با حالت <code>"a"</code></h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30272,8 +30275,8 @@ New line added</div>
 </div>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt"># نتیجه: AliSara
+<span class="code-label">Python — مقایسه</span>
+<div class="code-block no-prompt"># نتیجه: AliSara (بدون \n)
 file.write("Ali")
 file.write("Sara")
 
@@ -30284,16 +30287,16 @@ file.write("Sara\n")</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۵ — مشکل روش دستی و راه‌حل <code>with</code></h2>
+<h2 class="lesson-title">گام ۴ — مدیریت ایمن با <code>with</code></h2>
 
 <p>
-روش بالا (open → کار → close) کار می‌کند، اما یک ایراد جدی دارد:
+روش قبلی (open → کار → close) کار می‌کند، اما یک ایراد جدی دارد:
 اگر بین <code>open()</code> و <code>close()</code> خطایی رخ دهد،
 <code>close()</code> هرگز اجرا نمی‌شود و فایل باز می‌ماند.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python — مشکل</span>
+<span class="code-label">Python — مشکل روش دستی</span>
 <div class="code-block no-prompt">file = open("data.txt", "r")
 content = file.read()
 
@@ -30304,8 +30307,8 @@ file.close()</div>
 </div>
 
 <p>
-<strong>راه‌حل:</strong> استفاده از <code>with</code>.
-این ساختار فایل را <strong>به صورت خودکار</strong> — حتی در صورت خطا — می‌بندد.
+<strong>راه‌حل:</strong> استفاده از <code>with</code>. این ساختار فایل را
+<strong>به صورت خودکار</strong> — حتی در صورت خطا — می‌بندد.
 </p>
 
 <div class="code-container">
@@ -30322,10 +30325,7 @@ file.close()</div>
 print(content)   # فایل اینجا خودکار بسته شده</div>
 </div>
 
-<div class="lesson-important">
-<strong>قانون طلایی:</strong>
-همیشه برای کار با فایل از <code>with</code> استفاده کن.
-</div>
+<h3>مقایسه روش دستی و <code>with</code></h3>
 
 <div class="table-wrap">
 <table>
@@ -30341,16 +30341,34 @@ print(content)   # فایل اینجا خودکار بسته شده</div>
 </table>
 </div>
 
+<div class="lesson-important">
+<strong>قانون طلایی:</strong>
+همیشه برای کار با فایل از <code>with</code> استفاده کن.
+</div>
+
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۶ — الگوهای اصلی با <code>with</code></h2>
+<h2 class="lesson-title">گام ۵ — الگوهای اصلی با <code>with</code></h2>
 
 <p>
-از این لحظه به بعد، همه کارهای فایل را با <code>with</code> انجام می‌دهیم.
-دو الگوی اصلی را حفظ کن:
+از این لحظه به بعد، همه کارها را با <code>with</code> انجام می‌دهیم.
+سه الگوی زیر را حفظ کن:
 </p>
 
-<h3>الگوی خواندن</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>الگو</th><th>کاربرد</th></tr>
+</thead>
+<tbody>
+<tr><td>خواندن خط به خط</td><td>پردازش فایل‌های حجیم</td></tr>
+<tr><td>نوشتن (حالت <code>w</code>)</td><td>ساخت فایل جدید یا بازنویسی</td></tr>
+<tr><td>اضافه کردن (حالت <code>a</code>)</td><td>افزودن به فایل موجود</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>الگوی ۱ — خواندن</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30359,7 +30377,7 @@ print(content)   # فایل اینجا خودکار بسته شده</div>
         print(line.strip())</div>
 </div>
 
-<h3>الگوی نوشتن</h3>
+<h3>الگوی ۲ — نوشتن</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30368,7 +30386,7 @@ print(content)   # فایل اینجا خودکار بسته شده</div>
     file.write("Second note\n")</div>
 </div>
 
-<h3>الگوی اضافه کردن</h3>
+<h3>الگوی ۳ — اضافه کردن</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -30376,7 +30394,7 @@ print(content)   # فایل اینجا خودکار بسته شده</div>
     file.write("Third note\n")</div>
 </div>
 
-<h3>ترکیب خواندن → پردازش → نوشتن</h3>
+<h3>الگوی ترکیبی — خواندن → پردازش → نوشتن</h3>
 
 <p>
 می‌توانیم محتوای یک فایل را بخوانیم، پردازش کنیم و در فایل دیگری بنویسیم:
@@ -30401,7 +30419,7 @@ files          FILES</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">مرحله ۷ — وقتی فایل وجود ندارد</h2>
+<h2 class="lesson-title">وقتی فایل وجود ندارد</h2>
 
 <p>
 اگر با حالت <code>"r"</code> فایلی را باز کنیم که وجود ندارد، خطا می‌گیریم:
@@ -30418,10 +30436,22 @@ files          FILES</div>
 <div class="code-block no-prompt">FileNotFoundError: [Errno 2] No such file or directory: 'nothing.txt'</div>
 </div>
 
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>حالت</th><th>فایل موجود</th><th>فایل ناموجود</th></tr>
+</thead>
+<tbody>
+<tr><td><code>"r"</code></td><td>باز می‌شود</td><td><code>FileNotFoundError</code></td></tr>
+<tr><td><code>"w"</code></td><td>پاک و بازنویسی</td><td>ساخته می‌شود</td></tr>
+<tr><td><code>"a"</code></td><td>به انتها اضافه می‌شود</td><td>ساخته می‌شود</td></tr>
+</tbody>
+</table>
+</div>
+
 <div class="lesson-note">
 <strong>نکته:</strong>
-حالت‌های <code>"w"</code> و <code>"a"</code> اگر فایل نباشد، آن را می‌سازند.
-فقط <code>"r"</code> خطا می‌دهد. مدیریت این خطاها در جلسه <strong>Error Handling</strong> می‌آید.
+مدیریت این خطاها در جلسه <strong>Error Handling</strong> آموزش داده می‌شود.
 </div>
 
 <hr class="lesson-divider">
@@ -30430,38 +30460,50 @@ files          FILES</div>
 
 <div class="code-container">
 <span class="code-label">Code</span>
-<div class="code-block no-prompt">مراحل کار با فایل:
-
-  1. open()         → اتصال به فایل
-  2. read() / readline() / readlines()  → خواندن
-     یا write()     → نوشتن
-  3. close()        → بستن
+<div class="code-block no-prompt">File
+  │
+  ├── open(filename, mode)  → اتصال به فایل
+  │
+  ├── خواندن:
+  │     ├── read()          → کل محتوا (str)
+  │     ├── readline()      → یک خط (str)
+  │     ├── readlines()     → همه خطوط (list)
+  │     └── for line in file → پیمایش خط به خط
+  │
+  ├── نوشتن:
+  │     └── write()         → نوشتن (بدون \n خودکار)
+  │
+  └── close()               → قطع اتصال
 
 با with:
   with open(...) as file:
-      ...           ← کار با فایل
-                    ← بستن خودکار در پایان بلاک
-
-حالت‌ها:
-  "r" → خواندن (فایل باید موجود باشد)
-  "w" → نوشتن (محتوای قبلی پاک می‌شود)
-  "a" → اضافه کردن به انتها</div>
+      ...
+      (بستن خودکار در پایان بلاک)</div>
 </div>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">نکات کلیدی جلسه</h2>
 
-<ul>
-<li><code>open()</code> فایل را باز می‌کند و یک File Object برمی‌گرداند.</li>
-<li>حالت‌ها: <code>"r"</code> خواندن، <code>"w"</code> نوشتن (پاک‌کننده)، <code>"a"</code> اضافه کردن.</li>
-<li><code>read()</code> → یک <code>str</code>، <code>readlines()</code> → یک <code>list</code>،
-<code>readline()</code> → یک خط.</li>
-<li>پیمایش مستقیم با <code>for line in file:</code> بهترین روش خواندن خط به خط است.</li>
-<li><code>write()</code> خط جدید اضافه نمی‌کند؛ باید <code>"\n"</code> بگذاری.</li>
-<li>همیشه از <code>with open(...) as file:</code> استفاده کن.</li>
-<li>حالت <code>"r"</code> روی فایل ناموجود <code>FileNotFoundError</code> می‌دهد.</li>
-</ul>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>مفهوم</th><th>نکته اصلی</th></tr>
+</thead>
+<tbody>
+<tr><td><code>open()</code></td><td>فایل را باز می‌کند و File Object برمی‌گرداند</td></tr>
+<tr><td><code>"r"</code></td><td>خواندن — فایل باید موجود باشد</td></tr>
+<tr><td><code>"w"</code></td><td>نوشتن — محتوای قبلی پاک می‌شود</td></tr>
+<tr><td><code>"a"</code></td><td>اضافه کردن به انتهای فایل</td></tr>
+<tr><td><code>read()</code></td><td>کل محتوا را به صورت یک <code>str</code> برمی‌گرداند</td></tr>
+<tr><td><code>readline()</code></td><td>یک خط برمی‌گرداند</td></tr>
+<tr><td><code>readlines()</code></td><td>همه خطوط را در یک <code>list</code> برمی‌گرداند</td></tr>
+<tr><td><code>write()</code></td><td>خط جدید خودکار اضافه نمی‌کند</td></tr>
+<tr><td><code>with open()</code></td><td>بستن خودکار فایل — استاندارد Python</td></tr>
+<tr><td><code>FileNotFoundError</code></td><td>خطای حالت <code>"r"</code> روی فایل ناموجود</td></tr>
+</tbody>
+</table>
+</div>
 
 <hr class="lesson-divider">
 
@@ -30499,36 +30541,20 @@ files          FILES</div>
 </ul>
 
 <p>
-این سناریو دقیقاً همان سه مرحله‌ای است که یاد گرفتیم: <strong>نوشتن</strong>، <strong>ذخیره</strong>، <strong>خواندن</strong>.
+این سناریو دقیقاً همان گام‌هایی است که یاد گرفتیم:
 </p>
 
-<h3>مرحله ۱ — دریافت یادداشت از کاربر</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">note = input("Write your note: ")</div>
-</div>
-
-<h3>مرحله ۲ — ذخیره در فایل با حالت <code>"a"</code></h3>
-
-<p>
-از <code>"a"</code> استفاده می‌کنیم تا یادداشت‌های قبلی پاک نشوند:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("notes.txt", "a") as file:
-    file.write(note + "\n")</div>
-</div>
-
-<h3>مرحله ۳ — خواندن و نمایش همه یادداشت‌ها</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">print("----- Notes -----")
-with open("notes.txt", "r") as file:
-    for line in file:
-        print("-", line.strip())</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>مرحله</th><th>کار</th><th>ابزار</th></tr>
+</thead>
+<tbody>
+<tr><td>۱</td><td>دریافت ورودی از کاربر</td><td><code>input()</code></td></tr>
+<tr><td>۲</td><td>ذخیره در فایل</td><td><code>with open("a")</code></td></tr>
+<tr><td>۳</td><td>خواندن و نمایش</td><td><code>with open("r")</code> + پیمایش</td></tr>
+</tbody>
+</table>
 </div>
 
 <h3>برنامه کامل</h3>
@@ -30548,23 +30574,21 @@ with open("notes.txt", "r") as file:
         print("-", line.strip())</div>
 </div>
 
-<p>اگر کاربر دو بار برنامه را اجرا کند و بنویسد:</p>
+<h3>اجرای نمونه</h3>
 
 <div class="code-container">
 <span class="code-label">Input</span>
 <div class="code-block no-prompt">Buy milk
-Study Python</div>
+Study Python
+Read book</div>
 </div>
-
-<p>نتیجه در فایل <code>notes.txt</code>:</p>
 
 <div class="code-container">
 <span class="code-label">notes.txt</span>
 <div class="code-block no-prompt">Buy milk
-Study Python</div>
+Study Python
+Read book</div>
 </div>
-
-<p>و در اجرای بعدی، همه یادداشت‌ها نمایش داده می‌شوند:</p>
 
 <div class="code-container">
 <span class="code-label">Output</span>
@@ -30730,6 +30754,8 @@ print()</div>
 از این پس برنامه‌های ما می‌توانند اطلاعات را <strong>پایدار</strong> نگه دارند.
 </p>
 
+<h3>خلاصه مفاهیم در یک نگاه</h3>
+
 <div class="table-wrap">
 <table>
 <thead>
@@ -30749,7 +30775,7 @@ print()</div>
 </table>
 </div>
 
-<p>مهم‌ترین الگوها را حفظ کن:</p>
+<h3>مهم‌ترین الگوها را حفظ کن</h3>
 
 <div class="code-container">
 <span class="code-label">Core Pattern — خواندن</span>
@@ -30763,6 +30789,8 @@ print()</div>
 <div class="code-block no-prompt">with open("file.txt", "a") as file:
     file.write("New line\n")</div>
 </div>
+
+<h3>جلسه بعد</h3>
 
 <p>
 در <strong>جلسه بعد — کار با مسیر فایل‌ها، <code>pathlib</code> و <code>os</code></strong>
