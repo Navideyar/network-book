@@ -5279,323 +5279,885 @@ print(account_info(name, balance))</pre>
     <p style="color: var(--text-muted); text-align: center; font-size: 0.95rem;">
         <i class="fas fa-info-circle"></i> تمام تمرین‌های این فصل را می‌توانید مستقیماً در همین صفحه اجرا کنید.
     </p>
-`,
+`
+,
 "ch11": `
-    <!-- ===== تمرین ۱ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۱</span>
-            <div>
-                <strong>List Comprehension - اعداد زوج</strong>
-                <small>درجه سختی: ساده</small>
+<!-- =========================================================
+     فصل ۱۱ — تمرین‌ها
+     ۱۲ تمرین از ساده تا چالشی
+     بخش ۱: Comprehension
+     بخش ۲: Lambda / map / filter / sorted
+========================================================= -->
+
+<!-- ===== تمرین ۱ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۱</span>
+        <div>
+            <strong>List Comprehension - اعداد زوج</strong>
+            <small>درجه سختی: ساده</small>
+        </div>
+    </div>
+
+    <p>لیست زیر را در نظر بگیرید:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>List Comprehension</strong> یک لیست جدید بسازید
+        که فقط اعداد زوج را شامل شود.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[2, 4, 6, 8, 10]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex1">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 1 · Even Numbers</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
             </div>
         </div>
-        <p>لیست زیر را در نظر بگیرید:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
-        <p>با استفاده از <strong>List Comprehension</strong> یک لیست جدید بسازید که فقط اعداد زوج را شامل شود.</p>
-        <div class="python-playground" data-playground="ch11-ex1">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 1 · Even Numbers</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
         </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol1"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol1">
-            <strong>پاسخ:</strong>
-            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol1">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol1">
+        <strong>پاسخ:</strong>
+        <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 even_numbers = [number for number in numbers if number % 2 == 0]
 
 print(even_numbers)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۲ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۲</span>
+        <div>
+            <strong>List Comprehension - محاسبه قیمت نهایی</strong>
+            <small>درجه سختی: ساده</small>
         </div>
     </div>
 
-    <!-- ===== تمرین ۲ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۲</span>
-            <div>
-                <strong>List Comprehension - حروف بزرگ</strong>
-                <small>درجه سختی: ساده</small>
+    <p>قیمت چند محصول را داریم:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">prices = [100, 200, 300, 400]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>List Comprehension</strong> یک لیست جدید بسازید
+        که قیمت هر محصول را با ۱۰٪ افزایش محاسبه کند.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[110.0, 220.0, 330.0, 440.0]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex2">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 2 · Product Prices</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
             </div>
         </div>
-        <p>لیست زیر را دارید:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["ali", "sara", "reza", "mina", "ahmad"]</div></div>
-        <p>با استفاده از <strong>List Comprehension</strong> لیستی جدید بسازید که تمام نام‌ها را با حروف بزرگ ذخیره کند.</p>
-        <p>خروجی مورد انتظار:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">['ALI', 'SARA', 'REZA', 'MINA', 'AHMAD']</div></div>
-        <div class="python-playground" data-playground="ch11-ex2">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 2 · Uppercase Letters</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
         </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol2"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol2">
-            <strong>پاسخ:</strong>
-            <pre>names = ["ali", "sara", "reza", "mina", "ahmad"]
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
 
-upper_names = [name.upper() for name in names]
+    <button class="solution-toggle" type="button" data-solution="ch11-sol2">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
 
-print(upper_names)</pre>
+    <div class="exercise-solution" id="ch11-sol2">
+        <strong>پاسخ:</strong>
+        <pre>prices = [100, 200, 300, 400]
+
+new_prices = [price * 1.1 for price in prices]
+
+print(new_prices)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۳ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۳</span>
+        <div>
+            <strong>Set Comprehension - طول کلمات</strong>
+            <small>درجه سختی: متوسط</small>
         </div>
     </div>
 
-    <!-- ===== تمرین ۳ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۳</span>
-            <div>
-                <strong>List Comprehension - تخفیف ۲۰٪</strong>
-                <small>درجه سختی: متوسط</small>
+    <p>لیست زیر شامل نام چند زبان برنامه‌نویسی است:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">languages = ["python", "java", "python", "go", "javascript", "java"]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>Set Comprehension</strong> مجموعه‌ای بسازید
+        که طول کلمات را بدون تکرار نگه دارد.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">{2, 4, 6, 10}</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex3">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 3 · Set Comprehension</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
             </div>
         </div>
-        <p>لیست زیر شامل قیمت محصولات است:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">prices = [100, 250, 80, 450, 120]</div></div>
-        <p>با استفاده از <strong>List Comprehension</strong> لیست جدیدی بسازید که قیمت هر محصول را با ۲۰٪ تخفیف محاسبه کند.</p>
-        <p>خروجی مورد انتظار:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">[80.0, 200.0, 64.0, 360.0, 96.0]</div></div>
-        <div class="python-playground" data-playground="ch11-ex3">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 3 · 20% Discount</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
         </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol3"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol3">
-            <strong>پاسخ:</strong>
-            <pre>prices = [100, 250, 80, 450, 120]
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
 
-discounted_prices = [price * 0.8 for price in prices]
+    <button class="solution-toggle" type="button" data-solution="ch11-sol3">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
 
-print(discounted_prices)</pre>
+    <div class="exercise-solution" id="ch11-sol3">
+        <strong>پاسخ:</strong>
+        <pre>languages = ["python", "java", "python", "go", "javascript", "java"]
+
+lengths = {len(language) for language in languages}
+
+print(lengths)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۴ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۴</span>
+        <div>
+            <strong>Dictionary Comprehension - دانش‌آموزان قبول</strong>
+            <small>درجه سختی: متوسط</small>
         </div>
     </div>
 
-    <!-- ===== تمرین ۴ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۴</span>
-            <div>
-                <strong>Set Comprehension - مربع اعداد فرد</strong>
-                <small>درجه سختی: متوسط</small>
-            </div>
-        </div>
-        <p>لیست زیر را در نظر بگیرید:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
-        <p>با استفاده از <strong>Set Comprehension</strong> یک مجموعه بسازید که مربع اعداد فرد را شامل شود.</p>
-        <p>خروجی مورد انتظار:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{1, 9, 25, 49, 81}</div></div>
-        <div class="python-playground" data-playground="ch11-ex4">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 4 · Square of Odd Numbers</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
-        </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol4"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol4">
-            <strong>پاسخ:</strong>
-            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    <p>نمرات دانش‌آموزان را داریم:</p>
 
-odd_squares = {number ** 2 for number in numbers if number % 2 != 0}
-
-print(odd_squares)</pre>
-        </div>
-    </div>
-
-    <!-- ===== تمرین ۵ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۵</span>
-            <div>
-                <strong>Dictionary Comprehension - نمرات ≥ ۱۷</strong>
-                <small>درجه سختی: سخت</small>
-            </div>
-        </div>
-        <p>لیست زیر شامل نام و نمره دانش‌آموزان است:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">students = {
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">students = {
     "Ali": 18,
-    "Sara": 15,
-    "Reza": 19,
+    "Sara": 9,
+    "Reza": 16,
     "Mina": 12,
-    "Ahmad": 17
-}</div></div>
-        <p>با استفاده از <strong>Dictionary Comprehension</strong> یک دیکشنری جدید بسازید که فقط دانش‌آموزانی را شامل شود که نمره آن‌ها حداقل ۱۷ است.</p>
-        <p>خروجی مورد انتظار:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{'Ali': 18, 'Reza': 19, 'Ahmad': 17}</div></div>
-        <div class="python-playground" data-playground="ch11-ex5">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 5 · Grades ≥ 17</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
+    "Ahmad": 8
+}</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>Dictionary Comprehension</strong> فقط دانش‌آموزانی
+        را نگه دارید که نمره آن‌ها حداقل ۱۰ است.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">{'Ali': 18, 'Reza': 16, 'Mina': 12}</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex4">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 4 · Students</span>
             </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
             </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
         </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol5"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol5">
-            <strong>پاسخ:</strong>
-            <pre>students = {
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol4">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol4">
+        <strong>پاسخ:</strong>
+        <pre>students = {
     "Ali": 18,
-    "Sara": 15,
-    "Reza": 19,
+    "Sara": 9,
+    "Reza": 16,
     "Mina": 12,
-    "Ahmad": 17
+    "Ahmad": 8
 }
 
-successful_students = {
+passed = {
     name: score
     for name, score in students.items()
-    if score >= 17
+    if score >= 10
 }
 
-print(successful_students)</pre>
+print(passed)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۵ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۵</span>
+        <div>
+            <strong>Lambda - محاسبه تخفیف</strong>
+            <small>درجه سختی: متوسط</small>
         </div>
     </div>
 
-    <!-- ===== تمرین ۶ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۶</span>
-            <div>
-                <strong>Dictionary Comprehension - زوج / فرد</strong>
-                <small>درجه سختی: سخت</small>
-            </div>
-        </div>
-        <p>لیست زیر شامل اعداد است:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</div></div>
-        <p>با استفاده از <strong>Dictionary Comprehension</strong> دیکشنری‌ای بسازید که:</p>
-        <ul>
-            <li>کلید = عدد</li>
-            <li>مقدار = <code>"زوج"</code> اگر عدد زوج باشد</li>
-            <li>مقدار = <code>"فرد"</code> اگر عدد فرد باشد</li>
-        </ul>
-        <p>خروجی مورد انتظار:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{1: 'فرد', 2: 'زوج', 3: 'فرد', 4: 'زوج', 5: 'فرد', 6: 'زوج', 7: 'فرد', 8: 'زوج', 9: 'فرد', 10: 'زوج'}</div></div>
-        <div class="python-playground" data-playground="ch11-ex6">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 6 · Even / Odd</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
-        </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol6"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol6">
-            <strong>پاسخ:</strong>
-            <pre>numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-number_types = {
-    number: "زوج" if number % 2 == 0 else "فرد"
-    for number in numbers
-}
-
-print(number_types)</pre>
-        </div>
-    </div>
-
-    <!-- ===== تمرین ۷ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۷</span>
-            <div>
-                <strong>Dictionary + Set Comprehension - ترکیبی</strong>
-                <small>درجه سختی: چالشی</small>
-            </div>
-        </div>
-        <p>لیست زیر شامل چند کلمه است:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">words = ["python", "java", "javascript", "go", "ruby", "c", "php"]</div></div>
-        <p>با استفاده از <strong>Dictionary Comprehension</strong> دیکشنری‌ای بسازید که:</p>
-        <ul>
-            <li>کلید = کلمه</li>
-            <li>مقدار = طول کلمه</li>
-            <li>فقط کلماتی در دیکشنری قرار بگیرند که حداقل ۵ حرف دارند.</li>
-        </ul>
-        <p>سپس با استفاده از <strong>Set Comprehension</strong> مجموعه‌ای از طول کلمات موجود در دیکشنری ایجاد کنید.</p>
-        <p>خروجی دیکشنری:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{'python': 6, 'javascript': 10}</div></div>
-        <p>و مجموعه طول‌ها:</p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{6, 10}</div></div>
-        <div class="python-playground" data-playground="ch11-ex7">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 7 · Combined</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
-        </div>
-        <button class="solution-toggle" type="button" data-solution="ch11-sol7"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch11-sol7">
-            <strong>پاسخ:</strong>
-            <pre>words = ["python", "java", "javascript", "go", "ruby", "c", "php"]
-
-word_lengths = {
-    word: len(word)
-    for word in words
-    if len(word) >= 5
-}
-
-lengths = {length for length in word_lengths.values()}
-
-print(word_lengths)
-print(lengths)</pre>
-        </div>
-    </div>
-
-    <hr class="lesson-divider">
-    <p style="color: var(--text-muted); text-align: center; font-size: 0.95rem;">
-        <i class="fas fa-info-circle"></i> تمام تمرین‌های این فصل را می‌توانید مستقیماً در همین صفحه اجرا کنید.
+    <p>
+        یک تابع <strong>lambda</strong> بسازید که قیمت و درصد تخفیف را دریافت کند
+        و قیمت نهایی را برگرداند.
     </p>
+
+    <p>مثلاً برای قیمت ۵۰۰ و تخفیف ۲۰٪، نتیجه باید ۴۰۰ باشد.</p>
+
+    <div class="code-container">
+        <span class="code-label">Expected Output</span>
+        <div class="code-block no-prompt">400.0</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex5">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 5 · Lambda Discount</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol5">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol5">
+        <strong>پاسخ:</strong>
+        <pre>discount = lambda price, percent: price * (1 - percent / 100)
+
+print(discount(500, 20))</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۶ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۶</span>
+        <div>
+            <strong>map() - تبدیل دما</strong>
+            <small>درجه سختی: متوسط</small>
+        </div>
+    </div>
+
+    <p>دماها بر حسب سانتی‌گراد هستند:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">temperatures = [0, 10, 20, 30]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>map()</strong> و <strong>lambda</strong>
+        تمام دماها را به Fahrenheit تبدیل کنید.
+    </p>
+
+    <p>فرمول:</p>
+
+    <div class="code-container">
+        <span class="code-label">Formula</span>
+        <div class="code-block no-prompt">F = C * 9 / 5 + 32</div>
+    </div>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[32.0, 50.0, 68.0, 86.0]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex6">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 6 · map()</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol6">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol6">
+        <strong>پاسخ:</strong>
+        <pre>temperatures = [0, 10, 20, 30]
+
+fahrenheit = list(
+    map(lambda c: c * 9 / 5 + 32, temperatures)
+)
+
+print(fahrenheit)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۷ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۷</span>
+        <div>
+            <strong>filter() - فیلتر محصولات</strong>
+            <small>درجه سختی: متوسط</small>
+        </div>
+    </div>
+
+    <p>قیمت محصولات یک فروشگاه:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">prices = [50, 120, 80, 250, 90, 180, 40]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>filter()</strong> و <strong>lambda</strong>
+        فقط قیمت‌هایی را انتخاب کنید که حداقل ۱۰۰ باشند.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[120, 250, 180]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex7">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 7 · filter()</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol7">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol7">
+        <strong>پاسخ:</strong>
+        <pre>prices = [50, 120, 80, 250, 90, 180, 40]
+
+expensive = list(
+    filter(lambda price: price >= 100, prices)
+)
+
+print(expensive)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۸ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۸</span>
+        <div>
+            <strong>sorted() + lambda - مرتب‌سازی نام‌ها</strong>
+            <small>درجه سختی: متوسط</small>
+        </div>
+    </div>
+
+    <p>نام افراد را داریم:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">names = ["Ali", "Sara", "Mohammad", "Reza", "Mina"]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>sorted()</strong> و <strong>lambda</strong>
+        نام‌ها را بر اساس طول نام، از کوتاه‌ترین به بلندترین مرتب کنید.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">['Ali', 'Sara', 'Reza', 'Mina', 'Mohammad']</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex8">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 8 · Sort by Length</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol8">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol8">
+        <strong>پاسخ:</strong>
+        <pre>names = ["Ali", "Sara", "Mohammad", "Reza", "Mina"]
+
+result = sorted(names, key=lambda name: len(name))
+
+print(result)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۹ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۹</span>
+        <div>
+            <strong>map() + filter() - پردازش نمرات</strong>
+            <small>درجه سختی: سخت</small>
+        </div>
+    </div>
+
+    <p>نمرات اولیه دانش‌آموزان را داریم:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">scores = [8, 12, 15, 9, 18, 20, 11]</div>
+    </div>
+
+    <p>دو مرحله انجام دهید:</p>
+
+    <ol>
+        <li>
+            با <strong>filter()</strong> فقط نمرات قبولی یعنی ۱۰ یا بیشتر را انتخاب کنید.
+        </li>
+        <li>
+            با <strong>map()</strong> روی نمرات باقی‌مانده، ۱ نمره اضافه کنید.
+        </li>
+    </ol>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[13, 16, 19, 21, 12]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex9">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 9 · Scores</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol9">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol9">
+        <strong>پاسخ:</strong>
+        <pre>scores = [8, 12, 15, 9, 18, 20, 11]
+
+passed = filter(lambda score: score >= 10, scores)
+
+result = list(
+    map(lambda score: score + 1, passed)
+)
+
+print(result)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۱۰ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۱۰</span>
+        <div>
+            <strong>sorted() + lambda - مرتب‌سازی محصولات</strong>
+            <small>درجه سختی: سخت</small>
+        </div>
+    </div>
+
+    <p>اطلاعات چند محصول به شکل زیر است:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">products = [
+    ("Laptop", 800),
+    ("Mouse", 20),
+    ("Monitor", 300),
+    ("Keyboard", 50)
+]</div>
+    </div>
+
+    <p>
+        با استفاده از <strong>sorted()</strong> و <strong>lambda</strong>
+        محصولات را بر اساس قیمت، از ارزان‌ترین به گران‌ترین مرتب کنید.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[('Mouse', 20), ('Keyboard', 50), ('Monitor', 300), ('Laptop', 800)]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex10">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 10 · Products</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol10">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol10">
+        <strong>پاسخ:</strong>
+        <pre>products = [
+    ("Laptop", 800),
+    ("Mouse", 20),
+    ("Monitor", 300),
+    ("Keyboard", 50)
+]
+
+result = sorted(products, key=lambda product: product[1])
+
+print(result)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۱۱ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۱۱</span>
+        <div>
+            <strong>ترکیبی - دانش‌آموزان برتر</strong>
+            <small>درجه سختی: سخت</small>
+        </div>
+    </div>
+
+    <p>نمرات دانش‌آموزان:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">students = {
+    "Ali": 18,
+    "Sara": 12,
+    "Reza": 19,
+    "Mina": 16,
+    "Ahmad": 9
+}</div>
+    </div>
+
+    <p>
+        ابتدا با <strong>filter()</strong> فقط دانش‌آموزانی را انتخاب کنید
+        که نمره آن‌ها حداقل ۱۵ است.
+    </p>
+
+    <p>
+        سپس با <strong>sorted()</strong> و <strong>lambda</strong>
+        آن‌ها را از بیشترین نمره به کمترین نمره مرتب کنید.
+    </p>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[('Reza', 19), ('Ali', 18), ('Mina', 16)]</div>
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex11">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 11 · Top Students</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol11">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol11">
+        <strong>پاسخ:</strong>
+        <pre>students = {
+    "Ali": 18,
+    "Sara": 12,
+    "Reza": 19,
+    "Mina": 16,
+    "Ahmad": 9
+}
+
+top_students = filter(
+    lambda item: item[1] >= 15,
+    students.items()
+)
+
+result = sorted(
+    top_students,
+    key=lambda item: item[1],
+    reverse=True
+)
+
+print(result)</pre>
+    </div>
+</div>
+
+
+<!-- ===== تمرین ۱۲ ===== -->
+<div class="exercise-card">
+    <div class="exercise-head">
+        <span class="exercise-num">۱۲</span>
+        <div>
+            <strong>پروژه کوچک - تحلیل قیمت محصولات</strong>
+            <small>درجه سختی: چالشی</small>
+        </div>
+    </div>
+
+    <p>قیمت محصولات یک فروشگاه به شکل زیر است:</p>
+
+    <div class="code-container">
+        <span class="code-label">Python</span>
+        <div class="code-block no-prompt">prices = [50, 120, 80, 200, 150, 90, 300]</div>
+    </div>
+
+    <p>برنامه‌ای بنویسید که این مراحل را انجام دهد:</p>
+
+    <ol>
+        <li>
+            با <strong>filter()</strong> فقط قیمت‌های حداقل ۱۰۰ را انتخاب کند.
+        </li>
+        <li>
+            با <strong>map()</strong> روی قیمت‌های انتخاب‌شده ۲۰٪ تخفیف اعمال کند.
+        </li>
+        <li>
+            با <strong>sorted()</strong> قیمت‌های نهایی را از کمترین به بیشترین مرتب کند.
+        </li>
+    </ol>
+
+    <p>خروجی مورد انتظار:</p>
+
+    <div class="code-container">
+        <span class="code-label">Output</span>
+        <div class="code-block no-prompt">[96.0, 120.0, 160.0, 240.0]</div>
+    </div>
+
+    <div class="lesson-important">
+        <strong>هدف تمرین:</strong>
+        در این تمرین باید چند ابزار جلسه را به صورت زنجیره‌ای و در یک مسئله واقعی‌تر به کار ببرید.
+    </div>
+
+    <div class="python-playground" data-playground="ch11-ex12">
+        <div class="playground-header">
+            <div class="playground-title">
+                <i class="fas fa-code"></i><span>Exercise 12 · Product Analysis</span>
+            </div>
+            <div class="playground-status"></div>
+            <div class="playground-actions">
+                <button type="button" class="playground-btn clear" data-action="clear">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <button type="button" class="playground-btn run" data-action="run">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+        <div class="playground-editor-wrap">
+            <textarea class="python-editor"></textarea>
+        </div>
+        <div class="playground-output">▶ Output will be shown here...</div>
+    </div>
+
+    <button class="solution-toggle" type="button" data-solution="ch11-sol12">
+        <i class="fas fa-eye"></i> نمایش پاسخ
+    </button>
+
+    <div class="exercise-solution" id="ch11-sol12">
+        <strong>پاسخ:</strong>
+        <pre>prices = [50, 120, 80, 200, 150, 90, 300]
+
+filtered = filter(
+    lambda price: price >= 100,
+    prices
+)
+
+discounted = map(
+    lambda price: price * 0.8,
+    filtered
+)
+
+result = sorted(discounted)
+
+print(result)</pre>
+    </div>
+</div>
 `
+
+
 ,
 "ch12": `
     <!-- ===== تمرین ۱ ===== -->
@@ -25757,20 +26319,23 @@ Result</div>
 <p>در طراحی Function سعی کن هر Function یک کار مشخص انجام دهد، ورودی‌هایش را با Parameter دریافت کند و نتیجه موردنیاز را با <code>return</code> برگرداند. با این روش، کدها ساده‌تر، قابل فهم‌تر و قابل استفاده مجدد می‌شوند.</p>`
 
 ,
-
-"ch11-1": `<div class="section-header"> <div class="section-badge">۱۱</div> <div> <h1>List، Set و Dictionary Comprehension</h1> <div class="meta">فصل ۱۱ · بخش ۱ از ۲</div> </div>
-
+"ch11-1": `<div class="section-header">
+    <div class="section-badge">۱۱</div>
+    <div>
+        <h1>List، Set و Dictionary Comprehension</h1>
+        <div class="meta">فصل ۱۱ · بخش ۱ از ۲</div>
+    </div>
 </div>
 
 <blockquote class="lesson-goal">
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه می‌توانی:</p>
 <ol>
-<li>مفهوم <strong>Comprehension</strong> را درک کنی.</li>
-<li>با <strong>List Comprehension</strong> یک List جدید بسازی.</li>
+<li>مفهوم <strong>Comprehension</strong> و کاربرد آن را درک کنی.</li>
+<li>با <strong>List Comprehension</strong> از روی داده‌های موجود، List جدید بسازی.</li>
 <li>با <code>for</code> داده‌ها را پردازش و با <code>if</code> آن‌ها را فیلتر کنی.</li>
-<li>با همین ایده <strong>Set</strong> و <strong>Dictionary</strong> جدید بسازی.</li>
-<li>تشخیص بدهی چه زمانی Comprehension انتخاب مناسبی است.</li>
+<li>از همین الگو برای ساخت <strong>Set</strong> و <strong>Dictionary</strong> استفاده کنی.</li>
+<li>تشخیص بدهی چه زمانی Comprehension مناسب است و چه زمانی Loop معمولی خواناتر است.</li>
 </ol>
 </blockquote>
 
@@ -25779,26 +26344,31 @@ Result</div>
 <h2 class="lesson-title">معرفی جلسه</h2>
 
 <p>
-تا اینجا یاد گرفتیم با <strong>List، Set و Dictionary</strong> داده‌ها را نگهداری کنیم،
-با <code>for</code> روی آن‌ها حرکت کنیم و با <strong>Function</strong> کدهای تکراری را مرتب و قابل استفاده مجدد بنویسیم.
+تا اینجا با <strong>List، Set و Dictionary</strong> برای نگهداری داده‌ها و با <code>for</code>
+برای پیمایش آن‌ها کار کرده‌ایم.
 </p>
 
 <p>
-حالا یک مسئله رایج داریم:
-<strong>اگر بخواهیم از روی یک مجموعه داده، یک مجموعه جدید بسازیم چه کنیم؟</strong>
+حالا یک مسئله مهم داریم:
+<strong>اگر بخواهیم از روی داده‌های موجود، یک Collection جدید بسازیم چه کنیم؟</strong>
 </p>
 
 <p>
-مثلاً اگر یک List از اعداد داشته باشیم و بخواهیم مربع همه آن‌ها را بسازیم،
-می‌توانیم از یک <code>for</code> و یک List جدید استفاده کنیم.
-اما Python راه کوتاه‌تری هم دارد که به آن <strong>Comprehension</strong> می‌گوییم.
+مثلاً فرض کن یک List از اعداد داریم و می‌خواهیم مربع همه آن‌ها را بسازیم.
+در روش معمولی می‌توانیم با یک <code>for</code>، نتیجه را محاسبه کرده و با <code>append()</code>
+داخل یک List جدید قرار دهیم.
+</p>
+
+<p>
+اما Python برای چنین کارهای ساده‌ای یک روش کوتاه‌تر و خواناتر دارد:
+<strong>Comprehension</strong>.
 </p>
 
 <div class="code-container">
 <span class="code-label">ایده اصلی</span>
 <div class="code-block no-prompt">داده‌های موجود
       ↓
-    for
+     for
       ↓
 پردازش یا شرط
       ↓
@@ -25806,17 +26376,17 @@ Collection جدید</div>
 </div>
 
 <p>
-در این جلسه ابتدا <strong>List Comprehension</strong> را یاد می‌گیریم و سپس همین مفهوم را برای
-<strong>Set</strong> و <strong>Dictionary</strong> به کار می‌بریم.
+در این جلسه ابتدا این مفهوم را با <strong>List Comprehension</strong> یاد می‌گیریم
+و بعد همان ایده را برای <strong>Set</strong> و <strong>Dictionary</strong> استفاده می‌کنیم.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. قبل از Comprehension؛ یک مثال ساده</h2>
+<h2 class="lesson-title">1. از Loop معمولی تا Comprehension</h2>
 
 <p>
-فرض کنیم می‌خواهیم از اعداد ۱ تا ۵ یک List بسازیم.
-در روش معمولی می‌توانیم از <code>for</code> و <code>append()</code> استفاده کنیم:
+قبل از یادگیری Comprehension، بهتر است ببینیم همین کار را با Loop معمولی چگونه انجام می‌دهیم.
+فرض کنیم می‌خواهیم اعداد ۱ تا ۵ را در یک List قرار دهیم:
 </p>
 
 <div class="code-container">
@@ -25824,10 +26394,9 @@ Collection جدید</div>
 <div class="code-block no-prompt">numbers = []
 
 for i in range(1, 6):
-numbers.append(i)
+    numbers.append(i)
 
 print(numbers)</div>
-
 </div>
 
 <div class="code-container">
@@ -25836,8 +26405,7 @@ print(numbers)</div>
 </div>
 
 <p>
-این روش کاملاً درست است. اما چون هدف ما فقط ساختن یک List ساده است،
-می‌توانیم همان کار را کوتاه‌تر بنویسیم:
+این روش کاملاً درست است. اما چون منطق کار ساده است، می‌توانیم همان نتیجه را در یک خط بنویسیم:
 </p>
 
 <div class="code-container">
@@ -25845,7 +26413,6 @@ print(numbers)</div>
 <div class="code-block no-prompt">numbers = [i for i in range(1, 6)]
 
 print(numbers)</div>
-
 </div>
 
 <div class="code-container">
@@ -25855,26 +26422,28 @@ print(numbers)</div>
 
 <div class="lesson-important">
 <strong>نکته:</strong>
-Comprehension جایگزین Loop نیست؛ یک روش کوتاه‌تر برای انجام بعضی Loopهای ساده و ساخت Collection جدید است.
+Comprehension جایگزین همه Loopها نیست؛ بلکه یک روش کوتاه‌تر برای بعضی عملیات ساده و ساخت Collection جدید است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. List Comprehension چیست؟</h2>
+<h2 class="lesson-title">2. ساختار List Comprehension</h2>
 
 <p>
 <strong>List Comprehension</strong> زمانی استفاده می‌شود که بخواهیم از روی یک داده موجود،
 یک <strong>List جدید</strong> بسازیم.
 </p>
 
-<p>ساختار پایه آن:</p>
+<p>ساختار پایه:</p>
 
 <div class="code-container">
 <span class="code-label">Syntax</span>
 <div class="code-block no-prompt">[expression for item in iterable]</div>
 </div>
 
-<p>برای فهم این ساختار، آن را به سه قسمت تقسیم کنیم:</p>
+<p>
+برای فهم بهتر، این ساختار را به سه بخش تقسیم می‌کنیم:
+</p>
 
 <div class="table-wrap">
 <table>
@@ -25887,21 +26456,23 @@ Comprehension جایگزین Loop نیست؛ یک روش کوتاه‌تر بر�
 <tbody>
 <tr>
 <td><code>expression</code></td>
-<td>مقداری که می‌خواهیم وارد List جدید شود</td>
+<td>مقداری که باید وارد List جدید شود</td>
 </tr>
 <tr>
 <td><code>for item</code></td>
-<td>گرفتن هر عنصر</td>
+<td>گرفتن هر عنصر از داده</td>
 </tr>
 <tr>
 <td><code>in iterable</code></td>
-<td>منبع داده</td>
+<td>منبع داده‌ای که روی آن حرکت می‌کنیم</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مثلاً می‌خواهیم مربع اعداد یک List را بسازیم:</p>
+<p>
+مثلاً می‌خواهیم مربع اعداد یک List را بسازیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25910,7 +26481,6 @@ Comprehension جایگزین Loop نیست؛ یک روش کوتاه‌تر بر�
 squares = [x ** 2 for x in numbers]
 
 print(squares)</div>
-
 </div>
 
 <div class="code-container">
@@ -25919,12 +26489,12 @@ print(squares)</div>
 </div>
 
 <p>
-یعنی Python هر بار یک مقدار از <code>numbers</code> می‌گیرد،
-آن را در <code>x ** 2</code> قرار می‌دهد و نتیجه را وارد List جدید می‌کند.
+Python هر بار یک مقدار از <code>numbers</code> می‌گیرد،
+آن را در عبارت <code>x ** 2</code> پردازش می‌کند و نتیجه را وارد List جدید می‌کند.
 </p>
 
 <div class="code-container">
-<span class="code-label">ذهنیت ساده</span>
+<span class="code-label">مدل ذهنی</span>
 <div class="code-block no-prompt">numbers
    ↓
 for x
@@ -25934,59 +26504,24 @@ x ** 2
 squares</div>
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">3. تبدیل Loop به Comprehension</h2>
-
-<p>
-برای یادگیری Comprehension، بهتر است همیشه ابتدا منطق Loop معمولی را بفهمیم.
-</p>
-
-<div class="code-container">
-<span class="code-label">Loop معمولی</span>
-<div class="code-block no-prompt">numbers = [1, 2, 3, 4]
-
-result = []
-
-for number in numbers:
-result.append(number * 2)
-
-print(result)</div>
-
-</div>
-
-<p>
-در این کد سه اتفاق اصلی رخ می‌دهد:
-</p>
-
-<ol>
-<li>روی <code>numbers</code> حرکت می‌کنیم.</li>
-<li>هر عدد را در ۲ ضرب می‌کنیم.</li>
-<li>نتیجه را داخل List جدید قرار می‌دهیم.</li>
-</ol>
-
-<p>همین منطق را می‌توانیم به شکل کوتاه‌تر بنویسیم:</p>
-
-<div class="code-container">
-<span class="code-label">Comprehension</span>
-<div class="code-block no-prompt">result = [number * 2 for number in numbers]</div>
-</div>
-
 <div class="lesson-important">
-<strong>قانون ذهنی:</strong>
-اول مشخص کن «چه مقداری می‌خواهم بسازم؟» سپس بگو «روی چه داده‌ای حرکت کنم؟».
+<strong>قانون ساده:</strong>
+در Comprehension اول بپرس: «چه چیزی می‌خواهم بسازم؟»
+بعد مشخص کن: «از روی چه داده‌ای و با چه پردازشی؟»
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. پردازش داده‌ها با Comprehension</h2>
+<h2 class="lesson-title">3. پردازش داده‌ها با Comprehension</h2>
 
 <p>
-Comprehension فقط برای کپی کردن داده‌ها نیست؛ می‌توانیم هنگام ساخت List،
-روی هر عنصر یک پردازش ساده انجام دهیم.
+قسمت <code>expression</code> می‌تواند یک عملیات ساده روی هر عنصر انجام دهد.
+بنابراین Comprehension فقط برای کپی کردن داده‌ها نیست.
 </p>
 
-<p>مثلاً تبدیل دما از Celsius به Fahrenheit:</p>
+<p>
+مثلاً می‌خواهیم همه دماها را از Celsius به Fahrenheit تبدیل کنیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25995,7 +26530,6 @@ Comprehension فقط برای کپی کردن داده‌ها نیست؛ می‌
 fahrenheit = [c * 9 / 5 + 32 for c in temperatures]
 
 print(fahrenheit)</div>
-
 </div>
 
 <div class="code-container">
@@ -26004,16 +26538,21 @@ print(fahrenheit)</div>
 </div>
 
 <p>
-پس می‌توانیم یک داده موجود را بگیریم، روی آن پردازش انجام دهیم و نتیجه را در یک List جدید قرار دهیم.
+پس الگوی اصلی همچنان همان است:
+<strong>داده را می‌گیریم → روی آن پردازش انجام می‌دهیم → نتیجه را در Collection جدید قرار می‌دهیم.</strong>
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. فیلتر کردن با <code>if</code></h2>
+<h2 class="lesson-title">4. فیلتر کردن داده‌ها با <code>if</code></h2>
 
 <p>
-گاهی نمی‌خواهیم همه عناصر وارد List جدید شوند؛ فقط بعضی از آن‌ها را می‌خواهیم.
-در این حالت می‌توانیم از <code>if</code> استفاده کنیم.
+گاهی نمی‌خواهیم همه عناصر وارد Collection جدید شوند.
+مثلاً از بین چند عدد، فقط اعداد زوج را می‌خواهیم.
+</p>
+
+<p>
+در این حالت می‌توانیم بعد از بخش <code>for</code> یک شرط <code>if</code> قرار دهیم:
 </p>
 
 <div class="code-container">
@@ -26022,7 +26561,7 @@ print(fahrenheit)</div>
 </div>
 
 <p>
-مثلاً فقط اعداد زوج را انتخاب کنیم:
+مثال:
 </p>
 
 <div class="code-container">
@@ -26032,7 +26571,6 @@ print(fahrenheit)</div>
 even_numbers = [x for x in numbers if x % 2 == 0]
 
 print(even_numbers)</div>
-
 </div>
 
 <div class="code-container">
@@ -26041,38 +26579,33 @@ print(even_numbers)</div>
 </div>
 
 <p>
-در اینجا برای هر <code>x</code> شرط <code>x % 2 == 0</code> بررسی می‌شود.
-فقط اگر شرط درست باشد، <code>x</code> وارد List جدید می‌شود.
+برای هر <code>x</code> شرط <code>x % 2 == 0</code> بررسی می‌شود.
+اگر شرط درست باشد، مقدار وارد List جدید می‌شود؛ در غیر این صورت نادیده گرفته می‌شود.
 </p>
 
 <div class="code-container">
-<span class="code-label">ذهنیت ساده</span>
+<span class="code-label">مدل ذهنی</span>
 <div class="code-block no-prompt">داده
  ↓
 for
  ↓
 شرط؟
  ↓
-بله → وارد List شود
+بله → وارد Collection شود
 خیر → نادیده گرفته شود</div>
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. یک مثال کاربردی</h2>
-
 <p>
-فرض کنیم نمره چند دانش‌آموز را داریم و فقط نمره‌های قبولی را می‌خواهیم:
+مثلاً می‌توانیم از همین روش برای انتخاب نمره‌های قبولی استفاده کنیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
+<span class="code-label">مثال کاربردی</span>
 <div class="code-block no-prompt">scores = [12, 8, 17, 5, 19, 10]
 
 passed = [score for score in scores if score >= 10]
 
 print(passed)</div>
-
 </div>
 
 <div class="code-container">
@@ -26081,17 +26614,16 @@ print(passed)</div>
 </div>
 
 <p>
-اینجا Comprehension همزمان دو کار انجام می‌دهد:
-<strong>روی نمره‌ها حرکت می‌کند و نمره‌های کمتر از ۱۰ را حذف می‌کند.</strong>
+در این مثال، Comprehension همزمان روی داده‌ها حرکت می‌کند و فقط مقادیر موردنظر را نگه می‌دارد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. استفاده از <code>range()</code></h2>
+<h2 class="lesson-title">5. استفاده از <code>range()</code></h2>
 
 <p>
-Comprehension می‌تواند با <code>range()</code> نیز استفاده شود.
-مثلاً مربع اعداد ۱ تا ۵:
+Comprehension فقط به Listهای موجود محدود نیست.
+می‌توانیم از <code>range()</code> نیز به عنوان منبع داده استفاده کنیم.
 </p>
 
 <div class="code-container">
@@ -26099,7 +26631,6 @@ Comprehension می‌تواند با <code>range()</code> نیز استفاده 
 <div class="code-block no-prompt">squares = [x ** 2 for x in range(1, 6)]
 
 print(squares)</div>
-
 </div>
 
 <div class="code-container">
@@ -26108,16 +26639,21 @@ print(squares)</div>
 </div>
 
 <p>
-پس هر چیزی که بتوانیم روی آن با <code>for</code> حرکت کنیم، می‌تواند منبع یک Comprehension باشد.
+در واقع هر چیزی که بتوانیم با <code>for</code> روی آن حرکت کنیم،
+می‌تواند منبع یک Comprehension باشد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. Set Comprehension</h2>
+<h2 class="lesson-title">6. Set Comprehension</h2>
 
 <p>
-همین ایده را می‌توانیم برای ساخت یک <strong>Set</strong> هم استفاده کنیم.
-تفاوت اصلی فقط نوع Collection است.
+تا اینجا خروجی ما <strong>List</strong> بود.
+اما همین ایده را می‌توانیم برای ساخت یک <strong>Set</strong> نیز استفاده کنیم.
+</p>
+
+<p>
+تفاوت اصلی در شکل نوشتن Collection خروجی است:
 </p>
 
 <div class="table-wrap">
@@ -26126,7 +26662,7 @@ print(squares)</div>
 <tr>
 <th>نوع</th>
 <th>ساختار</th>
-<th>نتیجه</th>
+<th>خروجی</th>
 </tr>
 </thead>
 <tbody>
@@ -26155,7 +26691,6 @@ print(squares)</div>
 unique = {x for x in numbers}
 
 print(unique)</div>
-
 </div>
 
 <div class="code-container">
@@ -26164,16 +26699,29 @@ print(unique)</div>
 </div>
 
 <p>
-چون نتیجه یک <strong>Set</strong> است، مقادیر تکراری در آن نگهداری نمی‌شوند.
+چون خروجی یک <strong>Set</strong> است، مقادیر تکراری در نتیجه نگهداری نمی‌شوند.
 </p>
+
+<p>
+Set Comprehension می‌تواند شرط هم داشته باشد؛ درست مانند List Comprehension:
+</p>
+
+<div class="code-container">
+<span class="code-label">مثال</span>
+<div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6]
+
+even = {x for x in numbers if x % 2 == 0}
+
+print(even)</div>
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. Dictionary Comprehension</h2>
+<h2 class="lesson-title">7. Dictionary Comprehension</h2>
 
 <p>
-برای ساخت یک <strong>Dictionary</strong> هم می‌توانیم از Comprehension استفاده کنیم.
-در اینجا به جای یک مقدار، یک <strong>Key و Value</strong> می‌سازیم.
+در <strong>Dictionary Comprehension</strong>، هدف ساخت یک Dictionary جدید است.
+بنابراین به جای یک مقدار، باید <strong>Key و Value</strong> تولید کنیم.
 </p>
 
 <div class="code-container">
@@ -26182,7 +26730,7 @@ print(unique)</div>
 </div>
 
 <p>
-مثلاً می‌خواهیم برای اعداد ۱ تا ۴، مربع هر عدد را ذخیره کنیم:
+مثلاً می‌خواهیم برای اعداد ۱ تا ۴، مربع هر عدد را در یک Dictionary ذخیره کنیم:
 </p>
 
 <div class="code-container">
@@ -26190,7 +26738,6 @@ print(unique)</div>
 <div class="code-block no-prompt">squares = {x: x ** 2 for x in range(1, 5)}
 
 print(squares)</div>
-
 </div>
 
 <div class="code-container">
@@ -26198,25 +26745,33 @@ print(squares)</div>
 <div class="code-block no-prompt">{1: 1, 2: 4, 3: 9, 4: 16}</div>
 </div>
 
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>بخش</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td>Key</td>
+</tr>
+<tr>
+<td><code>x ** 2</code></td>
+<td>Value</td>
+</tr>
+</tbody>
+</table>
+</div>
+
 <p>
-در این مثال:
-</p>
-
-<ul>
-<li><code>x</code> → <strong>Key</strong></li>
-<li><code>x ** 2</code> → <strong>Value</strong></li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">10. Dictionary Comprehension با شرط</h2>
-
-<p>
-در Dictionary Comprehension هم می‌توانیم از <code>if</code> برای فیلتر کردن داده‌ها استفاده کنیم.
+در Dictionary Comprehension نیز می‌توانیم داده‌ها را با <code>if</code> فیلتر کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
+<span class="code-label">مثال کاربردی</span>
 <div class="code-block no-prompt">scores = {
     "Ali": 18,
     "Sara": 9,
@@ -26224,13 +26779,12 @@ print(squares)</div>
 }
 
 passed = {
-name: score
-for name, score in scores.items()
-if score >= 10
+    name: score
+    for name, score in scores.items()
+    if score >= 10
 }
 
 print(passed)</div>
-
 </div>
 
 <div class="code-container">
@@ -26239,13 +26793,17 @@ print(passed)</div>
 </div>
 
 <p>
-اینجا روی Key و Valueهای Dictionary حرکت می‌کنیم و فقط دانش‌آموزانی را نگه می‌داریم
-که نمره آن‌ها حداقل ۱۰ است.
+در اینجا با <code>items()</code> به Key و Valueهای Dictionary دسترسی داریم
+و فقط مواردی را نگه می‌داریم که نمره آن‌ها حداقل ۱۰ باشد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. مقایسه سه نوع Comprehension</h2>
+<h2 class="lesson-title">8. سه نوع Comprehension در کنار هم</h2>
+
+<p>
+حالا می‌توانیم تفاوت سه نوع اصلی را در یک جدول ببینیم:
+</p>
 
 <div class="table-wrap">
 <table>
@@ -26265,7 +26823,7 @@ print(passed)</div>
 <tr>
 <td>Set</td>
 <td><code>{value for ...}</code></td>
-<td>ساخت Set جدید</td>
+<td>ساخت Set جدید و حذف تکراری‌ها</td>
 </tr>
 <tr>
 <td>Dictionary</td>
@@ -26277,31 +26835,33 @@ print(passed)</div>
 </div>
 
 <div class="code-container">
-<span class="code-label">Recall</span>
+<span class="code-label">Core Patterns</span>
 <div class="code-block no-prompt">[value for ...]
-      ↓
-    List
+        ↓
+      List
 
 {value for ...}
-↓
-Set
+        ↓
+       Set
 
 {key: value for ...}
-↓
-Dictionary</div>
-
+        ↓
+   Dictionary</div>
 </div>
 
 <p>
-بنابراین مهم‌ترین تفاوت، <strong>نوع Collection خروجی</strong> است.
+پس چیزی که بین هر سه مشترک است، <strong>منطق کار</strong> است:
+روی داده حرکت می‌کنیم، در صورت نیاز آن را پردازش یا فیلتر می‌کنیم
+و نتیجه را در Collection موردنظر قرار می‌دهیم.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. Comprehension یا Loop معمولی؟</h2>
+<h2 class="lesson-title">9. Comprehension یا Loop معمولی؟</h2>
 
 <p>
-Comprehension برای منطق‌های ساده بسیار مناسب است؛ اما قرار نیست همیشه از آن استفاده کنیم.
+Comprehension کد را کوتاه‌تر می‌کند، اما هدف اصلی آن فقط کوتاه کردن کد نیست؛
+<strong>خوانایی</strong> هم اهمیت دارد.
 </p>
 
 <div class="table-wrap">
@@ -26318,15 +26878,19 @@ Comprehension برای منطق‌های ساده بسیار مناسب است؛
 <td><strong>Comprehension</strong></td>
 </tr>
 <tr>
-<td>شرط و منطق ساده</td>
+<td>فیلتر ساده با <code>if</code></td>
 <td><strong>Comprehension</strong></td>
 </tr>
 <tr>
-<td>منطق پیچیده یا چند مرحله‌ای</td>
+<td>چند مرحله پردازش</td>
 <td><strong>Loop معمولی</strong></td>
 </tr>
 <tr>
-<td>وقتی خوانایی کد کم می‌شود</td>
+<td>شرایط و منطق پیچیده</td>
+<td><strong>Loop معمولی</strong></td>
+</tr>
+<tr>
+<td>وقتی کد سخت خوانده می‌شود</td>
 <td><strong>Loop معمولی</strong></td>
 </tr>
 </tbody>
@@ -26334,42 +26898,59 @@ Comprehension برای منطق‌های ساده بسیار مناسب است؛
 </div>
 
 <div class="lesson-important">
-<strong>قانون ساده:</strong>
-کوتاه‌تر بودن کد به تنهایی کافی نیست؛ کد باید همچنان واضح و قابل فهم باشد.
+<strong>قانون مهم:</strong>
+اگر Comprehension باعث شود کد کوتاه‌تر ولی سخت‌تر شود، Loop معمولی انتخاب بهتری است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. یک سناریوی ترکیبی</h2>
+<h2 class="lesson-title">10. یک مثال ترکیبی</h2>
 
 <p>
-حالا سه نوع Comprehension را در یک مسئله ساده کنار هم ببینیم.
-فرض کنیم نمره‌ها را داریم و می‌خواهیم:
+حالا سه نوع Comprehension را در یک سناریوی ساده کنار هم قرار دهیم.
+فرض کنیم نمره‌ها را داریم:
 </p>
 
-<ol>
-<li>فقط نمره‌های قبولی را داشته باشیم.</li>
-<li>نمره‌های تکراری را حذف کنیم.</li>
-<li>برای هر نمره، مقدار دو برابر آن را در یک Dictionary قرار دهیم.</li>
-</ol>
+<div class="code-container">
+<span class="code-label">داده اولیه</span>
+<div class="code-block no-prompt">scores = [12, 15, 8, 12, 18, 8]</div>
+</div>
+
+<p>
+ابتدا فقط نمره‌های قبولی را با <strong>List Comprehension</strong> انتخاب می‌کنیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">List</span>
-<div class="code-block no-prompt">scores = [12, 15, 8, 12, 18, 8]
-
-passed = [score for score in scores if score >= 10]
+<div class="code-block no-prompt">passed = [score for score in scores if score >= 10]
 
 print(passed)</div>
-
 </div>
 
 <div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">[12, 15, 12, 18]</div>
+</div>
+
+<p>
+حالا با <strong>Set Comprehension</strong> نمره‌های تکراری را حذف می‌کنیم:
+</p>
+
+<div class="code-container">
 <span class="code-label">Set</span>
-<div class="code-block no-prompt">unique_scores = {score for score in scores}
+<div class="code-block no-prompt">unique_scores = {score for score in passed}
 
 print(unique_scores)</div>
-
 </div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">{12, 15, 18}</div>
+</div>
+
+<p>
+در مرحله آخر با <strong>Dictionary Comprehension</strong> برای هر نمره، مقدار دو برابر آن را می‌سازیم:
+</p>
 
 <div class="code-container">
 <span class="code-label">Dictionary</span>
@@ -26379,27 +26960,16 @@ print(unique_scores)</div>
 }
 
 print(double_scores)</div>
+</div>
 
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">{12: 24, 15: 30, 18: 36}</div>
 </div>
 
 <p>
-نکته مهم این است که در هر سه مثال، منطق اصلی یکی است:
-<strong>داده را می‌گیریم، روی آن حرکت می‌کنیم، در صورت نیاز پردازش یا فیلتر می‌کنیم و نتیجه را در یک Collection جدید قرار می‌دهیم.</strong>
+در هر سه مرحله، منطق اصلی یکی است؛ فقط نوع Collection خروجی و شکل داده‌ای که می‌سازیم متفاوت است.
 </p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">🔄 Recall سریع</h2>
-
-<ol>
-<li>Comprehension چه مسئله‌ای را ساده می‌کند؟</li>
-<li>ساختار پایه List Comprehension چیست؟</li>
-<li>چطور با Comprehension روی داده‌ها پردازش انجام می‌دهیم؟</li>
-<li>چطور با <code>if</code> داده‌ها را فیلتر می‌کنیم؟</li>
-<li>تفاوت List و Set Comprehension چیست؟</li>
-<li>Dictionary Comprehension چگونه Key و Value می‌سازد؟</li>
-<li>چه زمانی Loop معمولی انتخاب بهتری است؟</li>
-</ol>
 
 <hr class="lesson-divider">
 
@@ -26559,71 +27129,78 @@ Set Comprehension با ساختار <code>{expression for ...}</code> نوشته
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم چگونه از روی داده‌های موجود، با یک ساختار کوتاه و خوانا،
-Collection جدید بسازیم.
+<strong>Comprehension</strong> یک روش کوتاه و خوانا برای ساخت یک Collection جدید
+از روی داده‌های موجود است. منطق آن معمولاً از سه مرحله تشکیل می‌شود:
+<strong>حرکت روی داده → پردازش یا فیلتر → ساخت Collection جدید</strong>.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مفهوم</th>
-<th>نکته اصلی</th>
+<th>نوع</th>
+<th>الگوی اصلی</th>
+<th>کاربرد</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>List Comprehension</td>
+<td><code>[value for ...]</code></td>
 <td>ساخت List جدید</td>
 </tr>
 <tr>
 <td>Set Comprehension</td>
-<td>ساخت Set جدید</td>
+<td><code>{value for ...}</code></td>
+<td>ساخت Set و حذف تکراری‌ها</td>
 </tr>
 <tr>
 <td>Dictionary Comprehension</td>
-<td>ساخت Dictionary با Key و Value</td>
-</tr>
-<tr>
-<td><code>for</code></td>
-<td>حرکت روی داده‌ها</td>
-</tr>
-<tr>
-<td><code>if</code></td>
-<td>فیلتر کردن داده‌ها</td>
+<td><code>{key: value for ...}</code></td>
+<td>ساخت Dictionary جدید</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <div class="code-container">
-<span class="code-label">Core Patterns</span>
-<div class="code-block no-prompt">[value for ...]
-      ↓
-    List
-
-{value for ...}
-↓
-Set
-
-{key: value for ...}
-↓
-Dictionary</div>
-
+<span class="code-label">الگوی ذهنی نهایی</span>
+<div class="code-block no-prompt">داده موجود
+    ↓
+   for
+    ↓
+پردازش یا if
+    ↓
+Collection جدید</div>
 </div>
 
 <p>
-پس مدل ذهنی این جلسه ساده است:
-<strong>داده → for → پردازش یا فیلتر → Collection جدید</strong>.
+مهم‌ترین نکته این است که <strong>Comprehension را برای کوتاه‌تر کردن هر کدی استفاده نمی‌کنیم.</strong>
+اگر منطق ساده باشد و کد همچنان واضح بماند، Comprehension انتخاب خوبی است؛
+اما اگر منطق پیچیده شود یا خوانایی کاهش پیدا کند، <strong>Loop معمولی</strong> انتخاب بهتری است.
 </p>
+
+<div class="lesson-important">
+<strong>سه الگوی مهم این جلسه را به خاطر بسپار:</strong>
+<br><br>
+<code>[value for ...]</code> → List
+<br>
+<code>{value for ...}</code> → Set
+<br>
+<code>{key: value for ...}</code> → Dictionary
+</div>
 
 <p>
 در <strong>جلسه ۱۸ — Lambda، map()، filter() و sorted()</strong>
-با چند ابزار دیگر برای پردازش و مرتب‌سازی داده‌ها آشنا می‌شویم.
+با ابزارهای دیگری برای پردازش و مرتب‌سازی داده‌ها آشنا می‌شویم.
 </p>`
 ,
-"ch11-2": `<div class="section-header"> <div class="section-badge">۱۱</div> <div> <h1>Lambda، map()، filter() و sorted()</h1> <div class="meta">فصل ۱۱ · بخش ۲ از ۲</div> </div>
-
+"ch11-2": `<div class="section-header">
+    <div class="section-badge">۱۱</div>
+    <div>
+        <h1>Lambda، map()، filter() و sorted()</h1>
+        <div class="meta">فصل ۱۱ · بخش ۲ از ۲</div>
+    </div>
 </div>
 
 <blockquote class="lesson-goal">
@@ -26632,8 +27209,8 @@ Dictionary</div>
 <ol>
 <li>مفهوم <strong>Lambda Function</strong> را درک کنی.</li>
 <li>برای عملیات‌های ساده از <code>lambda</code> استفاده کنی.</li>
-<li>با <code>map()</code> روی چند داده یک عملیات یکسان انجام دهی.</li>
-<li>با <code>filter()</code> داده‌های موردنظر را جدا کنی.</li>
+<li>با <code>map()</code> روی عناصر یک Collection پردازش انجام دهی.</li>
+<li>با <code>filter()</code> عناصر موردنظر را بر اساس شرط انتخاب کنی.</li>
 <li>با <code>sorted()</code> داده‌ها را مرتب کنی.</li>
 <li>ارتباط بین <code>lambda</code>، <code>map()</code>، <code>filter()</code> و <code>sorted()</code> را درک کنی.</li>
 </ol>
@@ -26644,13 +27221,13 @@ Dictionary</div>
 <h2 class="lesson-title">معرفی جلسه</h2>
 
 <p>
-در جلسه قبل یاد گرفتیم که با <strong>Comprehension</strong> می‌توانیم روی داده‌ها حرکت کنیم،
+در جلسه قبل با <strong>Comprehension</strong> یاد گرفتیم که چگونه روی داده‌ها حرکت کنیم،
 آن‌ها را پردازش یا فیلتر کنیم و یک Collection جدید بسازیم.
 </p>
 
 <p>
-حالا می‌خواهیم چند ابزار دیگر Python را یاد بگیریم که برای <strong>پردازش و مرتب‌سازی داده‌ها</strong>
-بسیار کاربردی هستند:
+حالا می‌خواهیم چند ابزار دیگر Python را یاد بگیریم که برای
+<strong>پردازش، انتخاب و مرتب‌سازی داده‌ها</strong> کاربرد زیادی دارند.
 </p>
 
 <div class="table-wrap">
@@ -26664,11 +27241,11 @@ Dictionary</div>
 <tbody>
 <tr>
 <td><code>lambda</code></td>
-<td>ساخت یک تابع ساده و کوتاه</td>
+<td>ساخت یک Function ساده و کوتاه</td>
 </tr>
 <tr>
 <td><code>map()</code></td>
-<td>اجرای یک عملیات روی همه عناصر</td>
+<td>اجرای یک Function روی عناصر</td>
 </tr>
 <tr>
 <td><code>filter()</code></td>
@@ -26683,16 +27260,38 @@ Dictionary</div>
 </div>
 
 <p>
-نکته مهم این است که این ابزارها جدا از مباحث قبلی نیستند؛
-بلکه روی مفاهیمی که قبلاً یاد گرفته‌ایم، مخصوصاً <strong>Function، Loop و Collection</strong> ساخته شده‌اند.
+این ابزارها مستقل از مطالب قبلی نیستند؛ بلکه روی مفاهیمی که تا اینجا یاد گرفته‌ایم،
+به‌خصوص <strong>Function، Loop و Collection</strong> ساخته شده‌اند.
 </p>
+
+<p>
+برای همین بهتر است آن‌ها را به صورت یک زنجیره یاد بگیریم:
+ابتدا یک Function ساده می‌سازیم، سپس آن را برای پردازش یا انتخاب داده‌ها استفاده می‌کنیم
+و در پایان می‌توانیم نتیجه را مرتب کنیم.
+</p>
+
+<div class="code-container">
+<span class="code-label">مسیر جلسه</span>
+<div class="code-block no-prompt">lambda
+   ↓
+Function ساده
+   ↓
+map() / filter()
+   ↓
+پردازش یا انتخاب داده
+   ↓
+sorted()
+   ↓
+مرتب‌سازی نتیجه</div>
+</div>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">1. Lambda چیست؟</h2>
 
 <p>
-در فصل ۱۰ یاد گرفتیم برای ساخت Function از <code>def</code> استفاده کنیم:
+در فصل ۱۰ یاد گرفتیم برای ساخت Function از <code>def</code> استفاده کنیم.
+مثلاً برای محاسبه مربع یک عدد:
 </p>
 
 <div class="code-container">
@@ -26701,7 +27300,6 @@ Dictionary</div>
     return x ** 2
 
 print(square(5))</div>
-
 </div>
 
 <div class="code-container">
@@ -26710,8 +27308,7 @@ print(square(5))</div>
 </div>
 
 <p>
-اگر تابع ما خیلی ساده باشد و فقط یک عبارت داشته باشد، می‌توانیم آن را به شکل کوتاه‌تری با
-<strong>lambda</strong> بنویسیم:
+اگر Function ما خیلی ساده باشد، می‌توانیم آن را با <strong>lambda</strong> کوتاه‌تر بنویسیم:
 </p>
 
 <div class="code-container">
@@ -26719,7 +27316,6 @@ print(square(5))</div>
 <div class="code-block no-prompt">square = lambda x: x ** 2
 
 print(square(5))</div>
-
 </div>
 
 <div class="code-container">
@@ -26728,7 +27324,7 @@ print(square(5))</div>
 </div>
 
 <p>
-در واقع این دو کد یک کار انجام می‌دهند:
+هر دو Function یک کار انجام می‌دهند؛ تفاوت اصلی در شکل نوشتن آن‌هاست.
 </p>
 
 <div class="table-wrap">
@@ -26736,17 +27332,17 @@ print(square(5))</div>
 <thead>
 <tr>
 <th>روش</th>
-<th>ویژگی</th>
+<th>مناسب برای</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>def</code></td>
-<td>مناسب برای Functionهای معمولی و چندخطی</td>
+<td>Functionهای معمولی، چندخطی و قابل استفاده مجدد</td>
 </tr>
 <tr>
 <td><code>lambda</code></td>
-<td>مناسب برای Functionهای بسیار ساده و کوتاه</td>
+<td>Functionهای بسیار ساده و کوتاه</td>
 </tr>
 </tbody>
 </table>
@@ -26754,28 +27350,31 @@ print(square(5))</div>
 
 <div class="lesson-important">
 <strong>نکته:</strong>
-Lambda قرار نیست جای همه Functionها را بگیرد؛ برای عملیات‌های ساده و کوتاه استفاده می‌شود.
+Lambda جایگزین همه Functionها نیست؛ زمانی استفاده می‌شود که عملیات موردنظر ساده و کوتاه باشد.
 </div>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">2. ساختار Lambda</h2>
 
-<p>ساختار کلی یک Lambda به شکل زیر است:</p>
+<p>
+ساختار کلی Lambda به شکل زیر است:
+</p>
 
 <div class="code-container">
 <span class="code-label">Syntax</span>
 <div class="code-block no-prompt">lambda parameters: expression</div>
 </div>
 
-<p>مثلاً:</p>
+<p>
+مثلاً یک Lambda برای جمع دو عدد:
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">add = lambda a, b: a + b
 
 print(add(3, 4))</div>
-
 </div>
 
 <div class="code-container">
@@ -26783,75 +27382,84 @@ print(add(3, 4))</div>
 <div class="code-block no-prompt">7</div>
 </div>
 
-<p>
-اینجا <code>a</code> و <code>b</code> پارامترها هستند و <code>a + b</code> مقداری است که Lambda برمی‌گرداند.
-</p>
-
-<div class="lesson-important">
-<strong>یادآوری:</strong>
-در Lambda معمولاً <code>return</code> نمی‌نویسیم؛ نتیجه همان expression است.
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>بخش</th>
+<th>نقش</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a, b</code></td>
+<td>پارامترها</td>
+</tr>
+<tr>
+<td><code>a + b</code></td>
+<td>Expression و نتیجه Function</td>
+</tr>
+</tbody>
+</table>
 </div>
+
+<p>
+در Lambda معمولاً <code>return</code> نمی‌نویسیم؛ نتیجه همان <strong>expression</strong> است.
+</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. چرا Lambda را کنار ابزارهای دیگر می‌بینیم؟</h2>
+<h2 class="lesson-title">3. چرا Lambda در کنار map() و filter() استفاده می‌شود؟</h2>
 
 <p>
-Lambda زمانی بسیار کاربردی می‌شود که بخواهیم یک Function کوچک را به ابزار دیگری بدهیم.
+یکی از کاربردهای مهم Lambda زمانی است که بخواهیم یک Function کوچک را
+مستقیماً به ابزار دیگری بدهیم.
 </p>
 
 <p>
-مثلاً به جای اینکه برای یک عملیات ساده یک Function جدا با <code>def</code> بسازیم،
-می‌توانیم همان عملیات را مستقیماً به <code>map()</code> یا <code>filter()</code> بدهیم.
+مثلاً اگر فقط بخواهیم هر عدد را دو برابر کنیم، لازم نیست حتماً یک Function جدا با
+<code>def</code> بنویسیم. می‌توانیم همان عملیات ساده را با Lambda مشخص کنیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">ایده اصلی</span>
 <div class="code-block no-prompt">داده‌ها
    ↓
-یک Function کوچک
+Function کوچک
    ↓
-پردازش داده‌ها</div>
+پردازش یا انتخاب
+   ↓
+نتیجه</div>
 </div>
 
 <p>
-پس ابتدا Lambda را یاد گرفتیم؛ حالا می‌توانیم از آن برای پردازش Collectionها استفاده کنیم.
+اینجا Lambda خودش ابزار پردازش نیست؛
+<strong>فقط Function کوچکی است که مشخص می‌کند روی هر داده چه کاری انجام شود.</strong>
+</p>
+
+<p>
+حالا ببینیم <code>map()</code> چگونه از این Function استفاده می‌کند.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. map() چیست؟</h2>
+<h2 class="lesson-title">4. map()؛ پردازش عناصر</h2>
 
 <p>
-فرض کنیم یک List از اعداد داریم و می‌خواهیم همه اعداد را دو برابر کنیم.
+فرض کنیم یک List از اعداد داریم و می‌خواهیم همه آن‌ها را دو برابر کنیم.
 با Loop معمولی می‌توانیم بنویسیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Loop</span>
+<span class="code-label">Loop معمولی</span>
 <div class="code-block no-prompt">numbers = [1, 2, 3, 4]
 
 result = []
 
 for number in numbers:
-result.append(number * 2)
+    result.append(number * 2)
 
 print(result)</div>
-
-</div>
-
-<p>
-همین کار را می‌توانیم با <strong>map()</strong> انجام دهیم.
-</p>
-
-<div class="code-container">
-<span class="code-label">map()</span>
-<div class="code-block no-prompt">numbers = [1, 2, 3, 4]
-
-result = map(lambda x: x * 2, numbers)
-
-print(list(result))</div>
-
 </div>
 
 <div class="code-container">
@@ -26860,19 +27468,41 @@ print(list(result))</div>
 </div>
 
 <p>
-ایده <code>map()</code> بسیار ساده است:
+اگر هدف ما این باشد که یک عملیات مشخص را روی <strong>تمام عناصر</strong> انجام دهیم،
+می‌توانیم از <code>map()</code> استفاده کنیم.
+</p>
+
+<div class="code-container">
+<span class="code-label">map() + lambda</span>
+<div class="code-block no-prompt">numbers = [1, 2, 3, 4]
+
+result = map(lambda x: x * 2, numbers)
+
+print(list(result))</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">[2, 4, 6, 8]</div>
+</div>
+
+<p>
+ایده <code>map()</code> ساده است:
 <strong>یک Function را روی تک‌تک عناصر اجرا می‌کند.</strong>
 </p>
 
 <div class="code-container">
-<span class="code-label">ذهنیت</span>
+<span class="code-label">مدل ذهنی</span>
 <div class="code-block no-prompt">[1, 2, 3, 4]
       ↓
-   lambda x
-      ↓
-    x * 2
+lambda x: x * 2
       ↓
 [2, 4, 6, 8]</div>
+</div>
+
+<div class="lesson-important">
+<strong>حفظ کن:</strong>
+<code>map()</code> یعنی «روی همه عناصر این عملیات را انجام بده».
 </div>
 
 <hr class="lesson-divider">
@@ -26881,7 +27511,7 @@ print(list(result))</div>
 
 <p>
 برای استفاده از <code>map()</code> مجبور نیستیم از Lambda استفاده کنیم.
-می‌توانیم یک Function معمولی هم به آن بدهیم.
+یک Function معمولی هم می‌تواند به <code>map()</code> داده شود.
 </p>
 
 <div class="code-container">
@@ -26894,7 +27524,6 @@ numbers = [1, 2, 3, 4]
 result = map(square, numbers)
 
 print(list(result))</div>
-
 </div>
 
 <div class="code-container">
@@ -26903,31 +27532,30 @@ print(list(result))</div>
 </div>
 
 <p>
-بنابراین <code>map()</code> فقط به Lambda وابسته نیست؛
-هر Function مناسب می‌تواند به آن داده شود.
+پس ارتباط این دو را به خاطر بسپار:
+<strong>Lambda یا Function معمولی → به عنوان عملیات → map()</strong>.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. filter() چیست؟</h2>
+<h2 class="lesson-title">6. filter()؛ انتخاب عناصر</h2>
 
 <p>
-اگر <code>map()</code> برای <strong>تغییر یا پردازش عناصر</strong> بود،
-<code>filter()</code> برای <strong>انتخاب عناصر</strong> استفاده می‌شود.
+گاهی هدف ما تغییر همه عناصر نیست؛ بلکه می‌خواهیم فقط بعضی از آن‌ها را نگه داریم.
+اینجاست که <strong>filter()</strong> کاربرد دارد.
 </p>
 
 <p>
-مثلاً می‌خواهیم فقط اعداد زوج را از یک List جدا کنیم:
+مثلاً می‌خواهیم فقط اعداد زوج را از یک List انتخاب کنیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">filter()</span>
+<span class="code-label">filter() + lambda</span>
 <div class="code-block no-prompt">numbers = [1, 2, 3, 4, 5, 6]
 
 result = filter(lambda x: x % 2 == 0, numbers)
 
 print(list(result))</div>
-
 </div>
 
 <div class="code-container">
@@ -26936,23 +27564,32 @@ print(list(result))</div>
 </div>
 
 <p>
-در <code>filter()</code>، Function باید یک شرط را بررسی کند.
+در <code>filter()</code>، Function باید یک <strong>شرط</strong> را بررسی کند.
 اگر نتیجه برای یک عنصر <code>True</code> باشد، آن عنصر نگه داشته می‌شود.
 </p>
 
 <div class="code-container">
-<span class="code-label">ذهنیت</span>
+<span class="code-label">مدل ذهنی</span>
 <div class="code-block no-prompt">داده
   ↓
 شرط
   ↓
 True  → نگه دار
-False → حذف</div>
+False → رد کن</div>
+</div>
+
+<div class="lesson-important">
+<strong>حفظ کن:</strong>
+<code>filter()</code> یعنی «فقط عناصر موردنظر را نگه دار».
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. map() و filter() چه تفاوتی دارند؟</h2>
+<h2 class="lesson-title">7. تفاوت map() و filter()</h2>
+
+<p>
+حالا تفاوت این دو ابزار بسیار ساده می‌شود:
+</p>
 
 <div class="table-wrap">
 <table>
@@ -26960,14 +27597,14 @@ False → حذف</div>
 <tr>
 <th>ابزار</th>
 <th>سؤال اصلی</th>
-<th>نتیجه</th>
+<th>کار</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>map()</code></td>
 <td>با هر عنصر چه کاری انجام بدهم؟</td>
-<td>تغییر/پردازش عناصر</td>
+<td>پردازش یا تبدیل عناصر</td>
 </tr>
 <tr>
 <td><code>filter()</code></td>
@@ -26978,41 +27615,38 @@ False → حذف</div>
 </table>
 </div>
 
-<p>مثلاً:</p>
-
 <div class="code-container">
-<span class="code-label">map</span>
+<span class="code-label">map()</span>
 <div class="code-block no-prompt">numbers = [1, 2, 3]
 
 result = list(map(lambda x: x * 10, numbers))
 
 # [10, 20, 30]</div>
-
 </div>
 
 <div class="code-container">
-<span class="code-label">filter</span>
+<span class="code-label">filter()</span>
 <div class="code-block no-prompt">numbers = [1, 2, 3]
 
 result = list(filter(lambda x: x > 1, numbers))
 
 # [2, 3]</div>
-
 </div>
 
 <div class="lesson-important">
-<strong>حفظ کن:</strong>
+<strong>یک راه ساده برای حفظ کردن:</strong>
+<br><br>
 <code>map()</code> → «تغییر بده»
-&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;
 <code>filter()</code> → «انتخاب کن»
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. sorted() چیست؟</h2>
+<h2 class="lesson-title">8. sorted()؛ مرتب‌سازی داده‌ها</h2>
 
 <p>
-ابزار مهم بعدی <strong>sorted()</strong> است.
+ابزار بعدی <strong>sorted()</strong> است.
 از آن برای مرتب‌سازی داده‌ها استفاده می‌کنیم.
 </p>
 
@@ -27023,7 +27657,6 @@ result = list(filter(lambda x: x > 1, numbers))
 result = sorted(numbers)
 
 print(result)</div>
-
 </div>
 
 <div class="code-container">
@@ -27032,27 +27665,20 @@ print(result)</div>
 </div>
 
 <p>
-برخلاف <code>sort()</code> که متد List است، <code>sorted()</code> یک Function داخلی Python است
-و می‌تواند یک نتیجه مرتب‌شده به ما برگرداند.
+به صورت پیش‌فرض، <code>sorted()</code> داده‌ها را به صورت <strong>صعودی</strong> مرتب می‌کند.
 </p>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">9. مرتب‌سازی نزولی با <code>reverse=True</code></h2>
-
 <p>
-به صورت پیش‌فرض، <code>sorted()</code> داده‌ها را صعودی مرتب می‌کند.
-برای مرتب‌سازی نزولی می‌توانیم از <code>reverse=True</code> استفاده کنیم:
+برای مرتب‌سازی نزولی از <code>reverse=True</code> استفاده می‌کنیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
+<span class="code-label">نزولی</span>
 <div class="code-block no-prompt">numbers = [5, 2, 8, 1, 3]
 
 result = sorted(numbers, reverse=True)
 
 print(result)</div>
-
 </div>
 
 <div class="code-container">
@@ -27060,13 +27686,22 @@ print(result)</div>
 <div class="code-block no-prompt">[8, 5, 3, 2, 1]</div>
 </div>
 
+<div class="lesson-important">
+<strong>نکته:</strong>
+<code>sorted()</code> یک Function داخلی Python است و یک نتیجه مرتب‌شده برمی‌گرداند.
+</div>
+
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. مرتب‌سازی با <code>key</code></h2>
+<h2 class="lesson-title">9. مرتب‌سازی با key</h2>
 
 <p>
-گاهی فقط مرتب کردن اعداد کافی نیست.
-مثلاً اگر Listای از کلمات داشته باشیم، می‌توانیم بر اساس <strong>طول کلمه</strong> آن‌ها را مرتب کنیم.
+گاهی نمی‌خواهیم داده‌ها بر اساس مقدار مستقیم خودشان مرتب شوند؛
+بلکه می‌خواهیم یک ویژگی از آن‌ها معیار مرتب‌سازی باشد.
+</p>
+
+<p>
+مثلاً می‌توانیم کلمات را بر اساس طول آن‌ها مرتب کنیم:
 </p>
 
 <div class="code-container">
@@ -27076,7 +27711,6 @@ print(result)</div>
 result = sorted(words, key=len)
 
 print(result)</div>
-
 </div>
 
 <div class="code-container">
@@ -27085,11 +27719,12 @@ print(result)</div>
 </div>
 
 <p>
-اینجا <code>key=len</code> یعنی Python برای مرتب‌سازی، طول هر کلمه را معیار قرار دهد.
+اینجا <code>key=len</code> یعنی:
+<strong>طول هر کلمه معیار مرتب‌سازی باشد.</strong>
 </p>
 
 <p>
-حتی می‌توانیم برای <code>key</code> از Lambda استفاده کنیم.
+برای معیارهای خاص‌تر می‌توانیم یک Lambda به <code>key</code> بدهیم.
 مثلاً مرتب‌سازی اعداد بر اساس فاصله آن‌ها از صفر:
 </p>
 
@@ -27100,7 +27735,6 @@ print(result)</div>
 result = sorted(numbers, key=lambda x: abs(x))
 
 print(result)</div>
-
 </div>
 
 <div class="code-container">
@@ -27109,19 +27743,23 @@ print(result)</div>
 </div>
 
 <p>
-در اینجا <code>lambda x: abs(x)</code> مشخص می‌کند معیار مرتب‌سازی، مقدار مطلق هر عدد باشد.
+در اینجا <code>lambda x: abs(x)</code> معیار مرتب‌سازی را مشخص می‌کند؛
+یعنی Python اعداد را بر اساس مقدار مطلق آن‌ها مرتب می‌کند.
 </p>
+
+<div class="lesson-important">
+<strong>نکته مهم:</strong>
+Lambda در اینجا خودش مرتب‌سازی نمی‌کند؛ فقط به <code>sorted()</code> می‌گوید
+«برای مقایسه، از این مقدار استفاده کن».
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. ترکیب ابزارها</h2>
+<h2 class="lesson-title">10. ترکیب filter() و sorted()</h2>
 
 <p>
-حالا می‌توانیم ابزارهایی را که یاد گرفتیم کنار هم قرار دهیم.
-</p>
-
-<p>
-فرض کن لیستی از نمره‌ها داریم و می‌خواهیم:
+حالا ابزارها را به صورت یک مسئله واقعی‌تر کنار هم قرار دهیم.
+فرض کنیم Listای از نمره‌ها داریم و می‌خواهیم:
 <strong>ابتدا نمره‌های قبولی را انتخاب کنیم و سپس آن‌ها را از بیشترین به کمترین مرتب کنیم.</strong>
 </p>
 
@@ -27134,7 +27772,6 @@ passed = filter(lambda x: x >= 10, scores)
 result = sorted(passed, reverse=True)
 
 print(result)</div>
-
 </div>
 
 <div class="code-container">
@@ -27143,40 +27780,44 @@ print(result)</div>
 </div>
 
 <p>
-مراحل کار:
+مراحل کار را این‌طور ببین:
 </p>
 
 <div class="code-container">
 <span class="code-label">Flow</span>
 <div class="code-block no-prompt">scores
-  ↓
+   ↓
 filter()
-  ↓
+   ↓
 فقط نمره‌های ≥ 10
-  ↓
+   ↓
 sorted(reverse=True)
-  ↓
+   ↓
 مرتب‌سازی نزولی
-  ↓
+   ↓
 [19, 17, 15, 12]</div>
 </div>
 
 <p>
-این دقیقاً همان چیزی است که در برنامه‌های واقعی زیاد انجام می‌دهیم:
-<strong>داده → فیلتر → پردازش → مرتب‌سازی</strong>.
+این یک الگوی مهم در کار با داده‌هاست:
+<strong>ابتدا داده‌های موردنظر را انتخاب می‌کنیم، سپس نتیجه را پردازش یا مرتب می‌کنیم.</strong>
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. یک مثال با Dictionary</h2>
+<h2 class="lesson-title">11. sorted() با Dictionary</h2>
 
 <p>
-این ابزارها فقط برای Listهای عددی نیستند.
-مثلاً فرض کنیم اطلاعات چند دانش‌آموز را به صورت Dictionary داریم:
+این ابزارها فقط برای Listهای ساده نیستند.
+می‌توانیم با داده‌های ساختاریافته‌تر نیز از آن‌ها استفاده کنیم.
+</p>
+
+<p>
+مثلاً اطلاعات چند دانش‌آموز را به صورت Listای از Dictionaryها داریم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
+<span class="code-label">داده</span>
 <div class="code-block no-prompt">students = [
     {"name": "Ali", "score": 18},
     {"name": "Sara", "score": 12},
@@ -27185,7 +27826,7 @@ sorted(reverse=True)
 </div>
 
 <p>
-می‌توانیم دانش‌آموزان را بر اساس نمره مرتب کنیم:
+حالا می‌خواهیم دانش‌آموزان را بر اساس نمره، از بیشترین به کمترین مرتب کنیم:
 </p>
 
 <div class="code-container">
@@ -27197,25 +27838,35 @@ sorted(reverse=True)
 )
 
 print(result)</div>
-
 </div>
 
 <p>
-اینجا <code>lambda</code> مشخص می‌کند که معیار مرتب‌سازی، مقدار <code>score</code> باشد.
+در اینجا Lambda مقدار <code>score</code> هر Dictionary را برمی‌گرداند
+تا <code>sorted()</code> از آن به عنوان معیار مرتب‌سازی استفاده کند.
 </p>
 
 <div class="lesson-important">
-<strong>نکته:</strong>
-در این مثال Lambda خودش داده‌ها را مرتب نمی‌کند؛ فقط مشخص می‌کند <code>sorted()</code> بر اساس چه مقداری مرتب‌سازی را انجام دهد.
+<strong>مدل ذهنی:</strong>
+<code>sorted()</code> → مرتب‌سازی را انجام می‌دهد
+<br>
+<code>key</code> → معیار مرتب‌سازی را مشخص می‌کند
+<br>
+<code>lambda</code> → مشخص می‌کند این معیار را از کجا به دست بیاوریم
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. Comprehension یا map/filter؟</h2>
+<h2 class="lesson-title">12. Comprehension یا map() و filter()؟</h2>
 
 <p>
-حالا که Comprehension جلسه قبل و <code>map()</code> و <code>filter()</code> را یاد گرفته‌ایم،
-ممکن است بپرسی: «کدام را استفاده کنیم؟»
+در جلسه قبل با <strong>Comprehension</strong> یاد گرفتیم که چگونه Collection جدید بسازیم.
+حالا ممکن است بپرسی: «پس چه زمانی از Comprehension استفاده کنیم و چه زمانی از
+<code>map()</code> یا <code>filter()</code>؟»
+</p>
+
+<p>
+هر دو روش می‌توانند برای بعضی مسائل مشابه استفاده شوند.
+انتخاب بهتر به خوانایی و نوع مسئله بستگی دارد.
 </p>
 
 <div class="table-wrap">
@@ -27228,7 +27879,7 @@ print(result)</div>
 </thead>
 <tbody>
 <tr>
-<td>ساخت یک Collection با منطق ساده</td>
+<td>ساخت Collection جدید با منطق ساده</td>
 <td><strong>Comprehension</strong></td>
 </tr>
 <tr>
@@ -27243,29 +27894,79 @@ print(result)</div>
 <td>مرتب‌سازی داده‌ها</td>
 <td><strong>sorted()</strong></td>
 </tr>
+<tr>
+<td>Function بسیار ساده و کوتاه</td>
+<td><strong>lambda</strong></td>
+</tr>
 </tbody>
 </table>
 </div>
 
 <p>
-در Python ممکن است یک مسئله را با چند روش بتوان حل کرد.
-مهم‌تر از کوتاه بودن کد، <strong>خوانایی و واضح بودن آن</strong> است.
+مثلاً برای دو برابر کردن اعداد، هر دو روش زیر می‌توانند مناسب باشند:
 </p>
+
+<div class="code-container">
+<span class="code-label">Comprehension</span>
+<div class="code-block no-prompt">numbers = [1, 2, 3]
+
+result = [x * 2 for x in numbers]</div>
+</div>
+
+<div class="code-container">
+<span class="code-label">map()</span>
+<div class="code-block no-prompt">numbers = [1, 2, 3]
+
+result = list(map(lambda x: x * 2, numbers))</div>
+</div>
+
+<p>
+هر دو کد نتیجه یکسانی دارند. در چنین شرایطی مهم است روشی را انتخاب کنیم
+که برای خواننده واضح‌تر باشد.
+</p>
+
+<div class="lesson-important">
+<strong>قانون مهم:</strong>
+کوتاه‌تر بودن کد همیشه به معنی بهتر بودن آن نیست؛
+<strong>خوانایی و ساده بودن منطق</strong> اهمیت بیشتری دارد.
+</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">🔄 Recall سریع</h2>
+<h2 class="lesson-title">13. انتخاب ابزار مناسب</h2>
 
-<ol>
-<li><code>lambda</code> چه نوع Functionای می‌سازد؟</li>
-<li>تفاوت اصلی <code>def</code> و <code>lambda</code> چیست؟</li>
-<li><code>map()</code> چه کاری انجام می‌دهد؟</li>
-<li><code>filter()</code> چه کاری انجام می‌دهد؟</li>
-<li>تفاوت <code>map()</code> و <code>filter()</code> چیست؟</li>
-<li><code>sorted()</code> چه کاری انجام می‌دهد؟</li>
-<li>پارامتر <code>key</code> در <code>sorted()</code> چه کاربردی دارد؟</li>
-<li>چه زمانی بهتر است به جای Lambda از یک Function معمولی استفاده کنیم؟</li>
-</ol>
+<p>
+حالا می‌توانیم کل جلسه را در چند سؤال ساده خلاصه کنیم.
+وقتی با یک Collection روبه‌رو شدی، ابتدا ببین هدفت چیست:
+</p>
+
+<div class="code-container">
+<span class="code-label">تصمیم‌گیری سریع</span>
+<div class="code-block no-prompt">Function خیلی ساده می‌خواهم؟
+        ↓
+      lambda
+
+می‌خواهم روی همه عناصر کاری انجام دهم؟
+        ↓
+       map()
+
+می‌خواهم فقط بعضی عناصر را نگه دارم؟
+        ↓
+      filter()
+
+می‌خواهم داده‌ها را مرتب کنم؟
+        ↓
+     sorted()
+
+می‌خواهم یک Collection جدید با منطق ساده بسازم؟
+        ↓
+   Comprehension</div>
+</div>
+
+<p>
+این ابزارها رقیب یکدیگر نیستند؛ هرکدام برای یک نوع مسئله مناسب‌تر هستند
+و گاهی می‌توان آن‌ها را در کنار هم استفاده کرد.
+</p>
 
 <hr class="lesson-divider">
 
@@ -27294,7 +27995,7 @@ print(result)</div>
 <div class="quiz-answer">
 <strong>✅ پاسخ: ج</strong>
 <br>
-Lambda مقدار <code>x</code> را به توان ۲ می‌رساند؛ پس <code>4 ** 2</code> برابر ۱۶ است.
+Lambda مقدار <code>x</code> را به توان ۲ می‌رساند؛ بنابراین <code>4 ** 2</code> برابر ۱۶ است.
 </div>
 </div>
 
@@ -27429,7 +28130,10 @@ Lambda برای Functionهای بسیار ساده و کوتاه مناسب اس
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم چند ابزار مهم برای پردازش و مرتب‌سازی داده‌ها چگونه کار می‌کنند.
+در این جلسه یاد گرفتیم چگونه با چند ابزار مهم Python، داده‌ها را
+<strong>پردازش، انتخاب و مرتب</strong> کنیم.
+نقطه شروع این ابزارها <strong>Function</strong> است و برای عملیات‌های بسیار ساده می‌توانیم
+از <code>lambda</code> استفاده کنیم.
 </p>
 
 <div class="table-wrap">
@@ -27437,60 +28141,87 @@ Lambda برای Functionهای بسیار ساده و کوتاه مناسب اس
 <thead>
 <tr>
 <th>ابزار</th>
+<th>مدل ذهنی</th>
 <th>کار اصلی</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>lambda</code></td>
-<td>Function ساده و کوتاه</td>
+<td>«این کار ساده را انجام بده»</td>
+<td>ساخت Function کوتاه</td>
 </tr>
 <tr>
 <td><code>map()</code></td>
-<td>پردازش همه عناصر</td>
+<td>«روی همه انجام بده»</td>
+<td>پردازش یا تبدیل عناصر</td>
 </tr>
 <tr>
 <td><code>filter()</code></td>
+<td>«فقط این‌ها را نگه دار»</td>
 <td>انتخاب عناصر بر اساس شرط</td>
 </tr>
 <tr>
 <td><code>sorted()</code></td>
+<td>«این‌ها را مرتب کن»</td>
 <td>مرتب‌سازی داده‌ها</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>«بر اساس این معیار مرتب کن»</td>
+<td>تعیین معیار مرتب‌سازی</td>
 </tr>
 </tbody>
 </table>
 </div>
 
 <div class="code-container">
-<span class="code-label">Core Pattern</span>
-<div class="code-block no-prompt">lambda
-  ↓
-Function ساده
-
-map()
-↓
-پردازش عناصر
-
-filter()
-↓
-انتخاب عناصر
-
-sorted()
-↓
-مرتب‌سازی</div>
-
+<span class="code-label">مدل ذهنی نهایی</span>
+<div class="code-block no-prompt">Function ساده
+      ↓
+    lambda
+      ↓
+ ┌───────────┐
+ ↓           ↓
+map()     filter()
+ ↓           ↓
+پردازش      انتخاب
+ └──────┬────┘
+        ↓
+    sorted()
+        ↓
+   مرتب‌سازی</div>
 </div>
 
 <p>
-مدل ذهنی این جلسه:
-<strong>Function کوچک → پردازش/فیلتر داده → مرتب‌سازی نتیجه</strong>.
+پس اگر بخواهیم خیلی ساده به خاطر بسپاریم:
+</p>
+
+<div class="lesson-important">
+<strong>
+<code>lambda</code> → Function ساده
+<br><br>
+<code>map()</code> → پردازش همه عناصر
+<br><br>
+<code>filter()</code> → انتخاب عناصر
+<br><br>
+<code>sorted()</code> → مرتب‌سازی
+</strong>
+</div>
+
+<p>
+در کنار این ابزارها، <strong>Comprehension</strong> که در بخش قبل یاد گرفتیم نیز
+برای ساخت Collectionهای جدید با منطق ساده بسیار کاربردی است.
+در عمل، انتخاب ابزار مناسب به <strong>نوع مسئله و خوانایی کد</strong> بستگی دارد.
 </p>
 
 <p>
-با پایان فصل ۱۱، حالا ابزارهای مهمی برای کار با Collectionها و پردازش داده‌ها در اختیار داریم.
-در <strong>فصل ۱۲ — Modules & Packages</strong> یاد می‌گیریم چگونه کدها را در Module و Package سازمان‌دهی کنیم
-و از کدهای آماده Python و کتابخانه‌های دیگر استفاده کنیم.
+با پایان فصل ۱۱، اکنون مجموعه‌ای از ابزارهای مهم برای کار با
+<strong>Collectionها و پردازش داده‌ها</strong> در اختیار داری.
+در <strong>فصل ۱۲ — Modules & Packages</strong> یاد می‌گیریم چگونه کدها را
+در Module و Package سازمان‌دهی کنیم و از کدها و کتابخانه‌های آماده استفاده کنیم.
 </p>`
+
 ,
 "ch12-1": `<div class="section-header"> <div class="section-badge">۱۲</div> <div> <h1>Module، import و Package</h1> <div class="meta">فصل ۱۲ · بخش ۱ از ۲</div> </div>
 
@@ -29256,193 +29987,236 @@ pip freeze > requirements.txt</div>
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>مفهوم <strong>File</strong> و کاربرد آن را توضیح بدهی.</li>
-<li>با <code>open()</code> فایل را باز کنی.</li>
-<li>حالت‌های مختلف باز کردن فایل را بشناسی: <code>r</code>، <code>w</code>، <code>a</code>.</li>
-<li>با <code>read()</code>، <code>readline()</code> و <code>readlines()</code> فایل را بخوانی.</li>
-<li>با <code>write()</code> در فایل بنویسی.</li>
-<li>با <code>close()</code> فایل را ببندی.</li>
-<li>بدانی چرا <code>with</code> روش بهتری است.</li>
-<li>با <code>with</code> فایل را به شکل ایمن مدیریت کنی.</li>
-<li>یک برنامه ساده ذخیره و بازیابی اطلاعات بسازی.</li>
+    <li>مفهوم File و کاربرد آن را توضیح بدهی.</li>
+    <li>با <code>open()</code> فایل را باز کنی.</li>
+    <li>حالت‌های <code>r</code>، <code>w</code> و <code>a</code> را تشخیص بدهی.</li>
+    <li>با <code>read()</code>، <code>readline()</code> و <code>readlines()</code> فایل را بخوانی.</li>
+    <li>با <code>write()</code> اطلاعات را در فایل ذخیره کنی.</li>
+    <li>تفاوت <code>close()</code> و مدیریت فایل با <code>with</code> را بدانی.</li>
+    <li>یک برنامه ساده برای ذخیره و بازیابی اطلاعات بسازی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">معرفی جلسه</h2>
+<h2 class="lesson-title">1. چرا به File نیاز داریم؟</h2>
 
 <p>
-تا اینجا تمام داده‌هایی که در برنامه‌ها ساختیم، فقط در حافظه موقت (RAM) بودند.
-به محض بسته شدن برنامه، همه چیز از بین می‌رفت.
+تا اینجا داده‌هایی که داخل برنامه ایجاد می‌کردیم معمولاً در حافظه موقت
+<strong>RAM</strong> قرار داشتند. با پایان اجرای برنامه، این داده‌ها دیگر در دسترس
+نبودند.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">name = "Ali"
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">name = "Ali"
 score = 18
 
-# بعد از بستن برنامه، این داده‌ها از بین می‌روند</div>
+print(name)
+print(score)</div>
 </div>
 
 <p>
-اما در دنیای واقعی، برنامه‌ها باید داده‌ها را <strong>ذخیره</strong> کنند تا
-دفعه بعد که اجرا شدند، همچنان در دسترس باشند.
-</p>
-
-<p>
-برای این کار از <strong>File</strong> استفاده می‌کنیم.
+اگر بخواهیم اطلاعات بعد از بسته شدن برنامه هم باقی بمانند، باید آن‌ها را در یک
+<strong>File</strong> ذخیره کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Program
+    <span class="code-label">Model</span>
+    <div class="code-block no-prompt">Program
    │
-   ├── نوشتن در فایل  → ذخیره دائمی
+   ├── Write → ذخیره اطلاعات در File
    │
-   └── خواندن از فایل → بازیابی اطلاعات</div>
+   └── Read  → خواندن اطلاعات از File</div>
 </div>
 
-<p>
-مثال‌های واقعی:
-</p>
+<p>مثال‌های واقعی استفاده از فایل:</p>
 
 <ul>
-<li>ذخیره امتیاز بازی</li>
-<li>ذخیره تنظیمات کاربر</li>
-<li>خواندن لیست محصولات از فایل</li>
-<li>ثبت لاگ برنامه</li>
+    <li>ذخیره تنظیمات برنامه</li>
+    <li>ذخیره اطلاعات کاربر</li>
+    <li>ثبت Log</li>
+    <li>ذخیره یادداشت‌ها</li>
+    <li>خواندن اطلاعات از یک فایل متنی</li>
 </ul>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. File چیست؟</h2>
+<h2 class="lesson-title">2. File چیست؟</h2>
 
 <p>
-<strong>File</strong> یک منبع ذخیره‌سازی روی دیسک است که داده‌ها را
-به صورت دائمی نگه می‌دارد.
+<strong>File</strong> محلی برای ذخیره اطلاعات است که معمولاً روی حافظه دائمی
+سیستم مانند SSD یا HDD قرار دارد.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مفهوم</th>
-<th>توضیح</th>
+    <th>مفهوم</th>
+    <th>کاربرد</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>File</td><td>فایلی روی دیسک که داده در آن ذخیره می‌شود</td></tr>
-<tr><td>Open</td><td>اتصال برنامه به فایل</td></tr>
-<tr><td>Read</td><td>خواندن محتوا</td></tr>
-<tr><td>Write</td><td>نوشتن در فایل</td></tr>
-<tr><td>Close</td><td>قطع اتصال از فایل</td></tr>
+<tr>
+    <td>File</td>
+    <td>محل ذخیره اطلاعات</td>
+</tr>
+<tr>
+    <td><code>open()</code></td>
+    <td>باز کردن فایل</td>
+</tr>
+<tr>
+    <td>Read</td>
+    <td>خواندن اطلاعات</td>
+</tr>
+<tr>
+    <td>Write</td>
+    <td>نوشتن اطلاعات</td>
+</tr>
+<tr>
+    <td><code>close()</code></td>
+    <td>بستن فایل</td>
+</tr>
 </tbody>
 </table>
 </div>
 
 <p>
-در Python برای کار با فایل‌ها از تابع <code>open()</code> استفاده می‌کنیم.
+در Python برای کار با فایل‌ها معمولاً از تابع <code>open()</code> استفاده می‌کنیم.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. باز کردن فایل با <code>open()</code></h2>
+<h2 class="lesson-title">3. باز کردن فایل با <code>open()</code></h2>
 
 <p>ساختار کلی:</p>
 
 <div class="code-container">
-<span class="code-label">Syntax</span>
-<div class="code-block no-prompt">open(filename, mode)</div>
+    <span class="code-label">Syntax</span>
+    <div class="code-block no-prompt">open(filename, mode)</div>
 </div>
 
-<p>مثلاً:</p>
+<p>مثال:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">file = open("data.txt", "r")</div>
 </div>
 
-<div class="code-container">
-<span class="code-label">Recall</span>
-<div class="code-block no-prompt">"data.txt"  → نام فایل
-"r"         → حالت باز کردن</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+    <th>بخش</th>
+    <th>معنی</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><code>"data.txt"</code></td>
+    <td>نام فایل</td>
+</tr>
+<tr>
+    <td><code>"r"</code></td>
+    <td>حالت باز کردن فایل</td>
+</tr>
+<tr>
+    <td><code>file</code></td>
+    <td>File Object برای کار با فایل</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 <p>
-تابع <code>open()</code> یک <strong>File Object</strong> برمی‌گرداند که
-با آن می‌توانیم بخوانیم یا بنویسیم.
+تابع <code>open()</code> یک <strong>File Object</strong> برمی‌گرداند و از طریق آن
+می‌توانیم فایل را بخوانیم یا در آن بنویسیم.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. حالت‌های باز کردن فایل</h2>
+<h2 class="lesson-title">4. حالت‌های باز کردن فایل</h2>
 
 <p>
-پارامتر دوم <code>open()</code> مشخص می‌کند که با فایل چه کاری می‌خواهیم انجام دهیم.
+پارامتر <code>mode</code> مشخص می‌کند که قرار است چه کاری با فایل انجام دهیم.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>Mode</th>
-<th>معنی</th>
-<th>توضیح</th>
+    <th>Mode</th>
+    <th>معنی</th>
+    <th>رفتار</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><code>"r"</code></td><td>Read</td><td>فقط خواندن (پیش‌فرض)</td></tr>
-<tr><td><code>"w"</code></td><td>Write</td><td>نوشتن — محتوای قبلی پاک می‌شود</td></tr>
-<tr><td><code>"a"</code></td><td>Append</td><td>نوشتن در انتهای فایل</td></tr>
-<tr><td><code>"r+"</code></td><td>Read + Write</td><td>خواندن و نوشتن</td></tr>
+<tr>
+    <td><code>"r"</code></td>
+    <td>Read</td>
+    <td>خواندن فایل</td>
+</tr>
+<tr>
+    <td><code>"w"</code></td>
+    <td>Write</td>
+    <td>نوشتن؛ محتوای قبلی فایل پاک می‌شود</td>
+</tr>
+<tr>
+    <td><code>"a"</code></td>
+    <td>Append</td>
+    <td>اضافه کردن اطلاعات به انتهای فایل</td>
+</tr>
+<tr>
+    <td><code>"r+"</code></td>
+    <td>Read + Write</td>
+    <td>خواندن و نوشتن در فایل موجود</td>
+</tr>
 </tbody>
 </table>
 </div>
 
 <div class="lesson-important">
 <strong>مهم:</strong>
-حالت <code>"w"</code> اگر فایل موجود باشد، <strong>کل محتوای آن را پاک می‌کند</strong>.
+اگر فایل موجود باشد، حالت <code>"w"</code> محتوای قبلی آن را پاک می‌کند.
 </div>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">r → خواندن (اگر فایل نباشد خطا)
-w → نوشتن (فایل پاک می‌شود)
-a → اضافه کردن به انتها</div>
+    <span class="code-label">Quick Review</span>
+    <div class="code-block no-prompt">r → خواندن
+w → نوشتن و جایگزینی محتوا
+a → اضافه کردن به انتهای فایل</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. خواندن فایل با <code>read()</code></h2>
+<h2 class="lesson-title">5. خواندن کل فایل با <code>read()</code></h2>
 
 <p>
-فرض کن فایل <code>data.txt</code> شامل این محتوا باشد:
+فرض کنیم فایل <code>data.txt</code> شامل این محتوا باشد:
 </p>
 
 <div class="code-container">
-<span class="code-label">data.txt</span>
-<div class="code-block no-prompt">Hello Python
+    <span class="code-label">data.txt</span>
+    <div class="code-block no-prompt">Hello Python
 Welcome to Files</div>
 </div>
 
 <p>
-برای خواندن کل محتوا:</p>
+برای خواندن کل محتوا از <code>read()</code> استفاده می‌کنیم:
+</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    content = file.read()
 
-content = file.read()
-
-print(content)
-
-file.close()</div>
+print(content)</div>
 </div>
 
 <div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Hello Python
+    <span class="code-label">Output</span>
+    <div class="code-block no-prompt">Hello Python
 Welcome to Files</div>
 </div>
 
@@ -29450,132 +30224,105 @@ Welcome to Files</div>
 <code>read()</code> کل محتوای فایل را به صورت یک <code>str</code> برمی‌گرداند.
 </p>
 
+<div class="lesson-note">
+<strong>نکته:</strong>
+برای فایل‌های بزرگ، خواندن کل فایل با <code>read()</code> می‌تواند حافظه بیشتری مصرف کند.
+در این حالت خواندن خط‌به‌خط مناسب‌تر است.
+</div>
+
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. بستن فایل با <code>close()</code></h2>
+<h2 class="lesson-title">6. خواندن یک خط با <code>readline()</code></h2>
 
 <p>
-بعد از استفاده از فایل، باید آن را ببندیم.
+اگر فقط به یک خط از فایل نیاز داشته باشیم، از <code>readline()</code> استفاده می‌کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file.close()</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    line = file.readline()
+
+print(line)</div>
 </div>
 
 <p>
-اگر فایل را نبندیم:
+هر بار اجرای <code>readline()</code>، خط بعدی فایل را می‌خواند.
 </p>
-
-<ul>
-<li>منابع سیستم آزاد نمی‌شوند.</li>
-<li>ممکن است داده‌ها به درستی ذخیره نشوند.</li>
-<li>در سیستم‌های بزرگ باعث مشکل می‌شود.</li>
-</ul>
 
 <div class="lesson-note">
 <strong>نکته:</strong>
-هر <code>open()</code> باید یک <code>close()</code> متناظر داشته باشد.
+در صورت وجود، کاراکتر پایان خط <code>\n</code> نیز همراه خط خوانده می‌شود.
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. خواندن خط به خط با <code>readline()</code></h2>
-
-<p>
-گاهی می‌خواهیم فایل را خط به خط بخوانیم.
-</p>
+<p>مثلاً برای خواندن دو خط:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")
-
-line1 = file.readline()
-line2 = file.readline()
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    line1 = file.readline()
+    line2 = file.readline()
 
 print(line1)
-print(line2)
-
-file.close()</div>
+print(line2)</div>
 </div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Hello Python
-
-Welcome to Files</div>
-</div>
-
-<p>
-دقت کن که <code>readline()</code> در انتهای هر خط، کاراکتر <code>"\n"</code> را
-هم برمی‌گرداند.
-</p>
 
 <hr class="lesson-divider">
 
 <h2 class="lesson-title">7. خواندن همه خطوط با <code>readlines()</code></h2>
 
 <p>
-<code>readlines()</code> همه خطوط را در یک <strong>List</strong> برمی‌گرداند.
+<code>readlines()</code> تمام خطوط فایل را در قالب یک <code>list</code> برمی‌گرداند.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    lines = file.readlines()
 
-lines = file.readlines()
-
-print(lines)
-
-file.close()</div>
+print(lines)</div>
 </div>
 
 <div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">['Hello Python\n', 'Welcome to Files']</div>
+    <span class="code-label">Output</span>
+    <div class="code-block no-prompt">['Hello Python\n', 'Welcome to Files']</div>
 </div>
 
 <p>
-پس می‌توانیم روی آن‌ها پیمایش کنیم:
+سپس می‌توانیم روی لیست خطوط پیمایش کنیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">for line in lines:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">for line in lines:
     print(line.strip())</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Hello Python
-Welcome to Files</div>
 </div>
 
 <div class="lesson-note">
 <strong>نکته:</strong>
-<code>strip()</code> کاراکتر <code>"\n"</code> را از انتهای هر خط حذف می‌کند.
+<code>strip()</code> فاصله‌های اضافی ابتدا و انتهای رشته، از جمله <code>\n</code> را حذف می‌کند.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. پیمایش مستقیم روی فایل</h2>
+<h2 class="lesson-title">8. روش بهتر برای خواندن خط‌به‌خط</h2>
 
 <p>
-بهترین و خواناترین روش خواندن فایل، پیمایش مستقیم روی خود File Object است.
+اگر هدف ما پردازش خط‌به‌خط فایل باشد، لازم نیست ابتدا تمام خطوط را با
+<code>readlines()</code> داخل یک لیست قرار دهیم.
+می‌توانیم مستقیماً روی فایل پیمایش کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")
-
-for line in file:
-    print(line.strip())
-
-file.close()</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    for line in file:
+        print(line.strip())</div>
 </div>
 
 <p>
-این روش خط به خط فایل را می‌خواند و حافظه کمی مصرف می‌کند.
+این روش ساده، خوانا و برای فایل‌های بزرگ مناسب‌تر است؛ زیرا خطوط را به صورت
+تدریجی پردازش می‌کند.
 </p>
 
 <hr class="lesson-divider">
@@ -29583,118 +30330,132 @@ file.close()</div>
 <h2 class="lesson-title">9. نوشتن در فایل با <code>write()</code></h2>
 
 <p>
-برای نوشتن در فایل از حالت <code>"w"</code> استفاده می‌کنیم.
+برای نوشتن اطلاعات در فایل از <code>write()</code> استفاده می‌کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("output.txt", "w")
-
-file.write("Hello Python\n")
-file.write("This is a new file\n")
-
-file.close()</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("output.txt", "w") as file:
+    file.write("Hello Python\n")
+    file.write("This is a new file\n")</div>
 </div>
 
 <p>
-اگر فایل <code>output.txt</code> وجود نداشته باشد، ساخته می‌شود.
-</p>
-
-<p>
-اگر وجود داشته باشد، <strong>کل محتوای قبلی پاک می‌شود</strong>.
+اگر فایل وجود نداشته باشد، در حالت <code>"w"</code> ساخته می‌شود.
+اگر وجود داشته باشد، محتوای قبلی آن جایگزین می‌شود.
 </p>
 
 <div class="code-container">
-<span class="code-label">output.txt</span>
-<div class="code-block no-prompt">Hello Python
+    <span class="code-label">output.txt</span>
+    <div class="code-block no-prompt">Hello Python
 This is a new file</div>
 </div>
 
 <div class="lesson-important">
 <strong>هشدار:</strong>
-حالت <code>"w"</code> بدون هشدار محتوا را پاک می‌کند.
-قبل از استفاده مطمئن شو که می‌خواهی این کار را انجام دهی.
+استفاده از <code>"w"</code> روی فایل موجود، محتوای قبلی را از بین می‌برد.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. اضافه کردن به فایل با حالت <code>"a"</code></h2>
+<h2 class="lesson-title">10. اضافه کردن اطلاعات با <code>"a"</code></h2>
 
 <p>
-اگر نمی‌خواهی محتوای قبلی پاک شود، از حالت <code>"a"</code> استفاده کن.
+اگر بخواهیم اطلاعات جدید را بدون حذف محتوای قبلی به انتهای فایل اضافه کنیم،
+از حالت <code>"a"</code> استفاده می‌کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("output.txt", "a")
-
-file.write("New line added\n")
-
-file.close()</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("output.txt", "a") as file:
+    file.write("New line added\n")</div>
 </div>
 
-<p>
-نتیجه:</p>
+<p>در نتیجه اطلاعات قبلی حفظ می‌شوند و متن جدید به انتهای فایل اضافه می‌شود.</p>
 
 <div class="code-container">
-<span class="code-label">output.txt</span>
-<div class="code-block no-prompt">Hello Python
+    <span class="code-label">output.txt</span>
+    <div class="code-block no-prompt">Hello Python
 This is a new file
 New line added</div>
 </div>
 
-<div class="code-container">
-<span class="code-label">Recall</span>
-<div class="code-block no-prompt">"w" → پاک کردن و نوشتن
-"a" → اضافه کردن به انتها</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+    <th>Mode</th>
+    <th>اگر فایل وجود داشته باشد</th>
+    <th>اگر فایل وجود نداشته باشد</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td><code>r</code></td>
+    <td>خوانده می‌شود</td>
+    <td>خطا</td>
+</tr>
+<tr>
+    <td><code>w</code></td>
+    <td>محتوا جایگزین می‌شود</td>
+    <td>فایل ساخته می‌شود</td>
+</tr>
+<tr>
+    <td><code>a</code></td>
+    <td>اطلاعات به انتها اضافه می‌شود</td>
+    <td>فایل ساخته می‌شود</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. مشکل روش دستی: مدیریت فایل با <code>with</code></h2>
+<h2 class="lesson-title">11. چرا <code>with</code> مهم است؟</h2>
 
 <p>
-روش قبلی کار می‌کند، اما مشکلی دارد:
-اگر بین <code>open()</code> و <code>close()</code> خطایی رخ دهد،
-فایل هرگز بسته نمی‌شود.
+می‌توانیم فایل را با <code>open()</code> باز کنیم و در پایان با
+<code>close()</code> ببندیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">file = open("data.txt", "r")
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">file = open("data.txt", "r")
 
 content = file.read()
-
-# اگر اینجا خطا رخ دهد...
-# file.close() اجرا نمی‌شود
 
 file.close()</div>
 </div>
 
 <p>
-راه‌حل: استفاده از <strong>with</strong>.
+این روش صحیح است، اما یک مشکل دارد: اگر قبل از رسیدن برنامه به
+<code>close()</code> خطایی رخ دهد، ممکن است فایل به شکل مورد انتظار بسته نشود.
+</p>
+
+<p>
+برای جلوگیری از این مشکل، در Python معمولاً از <strong>with</strong> استفاده می‌کنیم.
 </p>
 
 <div class="lesson-important">
-<strong>قانون طلایی:</strong>
-همیشه برای کار با فایل از <code>with</code> استفاده کن.
+<strong>قانون کاربردی:</strong>
+برای کارهای معمول با فایل، الگوی <code>with open(...) as file:</code> را ترجیح بده.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. ساختار <code>with</code></h2>
+<h2 class="lesson-title">12. ساختار <code>with open()</code></h2>
 
 <div class="code-container">
-<span class="code-label">Syntax</span>
-<div class="code-block no-prompt">with open(filename, mode) as file:
+    <span class="code-label">Syntax</span>
+    <div class="code-block no-prompt">with open(filename, mode) as file:
     # کار با فایل</div>
 </div>
 
 <p>مثال خواندن:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("data.txt", "r") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
     content = file.read()
 
 print(content)</div>
@@ -29703,145 +30464,158 @@ print(content)</div>
 <p>مثال نوشتن:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("output.txt", "w") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("output.txt", "w") as file:
     file.write("Hello\n")
     file.write("Python\n")</div>
 </div>
 
 <p>
-در این روش، فایل <strong>به صورت خودکار</strong> بعد از اتمام بلاک
-<code>with</code> بسته می‌شود.
+پس از خروج از بلاک <code>with</code>، فایل به صورت خودکار بسته می‌شود.
+این اتفاق حتی در صورت رخ دادن Exception نیز انجام می‌شود.
 </p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">13. چرا <code>with</code> بهتر است؟</h2>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>ویژگی</th>
-<th><code>open</code> دستی</th>
-<th><code>with</code></th>
+    <th>روش</th>
+    <th>مدیریت فایل</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>نیاز به <code>close()</code></td><td>بله</td><td>خیر (خودکار)</td></tr>
-<tr><td>مدیریت خطا</td><td>ضعیف</td><td>خوب</td></tr>
-<tr><td>خوانایی کد</td><td>کمتر</td><td>بیشتر</td></tr>
-<tr><td>استاندارد Python</td><td>قدیمی</td><td>توصیه‌شده</td></tr>
+<tr>
+    <td><code>open()</code> + <code>close()</code></td>
+    <td>بستن فایل به صورت دستی</td>
+</tr>
+<tr>
+    <td><code>with open()</code></td>
+    <td>بستن خودکار و توصیه‌شده</td>
+</tr>
 </tbody>
 </table>
 </div>
 
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">with open(...) as file:
-    ↓
-بلاک کد
-    ↓
-بستن خودکار فایل</div>
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. خواندن خط به خط با <code>with</code></h2>
+<h2 class="lesson-title">13. الگوهای پرکاربرد</h2>
+
+<h3>خواندن کل فایل</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("data.txt", "r") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
+    content = file.read()
+
+print(content)</div>
+</div>
+
+<h3>خواندن خط‌به‌خط</h3>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("data.txt", "r") as file:
     for line in file:
         print(line.strip())</div>
 </div>
 
-<p>
-این الگو یکی از پرکاربردترین الگوهای کار با فایل است.
-</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">15. نوشتن و اضافه کردن با <code>with</code></h2>
-
-<h3>نوشتن (حالت w)</h3>
+<h3>نوشتن و جایگزینی محتوا</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("notes.txt", "w") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("notes.txt", "w") as file:
     file.write("First note\n")
     file.write("Second note\n")</div>
 </div>
 
-<h3>اضافه کردن (حالت a)</h3>
+<h3>اضافه کردن به فایل</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("notes.txt", "a") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("notes.txt", "a") as file:
     file.write("Third note\n")</div>
-</div>
-
-<p>
-نتیجه در فایل:</p>
-
-<div class="code-container">
-<span class="code-label">notes.txt</span>
-<div class="code-block no-prompt">First note
-Second note
-Third note</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">16. نکته: <code>write()</code> خط جدید اضافه نمی‌کند</h2>
+<h2 class="lesson-title">14. یک نکته مهم درباره <code>write()</code></h2>
 
 <p>
-<code>write()</code> به‌طور خودکار به خط بعد نمی‌رود.
-باید خودمان <code>"\n"</code> قرار دهیم.
+تابع <code>write()</code> به صورت خودکار خط جدید ایجاد نمی‌کند.
+اگر بخواهیم متن‌ها در خطوط جداگانه قرار بگیرند، باید خودمان
+<code>\n</code> اضافه کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("test.txt", "w") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("test.txt", "w") as file:
     file.write("Ali")
     file.write("Sara")</div>
 </div>
 
-<p>
-نتیجه:</p>
-
 <div class="code-container">
-<span class="code-label">test.txt</span>
-<div class="code-block no-prompt">AliSara</div>
+    <span class="code-label">test.txt</span>
+    <div class="code-block no-prompt">AliSara</div>
 </div>
 
-<p>
-اگر خط جدید می‌خواهیم:</p>
+<p>برای قرار گرفتن هر مقدار در یک خط:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("test.txt", "w") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("test.txt", "w") as file:
     file.write("Ali\n")
     file.write("Sara\n")</div>
 </div>
 
 <div class="code-container">
-<span class="code-label">test.txt</span>
-<div class="code-block no-prompt">Ali
+    <span class="code-label">test.txt</span>
+    <div class="code-block no-prompt">Ali
 Sara</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">17. ترکیب خواندن، پردازش و نوشتن</h2>
+<h2 class="lesson-title">15. اگر فایل وجود نداشته باشد چه می‌شود؟</h2>
 
 <p>
-می‌توانیم فایلی را بخوانیم، محتوا را پردازش کنیم و نتیجه را در فایل دیگری بنویسیم.
+حالت <code>"r"</code> برای خواندن یک فایل موجود است.
+اگر فایل وجود نداشته باشد، Python خطای
+<code>FileNotFoundError</code> ایجاد می‌کند.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("input.txt", "r") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("nothing.txt", "r") as file:
+    content = file.read()</div>
+</div>
+
+<div class="code-container">
+    <span class="code-label">Error</span>
+    <div class="code-block no-prompt">FileNotFoundError: [Errno 2] No such file or directory: 'nothing.txt'</div>
+</div>
+
+<p>
+مدیریت این خطاها در مبحث <strong>Error Handling</strong> بررسی خواهد شد.
+</p>
+
+<div class="lesson-note">
+<strong>به خاطر بسپار:</strong>
+<code>"w"</code> و <code>"a"</code> در صورت نبودن فایل، آن را ایجاد می‌کنند؛
+اما <code>"r"</code> فایل ناموجود را ایجاد نمی‌کند.
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">16. ترکیب خواندن، پردازش و نوشتن</h2>
+
+<p>
+یکی از کاربردهای مهم فایل‌ها این است که اطلاعات را از یک فایل بخوانیم،
+آن‌ها را پردازش کنیم و نتیجه را در فایل دیگری ذخیره کنیم.
+</p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("input.txt", "r") as file:
     lines = file.readlines()
 
 with open("output.txt", "w") as file:
@@ -29849,11 +30623,11 @@ with open("output.txt", "w") as file:
         file.write(line.upper())</div>
 </div>
 
-<p>اگر فایل ورودی:</p>
+<p>فایل ورودی:</p>
 
 <div class="code-container">
-<span class="code-label">input.txt</span>
-<div class="code-block no-prompt">hello
+    <span class="code-label">input.txt</span>
+    <div class="code-block no-prompt">hello
 python
 files</div>
 </div>
@@ -29861,137 +30635,59 @@ files</div>
 <p>فایل خروجی:</p>
 
 <div class="code-container">
-<span class="code-label">output.txt</span>
-<div class="code-block no-prompt">HELLO
+    <span class="code-label">output.txt</span>
+    <div class="code-block no-prompt">HELLO
 PYTHON
 FILES</div>
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">18. اگر فایل وجود نداشته باشد چه می‌شود؟</h2>
-
-<p>
-اگر با حالت <code>"r"</code> فایلی را باز کنیم که وجود ندارد، با خطا مواجه می‌شویم.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("nothing.txt", "r") as file:
-    content = file.read()</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Error</span>
-<div class="code-block no-prompt">FileNotFoundError: [Errno 2] No such file or directory: 'nothing.txt'</div>
-</div>
-
-<p>
-این نوع خطاها در جلسه <strong>Error Handling</strong> مدیریت می‌شوند.
-</p>
-
 <div class="lesson-note">
-<strong>نکته:</strong>
-حالت‌های <code>"w"</code> و <code>"a"</code> اگر فایل نباشد، آن را می‌سازند.
+<strong>الگوی ذهنی:</strong>
+خواندن → پردازش → نوشتن
 </div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">19. مدل ذهنی کار با فایل</h2>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">File
-  │
-  ├── open()        → اتصال
-  │
-  ├── read()        → خواندن کل
-  ├── readline()    → یک خط
-  ├── readlines()   → همه خطوط
-  │
-  ├── write()       → نوشتن
-  │
-  └── close()       → بستن
-
-با with:
-  with open(...) as file:
-      ...
-      (بستن خودکار)</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">نکات مهم جلسه</h2>
-
-<ul>
-<li><code>open()</code> فایل را باز می‌کند و یک File Object برمی‌گرداند.</li>
-<li>حالت‌های مهم: <code>"r"</code>، <code>"w"</code>، <code>"a"</code>.</li>
-<li>حالت <code>"w"</code> محتوای قبلی را پاک می‌کند.</li>
-<li>حالت <code>"a"</code> محتوا را به انتها اضافه می‌کند.</li>
-<li><code>read()</code> کل محتوا را برمی‌گرداند.</li>
-<li><code>readline()</code> یک خط و <code>readlines()</code> همه خطوط را برمی‌گرداند.</li>
-<li><code>write()</code> خط جدید اضافه نمی‌کند؛ باید <code>"\n"</code> بگذاری.</li>
-<li><code>close()</code> فایل را می‌بندد.</li>
-<li>بهترین روش: <code>with open(...) as file:</code></li>
-<li><code>with</code> فایل را به صورت خودکار و ایمن می‌بندد.</li>
-<li>حالت <code>"r"</code> روی فایل ناموجود، <code>FileNotFoundError</code> می‌دهد.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">🔄 Recall سریع</h2>
-
-<p>بدون نگاه کردن به درس جواب بده:</p>
-
-<ol>
-<li>برای باز کردن فایل از چه تابعی استفاده می‌کنیم؟</li>
-<li>حالت <code>"r"</code>، <code>"w"</code> و <code>"a"</code> چه تفاوتی دارند؟</li>
-<li><code>read()</code> چه چیزی برمی‌گرداند؟</li>
-<li>تفاوت <code>readline()</code> و <code>readlines()</code> چیست؟</li>
-<li>چرا باید فایل را ببندیم؟</li>
-<li><code>with</code> چه مزیتی دارد؟</li>
-<li><code>write()</code> به‌طور خودکار خط جدید اضافه می‌کند؟</li>
-<li>اگر با حالت <code>"r"</code> فایل ناموجود را باز کنیم چه می‌شود؟</li>
-<li>حالت <code>"w"</code> روی فایل موجود چه می‌کند؟</li>
-<li>برای اضافه کردن به انتهای فایل از چه حالتی استفاده می‌کنیم؟</li>
-</ol>
 
 <hr class="lesson-divider">
 
 <h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — دفترچه یادداشت ساده
+سناریوی عملی — دفترچه یادداشت ساده
 </h1>
 
 <p>
-می‌خواهیم برنامه‌ای بسازیم که:
+حالا مفاهیم جلسه را در یک برنامه کوچک ترکیب می‌کنیم.
+برنامه باید:
 </p>
 
 <ul>
-<li>از کاربر یک یادداشت بگیرد.</li>
-<li>آن را در فایل ذخیره کند.</li>
-<li>دفعه بعد که برنامه اجرا شد، یادداشت‌ها را نمایش دهد.</li>
+    <li>یک یادداشت از کاربر دریافت کند.</li>
+    <li>آن را در فایل ذخیره کند.</li>
+    <li>یادداشت‌های قبلی را نگه دارد.</li>
+    <li>در پایان همه یادداشت‌ها را نمایش دهد.</li>
 </ul>
 
-<h3>مرحله ۱ — دریافت یادداشت از کاربر</h3>
+<h3>مرحله ۱ — دریافت یادداشت</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">note = input("Write your note: ")</div>
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">note = input("Write your note: ")</div>
 </div>
 
-<h3>مرحله ۲ — ذخیره در فایل (حالت a)</h3>
+<h3>مرحله ۲ — ذخیره یادداشت</h3>
+
+<p>
+چون نمی‌خواهیم یادداشت‌های قبلی حذف شوند، از حالت <code>"a"</code> استفاده می‌کنیم.
+</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("notes.txt", "a") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("notes.txt", "a") as file:
     file.write(note + "\n")</div>
 </div>
 
-<h3>مرحله ۳ — نمایش همه یادداشت‌ها</h3>
+<h3>مرحله ۳ — خواندن یادداشت‌ها</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">print("----- Notes -----")
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">print("----- Notes -----")
 
 with open("notes.txt", "r") as file:
     for line in file:
@@ -30001,8 +30697,8 @@ with open("notes.txt", "r") as file:
 <h3>برنامه کامل</h3>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">note = input("Write your note: ")
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">note = input("Write your note: ")
 
 with open("notes.txt", "a") as file:
     file.write(note + "\n")
@@ -30015,43 +30711,29 @@ with open("notes.txt", "r") as file:
         print("-", line.strip())</div>
 </div>
 
-<p>اگر کاربر دو بار برنامه را اجرا کند و بنویسد:</p>
+<p>
+اگر برنامه چند بار اجرا شود، هر یادداشت جدید به انتهای فایل اضافه می‌شود.
+مثلاً:
+</p>
 
 <div class="code-container">
-<span class="code-label">Input</span>
-<div class="code-block no-prompt">Buy milk
-Study Python</div>
+    <span class="code-label">notes.txt</span>
+    <div class="code-block no-prompt">Buy milk
+Study Python
+Read book</div>
 </div>
 
-<p>نتیجه در فایل <code>notes.txt</code>:</p>
-
 <div class="code-container">
-<span class="code-label">notes.txt</span>
-<div class="code-block no-prompt">Buy milk
-Study Python</div>
-</div>
-
-<p>و در اجرای سوم، همه یادداشت‌ها نمایش داده می‌شوند:</p>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">----- Notes -----
-- Buy milk
-- Study Python
-- Read book</div>
-</div>
-
-<p>در این برنامه همه مفاهیم جلسه به هم متصل شدند:</p>
-
-<div class="code-container">
-<span class="code-label">Final Flow</span>
-<div class="code-block no-prompt">input()
+    <span class="code-label">Flow</span>
+    <div class="code-block no-prompt">input()
    ↓
-with open("a") → ذخیره
+with open("a")
    ↓
-with open("r") → خواندن
+ذخیره یادداشت
    ↓
-for line in file
+with open("r")
+   ↓
+خواندن خط‌به‌خط
    ↓
 print()</div>
 </div>
@@ -30061,11 +30743,11 @@ print()</div>
 <h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
 
 <p>
-هر سؤال را ابتدا خودت حل کن، سپس گزینه را انتخاب کن تا پاسخ و توضیح نمایش داده شود.
+قبل از مشاهده پاسخ، ابتدا هر سؤال را خودت حل کن.
 </p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — کدام تابع برای باز کردن فایل در Python استفاده می‌شود؟</p>
+<p>❓ <strong>سؤال ۱</strong> — کدام تابع برای باز کردن فایل در Python استفاده می‌شود؟</p>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>file()</code></button>
@@ -30075,118 +30757,120 @@ print()</div>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>open()</code> فایل را باز می‌کند و یک File Object برمی‌گرداند.
+<strong>✅ پاسخ: ب</strong><br>
+<code>open()</code> برای باز کردن فایل و ایجاد File Object استفاده می‌شود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — حالت <code>"w"</code> چه ویژگی‌ای دارد؟</p>
+<p>❓ <strong>سؤال ۲</strong> — حالت <code>"w"</code> چه کاری انجام می‌دهد؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) فقط می‌خواند</button>
-<button onclick="selectOption(this)">ب) محتوا را به انتها اضافه می‌کند</button>
-<button onclick="selectOption(this)">ج) کل محتوا را پاک کرده و می‌نویسد</button>
+<button onclick="selectOption(this)">الف) فقط فایل را می‌خواند</button>
+<button onclick="selectOption(this)">ب) اطلاعات را به انتهای فایل اضافه می‌کند</button>
+<button onclick="selectOption(this)">ج) فایل را برای نوشتن باز کرده و محتوای قبلی را جایگزین می‌کند</button>
 <button onclick="selectOption(this)">د) فایل را قفل می‌کند</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-حالت <code>"w"</code> اگر فایل موجود باشد، محتوای آن را پاک می‌کند.
+<strong>✅ پاسخ: ج</strong><br>
+حالت <code>"w"</code> برای نوشتن است و اگر فایل موجود باشد، محتوای قبلی را پاک می‌کند.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — خروجی کد زیر چیست؟ (فایل شامل دو خط است)<br>
-<code>with open("f.txt") as file:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;print(file.readline())</code></p>
+<p>
+❓ <strong>سؤال ۳</strong> — اگر فایل شامل دو خط باشد، این کد چه چیزی می‌خواند؟
+<br>
+<code>file.readline()</code>
+</p>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) همه خطوط</button>
-<button onclick="selectOption(this)">ب) فقط خط اول</button>
-<button onclick="selectOption(this)">ج) List خطوط</button>
-<button onclick="selectOption(this)">د) خطا</button>
+<button onclick="selectOption(this)">ب) فقط یک خط</button>
+<button onclick="selectOption(this)">ج) یک List شامل همه خطوط</button>
+<button onclick="selectOption(this)">د) هیچ مقداری</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>readline()</code> یک خط از فایل را برمی‌گرداند.
+<strong>✅ پاسخ: ب</strong><br>
+<code>readline()</code> یک خط از فایل را می‌خواند.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۴ — تفاوت <code>readlines()</code> و <code>read()</code> چیست؟</p>
+<p>❓ <strong>سؤال ۴</strong> — تفاوت <code>read()</code> و <code>readlines()</code> چیست؟</p>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) هیچ تفاوتی ندارند</button>
-<button onclick="selectOption(this)">ب) <code>read()</code> یک List، <code>readlines()</code> یک str برمی‌گرداند</button>
-<button onclick="selectOption(this)">ج) <code>read()</code> یک str، <code>readlines()</code> یک List برمی‌گرداند</button>
-<button onclick="selectOption(this)">د) هر دو خطا می‌دهند</button>
+<button onclick="selectOption(this)">ب) <code>read()</code> یک List و <code>readlines()</code> یک str برمی‌گرداند</button>
+<button onclick="selectOption(this)">ج) <code>read()</code> یک str و <code>readlines()</code> یک List برمی‌گرداند</button>
+<button onclick="selectOption(this)">د) هر دو خطا ایجاد می‌کنند</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-<code>read()</code> کل محتوا را به صورت یک <code>str</code>،
-و <code>readlines()</code> خطوط را در یک List برمی‌گرداند.
+<strong>✅ پاسخ: ج</strong><br>
+<code>read()</code> کل محتوا را به صورت <code>str</code> و
+<code>readlines()</code> خطوط را به صورت <code>list</code> برمی‌گرداند.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۵ — چرا استفاده از <code>with</code> توصیه می‌شود؟</p>
+<p>❓ <strong>سؤال ۵</strong> — مهم‌ترین مزیت استفاده از <code>with open()</code> چیست؟</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) سریع‌تر است</button>
-<button onclick="selectOption(this)">ب) فایل را به صورت خودکار و ایمن می‌بندد</button>
+<button onclick="selectOption(this)">الف) همیشه سریع‌تر اجرا می‌شود</button>
+<button onclick="selectOption(this)">ب) فایل پس از پایان بلاک به صورت خودکار بسته می‌شود</button>
 <button onclick="selectOption(this)">ج) فایل را رمزگذاری می‌کند</button>
-<button onclick="selectOption(this)">د) نیازی به <code>open()</code> ندارد</button>
+<button onclick="selectOption(this)">د) دیگر نیازی به <code>open()</code> نداریم</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>with</code> حتی در صورت خطا، فایل را به صورت خودکار می‌بندد.
+<strong>✅ پاسخ: ب</strong><br>
+<code>with</code> مدیریت فایل را انجام می‌دهد و پس از خروج از بلاک، فایل را خودکار می‌بندد.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — خروجی کد زیر چیست؟<br>
-<code>with open("f.txt", "w") as file:<br>
+<p>
+❓ <strong>سؤال ۶</strong> — نتیجه اجرای این کد در فایل چیست؟
+<br><br>
+<code>
+with open("f.txt", "w") as file:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;file.write("A")<br>
-&nbsp;&nbsp;&nbsp;&nbsp;file.write("B")</code></p>
+&nbsp;&nbsp;&nbsp;&nbsp;file.write("B")
+</code>
+</p>
 
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>A</code> و <code>B</code> در دو خط</button>
-<button onclick="selectOption(this)">ب) <code>AB</code> در یک خط</button>
+<button onclick="selectOption(this)">الف) A و B در دو خط</button>
+<button onclick="selectOption(this)">ب) AB در یک خط</button>
 <button onclick="selectOption(this)">ج) خطا</button>
-<button onclick="selectOption(this)">د) فایل خالی</button>
+<button onclick="selectOption(this)">د) فایل خالی می‌ماند</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>write()</code> به‌طور خودکار خط جدید اضافه نمی‌کند.
+<strong>✅ پاسخ: ب</strong><br>
+<code>write()</code> خودش خط جدید اضافه نمی‌کند؛ بنابراین خروجی <code>AB</code> خواهد بود.
 </div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۷ — اگر فایل موجود نباشد و با حالت <code>"r"</code> بازش کنیم چه می‌شود؟</p>
+<p>
+❓ <strong>سؤال ۷</strong> — اگر فایل وجود نداشته باشد و با حالت <code>"r"</code> باز شود، چه اتفاقی می‌افتد؟
+</p>
 
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) فایل ساخته می‌شود</button>
 <button onclick="selectOption(this)">ب) <code>FileNotFoundError</code> رخ می‌دهد</button>
-<button onclick="selectOption(this)">ج) یک فایل خالی برمی‌گردد</button>
-<button onclick="selectOption(this)">د) <code>None</code> برمی‌گردد</button>
+<button onclick="selectOption(this)">ج) یک فایل خالی ایجاد می‌شود</button>
+<button onclick="selectOption(this)">د) مقدار <code>None</code> برمی‌گردد</button>
 </div>
 
 <div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-حالت <code>"r"</code> فقط فایل موجود را باز می‌کند؛
-اگر فایل نباشد خطای <code>FileNotFoundError</code> رخ می‌دهد.
+<strong>✅ پاسخ: ب</strong><br>
+حالت <code>"r"</code> برای خواندن فایل موجود است و فایل ناموجود باعث
+<code>FileNotFoundError</code> می‌شود.
 </div>
 </div>
 
@@ -30195,84 +30879,93 @@ print()</div>
 <h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم چگونه داده‌ها را در فایل ذخیره کنیم و دوباره بخوانیم.
-از این پس برنامه‌های ما می‌توانند اطلاعات را <strong>پایدار</strong> نگه دارند.
+در این جلسه یاد گرفتیم چگونه اطلاعات را در فایل ذخیره کنیم و دوباره آن‌ها را
+بخوانیم. مهم‌ترین بخش این جلسه، شناخت <strong>modeها</strong> و استفاده صحیح از
+<strong><code>with open()</code></strong> است.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>مفهوم</th>
-<th>نکته اصلی</th>
+    <th>مفهوم</th>
+    <th>کاربرد</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>open()</code></td>
-<td>باز کردن فایل</td>
+    <td><code>open()</code></td>
+    <td>باز کردن فایل</td>
 </tr>
 <tr>
-<td><code>"r"</code></td>
-<td>خواندن</td>
+    <td><code>"r"</code></td>
+    <td>خواندن فایل</td>
 </tr>
 <tr>
-<td><code>"w"</code></td>
-<td>نوشتن (پاک کردن محتوا)</td>
+    <td><code>"w"</code></td>
+    <td>نوشتن و جایگزینی محتوای قبلی</td>
 </tr>
 <tr>
-<td><code>"a"</code></td>
-<td>اضافه کردن به انتها</td>
+    <td><code>"a"</code></td>
+    <td>اضافه کردن به انتهای فایل</td>
 </tr>
 <tr>
-<td><code>read()</code></td>
-<td>خواندن کل محتوا</td>
+    <td><code>read()</code></td>
+    <td>خواندن کل محتوا به صورت <code>str</code></td>
 </tr>
 <tr>
-<td><code>readline()</code></td>
-<td>خواندن یک خط</td>
+    <td><code>readline()</code></td>
+    <td>خواندن یک خط</td>
 </tr>
 <tr>
-<td><code>readlines()</code></td>
-<td>خواندن همه خطوط در List</td>
+    <td><code>readlines()</code></td>
+    <td>خواندن همه خطوط به صورت <code>list</code></td>
 </tr>
 <tr>
-<td><code>write()</code></td>
-<td>نوشتن در فایل</td>
+    <td><code>write()</code></td>
+    <td>نوشتن اطلاعات در فایل</td>
 </tr>
 <tr>
-<td><code>close()</code></td>
-<td>بستن فایل</td>
+    <td><code>close()</code></td>
+    <td>بستن دستی فایل</td>
 </tr>
 <tr>
-<td><code>with open()</code></td>
-<td>روش توصیه‌شده برای کار با فایل</td>
+    <td><code>with open()</code></td>
+    <td>مدیریت و بستن خودکار فایل</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>مهم‌ترین الگوی این جلسه را حفظ کن:</p>
+<p><strong>سه حالت اصلی را همیشه به خاطر داشته باش:</strong></p>
 
 <div class="code-container">
-<span class="code-label">Core Pattern</span>
-<div class="code-block no-prompt">with open("file.txt", "r") as file:
+    <span class="code-label">Core Pattern</span>
+    <div class="code-block no-prompt">"r" → Read
+"w" → Write / Replace
+"a" → Append</div>
+</div>
+
+<p><strong>الگوی اصلی خواندن فایل:</strong></p>
+
+<div class="code-container">
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("file.txt", "r") as file:
     for line in file:
         print(line.strip())</div>
 </div>
 
-<p>و برای نوشتن:</p>
+<p><strong>الگوی اصلی اضافه کردن اطلاعات:</strong></p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">with open("file.txt", "a") as file:
+    <span class="code-label">Python</span>
+    <div class="code-block no-prompt">with open("file.txt", "a") as file:
     file.write("New line\n")</div>
 </div>
 
 <p>
-در <strong>جلسه ۲۲ — کار با مسیر فایل‌ها، pathlib و os</strong> یاد می‌گیریم
-چگونه مسیر فایل‌ها را مدیریت کنیم، پوشه بسازیم، فایل‌ها را جابجا کنیم
-و به شکل حرفه‌ای با ساختار پروژه کار کنیم.
+در <strong>بخش ۲</strong> وارد کار با مسیر فایل‌ها، <code>pathlib</code> و
+<code>os</code> می‌شویم تا بتوانیم فایل‌ها و پوشه‌ها را به شکل حرفه‌ای‌تر مدیریت کنیم.
 </p>`
 ,
 
