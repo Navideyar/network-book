@@ -25057,7 +25057,6 @@ return
 
 <p>در <strong>جلسه ۲ فصل ۱۰</strong> همین مسیر را ادامه می‌دهیم و با <strong>انواع آرگومان‌ها، Scope متغیرها و اصول بهتر طراحی Functionها</strong> آشنا می‌شویم.</p>`
 ,
-
 "ch10-2": `<div class="section-header">
     <div class="section-badge">۱۰</div>
     <div>
@@ -25068,14 +25067,14 @@ return
 
 <blockquote class="lesson-goal">
 <strong class="goal-title">هدف جلسه</strong>
-<p>در این جلسه یاد می‌گیریم چگونه Argumentها را به Function ارسال کنیم، ورودی‌های اختیاری بسازیم، تفاوت متغیرهای Local و Global را بفهمیم و Functionهای ساده و قابل استفاده مجدد طراحی کنیم.</p>
+<p>در این جلسه یاد می‌گیریم چگونه ورودی‌های مختلف را به Function ارسال کنیم، برای ورودی‌ها مقدار پیش‌فرض قرار دهیم، محدوده متغیرها را بشناسیم و Functionهایی ساده، مستقل و قابل استفاده مجدد طراحی کنیم.</p>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. Parameter و Argument</h2>
+<h2 class="lesson-title">1. از Parameter تا Argument</h2>
 
-<p>در تعریف Function، نام ورودی را <strong>Parameter</strong> می‌نامیم و مقداری که هنگام فراخوانی ارسال می‌کنیم <strong>Argument</strong> است.</p>
+<p>در بخش قبل با Parameter و Argument آشنا شدیم. حالا می‌خواهیم ببینیم هنگام فراخوانی یک Function، مقدارها چگونه به Parameterها منتقل می‌شوند.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25085,61 +25084,139 @@ return
 greet("Ali")</div>
 </div>
 
+<p>در زمان تعریف Function، <code>name</code> یک <strong>Parameter</strong> است. هنگام فراخوانی، مقدار <code>"Ali"</code> یک <strong>Argument</strong> است.</p>
+
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>مفهوم</th>
+<th>کجا؟</th>
 <th>مثال</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Parameter</td>
+<td>در تعریف Function</td>
 <td><code>name</code></td>
 </tr>
 <tr>
 <td>Argument</td>
+<td>هنگام فراخوانی</td>
 <td><code>"Ali"</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 
+<p>پس به زبان ساده:</p>
+
+<blockquote>
+<strong>Parameter = جای ورودی</strong><br>
+<strong>Argument = مقدار ورودی</strong>
+</blockquote>
+
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. Positional و Keyword Argument</h2>
+<h2 class="lesson-title">2. Positional Argument</h2>
 
-<p>دو روش اصلی برای ارسال Argument داریم.</p>
-
-<h3>Positional Argument</h3>
-
-<p>مقدار بر اساس ترتیب Parameterها قرار می‌گیرد.</p>
+<p>ساده‌ترین روش ارسال Argument، ارسال بر اساس <strong>ترتیب</strong> Parameterها است. به این روش <strong>Positional Argument</strong> می‌گوییم.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">def introduce(name, age):
-    print(name, age)
+    print("Name:", name)
+    print("Age:", age)
 
 introduce("Ali", 20)</div>
 </div>
 
-<p><code>"Ali"</code> به <code>name</code> و <code>20</code> به <code>age</code> می‌رود؛ بنابراین ترتیب مهم است.</p>
+<p>Python مقدارها را بر اساس ترتیب قرار می‌دهد:</p>
 
-<h3>Keyword Argument</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Argument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>"Ali"</code></td>
+</tr>
+<tr>
+<td><code>age</code></td>
+<td><code>20</code></td>
+</tr>
+</tbody>
+</table>
+</div>
 
-<p>در این روش نام Parameter را مشخص می‌کنیم.</p>
+<p>بنابراین در Positional Argument، <strong>ترتیب اهمیت دارد</strong>:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">introduce(name="Ali", age=20)</div>
+<div class="code-block no-prompt">introduce("Ali", 20)
+
+introduce(20, "Ali")</div>
 </div>
 
-<p>در Keyword Argument ترتیب مهم نیست:</p>
+<p>در فراخوانی دوم، مقدارها جابه‌جا می‌شوند و ممکن است نتیجه مورد انتظار را نداشته باشیم.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">3. Keyword Argument</h2>
+
+<p>روش دیگر این است که هنگام ارسال مقدار، نام Parameter را هم مشخص کنیم. به این روش <strong>Keyword Argument</strong> می‌گوییم.</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def introduce(name, age):
+    print("Name:", name)
+    print("Age:", age)
+
+introduce(name="Ali", age=20)</div>
+</div>
+
+<p>در این روش مشخص کرده‌ایم که هر مقدار متعلق به کدام Parameter است؛ بنابراین ترتیب دیگر مهم نیست.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">introduce(age=20, name="Ali")</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>روش</th>
+<th>مبنای اتصال</th>
+<th>مثال</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Positional</td>
+<td>ترتیب</td>
+<td><code>introduce("Ali", 20)</code></td>
+</tr>
+<tr>
+<td>Keyword</td>
+<td>نام Parameter</td>
+<td><code>introduce(name="Ali", age=20)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>حتی می‌توانیم بعضی مقدارها را Positional و بعضی را Keyword ارسال کنیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">introduce("Ali", age=20)</div>
 </div>
 
 <blockquote>
@@ -25149,9 +25226,9 @@ introduce("Ali", 20)</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. Default Parameter</h2>
+<h2 class="lesson-title">4. Default Parameter؛ ورودی اختیاری</h2>
 
-<p>اگر بخواهیم یک Parameter مقدار پیش‌فرض داشته باشد، می‌توانیم هنگام تعریف Function آن را مشخص کنیم.</p>
+<p>گاهی می‌خواهیم یک Function بدون ارسال بعضی ورودی‌ها هم قابل اجرا باشد. در این حالت می‌توانیم برای Parameter یک <strong>مقدار پیش‌فرض</strong> تعیین کنیم.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25170,9 +25247,9 @@ greet()</div>
 Hello Guest</div>
 </div>
 
-<p>اگر Argument ارسال شود، همان مقدار استفاده می‌شود؛ اگر ارسال نشود، مقدار پیش‌فرض استفاده می‌شود.</p>
+<p>اگر Argument ارسال شود، همان مقدار استفاده می‌شود؛ اگر ارسال نشود، مقدار پیش‌فرض استفاده خواهد شد.</p>
 
-<p>می‌توانیم Parameter اجباری و اختیاری را هم ترکیب کنیم:</p>
+<p>می‌توانیم Parameter اجباری و اختیاری را هم با هم داشته باشیم:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25183,36 +25260,65 @@ print(calculate_price(100))
 print(calculate_price(100, 20))</div>
 </div>
 
-<p>در این مثال <code>price</code> اجباری و <code>discount</code> اختیاری است.</p>
+<p>در این Function:</p>
+
+<ul>
+<li><code>price</code> باید حتماً ارسال شود.</li>
+<li><code>discount</code> مقدار پیش‌فرض <code>0</code> دارد.</li>
+</ul>
+
+<p>بنابراین:</p>
+
+<div class="code-container">
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">calculate_price(100)
+       ↓
+discount = 0
+
+calculate_price(100, 20)
+       ↓
+discount = 20</div>
+</div>
 
 <blockquote>
-<strong>Parameterهای اجباری قبل از Parameterهای دارای مقدار پیش‌فرض قرار می‌گیرند.</strong>
+<strong>Parameterهای بدون مقدار پیش‌فرض باید قبل از Parameterهای دارای مقدار پیش‌فرض قرار بگیرند.</strong>
 </blockquote>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def example(name, age=18):
+    print(name, age)</div>
+</div>
+
+<p>این ساختار درست است؛ چون <code>name</code> اجباری و <code>age</code> دارای مقدار پیش‌فرض است.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. Scope چیست؟</h2>
+<h2 class="lesson-title">5. Scope چیست؟</h2>
 
-<p><strong>Scope</strong> یعنی محدوده‌ای که یک متغیر در آن قابل دسترسی است.</p>
+<p>حالا که با ورودی‌های Function آشنا شدیم، باید بدانیم متغیرهایی که داخل و خارج Function ساخته می‌شوند، در کجا قابل استفاده هستند. این محدوده را <strong>Scope</strong> می‌گوییم.</p>
 
-<p>در سطح Basic دو نوع مهم داریم:</p>
+<p>در سطح Python Basic، دو نوع مهم Scope داریم:</p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>نوع</th>
+<th>نوع متغیر</th>
 <th>محل تعریف</th>
+<th>محدوده استفاده</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Local</td>
 <td>داخل Function</td>
+<td>همان Function</td>
 </tr>
 <tr>
 <td>Global</td>
 <td>خارج Function</td>
+<td>سطح کلی برنامه</td>
 </tr>
 </tbody>
 </table>
@@ -25220,7 +25326,7 @@ print(calculate_price(100, 20))</div>
 
 <h3>Local Variable</h3>
 
-<p>متغیری که داخل Function ساخته می‌شود، در همان Function قابل استفاده است.</p>
+<p>متغیری که داخل Function ساخته می‌شود، معمولاً <strong>Local</strong> است؛ یعنی متعلق به همان Function است.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25231,11 +25337,27 @@ print(calculate_price(100, 20))</div>
 calculate()</div>
 </div>
 
-<p>اینجا <code>result</code> یک متغیر Local است.</p>
+<p>اینجا <code>result</code> داخل Function ساخته شده و در همان Function قابل استفاده است.</p>
 
-<h3>Global Variable</h3>
+<p>اگر بیرون Function بخواهیم مستقیماً از آن استفاده کنیم:</p>
 
-<p>متغیری که خارج Function تعریف شود، در سطح برنامه قرار دارد.</p>
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate():
+    result = 100
+
+calculate()
+
+print(result)   # Error</div>
+</div>
+
+<p>چون <code>result</code> یک متغیر Local است و خارج از Function در دسترس نیست.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">6. Global Variable</h2>
+
+<p>اگر متغیری خارج از Function تعریف شود، در سطح برنامه قرار دارد و می‌توانیم از داخل Function مقدار آن را بخوانیم.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25247,13 +25369,25 @@ def greet():
 greet()</div>
 </div>
 
-<p>Function می‌تواند مقدار Global را بخواند.</p>
+<p>چون <code>name</code> خارج از Function ساخته شده، یک متغیر Global است و Function می‌تواند مقدار آن را بخواند.</p>
+
+<p>با این حال، بهتر است Functionها تا حد امکان اطلاعات موردنیاز خود را با <strong>Parameter</strong> دریافت کنند:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def greet(name):
+    print("Hello", name)
+
+greet("Ali")</div>
+</div>
+
+<p>این روش باعث می‌شود Function مستقل‌تر و قابل استفاده مجدد باشد.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. Local و Global با یک نام</h2>
+<h2 class="lesson-title">7. Local و Global با یک نام</h2>
 
-<p>اگر داخل Function متغیری با همان نام متغیر بیرونی بسازیم، متغیر داخلی Local است.</p>
+<p>ممکن است یک نام هم برای متغیر Global و هم برای یک متغیر Local استفاده شود. در این حالت، متغیر داخل Function همان متغیر Local است.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25264,6 +25398,7 @@ def test():
     print(name)
 
 test()
+
 print(name)</div>
 </div>
 
@@ -25275,26 +25410,43 @@ print(name)</div>
 Ali</div>
 </div>
 
-<p>چون دو متغیر در دو Scope متفاوت داریم.</p>
+<p>چرا؟ چون دو متغیر در دو محدوده متفاوت داریم:</p>
+
+<div class="code-container">
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">Global
+name = "Ali"
+     │
+     └── Function
+         name = "Sara"
+         ↓
+         Local</div>
+</div>
+
+<p>تغییر یا تعریف متغیر Local باعث تغییر متغیر Global با همان نام نمی‌شود.</p>
 
 <blockquote>
-<strong>Local داخل Function است؛ Global خارج Function.</strong>
+<strong>Local → داخل Function</strong><br>
+<strong>Global → خارج Function</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. Function خوب چگونه طراحی می‌شود؟</h2>
+<h2 class="lesson-title">8. Function خوب چه ویژگی‌ای دارد؟</h2>
 
-<p>یک Function خوب بهتر است:</p>
+<p>حالا می‌توانیم از مفاهیم بالا برای طراحی Functionهای بهتر استفاده کنیم.</p>
+
+<p>یک Function خوب در سطح Basic بهتر است:</p>
 
 <ul>
 <li>یک کار مشخص انجام دهد.</li>
-<li>داده موردنیاز را با Parameter دریافت کند.</li>
-<li>نتیجه را با <code>return</code> برگرداند.</li>
+<li>ورودی موردنیاز خود را با Parameter دریافت کند.</li>
+<li>برای ورودی‌های اختیاری از Default Parameter استفاده کند.</li>
+<li>نتیجه قابل استفاده را با <code>return</code> برگرداند.</li>
 <li>تا حد امکان به متغیرهای Global وابسته نباشد.</li>
 </ul>
 
-<p>مثلاً:</p>
+<p>مثلاً برای محاسبه میانگین دو عدد، لازم نیست Function از متغیرهای بیرونی استفاده کند:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25306,26 +25458,28 @@ average = calculate_average(18, 16)
 print(average)</div>
 </div>
 
-<p>جریان Function ساده است:</p>
+<p>در این مثال Function همه اطلاعات موردنیازش را از طریق Parameter دریافت می‌کند و نتیجه را با <code>return</code> برمی‌گرداند.</p>
 
 <div class="code-container">
 <span class="code-label">Concept</span>
-<div class="code-block no-prompt">Input
-  ↓
+<div class="code-block no-prompt">Argument
+   ↓
+Parameter
+   ↓
 Processing
-  ↓
+   ↓
 return
-  ↓
+   ↓
 Result</div>
 </div>
 
-<p>بهتر است Function نتیجه را با <code>return</code> برگرداند تا برنامه اصلی بتواند از آن استفاده کند.</p>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. چند Function در کنار هم</h2>
+<h2 class="lesson-title">9. یک Function، یک مسئولیت</h2>
 
-<p>برای برنامه‌های بزرگ‌تر، می‌توانیم هر کار را به یک Function جدا تقسیم کنیم.</p>
+<p>بهتر است هر Function یک کار مشخص داشته باشد. اگر یک Function چند کار کاملاً متفاوت انجام دهد، فهمیدن و استفاده مجدد از آن سخت‌تر می‌شود.</p>
+
+<p>مثلاً می‌توانیم محاسبه میانگین و بررسی نتیجه را جدا کنیم:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25345,7 +25499,7 @@ result = check_result(average)
 print(result)</div>
 </div>
 
-<p>اینجا هر Function یک مسئولیت دارد:</p>
+<p>در اینجا هر Function فقط یک مسئولیت دارد:</p>
 
 <div class="code-container">
 <span class="code-label">Concept</span>
@@ -25360,13 +25514,61 @@ check_result()
 Pass / Fail</div>
 </div>
 
-<p>این ساختار باعث می‌شود کد ساده‌تر، قابل فهم‌تر و قابل استفاده مجدد باشد.</p>
+<p>مزیت این روش این است که هر بخش را می‌توان جداگانه فهمید، تست کرد و دوباره استفاده کرد.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. یک الگوی ساده برای طراحی Function</h2>
+<h2 class="lesson-title">10. چرا چند Function بهتر از یک Function بزرگ است؟</h2>
 
-<p>قبل از نوشتن Function، چهار سؤال بپرس:</p>
+<p>فرض کنیم برنامه‌ای داریم که باید:</p>
+
+<ol>
+<li>قیمت را دریافت کند.</li>
+<li>تخفیف را محاسبه کند.</li>
+<li>قیمت نهایی را به دست آورد.</li>
+</ol>
+
+<p>به جای اینکه همه این کارها را در یک بخش بزرگ بنویسیم، می‌توانیم هر کار را به یک Function بسپاریم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">def calculate_discount(price, percent):
+    return price * percent / 100
+
+
+def calculate_final_price(price, discount):
+    return price - discount
+
+
+price = 100
+discount = calculate_discount(price, 20)
+final_price = calculate_final_price(price, discount)
+
+print(final_price)</div>
+</div>
+
+<p>جریان برنامه واضح است:</p>
+
+<div class="code-container">
+<span class="code-label">Concept</span>
+<div class="code-block no-prompt">price
+  ↓
+calculate_discount()
+  ↓
+discount
+  ↓
+calculate_final_price()
+  ↓
+final_price</div>
+</div>
+
+<p>این همان ایده اصلی Functionهاست: <strong>تقسیم یک مسئله به بخش‌های کوچک‌تر و قابل مدیریت.</strong></p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">11. یک الگوی ساده برای طراحی Function</h2>
+
+<p>قبل از نوشتن یک Function، می‌توانیم مسئله را با چهار سؤال ساده مشخص کنیم:</p>
 
 <div class="table-wrap">
 <table>
@@ -25382,22 +25584,22 @@ Pass / Fail</div>
 <td>محاسبه میانگین</td>
 </tr>
 <tr>
-<td>چه ورودی‌هایی دارد؟</td>
-<td>نمره‌ها</td>
+<td>چه ورودی‌هایی لازم دارد؟</td>
+<td>سه نمره</td>
 </tr>
 <tr>
 <td>چه پردازشی انجام می‌دهد؟</td>
-<td>جمع و تقسیم</td>
+<td>جمع و تقسیم بر ۳</td>
 </tr>
 <tr>
-<td>چه چیزی برمی‌گرداند؟</td>
+<td>چه نتیجه‌ای برمی‌گرداند؟</td>
 <td>میانگین</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>سپس Function را بنویس:</p>
+<p>بعد از مشخص کردن این موارد، Function را می‌نویسیم:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -25405,30 +25607,60 @@ Pass / Fail</div>
     return (a + b + c) / 3</div>
 </div>
 
+<p>حالا استفاده از آن ساده است:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">average = calculate_average(18, 16, 20)
+
+print(average)</div>
+</div>
+
 <blockquote>
-<strong>یک Function خوب مشخص می‌کند: چه چیزی می‌گیرد، چه کاری انجام می‌دهد و چه چیزی برمی‌گرداند.</strong>
+<strong>قبل از نوشتن Function مشخص کن: چه چیزی می‌گیرد، چه کاری انجام می‌دهد و چه چیزی برمی‌گرداند.</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">🎯 جمع‌بندی</h2>
+<h2 class="lesson-title">12. تصویر کلی فصل Functions</h2>
+
+<p>تا اینجا دو بخش فصل Functions را کنار هم قرار دادیم. مسیر کلی کار با Function به شکل زیر است:</p>
+
+<div class="code-container">
+<span class="code-label">Mental Model</span>
+<div class="code-block no-prompt">تعریف Function
+      ↓
+Parameter
+      ↓
+فراخوانی Function
+      ↓
+Argument
+      ↓
+Processing
+      ↓
+return
+      ↓
+Result</div>
+</div>
+
+<p>در کنار این مسیر، باید Scope را هم در نظر داشته باشیم:</p>
 
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
 <th>مفهوم</th>
-<th>نکته مهم</th>
+<th>نقش</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Parameter</td>
-<td>نام ورودی در تعریف Function</td>
+<td>دریافت ورودی در تعریف Function</td>
 </tr>
 <tr>
 <td>Argument</td>
-<td>مقدار هنگام فراخوانی Function</td>
+<td>مقداری که هنگام فراخوانی ارسال می‌شود</td>
 </tr>
 <tr>
 <td>Positional</td>
@@ -25440,34 +25672,90 @@ Pass / Fail</div>
 </tr>
 <tr>
 <td>Default</td>
-<td>مقدار پیش‌فرض برای ورودی اختیاری</td>
+<td>تعیین مقدار پیش‌فرض برای ورودی</td>
 </tr>
 <tr>
 <td>Local</td>
-<td>متغیر داخل Function</td>
+<td>متغیر مربوط به داخل Function</td>
 </tr>
 <tr>
 <td>Global</td>
-<td>متغیر خارج Function</td>
+<td>متغیر تعریف‌شده خارج Function</td>
 </tr>
 <tr>
 <td>return</td>
-<td>برگرداندن نتیجه به برنامه</td>
+<td>برگرداندن نتیجه به محل فراخوانی</td>
 </tr>
 </tbody>
 </table>
 </div>
 
-<p>در طراحی Function این الگو را به خاطر بسپار:</p>
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">🎯 جمع‌بندی</h2>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>موضوع</th>
+<th>خلاصه</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parameter</td>
+<td>نام ورودی در تعریف Function</td>
+</tr>
+<tr>
+<td>Argument</td>
+<td>مقدار ارسال‌شده هنگام فراخوانی</td>
+</tr>
+<tr>
+<td>Positional</td>
+<td>اتصال مقدارها بر اساس ترتیب</td>
+</tr>
+<tr>
+<td>Keyword</td>
+<td>اتصال مقدار به Parameter با نام آن</td>
+</tr>
+<tr>
+<td>Default Parameter</td>
+<td>مقدار پیش‌فرض برای ورودی اختیاری</td>
+</tr>
+<tr>
+<td>Local Variable</td>
+<td>متغیری که داخل Function تعریف می‌شود</td>
+</tr>
+<tr>
+<td>Global Variable</td>
+<td>متغیری که خارج Function تعریف می‌شود</td>
+</tr>
+<tr>
+<td>return</td>
+<td>برگرداندن نتیجه برای استفاده در ادامه برنامه</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>الگوی اصلی:</strong></p>
 
 <div class="code-container">
 <span class="code-label">Mental Model</span>
 <div class="code-block no-prompt">Function
    ↓
-Input → Processing → return → Result</div>
+Input
+   ↓
+Processing
+   ↓
+return
+   ↓
+Result</div>
 </div>
 
-<p>هدف Function این است که یک کار مشخص را از برنامه جدا کند؛ ورودی را دریافت کند، پردازش را انجام دهد و در صورت نیاز نتیجه را برگرداند.</p>`
+<p>در طراحی Function سعی کن هر Function یک کار مشخص انجام دهد، ورودی‌هایش را با Parameter دریافت کند و نتیجه موردنیاز را با <code>return</code> برگرداند. با این روش، کدها ساده‌تر، قابل فهم‌تر و قابل استفاده مجدد می‌شوند.</p>`
+
 ,
 
 "ch11-1": `<div class="section-header"> <div class="section-badge">۱۱</div> <div> <h1>List، Set و Dictionary Comprehension</h1> <div class="meta">فصل ۱۱ · بخش ۱ از ۲</div> </div>
