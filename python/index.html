@@ -38382,7 +38382,7 @@ Attributeهایی که با دو زیرخط شروع می‌شوند از بیر
 "ch16-1": `<div class="section-header">
     <div class="section-badge">۱۶</div>
     <div>
-        <h1>آشنایی با Regular Expression و Regex با <code>re</code></h1>
+        <h1>آشنایی با Regular Expression و Regex در Python</h1>
         <div class="meta">فصل ۱۶ · بخش ۱ از ۲</div>
     </div>
 </div>
@@ -38391,15 +38391,15 @@ Attributeهایی که با دو زیرخط شروع می‌شوند از بیر
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>بدانی Regular Expression یا Regex چیست و چه مسئله‌ای را حل می‌کند.</li>
-<li>مفهوم Pattern را در Regex درک کنی.</li>
-<li>ماژول <code>re</code> را در Python وارد و استفاده کنی.</li>
-<li>با <code>re.search()</code> یک الگو را در متن پیدا کنی.</li>
-<li>با <code>re.match()</code> تطابق از ابتدای متن را بررسی کنی.</li>
-<li>کاراکترهای مهمی مثل <code>\d</code>، <code>\w</code>، <code>\s</code> و <code>.</code> را بشناسی.</li>
-<li>با Character Class مثل <code>[abc]</code> و بازه‌هایی مثل <code>[0-9]</code> کار کنی.</li>
+<li>بدانی Regex چیست و در Python چه کاربردی دارد.</li>
+<li>تفاوت متن معمولی و Pattern را درک کنی.</li>
+<li>ماژول <code>re</code> را وارد و استفاده کنی.</li>
+<li>با <code>re.search()</code> اولین تطابق را پیدا کنی.</li>
+<li>با <code>re.match()</code> ابتدای رشته را بررسی کنی.</li>
+<li>با <code>\\d</code>، <code>\\w</code>، <code>\\s</code> و <code>.</code> آشنا شوی.</li>
+<li>با Character Class مانند <code>[abc]</code> و بازه‌هایی مانند <code>[0-9]</code> کار کنی.</li>
 <li>با <code>+</code>، <code>*</code>، <code>?</code> و <code>{}</code> تعداد تکرار را مشخص کنی.</li>
-<li>چند الگوی ساده Regex را در Python بنویسی و درک کنی.</li>
+<li>یک Pattern ساده را از چند بخش کوچک بسازی.</li>
 </ol>
 </blockquote>
 
@@ -38408,111 +38408,94 @@ Attributeهایی که با دو زیرخط شروع می‌شوند از بیر
 <h2 class="lesson-title">معرفی جلسه</h2>
 
 <p>
-تا اینجا با Stringها کار کرده‌ایم و یاد گرفته‌ایم متن را بخوانیم،
-جستجو کنیم، برش بزنیم و تغییر دهیم.
+در Python برای کار با متن معمولاً از ابزارهایی مثل <code>in</code>، <code>find()</code> و
+متدهای String استفاده می‌کنیم.
 </p>
 
 <p>
-اما فرض کن بخواهیم از داخل یک متن، <strong>همه عددها</strong> را پیدا کنیم:
+اما گاهی فقط به دنبال یک کلمه مشخص نیستیم؛ می‌خواهیم یک <strong>الگو</strong> را پیدا کنیم.
+مثلاً هر دنباله‌ای از چند رقم، نه یک عدد مشخص.
 </p>
 
 <div class="code-container">
-<span class="code-label">مسئله</span>
-<div class="code-block no-prompt">text = "Ali is 20 years old and Sara is 22 years old."</div>
+<span class="code-label">یک مثال واقعی</span>
+<div class="code-block no-prompt">text = "Ali is 20 and Sara is 22."</div>
 </div>
 
 <p>
-می‌توانیم با روش‌های معمول Python این کار را انجام دهیم،
-اما وقتی الگو پیچیده‌تر شود، کار سخت می‌شود.
-مثلاً اگر بخواهیم شماره تلفن، ایمیل، تاریخ یا ترکیبی از چند نوع داده را پیدا کنیم،
-به ابزاری نیاز داریم که بتواند <strong>الگو</strong> را تشخیص دهد.
-</p>
-
-<p>
-این ابزار <strong>Regular Expression</strong> یا به اختصار <strong>Regex</strong> است.
+اگر فقط دنبال کلمه <code>Ali</code> باشیم، می‌توانیم همان متن را جستجو کنیم.
+اما اگر بخواهیم <strong>هر عددی با یک یا چند رقم</strong> را پیدا کنیم، بهتر است از Regex استفاده کنیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">String Methods
-      ↓
-کار با متن به صورت معمول
+<div class="code-block no-prompt">متن مشخص
+   ↓
+جستجوی معمولی
 
-Regex
-      ↓
-جستجو و بررسی بر اساس الگو</div>
+الگوی قابل تغییر
+   ↓
+Regex</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. Regular Expression چیست؟</h2>
+<h2 class="lesson-title">1. Regex چیست؟</h2>
 
 <p>
-<strong>Regular Expression</strong> یا <strong>Regex</strong> یک
-<strong>الگوی متنی</strong> است که به ما کمک می‌کند بخش‌هایی از متن را
-بر اساس یک قانون مشخص پیدا یا بررسی کنیم.
+<strong>Regular Expression</strong> یا <strong>Regex</strong> روشی برای تعریف یک
+<strong>Pattern</strong> است تا بتوانیم بخش‌هایی از متن را بر اساس آن Pattern پیدا یا بررسی کنیم.
 </p>
 
 <p>
-مثلاً به جای اینکه بگوییم:
+یک اشتباه رایج این است که دو مثال کاملاً متفاوت را مقابل هم قرار دهیم.
+مثلاً <code>"cat"</code> و <code>\\d+</code> جایگزین مستقیم هم نیستند؛
+اولی یک <strong>متن دقیق</strong> است و دومی یک <strong>الگوی متنی</strong>.
 </p>
 
 <div class="code-container">
-<span class="code-label">جستجوی معمولی</span>
+<span class="code-label">متن دقیق</span>
 <div class="code-block no-prompt">"cat"</div>
 </div>
 
 <p>
-می‌توانیم بگوییم:
+یعنی دقیقاً به دنبال رشته <code>cat</code> می‌گردیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">جستجوی الگویی</span>
-<div class="code-block no-prompt">\d+</div>
+<span class="code-label">الگوی Regex</span>
+<div class="code-block no-prompt">\\d+</div>
 </div>
 
 <p>
-یعنی:
-<strong>یک یا چند رقم پشت سر هم</strong>.
+یعنی: <strong>یک یا چند رقم پشت سر هم</strong>.
+مثلاً با <code>20</code>، <code>123</code> و <code>9876</code> مطابقت دارد.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>مفهوم</th>
-<th>معنی</th>
-</tr>
+<tr><th>مفهوم</th><th>معنی</th></tr>
 </thead>
 <tbody>
-<tr>
-<td>Regex</td>
-<td>الگوی جستجو و بررسی متن</td>
-</tr>
-<tr>
-<td>Pattern</td>
-<td>قانونی که مشخص می‌کند چه چیزی را پیدا کنیم</td>
-</tr>
-<tr>
-<td>Match</td>
-<td>بخشی از متن که با Pattern مطابقت دارد</td>
-</tr>
+<tr><td>Regex</td><td>روشی برای تعریف الگوی جستجو و بررسی متن</td></tr>
+<tr><td>Pattern</td><td>قانونی که مشخص می‌کند چه شکلی از متن را می‌خواهیم</td></tr>
+<tr><td>Match</td><td>بخشی از متن که با Pattern مطابقت پیدا کرده است</td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="lesson-important">
-<strong>نکته:</strong>
-Regex خودش متن نیست؛ یک <strong>الگو برای پیدا کردن یا بررسی متن</strong> است.
+<strong>اصل مهم:</strong>
+Regex را مثل یک «قانون برای پیدا کردن متن» در نظر بگیر، نه یک نوع داده یا دستور Python.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. Regex در Python — ماژول <code>re</code></h2>
+<h2 class="lesson-title">2. Regex در Python با <code>re</code></h2>
 
 <p>
-برای استفاده از Regex در Python معمولاً از ماژول داخلی
-<strong><code>re</code></strong> استفاده می‌کنیم.
+Python یک ماژول داخلی به نام <code>re</code> دارد که ابزارهای Regex را در اختیارمان می‌گذارد.
 </p>
 
 <div class="code-container">
@@ -38521,7 +38504,7 @@ Regex خودش متن نیست؛ یک <strong>الگو برای پیدا کرد�
 </div>
 
 <p>
-بعد از آن می‌توانیم توابع Regex را با <code>re</code> صدا بزنیم.
+بعد از وارد کردن ماژول، می‌توانیم از توابع آن استفاده کنیم.
 </p>
 
 <div class="code-container">
@@ -38529,16 +38512,13 @@ Regex خودش متن نیست؛ یک <strong>الگو برای پیدا کرد�
 <div class="code-block no-prompt">re.function(pattern, text)</div>
 </div>
 
-<p>
-فعلاً مهم‌ترین تابع برای شروع <code>search()</code> است.
-</p>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">3. اولین Regex با <code>re.search()</code></h2>
+<h2 class="lesson-title">3. اولین جستجو با <code>re.search()</code></h2>
 
 <p>
-تابع <code>re.search()</code> در کل متن به دنبال اولین تطابق با Pattern می‌گردد.
+<code>re.search()</code> در کل رشته جستجو می‌کند و <strong>اولین تطابق</strong> را برمی‌گرداند.
+اگر چیزی پیدا نشود، مقدار <code>None</code> برمی‌گردد.
 </p>
 
 <div class="code-container">
@@ -38549,26 +38529,24 @@ text = "I love Python"
 
 result = re.search(r"Python", text)
 
-print(result)</div>
+if result:
+    print(result.group())
+else:
+    print("Not found")</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt">&lt;re.Match object; span=(7, 13), match='Python'&gt;</div>
+<div class="code-block no-prompt">Python</div>
 </div>
 
 <p>
-اگر چیزی پیدا نشود، نتیجه <code>None</code> خواهد بود.
+متد <code>group()</code> متنِ تطابق‌داده‌شده را برمی‌گرداند.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = "I love Python"
-
-result = re.search(r"Java", text)
-
+<span class="code-label">وقتی چیزی پیدا نشود</span>
+<div class="code-block no-prompt">result = re.search(r"Java", text)
 print(result)</div>
 </div>
 
@@ -38577,39 +38555,12 @@ print(result)</div>
 <div class="code-block no-prompt">None</div>
 </div>
 
-<p>
-به همین دلیل می‌توانیم نتیجه را در شرط استفاده کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = "I love Python"
-
-if re.search(r"Python", text):
-    print("Found")
-else:
-    print("Not found")</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Found</div>
-</div>
-
-<div class="lesson-important">
-<strong>نکته:</strong>
-اگر <code>search()</code> چیزی پیدا کند، یک <code>Match Object</code> می‌دهد؛
-اگر پیدا نکند، <code>None</code> برمی‌گرداند.
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. Pattern ساده — متن دقیق</h2>
+<h2 class="lesson-title">4. Pattern ساده؛ متن دقیق</h2>
 
 <p>
-ساده‌ترین Pattern همان متن معمولی است.
+ساده‌ترین Pattern همان یک متن معمولی است.
 </p>
 
 <div class="code-container">
@@ -38623,66 +38574,40 @@ print(re.search(r"Java", text))</div>
 </div>
 
 <p>
-در این حالت Regex به دنبال همان متن دقیق می‌گردد.
-اما قدرت واقعی Regex زمانی مشخص می‌شود که به جای متن ثابت،
-<strong>الگو</strong> تعریف کنیم.
+در Pattern اول، Regex فقط همان کلمه <code>Python</code> را می‌خواهد.
+در این حالت Regex هنوز مزیت خاصی نسبت به جستجوی معمولی ندارد؛
+مزیت اصلی زمانی دیده می‌شود که Pattern متغیر باشد.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. کاراکترهای ویژه Regex</h2>
-
-<p>
-Regex تعدادی کاراکتر ویژه دارد که به جای یک کاراکتر مشخص،
-<strong>نوعی از کاراکترها</strong> را مشخص می‌کنند.
-</p>
+<h2 class="lesson-title">5. کاراکترهای پایه Regex</h2>
 
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Pattern</th>
-<th>معنی ساده</th>
-<th>مثال</th>
-</tr>
+<tr><th>Pattern</th><th>معنی ساده</th><th>مثال</th></tr>
 </thead>
 <tbody>
-<tr>
-<td><code>\d</code></td>
-<td>یک رقم از 0 تا 9</td>
-<td><code>7</code></td>
-</tr>
-<tr>
-<td><code>\w</code></td>
-<td>یک کاراکتر Word مانند حرف، رقم یا <code>_</code></td>
-<td><code>A</code>، <code>7</code>، <code>_</code></td>
-</tr>
-<tr>
-<td><code>\s</code></td>
-<td>Whitespace مانند فاصله، Tab یا خط جدید</td>
-<td>Space</td>
-</tr>
-<tr>
-<td><code>.</code></td>
-<td>تقریباً هر کاراکتر دلخواه</td>
-<td><code>A</code>، <code>7</code>، <code>@</code></td>
-</tr>
+<tr><td><code>\\d</code></td><td>یک رقم</td><td><code>7</code></td></tr>
+<tr><td><code>\\w</code></td><td>یک Word Character؛ در Python معمولاً حروف، ارقام و <code>_</code></td><td><code>A</code>، <code>7</code>، <code>_</code></td></tr>
+<tr><td><code>\\s</code></td><td>یک فاصله یا Whitespace</td><td>Space / Tab</td></tr>
+<tr><td><code>.</code></td><td>یک کاراکتر دلخواه به جز Newline در حالت معمول</td><td><code>A</code>، <code>7</code>، <code>@</code></td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="lesson-note">
 <strong>نکته:</strong>
-در Regex حروف کوچک و بزرگ این الگوها معمولاً معنی متفاوتی دارند.
-مثلاً <code>\d</code> با <code>\D</code> یکسان نیست.
+در Regex حروف کوچک و بزرگ بعضی الگوها معنی متفاوت دارند؛ مثلاً <code>\\d</code> با <code>\\D</code> فرق دارد.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">6. پیدا کردن عدد با <code>\d</code></h2>
+<h2 class="lesson-title">6. <code>\\d</code> — پیدا کردن رقم</h2>
 
 <p>
-اگر بخواهیم یک رقم را پیدا کنیم، می‌توانیم از <code>\d</code> استفاده کنیم.
+<code>\\d</code> فقط <strong>یک رقم</strong> را مشخص می‌کند.
 </p>
 
 <div class="code-container">
@@ -38691,7 +38616,7 @@ Regex تعدادی کاراکتر ویژه دارد که به جای یک کار
 
 text = "My age is 20"
 
-result = re.search(r"\d", text)
+result = re.search(r"\\d", text)
 
 print(result.group())</div>
 </div>
@@ -38702,62 +38627,44 @@ print(result.group())</div>
 </div>
 
 <p>
-چرا فقط <code>2</code> پیدا شد؟
-چون <code>\d</code> فقط <strong>یک رقم</strong> را مشخص می‌کند.
-برای اینکه چند رقم پشت سر هم را مشخص کنیم، باید از Quantifier استفاده کنیم.
+چون <code>\\d</code> فقط یک رقم را مشخص می‌کند، اولین رقم یعنی <code>2</code> پیدا شده است.
+برای چند رقم پشت سر هم از Quantifier استفاده می‌کنیم.
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. Quantifierها — مشخص کردن تعداد تکرار</h2>
+<h2 class="lesson-title">7. Quantifier — مشخص کردن تعداد</h2>
 
 <p>
-Quantifierها به ما می‌گویند یک Pattern چند بار می‌تواند تکرار شود.
+Quantifier مشخص می‌کند Pattern قبل از آن چند بار می‌تواند تکرار شود.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Quantifier</th>
-<th>معنی</th>
-</tr>
+<tr><th>Quantifier</th><th>معنی</th></tr>
 </thead>
 <tbody>
-<tr>
-<td><code>+</code></td>
-<td>یک یا چند بار</td>
-</tr>
-<tr>
-<td><code>*</code></td>
-<td>صفر یا چند بار</td>
-</tr>
-<tr>
-<td><code>?</code></td>
-<td>صفر یا یک بار</td>
-</tr>
-<tr>
-<td><code>{n}</code></td>
-<td>دقیقاً n بار</td>
-</tr>
-<tr>
-<td><code>{n,m}</code></td>
-<td>بین n تا m بار</td>
-</tr>
+<tr><td><code>+</code></td><td>یک یا چند بار</td></tr>
+<tr><td><code>*</code></td><td>صفر یا چند بار</td></tr>
+<tr><td><code>?</code></td><td>صفر یا یک بار</td></tr>
+<tr><td><code>{n}</code></td><td>دقیقاً n بار</td></tr>
+<tr><td><code>{n,m}</code></td><td>بین n تا m بار</td></tr>
 </tbody>
 </table>
 </div>
 
 <h3><code>+</code> — یک یا چند بار</h3>
 
-<p>
-اگر بخواهیم یک یا چند رقم پشت سر هم را پیدا کنیم:
-</p>
-
 <div class="code-container">
 <span class="code-label">Regex</span>
-<div class="code-block no-prompt">\d+</div>
+<div class="code-block no-prompt">\\d+</div>
 </div>
+
+<p>
+<code>\\d</code> یعنی یک رقم و <code>+</code> یعنی یک یا چند بار؛
+پس <code>\\d+</code> یعنی <strong>یک یا چند رقم پشت سر هم</strong>.
+</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -38765,7 +38672,7 @@ Quantifierها به ما می‌گویند یک Pattern چند بار می‌ت�
 
 text = "Age: 20"
 
-result = re.search(r"\d+", text)
+result = re.search(r"\\d+", text)
 
 print(result.group())</div>
 </div>
@@ -38777,137 +38684,74 @@ print(result.group())</div>
 
 <h3><code>*</code> — صفر یا چند بار</h3>
 
-<p>
-یعنی Pattern می‌تواند اصلاً وجود نداشته باشد یا چند بار تکرار شود.
-</p>
-
 <div class="code-container">
-<span class="code-label">Example</span>
-<div class="code-block no-prompt">ab*
-</div>
+<span class="code-label">Regex</span>
+<div class="code-block no-prompt">ab*</div>
 </div>
 
 <p>
-این Pattern با مواردی مثل <code>a</code>، <code>ab</code> و <code>abb</code>
-مطابقت دارد.
+این Pattern با <code>a</code>، <code>ab</code> و <code>abb</code> مطابقت دارد؛
+چون <code>b</code> می‌تواند صفر بار یا چند بار تکرار شود.
 </p>
 
 <h3><code>?</code> — صفر یا یک بار</h3>
 
-<p>
-یعنی وجود Pattern اختیاری است.
-</p>
-
 <div class="code-container">
-<span class="code-label">Example</span>
+<span class="code-label">Regex</span>
 <div class="code-block no-prompt">colou?r</div>
 </div>
 
 <p>
-این Pattern هم <code>color</code> و هم <code>colour</code> را قبول می‌کند.
+این Pattern هم <code>color</code> و هم <code>colour</code> را می‌پذیرد؛
+چون <code>u</code> اختیاری است.
 </p>
 
-<h3><code>{n}</code> — تعداد دقیق</h3>
-
-<p>
-مثلاً برای دقیقاً ۴ رقم:
-</p>
+<h3><code>{n}</code> و <code>{n,m}</code></h3>
 
 <div class="code-container">
 <span class="code-label">Regex</span>
-<div class="code-block no-prompt">\d{4}</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Example</span>
-<div class="code-block no-prompt">2026</div>
-</div>
-
-<h3><code>{n,m}</code> — بازه</h3>
-
-<p>
-مثلاً بین 2 تا 4 رقم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Regex</span>
-<div class="code-block no-prompt">\d{2,4}</div>
+<div class="code-block no-prompt">\\d{4}      → دقیقاً ۴ رقم
+\\d{2,4}    → بین ۲ تا ۴ رقم</div>
 </div>
 
 <div class="lesson-important">
 <strong>نکته:</strong>
-Quantifier روی Pattern قبل از خودش اعمال می‌شود.
-مثلاً در <code>\d+</code>، علامت <code>+</code> روی <code>\d</code> اعمال شده است.
+Quantifier روی Pattern بلافاصله قبل از خودش اعمال می‌شود.
+در <code>\\d+</code>، علامت <code>+</code> روی <code>\\d</code> اعمال شده است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. Character Class — انتخاب از بین چند کاراکتر</h2>
+<h2 class="lesson-title">8. Character Class با <code>[]</code></h2>
 
 <p>
-با <code>[]</code> می‌توانیم مشخص کنیم که یک کاراکتر باید
-از بین چند گزینه انتخاب شود.
+با <code>[]</code> مشخص می‌کنیم که یک کاراکتر باید از بین چند گزینه انتخاب شود.
 </p>
 
 <div class="table-wrap">
 <table>
 <thead>
-<tr>
-<th>Pattern</th>
-<th>معنی</th>
-</tr>
+<tr><th>Pattern</th><th>معنی</th></tr>
 </thead>
 <tbody>
-<tr>
-<td><code>[abc]</code></td>
-<td>یکی از a یا b یا c</td>
-</tr>
-<tr>
-<td><code>[0-9]</code></td>
-<td>یک رقم</td>
-</tr>
-<tr>
-<td><code>[a-z]</code></td>
-<td>یک حرف کوچک انگلیسی</td>
-</tr>
-<tr>
-<td><code>[A-Z]</code></td>
-<td>یک حرف بزرگ انگلیسی</td>
-</tr>
+<tr><td><code>[abc]</code></td><td>یکی از <code>a</code> یا <code>b</code> یا <code>c</code></td></tr>
+<tr><td><code>[0-9]</code></td><td>یک رقم از 0 تا 9</td></tr>
+<tr><td><code>[a-z]</code></td><td>یک حرف کوچک انگلیسی</td></tr>
+<tr><td><code>[A-Z]</code></td><td>یک حرف بزرگ انگلیسی</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>
-مثلاً:
-</p>
-
 <div class="code-container">
-<span class="code-label">Regex</span>
-<div class="code-block no-prompt">[aeiou]</div>
+<span class="code-label">Example</span>
+<div class="code-block no-prompt">[aeiou]      → یکی از حروف صدادار انگلیسی
+[0-9]+       → یک یا چند رقم
+[A-Z]        → یک حرف بزرگ انگلیسی</div>
 </div>
-
-<p>
-یعنی یک حرف از بین حروف صدادار انگلیسی.
-</p>
-
-<p>
-یا:
-</p>
-
-<div class="code-container">
-<span class="code-label">Regex</span>
-<div class="code-block no-prompt">[0-9]</div>
-</div>
-
-<p>
-یعنی یک رقم.
-</p>
 
 <div class="lesson-note">
-<strong>تفاوت مهم:</strong>
-<code>[0-9]</code> یک رقم را مشخص می‌کند؛
-اما <code>[0-9]+</code> یک یا چند رقم پشت سر هم را مشخص می‌کند.
+<strong>تفاوت:</strong>
+<code>[0-9]</code> یک رقم را مشخص می‌کند، اما <code>[0-9]+</code> یک یا چند رقم پشت سر هم را مشخص می‌کند.
 </div>
 
 <hr class="lesson-divider">
@@ -38915,63 +38759,40 @@ Quantifier روی Pattern قبل از خودش اعمال می‌شود.
 <h2 class="lesson-title">9. ترکیب Patternها</h2>
 
 <p>
-قدرت Regex زمانی بیشتر می‌شود که چند بخش را کنار هم قرار دهیم.
-</p>
-
-<p>
-مثلاً فرض کن می‌خواهیم یک کد چهاررقمی را پیدا کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Regex</span>
-<div class="code-block no-prompt">\d{4}</div>
-</div>
-
-<p>
-یا می‌خواهیم متنی مثل زیر را پیدا کنیم:
+می‌توانیم چند Pattern ساده را کنار هم قرار دهیم تا یک Pattern بزرگ‌تر بسازیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">Text</span>
-<div class="code-block no-prompt">Code: A123</div>
+<div class="code-block no-prompt">Product A123</div>
 </div>
-
-<p>
-الگوی آن می‌تواند این باشد:
-</p>
 
 <div class="code-container">
 <span class="code-label">Regex</span>
-<div class="code-block no-prompt">[A-Z]\d{3}</div>
+<div class="code-block no-prompt">[A-Z]\\d{3}</div>
 </div>
-
-<p>
-یعنی:
-</p>
 
 <div class="code-container">
 <span class="code-label">Breakdown</span>
-<div class="code-block no-prompt">[A-Z]  → یک حرف بزرگ
-\d{3}  → دقیقاً سه رقم
+<div class="code-block no-prompt">[A-Z]   → یک حرف بزرگ
+\\d      → یک رقم
+{3}     → سه بار
 
 نتیجه:
-A123</div>
+یک حرف بزرگ + سه رقم
+مثلاً A123</div>
 </div>
 
 <p>
-این همان طرز فکر اصلی در Regex است:
-<strong>یک الگوی بزرگ را از چند الگوی کوچک بساز.</strong>
+این روش را به عنوان یک عادت ذهنی حفظ کن:
+<strong>Pattern بزرگ را از قطعات کوچک بساز و هر قطعه را جداگانه بخوان.</strong>
 </p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. <code>\w</code> و <code>\s</code> در عمل</h2>
+<h2 class="lesson-title">10. <code>\\w</code> و <code>\\s</code> در عمل</h2>
 
-<p>
-برای درک بهتر چند مثال ساده ببینیم.
-</p>
-
-<h3><code>\w+</code> — یک یا چند Word Character</h3>
+<h3><code>\\w+</code> — یک یا چند Word Character</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -38979,7 +38800,7 @@ A123</div>
 
 text = "Hello Python"
 
-result = re.search(r"\w+", text)
+result = re.search(r"\\w+", text)
 
 print(result.group())</div>
 </div>
@@ -38990,11 +38811,10 @@ print(result.group())</div>
 </div>
 
 <p>
-چون <code>\w+</code> اولین مجموعه از Word Characterها را پیدا می‌کند،
-به <code>Hello</code> می‌رسد و همان‌جا متوقف می‌شود.
+Regex از ابتدای متن شروع می‌کند و اولین مجموعه‌ای را که با <code>\\w+</code> مطابقت دارد پیدا می‌کند.
 </p>
 
-<h3><code>\s</code> — فاصله</h3>
+<h3><code>\\s</code> — پیدا کردن Whitespace</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -39002,18 +38822,18 @@ print(result.group())</div>
 
 text = "Hello Python"
 
-result = re.search(r"\s", text)
+result = re.search(r"\\s", text)
 
-print(result.group())</div>
+print(repr(result.group()))</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt"> </div>
+<div class="code-block no-prompt">' '</div>
 </div>
 
 <p>
-این Match همان فاصله بین <code>Hello</code> و <code>Python</code> است.
+از <code>repr()</code> استفاده کردیم تا وجود فاصله در خروجی واضح باشد.
 </p>
 
 <hr class="lesson-divider">
@@ -39021,8 +38841,8 @@ print(result.group())</div>
 <h2 class="lesson-title">11. کاراکتر <code>.</code></h2>
 
 <p>
-در Regex، نقطه <code>.</code> معمولاً به معنی
-<strong>یک کاراکتر دلخواه</strong> است.
+در Regex، نقطه <code>.</code> معمولاً یک کاراکتر دلخواه را مشخص می‌کند؛
+به جز Newline در حالت معمول.
 </p>
 
 <div class="code-container">
@@ -39031,35 +38851,21 @@ print(result.group())</div>
 </div>
 
 <p>
-این الگو می‌تواند با مواردی مثل موارد زیر تطابق داشته باشد:
-</p>
-
-<div class="code-container">
-<span class="code-label">Examples</span>
-<div class="code-block no-prompt">hat
-hot
-hit
-h7t</div>
-</div>
-
-<p>
-چون بین <code>h</code> و <code>t</code> دقیقاً یک کاراکتر قرار گرفته است.
+این Pattern می‌تواند با <code>hat</code>، <code>hot</code>، <code>hit</code> و <code>h7t</code> مطابقت داشته باشد.
 </p>
 
 <div class="lesson-important">
 <strong>نکته:</strong>
-<code>.</code> با <code>\.</code> فرق دارد.
-<code>.</code> یعنی یک کاراکتر دلخواه؛
-اما <code>\.</code> یعنی خودِ کاراکتر نقطه.
+<code>.</code> با <code>\\.</code> فرق دارد.
+<code>.</code> یک کاراکتر دلخواه است، اما <code>\\.</code> خودِ کاراکتر نقطه را مشخص می‌کند.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. <code>match()</code> — بررسی از ابتدای متن</h2>
+<h2 class="lesson-title">12. <code>match()</code> — بررسی از ابتدای رشته</h2>
 
 <p>
-تا اینجا از <code>search()</code> استفاده کردیم.
-اما <code>re.match()</code> فقط از <strong>ابتدای رشته</strong> بررسی می‌کند.
+<code>re.match()</code> فقط <strong>از ابتدای رشته</strong> بررسی را شروع می‌کند.
 </p>
 
 <div class="code-container">
@@ -39079,112 +38885,59 @@ print(result.group())</div>
 </div>
 
 <p>
-اما اگر Pattern در ابتدای متن نباشد:
+اگر Pattern در ابتدای رشته نباشد، <code>None</code> دریافت می‌کنیم.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
+<span class="code-label">مقایسه</span>
+<div class="code-block no-prompt">re.search(r"Python", "I love Python")
+→ پیدا می‌کند
 
-text = "I love Python"
-
-result = re.match(r"Python", text)
-
-print(result)</div>
+re.match(r"Python", "I love Python")
+→ None</div>
 </div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">None</div>
-</div>
-
-<p>
-چون <code>Python</code> در ابتدای رشته قرار ندارد.
-</p>
 
 <div class="table-wrap">
 <table>
-<thead>
-<tr>
-<th>تابع</th>
-<th>رفتار</th>
-</tr>
-</thead>
+<thead><tr><th>تابع</th><th>رفتار</th></tr></thead>
 <tbody>
-<tr>
-<td><code>re.search()</code></td>
-<td>در کل متن به دنبال اولین تطابق می‌گردد.</td>
-</tr>
-<tr>
-<td><code>re.match()</code></td>
-<td>فقط از ابتدای متن بررسی می‌کند.</td>
-</tr>
+<tr><td><code>re.search()</code></td><td>در کل رشته به دنبال اولین تطابق می‌گردد.</td></tr>
+<tr><td><code>re.match()</code></td><td>فقط از ابتدای رشته بررسی می‌کند.</td></tr>
 </tbody>
 </table>
 </div>
 
-<div class="lesson-important">
-<strong>به خاطر بسپار:</strong>
-<code>search()</code> می‌گوید «هر جای متن پیدا کن»،
-ولی <code>match()</code> می‌گوید «از اول متن بررسی کن».
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. چرا از <code>r"..."</code> استفاده می‌کنیم؟</h2>
+<h2 class="lesson-title">13. چرا <code>r"..."</code> می‌نویسیم؟</h2>
 
 <p>
-در مثال‌های Regex زیاد می‌بینی که Pattern را این‌گونه می‌نویسیم:
+در Patternهای Regex زیاد می‌بینی که قبل از String حرف <code>r</code> آمده است:
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">r"\d+"</div>
+<div class="code-block no-prompt">r"\\d+"</div>
 </div>
 
 <p>
-حرف <code>r</code> قبل از String یعنی <strong>Raw String</strong>.
+این یک <strong>Raw String</strong> است. در Regex استفاده از Raw String باعث می‌شود
+Backslashها را واضح‌تر و بدون Escape اضافی بنویسیم.
 </p>
+
+<div class="code-container">
+<span class="code-label">مقایسه</span>
+<div class="code-block no-prompt">r"\\d+"
+"\\\\d+"</div>
+</div>
 
 <p>
-این کار باعث می‌شود Backslashها راحت‌تر برای Regex نوشته شوند.
+هر دو می‌توانند یک Pattern یکسان بسازند، اما در Regex معمولاً <code>r"..."</code> خواناتر است.
 </p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>نوشتن</th>
-<th>کاربرد</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>r"\d+"</code></td>
-<td>روش پیشنهادی و خواناتر برای Regex</td>
-</tr>
-<tr>
-<td><code>"\\d+"</code></td>
-<td>قابل استفاده است، اما Backslash بیشتری لازم دارد</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<div class="lesson-note">
-<strong>قاعده ساده:</strong>
-برای Patternهای Regex در Python معمولاً از
-<strong>Raw String یعنی <code>r"..."</code></strong> استفاده کن.
-</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. ساخت یک Pattern کاربردی ساده</h2>
-
-<p>
-حالا مفاهیمی که یاد گرفتیم را کنار هم قرار دهیم.
-فرض کن می‌خواهیم یک شماره چهاررقمی را از متن پیدا کنیم.
-</p>
+<h2 class="lesson-title">14. یک مثال ترکیبی ساده</h2>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -39192,7 +38945,7 @@ print(result)</div>
 
 text = "Your code is 2026."
 
-result = re.search(r"\d{4}", text)
+result = re.search(r"\\d{4}", text)
 
 if result:
     print("Found:", result.group())</div>
@@ -39203,124 +38956,12 @@ if result:
 <div class="code-block no-prompt">Found: 2026</div>
 </div>
 
-<p>
-Pattern را مرحله‌به‌مرحله بخوانیم:
-</p>
-
 <div class="code-container">
 <span class="code-label">Breakdown</span>
-<div class="code-block no-prompt">\d      → یک رقم
-{4}     → دقیقاً چهار بار
+<div class="code-block no-prompt">\\d     → یک رقم
+{4}    → دقیقاً چهار بار
 
-پس:
-
-\d{4}   → دقیقاً چهار رقم پشت سر هم</div>
-</div>
-
-<p>
-مثال دیگر:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = "Product A123"
-
-result = re.search(r"[A-Z]\d{3}", text)
-
-if result:
-    print(result.group())</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">A123</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Breakdown</span>
-<div class="code-block no-prompt">[A-Z]  → یک حرف بزرگ انگلیسی
-\d{3}  → سه رقم
-
-پس:
-
-[A-Z]\d{3}
-      ↓
-یک حرف بزرگ + سه رقم</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">15. جمع‌بندی الگوهای پایه</h2>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Pattern</th>
-<th>معنی</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>\d</code></td>
-<td>یک رقم</td>
-</tr>
-<tr>
-<td><code>\d+</code></td>
-<td>یک یا چند رقم</td>
-</tr>
-<tr>
-<td><code>\w</code></td>
-<td>یک Word Character</td>
-</tr>
-<tr>
-<td><code>\w+</code></td>
-<td>یک یا چند Word Character</td>
-</tr>
-<tr>
-<td><code>\s</code></td>
-<td>یک Whitespace</td>
-</tr>
-<tr>
-<td><code>.</code></td>
-<td>یک کاراکتر دلخواه</td>
-</tr>
-<tr>
-<td><code>[abc]</code></td>
-<td>یکی از a یا b یا c</td>
-</tr>
-<tr>
-<td><code>[0-9]</code></td>
-<td>یک رقم</td>
-</tr>
-<tr>
-<td><code>[A-Z]</code></td>
-<td>یک حرف بزرگ انگلیسی</td>
-</tr>
-<tr>
-<td><code>+</code></td>
-<td>یک یا چند بار</td>
-</tr>
-<tr>
-<td><code>*</code></td>
-<td>صفر یا چند بار</td>
-</tr>
-<tr>
-<td><code>?</code></td>
-<td>صفر یا یک بار</td>
-</tr>
-<tr>
-<td><code>{n}</code></td>
-<td>دقیقاً n بار</td>
-</tr>
-<tr>
-<td><code>{n,m}</code></td>
-<td>بین n تا m بار</td>
-</tr>
-</tbody>
-</table>
+\\d{4}  → دقیقاً چهار رقم پشت سر هم</div>
 </div>
 
 <hr class="lesson-divider">
@@ -39332,16 +38973,15 @@ if result:
 <div class="code-block no-prompt">Regex
  │
  ├── Pattern
- │      └── قانونی که می‌خواهیم پیدا کنیم
  │
  ├── Character
- │      ├── \d
- │      ├── \w
- │      ├── \s
+ │      ├── \\d
+ │      ├── \\w
+ │      ├── \\s
  │      └── .
  │
  ├── Character Class
- │      └── [A-Z] / [0-9] / [abc]
+ │      └── [abc] / [0-9] / [A-Z]
  │
  ├── Quantifier
  │      ├── +
@@ -39355,18 +38995,18 @@ if result:
 </div>
 
 <p>
-پس هنگام ساخت Regex می‌توانیم از خودمان بپرسیم:
+برای ساخت Pattern این سؤال‌ها را از خودت بپرس:
 </p>
 
 <div class="code-container">
 <span class="code-label">روش فکر کردن</span>
 <div class="code-block no-prompt">چه چیزی می‌خواهم پیدا کنم؟
         ↓
-نوع کاراکتر چیست؟
+چه نوع کاراکتری است؟
         ↓
 چند بار تکرار می‌شود؟
         ↓
-آیا چند الگو باید کنار هم قرار بگیرند؟
+آیا چند Pattern باید کنار هم قرار بگیرند؟
         ↓
 Pattern نهایی</div>
 </div>
@@ -39376,199 +39016,115 @@ Pattern نهایی</div>
 <h2 class="lesson-title">نکات مهم جلسه</h2>
 
 <ul>
-<li>Regex یک <strong>الگو برای پیدا کردن یا بررسی متن</strong> است.</li>
-<li>در Python برای کار با Regex معمولاً از ماژول <code>re</code> استفاده می‌کنیم.</li>
-<li><code>re.search()</code> در کل متن به دنبال اولین تطابق می‌گردد.</li>
+<li>Regex برای تعریف Pattern و جستجو یا بررسی متن استفاده می‌شود.</li>
+<li>در Python برای Regex معمولاً از ماژول <code>re</code> استفاده می‌کنیم.</li>
+<li><code>re.search()</code> در کل رشته اولین تطابق را پیدا می‌کند.</li>
 <li><code>re.match()</code> فقط از ابتدای رشته بررسی می‌کند.</li>
-<li><code>\d</code> برای رقم، <code>\w</code> برای Word Character و <code>\s</code> برای Whitespace استفاده می‌شود.</li>
-<li><code>.</code> معمولاً یک کاراکتر دلخواه را مشخص می‌کند.</li>
+<li><code>\\d</code> یک رقم و <code>\\d+</code> یک یا چند رقم پشت سر هم است.</li>
+<li><code>\\w</code> برای Word Character و <code>\\s</code> برای Whitespace است.</li>
 <li><code>[]</code> برای انتخاب یک کاراکتر از بین چند گزینه استفاده می‌شود.</li>
-<li><code>+</code> یعنی یک یا چند بار.</li>
-<li><code>*</code> یعنی صفر یا چند بار.</li>
-<li><code>?</code> یعنی صفر یا یک بار.</li>
-<li><code>{n}</code> تعداد دقیق تکرار را مشخص می‌کند.</li>
-<li><code>{n,m}</code> یک بازه برای تعداد تکرار مشخص می‌کند.</li>
-<li>برای Patternهای Regex بهتر است از Raw String مانند <code>r"\d+"</code> استفاده کنیم.</li>
-<li>یک Regex پیچیده را می‌توان از چند Pattern ساده ساخت.</li>
+<li><code>+</code>، <code>*</code> و <code>?</code> تعداد تکرار را مشخص می‌کنند.</li>
+<li><code>{n}</code> و <code>{n,m}</code> تعداد دقیق یا بازه تکرار را مشخص می‌کنند.</li>
+<li>برای Patternهای Regex معمولاً Raw String مثل <code>r"\\d+"</code> خواناتر است.</li>
 </ul>
 
 <hr class="lesson-divider">
 
-<h1 class="lesson-title section-test">تست پایانی — ۶ سؤال</h1>
+<h1 class="lesson-title section-test">تست پایانی — ۵ سؤال</h1>
 
-<p>
-ابتدا خودت پاسخ را انتخاب کن، سپس پاسخ و توضیح را ببین.
-</p>
+<p>ابتدا خودت پاسخ را انتخاب کن، سپس پاسخ و توضیح را ببین.</p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — Regex چیست؟</p>
-
+<p>❓ سؤال ۱ — کدام گزینه یک Pattern برای «یک یا چند رقم پشت سر هم» است؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) یک نوع متغیر در Python</button>
-<button onclick="selectOption(this)">ب) الگویی برای جستجو و بررسی متن</button>
-<button onclick="selectOption(this)">ج) یک نوع فایل</button>
-<button onclick="selectOption(this)">د) یک دستور برای چاپ متن</button>
+<button onclick="selectOption(this)">الف) <code>\\d</code></button>
+<button onclick="selectOption(this)">ب) <code>\\d+</code></button>
+<button onclick="selectOption(this)">ج) <code>\\s+</code></button>
+<button onclick="selectOption(this)">د) <code>[A-Z]</code></button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-Regex یک الگوی متنی است که برای پیدا کردن، بررسی و پردازش متن استفاده می‌شود.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>\\d</code> یک رقم و <code>+</code> یک یا چند بار تکرار را مشخص می‌کند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — کدام تابع در کل متن به دنبال اولین تطابق می‌گردد؟</p>
-
+<p>❓ سؤال ۲ — <code>re.search()</code> چه کاری انجام می‌دهد؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>re.search()</code></button>
-<button onclick="selectOption(this)">ب) <code>re.match()</code></button>
-<button onclick="selectOption(this)">ج) <code>re.find()</code></button>
-<button onclick="selectOption(this)">د) <code>re.check()</code></button>
+<button onclick="selectOption(this)">الف) فقط ابتدای رشته را بررسی می‌کند</button>
+<button onclick="selectOption(this)">ب) کل رشته را به صورت List برمی‌گرداند</button>
+<button onclick="selectOption(this)">ج) در کل رشته به دنبال اولین تطابق می‌گردد</button>
+<button onclick="selectOption(this)">د) رشته را حذف می‌کند</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: الف</strong>
-<br>
-<code>re.search()</code> در کل رشته به دنبال اولین Match می‌گردد.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>search()</code> در کل رشته جستجو می‌کند و اولین Match را برمی‌گرداند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — Pattern <code>\d+</code> چه چیزی را پیدا می‌کند؟</p>
-
+<p>❓ سؤال ۳ — <code>[A-Z]</code> چه چیزی را مشخص می‌کند؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) دقیقاً یک رقم</button>
-<button onclick="selectOption(this)">ب) یک یا چند رقم پشت سر هم</button>
-<button onclick="selectOption(this)">ج) یک یا چند حرف</button>
-<button onclick="selectOption(this)">د) فقط فاصله</button>
+<button onclick="selectOption(this)">الف) یک رقم</button>
+<button onclick="selectOption(this)">ب) یک حرف بزرگ انگلیسی</button>
+<button onclick="selectOption(this)">ج) یک یا چند حرف بزرگ</button>
+<button onclick="selectOption(this)">د) هر کاراکتر دلخواه</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>\d</code> یک رقم و <code>+</code> یعنی یک یا چند بار؛
-پس <code>\d+</code> یعنی یک یا چند رقم پشت سر هم.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>[A-Z]</code> فقط یک کاراکتر از بازه A تا Z را مشخص می‌کند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۴ — کدام Pattern دقیقاً چهار رقم را مشخص می‌کند؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>\d+</code></button>
-<button onclick="selectOption(this)">ب) <code>\d?</code></button>
-<button onclick="selectOption(this)">ج) <code>\d{4}</code></button>
-<button onclick="selectOption(this)">د) <code>\d*</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-<code>{4}</code> یعنی Pattern دقیقاً چهار بار تکرار شود.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۵ — تفاوت <code>search()</code> و <code>match()</code> چیست؟</p>
-
+<p>❓ سؤال ۴ — تفاوت <code>search()</code> و <code>match()</code> چیست؟</p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) هیچ تفاوتی ندارند</button>
-<button onclick="selectOption(this)">ب) search فقط عدد پیدا می‌کند</button>
-<button onclick="selectOption(this)">ج) search در کل متن جستجو می‌کند، match فقط از ابتدا</button>
-<button onclick="selectOption(this)">د) match همیشه List برمی‌گرداند</button>
+<button onclick="selectOption(this)">ب) search از ابتدا و match از انتها جستجو می‌کند</button>
+<button onclick="selectOption(this)">ج) search در کل رشته جستجو می‌کند، match فقط از ابتدا</button>
+<button onclick="selectOption(this)">د) match فقط برای اعداد است</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-<code>search()</code> در کل رشته جستجو می‌کند، اما <code>match()</code>
-فقط ابتدای رشته را بررسی می‌کند.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>search()</code> کل رشته را بررسی می‌کند، اما <code>match()</code> فقط ابتدای رشته را بررسی می‌کند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — در Pattern <code>[A-Z]\d{3}</code> چه چیزی را پیدا می‌کنیم؟</p>
-
+<p>❓ سؤال ۵ — Pattern <code>[A-Z]\\d{3}</code> چه چیزی را مشخص می‌کند؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) سه حرف بزرگ</button>
+<button onclick="selectOption(this)">الف) سه حرف و یک رقم</button>
 <button onclick="selectOption(this)">ب) یک حرف بزرگ و سه رقم</button>
-<button onclick="selectOption(this)">ج) یک رقم و سه حرف</button>
-<button onclick="selectOption(this)">د) هر چهار کاراکتر دلخواه</button>
+<button onclick="selectOption(this)">ج) چهار رقم</button>
+<button onclick="selectOption(this)">د) چهار کاراکتر دلخواه</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>[A-Z]</code> یک حرف بزرگ و <code>\d{3}</code> دقیقاً سه رقم را مشخص می‌کند.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>[A-Z]</code> یک حرف بزرگ و <code>\\d{3}</code> دقیقاً سه رقم را مشخص می‌کند.</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
+<h2 class="lesson-title">جمع‌بندی جلسه</h2>
 
 <p>
-در این جلسه یاد گرفتیم Regex چیست و چرا برای کار با متن به آن نیاز داریم.
-سپس با ماژول <code>re</code> در Python آشنا شدیم و اولین جستجوهای خود را
-با <code>search()</code> و <code>match()</code> انجام دادیم.
-</p>
-
-<p>
-بعد یاد گرفتیم Regex را از قطعات کوچک‌تر بسازیم:
+در این جلسه Regex را به عنوان روشی برای تعریف الگوی متن یاد گرفتیم و آن را با ماژول
+<code>re</code> در Python به کار بردیم.
 </p>
 
 <div class="code-container">
 <span class="code-label">Final Model</span>
-<div class="code-block no-prompt">Character
+<div class="code-block no-prompt">نوع کاراکتر
    ↓
-\d / \w / \s / .
-   ↓
-Character Class
-   ↓
-[0-9] / [A-Z]
-   ↓
-Quantifier
-   ↓
-+ / * / ? / {n}
+تعداد تکرار
    ↓
 ترکیب Patternها
    ↓
-Regex نهایی</div>
-</div>
-
-<p>
-مثلاً:
-</p>
-
-<div class="code-container">
-<span class="code-label">Example</span>
-<div class="code-block no-prompt">[A-Z]\d{3}
-
-[A-Z]  → یک حرف بزرگ
-\d     → یک رقم
-{3}    → سه بار
-
-نتیجه:
-یک حرف بزرگ + سه رقم</div>
+Regex
+   ↓
+re.search() / re.match()</div>
 </div>
 
 <div class="lesson-important">
 <strong>اصل مهم:</strong>
-Regex را لازم نیست یک‌باره حفظ کنی.
-Pattern را به قسمت‌های کوچک تقسیم کن و هر قسمت را جداگانه بخوان.
+Regex را حفظ نکن؛ Pattern را به قسمت‌های کوچک تقسیم کن و معنی هر قسمت را بخوان.
 </div>
 
 <p>
-در <strong>جلسه ۲ — کاربردهای عملی Regex</strong> از همین پایه‌ها استفاده می‌کنیم
-تا بتوانیم داده را <strong>استخراج، اعتبارسنجی، تقسیم، جایگزین و پاک‌سازی</strong> کنیم
-و Regex را در برنامه‌های واقعی Python به کار ببریم.
+در بخش دوم همین فصل، از این پایه‌ها برای <strong>استخراج، اعتبارسنجی، تقسیم و جایگزینی متن</strong>
+در برنامه‌های Python استفاده می‌کنیم.
 </p>`
 ,
 "ch16-2": `<div class="section-header">
     <div class="section-badge">۱۶</div>
     <div>
-        <h1>کاربردهای عملی Regex</h1>
+        <h1>کاربردهای عملی Regex در Python</h1>
         <div class="meta">فصل ۱۶ · بخش ۲ از ۲</div>
     </div>
 </div>
@@ -39577,14 +39133,14 @@ Pattern را به قسمت‌های کوچک تقسیم کن و هر قسمت ر
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>با گروه‌های Capturing در Regex داده استخراج کنی.</li>
-<li>اطلاعات یک <code>Match Object</code> را بررسی کنی.</li>
-<li>با <code>findall()</code> چند داده را از متن استخراج کنی.</li>
-<li>ورودی را با Regex اعتبارسنجی کنی.</li>
-<li>الگوهای عملی برای ایمیل، موبایل و کد پستی بنویسی.</li>
-<li>با <code>re.split()</code> متن را بر اساس چند جداکننده تقسیم کنی.</li>
-<li>با <code>re.sub()</code> متن را جایگزین و پاک‌سازی کنی.</li>
-<li>Regex را با فایل، حلقه و ورودی کاربر ترکیب کنی.</li>
+<li>با گروه‌های <code>()</code> بخش‌های مشخصی از متن را استخراج کنی.</li>
+<li>اطلاعات ساده یک <code>Match Object</code> را دریافت کنی.</li>
+<li>با <code>findall()</code> چند تطابق را استخراج کنی.</li>
+<li>با <code>fullmatch()</code> کل ورودی را بررسی کنی.</li>
+<li>Regex را برای اعتبارسنجی ساده داده‌هایی مثل ایمیل، موبایل و کد پستی به کار ببری.</li>
+<li>با <code>re.split()</code> متن را بر اساس یک الگوی جداکننده تقسیم کنی.</li>
+<li>با <code>re.sub()</code> متن را جایگزین یا پاک‌سازی کنی.</li>
+<li>Regex را در یک برنامه ساده با فایل و ورودی کاربر ترکیب کنی.</li>
 </ol>
 </blockquote>
 
@@ -39593,34 +39149,24 @@ Pattern را به قسمت‌های کوچک تقسیم کن و هر قسمت ر
 <h2 class="lesson-title">معرفی جلسه</h2>
 
 <p>
-در جلسه قبل با مفهوم Regex و الگوهای پایه آشنا شدیم و یاد گرفتیم
-چگونه با ماژول <code>re</code> در متن جستجو کنیم.
+در بخش اول یاد گرفتیم Regex چگونه ساخته می‌شود؛ یعنی Characterها، Character Classها و Quantifierها را شناختیم.
 </p>
 
 <p>
-حالا وقت آن است که Regex را در مسئله‌های واقعی Python استفاده کنیم:
+حالا از همان Patternها برای چند کار واقعی در Python استفاده می‌کنیم:
 </p>
 
 <div class="code-container">
-<span class="code-label">کاربردهای اصلی</span>
-<div class="code-block no-prompt">اعتبارسنجی ورودی
-      ↓
-استخراج اطلاعات
-      ↓
-تقسیم متن
-      ↓
-جایگزینی و پاک‌سازی
-      ↓
-پردازش فایل و داده</div>
-</div>
-
-<div class="code-container">
 <span class="code-label">مدل ذهنی</span>
-<div class="code-block no-prompt">جلسه ۱
-Regex چیست و چگونه کار می‌کند؟
-
-جلسه ۲
-با Regex در برنامه واقعی چه کارهایی می‌توانیم انجام دهیم؟</div>
+<div class="code-block no-prompt">پیدا کردن
+   ↓
+استخراج کردن
+   ↓
+بررسی کردن
+   ↓
+تقسیم کردن
+   ↓
+جایگزین کردن</div>
 </div>
 
 <hr class="lesson-divider">
@@ -39628,9 +39174,8 @@ Regex چیست و چگونه کار می‌کند؟
 <h2 class="lesson-title">1. گروه‌بندی با <code>()</code></h2>
 
 <p>
-یکی از مهم‌ترین قابلیت‌های Regex، <strong>گروه‌بندی</strong> است.
-با قرار دادن بخشی از الگو داخل <code>()</code> می‌توانیم آن قسمت را
-جداگانه دریافت کنیم.
+با قرار دادن بخشی از Pattern داخل <code>()</code> آن قسمت را به عنوان یک <strong>Group</strong> جدا می‌کنیم
+تا بتوانیم بعداً مقدار آن را دریافت کنیم.
 </p>
 
 <div class="code-container">
@@ -39655,43 +39200,23 @@ Ali
 
 <div class="table-wrap">
 <table>
-<thead>
-<tr>
-<th>عبارت</th>
-<th>معنی</th>
-</tr>
-</thead>
+<thead><tr><th>عبارت</th><th>معنی</th></tr></thead>
 <tbody>
-<tr>
-<td><code>group(0)</code></td>
-<td>کل تطابق</td>
-</tr>
-<tr>
-<td><code>group(1)</code></td>
-<td>گروه اول</td>
-</tr>
-<tr>
-<td><code>group(2)</code></td>
-<td>گروه دوم</td>
-</tr>
+<tr><td><code>group(0)</code></td><td>کل Match</td></tr>
+<tr><td><code>group(1)</code></td><td>مقدار Group اول</td></tr>
+<tr><td><code>group(2)</code></td><td>مقدار Group دوم</td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="lesson-important">
 <strong>نکته:</strong>
-شماره‌گذاری گروه‌ها از <code>1</code> شروع می‌شود.
-<code>group(0)</code> همیشه کل بخش تطبیق‌داده‌شده را نشان می‌دهد.
+شماره‌گذاری Capture Groupها از <code>1</code> شروع می‌شود؛ <code>group(0)</code> کل Match است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. چند گروه و <code>groups()</code></h2>
-
-<p>
-وقتی چند گروه داشته باشیم، <code>groups()</code> همه گروه‌ها را
-به صورت یک <strong>Tuple</strong> برمی‌گرداند.
-</p>
+<h2 class="lesson-title">2. دریافت همه Groupها با <code>groups()</code></h2>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -39701,72 +39226,41 @@ text = "Ali - 20 - Tehran"
 
 result = re.search(r"(\\w+) - (\\d+) - (\\w+)", text)
 
-print(result.group(1))
-print(result.group(2))
-print(result.group(3))
-
-print(result.groups())</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Ali
-20
-Tehran
-('Ali', '20', 'Tehran')</div>
-</div>
-
-<p>
-این ویژگی هنگام استخراج چند داده بسیار کاربردی است.
-</p>
-
-<div class="code-container">
-<span class="code-label">استفاده مستقیم</span>
-<div class="code-block no-prompt">name, age, city = result.groups()
+name, age, city = result.groups()
 
 print(name)
 print(age)
 print(city)</div>
 </div>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">3. اطلاعات مهم در <code>Match Object</code></h2>
+<div class="code-container">
+<span class="code-label">Output</span>
+<div class="code-block no-prompt">Ali
+20
+Tehran</div>
+</div>
 
 <p>
-خروجی <code>re.search()</code> و <code>re.match()</code> در صورت پیدا شدن
-تطابق، یک <strong>Match Object</strong> است.
+<code>groups()</code> تمام Groupها را به صورت یک Tuple برمی‌گرداند؛ بنابراین می‌توانیم آن‌ها را مستقیماً داخل چند متغیر قرار دهیم.
+</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">3. اطلاعات ساده از <code>Match Object</code></h2>
+
+<p>
+وقتی <code>search()</code> یا <code>match()</code> موفق شود، یک <code>Match Object</code> دریافت می‌کنیم.
+برای شروع همین چند مورد مهم هستند:
 </p>
 
 <div class="table-wrap">
 <table>
-<thead>
-<tr>
-<th>متد</th>
-<th>کاربرد</th>
-</tr>
-</thead>
+<thead><tr><th>متد</th><th>کاربرد</th></tr></thead>
 <tbody>
-<tr>
-<td><code>group()</code></td>
-<td>دریافت کل تطابق یا یک گروه</td>
-</tr>
-<tr>
-<td><code>groups()</code></td>
-<td>دریافت تمام گروه‌ها</td>
-</tr>
-<tr>
-<td><code>start()</code></td>
-<td>Index شروع تطابق</td>
-</tr>
-<tr>
-<td><code>end()</code></td>
-<td>Index پایان تطابق</td>
-</tr>
-<tr>
-<td><code>span()</code></td>
-<td>شروع و پایان تطابق به صورت Tuple</td>
-</tr>
+<tr><td><code>group()</code></td><td>دریافت کل Match</td></tr>
+<tr><td><code>groups()</code></td><td>دریافت همه Groupها</td></tr>
+<tr><td><code>start()</code></td><td>Index شروع Match</td></tr>
+<tr><td><code>end()</code></td><td>Index پایان Match</td></tr>
 </tbody>
 </table>
 </div>
@@ -39782,8 +39276,7 @@ result = re.search(r"(\\w+) (\\d+)", text)
 print(result.group())
 print(result.groups())
 print(result.start())
-print(result.end())
-print(result.span())</div>
+print(result.end())</div>
 </div>
 
 <div class="code-container">
@@ -39791,26 +39284,20 @@ print(result.span())</div>
 <div class="code-block no-prompt">Hello 123
 ('Hello', '123')
 0
-9
-(0, 9)</div>
+9</div>
 </div>
 
-<div class="lesson-important">
+<div class="lesson-note">
 <strong>نکته:</strong>
-Index پایان شامل آخرین کاراکتر نیست؛ همان رفتار معمول Slice در Python را دارد.
+<code>end()</code> Index پایان را به صورت غیرشامل برمی‌گرداند؛ درست مثل انتهای Slice در Python.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. استخراج چند داده با <code>findall()</code></h2>
+<h2 class="lesson-title">4. استخراج چند تطابق با <code>findall()</code></h2>
 
 <p>
-اگر هدف ما پیدا کردن <strong>همه تطابق‌ها</strong> باشد،
-<code>re.findall()</code> بسیار مناسب است.
-</p>
-
-<p>
-وقتی Regex دارای گروه باشد، نتیجه به شکل List از Tuple برمی‌گردد.
+اگر بخواهیم <strong>همه تطابق‌ها</strong> را پیدا کنیم، <code>re.findall()</code> مناسب است.
 </p>
 
 <div class="code-container">
@@ -39823,9 +39310,7 @@ Sara - 22
 Reza - 19
 """
 
-pattern = r"(\\w+) - (\\d+)"
-
-results = re.findall(pattern, text)
+results = re.findall(r"(\\w+) - (\\d+)", text)
 
 print(results)</div>
 </div>
@@ -39836,33 +39321,22 @@ print(results)</div>
 </div>
 
 <p>
-حالا می‌توانیم داده‌ها را مستقیماً در حلقه استفاده کنیم:
+چون Pattern دو Group دارد، هر تطابق به شکل یک Tuple برگردانده شده است.
 </p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
+<span class="code-label">استفاده در حلقه</span>
 <div class="code-block no-prompt">for name, age in results:
     print(f"{name} is {age} years old.")</div>
 </div>
 
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Ali is 20 years old.
-Sara is 22 years old.
-Reza is 19 years old.</div>
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">5. اعتبارسنجی ورودی با Regex</h2>
+<h2 class="lesson-title">5. اعتبارسنجی کل رشته با <code>fullmatch()</code></h2>
 
 <p>
-یکی از کاربردهای مهم Regex بررسی معتبر بودن یک ورودی است.
-</p>
-
-<p>
-برای زمانی که می‌خواهیم <strong>کل رشته</strong> با الگو مطابقت داشته باشد،
-<code>re.fullmatch()</code> انتخاب بسیار مناسبی است.
+گاهی نمی‌خواهیم فقط بخشی از ورودی درست باشد؛ می‌خواهیم <strong>کل رشته</strong> با Pattern مطابقت داشته باشد.
+برای این کار <code>re.fullmatch()</code> بسیار مناسب است.
 </p>
 
 <div class="code-container">
@@ -39879,108 +39353,31 @@ else:
     print("Invalid username")</div>
 </div>
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>تابع</th>
-<th>رفتار</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>re.search()</code></td>
-<td>پیدا کردن الگو در هر جای متن</td>
-</tr>
-<tr>
-<td><code>re.match()</code></td>
-<td>بررسی از ابتدای رشته</td>
-</tr>
-<tr>
-<td><code>re.fullmatch()</code></td>
-<td>بررسی کل رشته</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<div class="lesson-important">
-<strong>برای اعتبارسنجی:</strong>
-اگر واقعاً می‌خواهی کل ورودی بررسی شود، <code>fullmatch()</code>
-خواناتر و واضح‌تر از ترکیب <code>match()</code> با <code>^</code> و <code>$</code> است.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. <code>^</code> و <code>$</code> همچنان چه کاربردی دارند؟</h2>
-
 <p>
-هرچند برای اعتبارسنجی کامل، <code>fullmatch()</code> گزینه مناسبی است،
-اما <code>^</code> و <code>$</code> همچنان در Regex کاربرد مهمی دارند.
+Pattern بالا یعنی نام کاربری باید بین ۳ تا ۱۲ کاراکتر و شامل حروف انگلیسی، ارقام یا <code>_</code> باشد.
 </p>
 
 <div class="table-wrap">
 <table>
-<thead>
-<tr>
-<th>نماد</th>
-<th>معنی</th>
-</tr>
-</thead>
+<thead><tr><th>تابع</th><th>کاربرد</th></tr></thead>
 <tbody>
-<tr>
-<td><code>^</code></td>
-<td>ابتدای رشته</td>
-</tr>
-<tr>
-<td><code>$</code></td>
-<td>انتهای رشته</td>
-</tr>
+<tr><td><code>re.search()</code></td><td>پیدا کردن اولین Match در کل رشته</td></tr>
+<tr><td><code>re.match()</code></td><td>بررسی از ابتدای رشته</td></tr>
+<tr><td><code>re.fullmatch()</code></td><td>بررسی کل رشته</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>
-مثلاً می‌توانیم بررسی کنیم یک متن با کلمه خاصی شروع می‌شود:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = "Python is easy"
-
-if re.search(r"^Python", text):
-    print("Starts with Python")</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Starts with Python</div>
-</div>
-
-<p>
-یا بررسی کنیم متن به عدد ختم می‌شود:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">text = "Order 12345"
-
-if re.search(r"\\d+$", text):
-    print("Ends with a number")</div>
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">7. اعتبارسنجی کد پستی ۱۰ رقمی</h2>
+<h2 class="lesson-title">6. اعتبارسنجی کد پستی ۱۰ رقمی</h2>
 
 <p>
-برای یک کد پستی ۱۰ رقمی می‌توانیم از این الگو استفاده کنیم:
+اگر هدف آموزشی ما این باشد که ورودی فقط شامل <strong>۱۰ رقم</strong> باشد:
 </p>
 
 <div class="code-container">
-<span class="code-label">Regex</span>
+<span class="label">Regex</span>
 <div class="code-block no-prompt">[0-9]{10}</div>
 </div>
 
@@ -39991,26 +39388,27 @@ if re.search(r"\\d+$", text):
 def is_valid_postal_code(code):
     return re.fullmatch(r"[0-9]{10}", code) is not None
 
-
 print(is_valid_postal_code("1234567890"))
-print(is_valid_postal_code("12345"))
-print(is_valid_postal_code("12345678901"))</div>
+print(is_valid_postal_code("12345"))</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
 <div class="code-block no-prompt">True
-False
 False</div>
+</div>
+
+<div class="lesson-note">
+<strong>نکته:</strong>
+این Regex فقط ساختار «۱۰ رقم» را بررسی می‌کند؛ وجود واقعی یا معتبر بودن کد پستی موضوع دیگری است.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">8. اعتبارسنجی شماره موبایل ایران</h2>
+<h2 class="lesson-title">7. اعتبارسنجی ساده شماره موبایل ایران</h2>
 
 <p>
-در یک بررسی ساده، شماره موبایل ایران را می‌توان به صورت
-<code>09</code> + نه رقم دیگر بررسی کرد.
+برای یک بررسی ساختاری ساده می‌توانیم بگوییم شماره باید با <code>09</code> شروع شود و بعد از آن ۹ رقم داشته باشد.
 </p>
 
 <div class="code-container">
@@ -40025,35 +39423,28 @@ False</div>
 def is_valid_mobile(number):
     return re.fullmatch(r"09[0-9]{9}", number) is not None
 
-
 print(is_valid_mobile("09121234567"))
-print(is_valid_mobile("09359876543"))
-print(is_valid_mobile("08121234567"))
-print(is_valid_mobile("0912123456"))</div>
+print(is_valid_mobile("08121234567"))</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
 <div class="code-block no-prompt">True
-True
-False
 False</div>
 </div>
 
 <div class="lesson-note">
 <strong>نکته:</strong>
-این الگو ساختار عمومی شماره را بررسی می‌کند؛
-اعتبارسنجی کامل اپراتور، نوع خط یا فعال بودن شماره موضوع دیگری است.
+این فقط ساختار کلی شماره را بررسی می‌کند و فعال بودن شماره یا اطلاعات اپراتور را مشخص نمی‌کند.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">9. اعتبارسنجی ایمیل — الگوی ساده</h2>
+<h2 class="lesson-title">8. اعتبارسنجی ساده ایمیل</h2>
 
 <p>
-Regex برای بررسی ساده ساختار ایمیل مفید است، اما ساخت یک Regex
-که تمام قوانین استاندارد ایمیل را پوشش دهد بسیار پیچیده است.
-برای سطح Python Basic، یک الگوی ساده کافی است.
+ساخت یک Regex کامل برای تمام قوانین استاندارد Email بسیار پیچیده است.
+برای Python Basic، یک Pattern ساده برای آشنایی کافی است.
 </p>
 
 <div class="code-container">
@@ -40064,42 +39455,28 @@ def is_valid_email(email):
     pattern = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
     return re.fullmatch(pattern, email) is not None
 
-
-emails = [
-    "ali@example.com",
-    "sara@mail.org",
-    "user123@site.net",
-    "invalid",
-    "no@dot",
-    "@example.com"
-]
-
-for email in emails:
-    print(email, "→", is_valid_email(email))</div>
+print(is_valid_email("ali@example.com"))
+print(is_valid_email("invalid"))</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt">ali@example.com → True
-sara@mail.org → True
-user123@site.net → True
-invalid → False
-no@dot → False
-@example.com → False</div>
+<div class="code-block no-prompt">True
+False</div>
 </div>
 
 <div class="lesson-important">
-<strong>نکته مهم:</strong>
-Regex بالا برای آموزش و بررسی ساده است، نه پیاده‌سازی کامل استاندارد ایمیل.
+<strong>نکته:</strong>
+این Pattern برای آموزش و بررسی ساده است، نه پیاده‌سازی کامل استاندارد Email.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">10. <code>re.split()</code> — تقسیم متن با چند جداکننده</h2>
+<h2 class="lesson-title">9. <code>re.split()</code> — تقسیم متن با Pattern</h2>
 
 <p>
-گاهی متن ما با یک جداکننده نوشته نشده است.
-مثلاً ممکن است بین داده‌ها از ویرگول، سمی‌کالن یا <code>|</code> استفاده شده باشد.
+<code>str.split()</code> برای یک جداکننده معمولی مناسب است.
+اما اگر جداکننده‌های مختلف داشته باشیم، <code>re.split()</code> می‌تواند یک Pattern را به عنوان جداکننده بگیرد.
 </p>
 
 <div class="code-container">
@@ -40110,21 +39487,7 @@ text = "Ali, Sara; Reza | Hossein"
 
 parts = re.split(r"[,;|]", text)
 
-print(parts)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">['Ali', ' Sara', ' Reza ', ' Hossein']</div>
-</div>
-
-<p>
-برای حذف فاصله‌های اطراف هر بخش می‌توانیم از <code>strip()</code> استفاده کنیم:
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">parts = [part.strip() for part in parts]
+parts = [part.strip() for part in parts]
 
 print(parts)</div>
 </div>
@@ -40134,19 +39497,12 @@ print(parts)</div>
 <div class="code-block no-prompt">['Ali', 'Sara', 'Reza', 'Hossein']</div>
 </div>
 
-<div class="lesson-note">
-<strong>تفاوت مهم:</strong>
-<code>str.split()</code> برای یک جداکننده معمولی مناسب است،
-اما <code>re.split()</code> می‌تواند یک الگوی Regex را به عنوان جداکننده بگیرد.
-</div>
-
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">11. جایگزینی با <code>re.sub()</code></h2>
+<h2 class="lesson-title">10. جایگزینی با <code>re.sub()</code></h2>
 
 <p>
-با <code>re.sub()</code> می‌توانیم تمام بخش‌هایی را که با الگو مطابقت دارند
-با یک مقدار جدید جایگزین کنیم.
+با <code>re.sub()</code> می‌توانیم بخش‌هایی را که با Pattern مطابقت دارند با مقدار دیگری جایگزین کنیم.
 </p>
 
 <div class="code-container">
@@ -40167,11 +39523,10 @@ print(result)</div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. استفاده از گروه‌ها در <code>sub()</code></h2>
+<h2 class="lesson-title">11. استفاده از Groupها در <code>sub()</code></h2>
 
 <p>
-یکی از قابلیت‌های جالب <code>re.sub()</code> این است که می‌توانیم
-اطلاعات گروه‌ها را در متن جایگزین دوباره استفاده کنیم.
+می‌توانیم Groupها را در Replacement دوباره استفاده کنیم.
 </p>
 
 <div class="code-container">
@@ -40196,36 +39551,24 @@ print(result)</div>
 
 <div class="table-wrap">
 <table>
-<thead>
-<tr>
-<th>عبارت</th>
-<th>معنی در Replacement</th>
-</tr>
-</thead>
+<thead><tr><th>Replacement</th><th>معنی</th></tr></thead>
 <tbody>
-<tr><td><code>\\1</code></td><td>گروه اول</td></tr>
-<tr><td><code>\\2</code></td><td>گروه دوم</td></tr>
-<tr><td><code>\\3</code></td><td>گروه سوم</td></tr>
+<tr><td><code>\\1</code></td><td>Group اول</td></tr>
+<tr><td><code>\\2</code></td><td>Group دوم</td></tr>
 </tbody>
 </table>
 </div>
 
 <div class="lesson-important">
-<strong>نکته:</strong>
-<code>\\1</code> و <code>\\2</code> در اینجا به گروه‌های Regex اشاره می‌کنند،
-نه به شماره کاراکترهای متن.
+<strong>دقت کن:</strong>
+<code>\\1</code> و <code>\\2</code> در اینجا به Groupهای Regex اشاره می‌کنند، نه به شماره کاراکترهای متن.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. پاک‌سازی داده‌ها با Regex</h2>
+<h2 class="lesson-title">12. پاک‌سازی ساده داده با Regex</h2>
 
-<p>
-Regex فقط برای پیدا کردن اطلاعات نیست؛ می‌توانیم از آن برای
-<strong>تمیز کردن داده‌های نامنظم</strong> هم استفاده کنیم.
-</p>
-
-<h3>13.1 حذف فاصله‌های اضافی</h3>
+<h3>حذف فاصله‌های اضافی</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -40243,11 +39586,13 @@ print(clean)</div>
 <div class="code-block no-prompt">Ali Sara Reza</div>
 </div>
 
-<h3>13.2 فقط نگه داشتن اعداد</h3>
+<h3>فقط نگه داشتن اعداد</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">text = "Phone: 0912-345-6789"
+<div class="code-block no-prompt">import re
+
+text = "Phone: 0912-345-6789"
 
 numbers_only = re.sub(r"\\D", "", text)
 
@@ -40259,43 +39604,22 @@ print(numbers_only)</div>
 <div class="code-block no-prompt">09123456789</div>
 </div>
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>الگو</th>
-<th>معنی</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>\\s</code></td>
-<td>Whitespace</td>
-</tr>
-<tr>
-<td><code>\\s+</code></td>
-<td>یک یا چند فاصله/Whitespace</td>
-</tr>
-<tr>
-<td><code>\\D</code></td>
-<td>هر کاراکتری که رقم نیست</td>
-</tr>
-</tbody>
-</table>
+<div class="lesson-note">
+<strong>یادآوری:</strong>
+<code>\\s</code> یعنی Whitespace و <code>\\D</code> یعنی هر چیزی که رقم نیست.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. اعتبارسنجی رمز عبور با چند شرط</h2>
+<h2 class="lesson-title">13. Regex و شرط‌های معمولی Python</h2>
 
 <p>
-همیشه لازم نیست همه قوانین را در یک Regex بسیار بزرگ بنویسیم.
+لازم نیست تمام قوانین یک ورودی را در یک Regex بزرگ بنویسیم.
 گاهی ترکیب Regex با شرط‌های ساده Python خواناتر است.
 </p>
 
 <p>
-مثلاً رمز عبور باید حداقل ۸ کاراکتر داشته باشد،
-حداقل یک حرف و حداقل یک رقم داشته باشد.
+مثلاً رمز عبور باید حداقل ۸ کاراکتر داشته باشد و حداقل یک حرف و یک رقم داشته باشد:
 </p>
 
 <div class="code-container">
@@ -40303,7 +39627,7 @@ print(numbers_only)</div>
 <div class="code-block no-prompt">import re
 
 def is_valid_password(password):
-    if len(password) &lt; 8:
+    if len(password) < 8:
         return False
 
     if not re.search(r"[A-Za-z]", password):
@@ -40314,503 +39638,143 @@ def is_valid_password(password):
 
     return True
 
-
 print(is_valid_password("abc123"))
-print(is_valid_password("abcdefgh"))
-print(is_valid_password("12345678"))
 print(is_valid_password("abc12345"))</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
 <div class="code-block no-prompt">False
-False
-False
 True</div>
 </div>
 
-<div class="lesson-note">
-<strong>اصل مهم:</strong>
-Regex باید کد را ساده‌تر کند، نه اینکه یک Regex بسیار پیچیده و سخت‌خوان بسازیم.
+<div class="lesson-important">
+<strong>اصل کاربردی:</strong>
+اگر ترکیب چند شرط ساده Python از یک Regex بسیار پیچیده قابل فهم‌تر است، همان روش را انتخاب کن.
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">15. پرچم‌های مهم Regex</h2>
+<h2 class="lesson-title">14. یک کاربرد ساده با فایل</h2>
 
 <p>
-Flags رفتار Regex را تغییر می‌دهند.
-در Python چند Flag کاربردی وجود دارد که در کار با متن زیاد دیده می‌شوند.
-</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Flag</th>
-<th>کاربرد</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>re.IGNORECASE</code> یا <code>re.I</code></td>
-<td>نادیده گرفتن تفاوت حروف بزرگ و کوچک</td>
-</tr>
-<tr>
-<td><code>re.MULTILINE</code> یا <code>re.M</code></td>
-<td>تأثیر <code>^</code> و <code>$</code> روی هر خط</td>
-</tr>
-<tr>
-<td><code>re.DOTALL</code> یا <code>re.S</code></td>
-<td>اجازه می‌دهد <code>.</code> با Newline هم مطابقت کند</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<h3>نمونه <code>IGNORECASE</code></h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = "Python PYTHON python"
-
-result = re.findall(
-    r"python",
-    text,
-    re.IGNORECASE
-)
-
-print(result)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">['Python', 'PYTHON', 'python']</div>
-</div>
-
-<h3>نمونه <code>MULTILINE</code></h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-text = """Ali
-Sara
-Reza"""
-
-result = re.findall(
-    r"^\\w+",
-    text,
-    re.MULTILINE
-)
-
-print(result)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">['Ali', 'Sara', 'Reza']</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">16. استخراج اطلاعات از فایل</h2>
-
-<p>
-یکی از کاربردهای واقعی Regex، خواندن فایل متنی و استخراج داده از آن است.
+Regex می‌تواند روی متن خوانده‌شده از فایل هم استفاده شود.
+مثلاً فرض کن فایل <code>data.txt</code> این محتوا را دارد:
 </p>
 
 <div class="code-container">
 <span class="code-label">data.txt</span>
-<div class="code-block no-prompt">Ali - 20 - ali@example.com
-Sara - 22 - sara@example.org
-Reza - 19 - reza@example.net</div>
+<div class="code-block no-prompt">Ali - 20
+Sara - 22
+Reza - 19</div>
 </div>
 
 <p>
-می‌توانیم ساختار هر خط را با سه گروه مشخص کنیم:
+می‌توانیم هر خط را بخوانیم و عدد موجود در آن را استخراج کنیم:
 </p>
-
-<div class="code-container">
-<span class="code-label">Regex</span>
-<div class="code-block no-prompt">([A-Za-z]+) - ([0-9]+) - ([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})</div>
-</div>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">import re
 
-pattern = (
-    r"([A-Za-z]+) - "
-    r"([0-9]+) - "
-    r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})"
-)
-
 with open("data.txt", "r") as file:
-    content = file.read()
+    for line in file:
+        result = re.search(r"\\d+", line)
 
-results = re.findall(pattern, content)
-
-for name, age, email in results:
-    print(f"Name: {name}")
-    print(f"Age: {age}")
-    print(f"Email: {email}")
-    print("-----")</div>
+        if result:
+            print(result.group())</div>
 </div>
 
 <div class="code-container">
 <span class="code-label">Output</span>
-<div class="code-block no-prompt">Name: Ali
-Age: 20
-Email: ali@example.com
------
-Name: Sara
-Age: 22
-Email: sara@example.org
------
-Name: Reza
-Age: 19
-Email: reza@example.net
------</div>
+<div class="code-block no-prompt">20
+22
+19</div>
 </div>
 
-<div class="lesson-important">
-<strong>نکته:</strong>
-وقتی Regex گروه دارد، <code>findall()</code> داده‌های Capture شده را
-به شکلی مناسب برای پردازش بعدی برمی‌گرداند.
-</div>
+<p>
+اینجا Regex کارش پیدا کردن الگوی عددی است و <code>open()</code> و حلقه <code>for</code> کار خواندن فایل را انجام می‌دهند.
+این دو را با هم قاطی نکن.
+</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">17. پردازش فایل خط‌به‌خط</h2>
+<h2 class="lesson-title">15. اعتبارسنجی ورودی کاربر با حلقه</h2>
 
 <p>
-اگر فایل بزرگ باشد، معمولاً بهتر است آن را خط‌به‌خط پردازش کنیم
-تا همه محتوا را یکجا در حافظه نخوانیم.
+می‌توانیم تا زمانی که کاربر ورودی معتبر وارد نکرده، دوباره از او ورودی بگیریم.
 </p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">import re
 
-pattern = re.compile(
-    r"([A-Za-z]+) - "
-    r"([0-9]+) - "
-    r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})"
-)
+while True:
+    email = input("Email: ").strip()
 
-with open("data.txt", "r") as file:
-    for line in file:
-        line = line.strip()
+    if re.fullmatch(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+        email
+    ):
+        print("Valid email")
+        break
 
-        match = pattern.fullmatch(line)
-
-        if match:
-            name, age, email = match.groups()
-
-            print(f"Name: {name}")
-            print(f"Age: {age}")
-            print(f"Email: {email}")
-            print("-----")
-        else:
-            print("Invalid line:", line)</div>
+    print("Invalid email. Try again.")</div>
 </div>
 
-<div class="lesson-note">
-<strong>نکته:</strong>
-<code>re.compile()</code> یک الگوی Regex را به یک Pattern Object تبدیل می‌کند
-تا بتوانیم همان الگو را چند بار استفاده کنیم.
-</div>
+<p>
+اینجا چند مفهوم پایه Python با هم کار می‌کنند:
+<code>input()</code> برای دریافت ورودی، <code>while</code> برای تکرار،
+شرط <code>if</code> برای تصمیم‌گیری و Regex برای بررسی شکل ورودی.
+</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">18. اعتبارسنجی با ورودی کاربر و حلقه</h2>
-
-<p>
-یک سناریوی واقعی این است که تا زمانی که کاربر ورودی معتبر وارد نکرده،
-از او دوباره ورودی بگیریم.
-</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-def get_email():
-    pattern = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
-
-    while True:
-        email = input("Email: ").strip()
-
-        if re.fullmatch(pattern, email):
-            return email
-
-        print("Invalid email. Try again.")
-
-
-email = get_email()
-
-print("Saved:", email)</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Example Output</span>
-<div class="code-block no-prompt">Email: invalid
-Invalid email. Try again.
-Email: ali@example.com
-Saved: ali@example.com</div>
-</div>
-
-<p>
-اینجا چند مفهوم Python با هم ترکیب شده‌اند:
-</p>
-
-<div class="code-container">
-<span class="code-label">Flow</span>
-<div class="code-block no-prompt">input()
-   ↓
-strip()
-   ↓
-Regex Validation
-   ↓
-معتبر؟
- ┌───────┴───────┐
- بله             خیر
- ↓                ↓
-return           چاپ خطا
-                    ↓
-                 تکرار حلقه</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h1 class="lesson-title section-scenario">
-سناریوی ترکیبی — تحلیل فایل مشتریان
-</h1>
-
-<p>
-حالا همه مفاهیم اصلی جلسه را در یک مثال واقعی کنار هم قرار می‌دهیم.
-فرض کن فایل زیر را داریم:
-</p>
-
-<div class="code-container">
-<span class="code-label">customers.txt</span>
-<div class="code-block no-prompt">Ali - 0912-1234567 - ali@example.com
-Sara - 0935-9876543 - sara@example.org
-Reza - 0999-1111222 - reza@example.net
-Invalid - line - without format</div>
-</div>
-
-<p>
-می‌خواهیم:
-</p>
-
-<ul>
-<li>فایل را خط‌به‌خط بخوانیم.</li>
-<li>فقط سطرهای معتبر را پردازش کنیم.</li>
-<li>نام، شماره موبایل و ایمیل را استخراج کنیم.</li>
-<li>سطرهای نامعتبر را نادیده بگیریم.</li>
-</ul>
-
-<h3>مرحله ۱ — ساخت الگو</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">pattern = re.compile(
-    r"([A-Za-z]+) - "
-    r"(09[0-9]{2}-[0-9]{7}) - "
-    r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})"
-)</div>
-</div>
-
-<h3>مرحله ۲ — خواندن فایل</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-pattern = re.compile(
-    r"([A-Za-z]+) - "
-    r"(09[0-9]{2}-[0-9]{7}) - "
-    r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})"
-)
-
-with open("customers.txt", "r") as file:
-
-    for line in file:
-        line = line.strip()
-
-        match = pattern.fullmatch(line)
-
-        if match:
-            name, phone, email = match.groups()
-
-            print(f"Name: {name}")
-            print(f"Phone: {phone}")
-            print(f"Email: {email}")
-            print("-----")
-
-        else:
-            print("Skipping invalid line.")</div>
-</div>
-
-<div class="code-container">
-<span class="code-label">Output</span>
-<div class="code-block no-prompt">Name: Ali
-Phone: 0912-1234567
-Email: ali@example.com
------
-Name: Sara
-Phone: 0935-9876543
-Email: sara@example.org
------
-Name: Reza
-Phone: 0999-1111222
-Email: reza@example.net
------
-Skipping invalid line.</div>
-</div>
-
-<h3>مرحله ۳ — نسخه مقاوم‌تر با مدیریت خطا</h3>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">import re
-
-pattern = re.compile(
-    r"([A-Za-z]+) - "
-    r"(09[0-9]{2}-[0-9]{7}) - "
-    r"([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,})"
-)
-
-try:
-    with open("customers.txt", "r") as file:
-
-        for line in file:
-            line = line.strip()
-
-            match = pattern.fullmatch(line)
-
-            if match:
-                name, phone, email = match.groups()
-
-                print(f"Name: {name}")
-                print(f"Phone: {phone}")
-                print(f"Email: {email}")
-                print("-----")
-
-            else:
-                print("Skipping invalid line.")
-
-except FileNotFoundError:
-    print("File not found.")</div>
-</div>
-
-<h3>مدل ذهنی سناریو</h3>
-
-<div class="code-container">
-<span class="code-label">Final Flow</span>
-<div class="code-block no-prompt">فایل
-  ↓
-خواندن خط‌به‌خط
-  ↓
-Regex Pattern
-  ↓
-fullmatch()
-  ↓
-معتبر؟
- ┌───────────────┴───────────────┐
- بله                             خیر
- ↓                                ↓
-groups()                    نادیده گرفتن
- ↓
-name / phone / email
- ↓
-پردازش داده</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">نکته مهم درباره Regex در پروژه واقعی</h2>
-
-<p>
-Regex ابزار بسیار قدرتمندی برای کار با متن است، اما قرار نیست همه مسائل
-متنی را فقط با Regex حل کنیم.
-</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>کار</th>
-<th>ابزار مناسب</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>جستجوی الگوی متنی</td>
-<td>Regex</td>
-</tr>
-<tr>
-<td>اعتبارسنجی ساده</td>
-<td>Regex + شرط‌های Python</td>
-</tr>
-<tr>
-<td>تقسیم متن ساده</td>
-<td><code>str.split()</code></td>
-</tr>
-<tr>
-<td>جایگزینی ساده</td>
-<td><code>str.replace()</code></td>
-</tr>
-<tr>
-<td>الگوی پیچیده و متغیر</td>
-<td>Regex</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<div class="lesson-note">
-<strong>قاعده طلایی:</strong>
-هرجا ابزار ساده Python مسئله را واضح‌تر حل می‌کند،
-لازم نیست حتماً Regex استفاده کنیم.
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">مدل ذهنی کامل Regex</h2>
+<h2 class="lesson-title">مدل ذهنی کامل Regex در Python Basic</h2>
 
 <div class="code-container">
 <span class="code-label">Mental Model</span>
 <div class="code-block no-prompt">Regex
  │
- ├── search()
- │      └── پیدا کردن الگو در متن
+ ├── Pattern
  │
- ├── match()
- │      └── بررسی از ابتدای متن
+ ├── پیدا کردن
+ │      └── search()
  │
- ├── fullmatch()
- │      └── بررسی کل متن
+ ├── بررسی ابتدا
+ │      └── match()
  │
- ├── findall()
- │      └── استخراج همه تطابق‌ها
+ ├── بررسی کل رشته
+ │      └── fullmatch()
  │
- ├── گروه‌ها ()
- │      └── استخراج بخش‌های خاص
+ ├── استخراج
+ │      └── findall() / groups()
  │
- ├── split()
- │      └── تقسیم متن
+ ├── تقسیم
+ │      └── split()
  │
- ├── sub()
- │      └── جایگزینی
- │
- └── Flags
-        ├── IGNORECASE
-        ├── MULTILINE
-        └── DOTALL</div>
+ └── جایگزینی و پاک‌سازی
+        └── sub()</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>نیاز</th><th>ابزار مناسب</th></tr></thead>
+<tbody>
+<tr><td>جستجوی یک الگو</td><td><code>re.search()</code></td></tr>
+<tr><td>بررسی ابتدای رشته</td><td><code>re.match()</code></td></tr>
+<tr><td>بررسی کل ورودی</td><td><code>re.fullmatch()</code></td></tr>
+<tr><td>استخراج همه تطابق‌ها</td><td><code>re.findall()</code></td></tr>
+<tr><td>تقسیم متن با الگو</td><td><code>re.split()</code></td></tr>
+<tr><td>جایگزینی و پاک‌سازی</td><td><code>re.sub()</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="lesson-note">
+<strong>نکته مهم:</strong>
+اگر یک کار ساده با <code>str.split()</code> یا <code>str.replace()</code> قابل انجام است،
+لازم نیست حتماً Regex استفاده کنی. Regex زمانی ارزش بیشتری دارد که الگو متغیر یا چندحالتی باشد.
 </div>
 
 <hr class="lesson-divider">
@@ -40818,257 +39782,108 @@ Regex ابزار بسیار قدرتمندی برای کار با متن است�
 <h2 class="lesson-title">نکات مهم جلسه</h2>
 
 <ul>
-<li><code>()</code> برای ساخت گروه و استخراج بخش‌های مشخص از متن استفاده می‌شود.</li>
-<li><code>group(0)</code> کل تطابق و <code>group(1)</code>، <code>group(2)</code> و ... گروه‌ها را برمی‌گردانند.</li>
-<li><code>groups()</code> تمام گروه‌ها را به صورت Tuple می‌دهد.</li>
-<li><code>findall()</code> برای استخراج چند تطابق بسیار کاربردی است.</li>
-<li><code>search()</code>، <code>match()</code> و <code>fullmatch()</code> رفتار یکسانی ندارند.</li>
-<li><code>fullmatch()</code> برای بررسی کل ورودی گزینه مناسبی برای اعتبارسنجی است.</li>
-<li><code>^</code> ابتدای رشته و <code>$</code> انتهای رشته را مشخص می‌کنند.</li>
-<li><code>re.split()</code> متن را بر اساس یک الگوی Regex تقسیم می‌کند.</li>
+<li><code>()</code> برای ساخت Capture Group و دریافت بخش مشخصی از Match است.</li>
+<li><code>group(0)</code> کل Match و <code>group(1)</code>، <code>group(2)</code> و ... Groupها هستند.</li>
+<li><code>groups()</code> همه Groupها را به صورت Tuple برمی‌گرداند.</li>
+<li><code>findall()</code> برای پیدا کردن چند تطابق مناسب است.</li>
+<li><code>fullmatch()</code> زمانی مفید است که کل ورودی باید با Pattern مطابقت داشته باشد.</li>
+<li><code>re.split()</code> متن را بر اساس یک Pattern تقسیم می‌کند.</li>
 <li><code>re.sub()</code> برای جایگزینی و پاک‌سازی متن استفاده می‌شود.</li>
-<li><code>\\1</code> و <code>\\2</code> در Replacement به گروه‌ها اشاره می‌کنند.</li>
-<li><code>re.compile()</code> برای ساخت Pattern قابل استفاده مجدد است.</li>
-<li>ترکیب Regex با شرط‌های ساده Python اغلب از یک Regex بسیار پیچیده بهتر است.</li>
+<li>Regex را می‌توان با <code>input()</code>، شرط، حلقه و فایل ترکیب کرد.</li>
+<li>برای مثال‌های واقعی مثل Email و Mobile، Regex آموزشی ممکن است تمام قوانین واقعی را پوشش ندهد.</li>
+<li>برای کارهای ساده، ابزارهای معمول String را بی‌دلیل با Regex جایگزین نکن.</li>
 </ul>
 
 <hr class="lesson-divider">
 
-<h1 class="lesson-title section-test">تست پایانی — ۷ سؤال</h1>
+<h1 class="lesson-title section-test">تست پایانی — ۵ سؤال</h1>
 
-<p>
-هر سؤال را ابتدا خودت حل کن، سپس پاسخ را بررسی کن.
-</p>
+<p>ابتدا خودت پاسخ را انتخاب کن، سپس پاسخ و توضیح را ببین.</p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — در الگوی <code>(\\w+) (\\d+)</code> پرانتزها چه کاری انجام می‌دهند؟</p>
-
+<p>❓ سؤال ۱ — <code>group(1)</code> چه چیزی را برمی‌گرداند؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) تعداد کاراکترها را مشخص می‌کنند</button>
-<button onclick="selectOption(this)">ب) بخش‌های موردنظر را به عنوان گروه ثبت می‌کنند</button>
-<button onclick="selectOption(this)">ج) متن را حذف می‌کنند</button>
-<button onclick="selectOption(this)">د) Regex را متوقف می‌کنند</button>
+<button onclick="selectOption(this)">الف) کل متن</button>
+<button onclick="selectOption(this)">ب) اولین Capture Group</button>
+<button onclick="selectOption(this)">ج) Index اول متن</button>
+<button onclick="selectOption(this)">د) تعداد Groupها</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-پرانتزها بخش‌های Regex را به صورت Capture Group مشخص می‌کنند.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>group(1)</code> مقدار اولین Capture Group را برمی‌گرداند؛ <code>group(0)</code> کل Match است.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۲ — برای بررسی اینکه کل رشته با الگو مطابقت دارد، کدام گزینه مناسب‌تر است؟</p>
-
+<p>❓ سؤال ۲ — برای بررسی اینکه کل رشته با Pattern مطابقت دارد، کدام گزینه مناسب‌تر است؟</p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>re.search()</code></button>
-<button onclick="selectOption(this)">ب) <code>re.findall()</code></button>
+<button onclick="selectOption(this)">ب) <code>re.match()</code></button>
 <button onclick="selectOption(this)">ج) <code>re.fullmatch()</code></button>
-<button onclick="selectOption(this)">د) <code>re.split()</code></button>
+<button onclick="selectOption(this)">د) <code>re.find()</code></button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-<code>re.fullmatch()</code> کل رشته را با الگو مقایسه می‌کند.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br><code>fullmatch()</code> کل رشته را با Pattern مقایسه می‌کند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۳ — خروجی کد زیر چیست؟<br>
-<code>result = re.search(r"(\\w+) (\\d+)", "Ali 20")</code><br>
-<code>print(result.group(2))</code></p>
-
+<p>❓ سؤال ۳ — <code>re.findall()</code> برای چه کاری مناسب است؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>Ali</code></button>
-<button onclick="selectOption(this)">ب) <code>20</code></button>
-<button onclick="selectOption(this)">ج) <code>Ali 20</code></button>
-<button onclick="selectOption(this)">د) <code>None</code></button>
+<button onclick="selectOption(this)">الف) حذف فایل</button>
+<button onclick="selectOption(this)">ب) پیدا کردن همه تطابق‌ها</button>
+<button onclick="selectOption(this)">ج) فقط بررسی ابتدای رشته</button>
+<button onclick="selectOption(this)">د) چاپ Pattern</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-گروه دوم همان <code>(\\d+)</code> است و مقدار <code>20</code> را در خود دارد.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br><code>findall()</code> برای استخراج همه تطابق‌های Pattern در متن مناسب است.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۴ — اگر بنویسیم <code>re.findall(r"(\\w+) - (\\d+)", text)</code> و چند تطابق وجود داشته باشد، نتیجه چه شکلی است؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) یک String</button>
-<button onclick="selectOption(this)">ب) یک Match Object</button>
-<button onclick="selectOption(this)">ج) یک List از Tupleها</button>
-<button onclick="selectOption(this)">د) یک Boolean</button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-وقتی <code>findall()</code> دارای چند گروه باشد، داده‌های گروه‌ها را در قالب List از Tuple برمی‌گرداند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۵ — کدام تابع برای تقسیم متن بر اساس یک الگوی Regex استفاده می‌شود؟</p>
-
+<p>❓ سؤال ۴ — کدام تابع برای جایگزینی بخش‌های مطابق Pattern استفاده می‌شود؟</p>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>re.sub()</code></button>
 <button onclick="selectOption(this)">ب) <code>re.split()</code></button>
-<button onclick="selectOption(this)">ج) <code>re.match()</code></button>
-<button onclick="selectOption(this)">د) <code>re.group()</code></button>
+<button onclick="selectOption(this)">ج) <code>re.group()</code></button>
+<button onclick="selectOption(this)">د) <code>re.change()</code></button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-<code>re.split()</code> متن را بر اساس الگوی مشخص‌شده به چند بخش تقسیم می‌کند.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br><code>re.sub()</code> بخش‌های مطابق Pattern را با مقدار جدید جایگزین می‌کند.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — در کد زیر <code>\\1</code> چه معنایی دارد؟<br>
-<code>re.sub(r"(a) (b)", r"\\2 \\1", text)</code></p>
-
+<p>❓ سؤال ۵ — چرا در مثال Email از <code>fullmatch()</code> استفاده کردیم؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) کاراکتر اول متن</button>
-<button onclick="selectOption(this)">ب) گروه اول</button>
-<button onclick="selectOption(this)">ج) تعداد تکرار اول</button>
-<button onclick="selectOption(this)">د) کل Regex</button>
+<button onclick="selectOption(this)">الف) چون فقط ابتدای Email مهم است</button>
+<button onclick="selectOption(this)">ب) چون می‌خواستیم کل ورودی با Pattern مطابقت داشته باشد</button>
+<button onclick="selectOption(this)">ج) چون fullmatch سریع‌تر از همه توابع است</button>
+<button onclick="selectOption(this)">د) چون Email فقط با عدد بررسی می‌شود</button>
 </div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ب</strong>
-<br>
-در Replacement، <code>\\1</code> به اولین Capture Group اشاره می‌کند.
-</div>
-</div>
-
-<div class="quiz-card">
-<p>❓ سؤال ۷ — برای نادیده گرفتن بزرگی و کوچکی حروف از کدام Flag استفاده می‌کنیم؟</p>
-
-<div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>re.MULTILINE</code></button>
-<button onclick="selectOption(this)">ب) <code>re.DOTALL</code></button>
-<button onclick="selectOption(this)">ج) <code>re.IGNORECASE</code></button>
-<button onclick="selectOption(this)">د) <code>re.FULL</code></button>
-</div>
-
-<div class="quiz-answer">
-<strong>✅ پاسخ: ج</strong>
-<br>
-<code>re.IGNORECASE</code> باعث می‌شود تفاوت بین حروف بزرگ و کوچک نادیده گرفته شود.
-</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در اعتبارسنجی ساده Email می‌خواهیم کل رشته مطابق Pattern باشد، نه فقط یک بخش از آن.</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">🎯 جمع‌بندی فصل ۱۶</h2>
+<h2 class="lesson-title">جمع‌بندی فصل ۱۶</h2>
 
 <p>
-در این فصل ابتدا یاد گرفتیم Regex چیست و چگونه الگوهای متنی را می‌سازیم.
-سپس یاد گرفتیم این ابزار را در برنامه واقعی Python به کار ببریم.
+در این فصل ابتدا یاد گرفتیم Regex چیست و چگونه Patternهای ساده بسازیم.
+سپس این Patternها را در Python با ماژول <code>re</code> برای جستجو، استخراج، اعتبارسنجی،
+تقسیم و جایگزینی متن به کار بردیم.
 </p>
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>مفهوم</th>
-<th>کاربرد اصلی</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>search()</code></td>
-<td>جستجو در متن</td>
-</tr>
-<tr>
-<td><code>match()</code></td>
-<td>شروع رشته</td>
-</tr>
-<tr>
-<td><code>fullmatch()</code></td>
-<td>اعتبارسنجی کل رشته</td>
-</tr>
-<tr>
-<td><code>findall()</code></td>
-<td>استخراج همه تطابق‌ها</td>
-</tr>
-<tr>
-<td><code>()</code></td>
-<td>گروه‌بندی و استخراج</td>
-</tr>
-<tr>
-<td><code>groups()</code></td>
-<td>دریافت همه گروه‌ها</td>
-</tr>
-<tr>
-<td><code>re.split()</code></td>
-<td>تقسیم متن</td>
-</tr>
-<tr>
-<td><code>re.sub()</code></td>
-<td>جایگزینی و پاک‌سازی</td>
-</tr>
-<tr>
-<td><code>re.compile()</code></td>
-<td>استفاده مجدد از یک Pattern</td>
-</tr>
-<tr>
-<td><code>re.IGNORECASE</code></td>
-<td>نادیده گرفتن بزرگی/کوچکی حروف</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<p>چهار الگوی کاربردی که باید خوب بلد باشی:</p>
-
 <div class="code-container">
-<span class="code-label">Core Patterns</span>
-<div class="code-block no-prompt"># جستجو
-re.search(r"pattern", text)
-
-# استخراج
-re.findall(r"(group1) (group2)", text)
-
-# اعتبارسنجی کل رشته
-re.fullmatch(r"pattern", text)
-
-# تقسیم متن
-re.split(r"[,;|]", text)
-
-# جایگزینی
-re.sub(r"pattern", "replacement", text)
-
-# استفاده از گروه در جایگزینی
-re.sub(r"(a) (b)", r"\\2 \\1", text)</div>
+<span class="code-label">Final Model</span>
+<div class="code-block no-prompt">Pattern
+   ↓
+re.search()      → پیدا کردن
+re.match()       → بررسی از ابتدا
+re.fullmatch()   → بررسی کل رشته
+re.findall()     → استخراج همه
+re.split()       → تقسیم
+re.sub()         → جایگزینی / پاک‌سازی</div>
 </div>
 
-<div class="code-container">
-<span class="code-label">Final Mental Model</span>
-<div class="code-block no-prompt">Regex
- │
- ├── پیدا کن      → search()
- ├── استخراج کن   → findall() + groups
- ├── بررسی کن     → fullmatch()
- ├── تقسیم کن     → split()
- ├── جایگزین کن   → sub()
- └── پردازش کن    → file + loop + Regex</div>
-</div>
+<div class="lesson-important">
+<strong>اصل نهایی:</strong>
+Regex یک ابزار برای کار با <strong>الگوی متن</strong> است.
+اگر مسئله با String Method ساده حل می‌شود، همان روش را استفاده کن؛
+اگر مسئله به یک الگوی متغیر نیاز دارد، Regex می‌تواند ابزار مناسبی باشد.
+</div>`
 
-<p>
-با پایان فصل ۱۶، دیگر Regex فقط یک مجموعه علامت و الگو نیست؛
-بلکه به عنوان ابزاری برای <strong>جستجو، استخراج، اعتبارسنجی،
-پاک‌سازی و پردازش داده‌های متنی</strong> از آن استفاده می‌کنی.
-</p>
-
-<p>
-در <strong>فصل ۱۷ — کاربردهای مهم Python</strong> سراغ ماژول‌ها و ابزارهای
-پرکاربرد Python می‌رویم و آن‌ها را در مثال‌های واقعی به کار می‌بریم.
-</p>`
 };
 
         // ============================================================
