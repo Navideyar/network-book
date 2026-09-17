@@ -6666,19 +6666,33 @@ pip_list(installed_packages)</pre>
         <div class="exercise-head">
             <span class="exercise-num">۱</span>
             <div>
-                <strong>خواندن محتوای فایل — شبیه‌سازی با StringIO</strong>
+                <strong>خواندن محتوای فایل</strong>
                 <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>با استفاده از ماژول <code>io</code> و کلاس <code>StringIO</code> یک فایل در حافظه بسازید که محتوای زیر را داشته باشد:</p>
-        <div class="code-container"><span class="code-label">Content</span><div class="code-block no-prompt">Hello
-World
-Python</div></div>
-        <p>سپس با استفاده از <code>with</code> آن را باز کرده، تمام محتوا را بخوانید و چاپ کنید.</p>
+
+        <p>
+            فایل <code>notes.txt</code> را در حالت خواندن باز کنید و تمام محتوای آن را
+            با استفاده از <code>read()</code> بخوانید و چاپ کنید.
+        </p>
+
+        <p><strong>کد اولیه:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Python</span>
+            <div class="code-block no-prompt">filename = "notes.txt"
+
+# کد خود را اینجا بنویسید</div>
+        </div>
+
         <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello
-World
-Python</div></div>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">Hello Python
+File Handling</div>
+        </div>
+
         <div class="python-playground" data-playground="ch13-ex1">
             <div class="playground-header">
                 <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 1 · Read File</span></div>
@@ -6689,40 +6703,44 @@ Python</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">filename = "notes.txt"
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol1"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol1">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>filename = "notes.txt"
 
-content = "Hello\nWorld\nPython"
+with open(filename, "r") as file:
+    content = file.read()
 
-with io.StringIO(content) as file:
-    data = file.read()
-
-print(data)</pre>
+print(content)</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۲ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۲</span>
             <div>
-                <strong>نوشتن در فایل — شبیه‌سازی با StringIO</strong>
+                <strong>نوشتن در فایل</strong>
                 <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>یک <code>StringIO</code> خالی بسازید و دو خط زیر را در آن بنویسید:</p>
-        <div class="code-container"><span class="code-label">Lines</span><div class="code-block no-prompt">Python
-Programming</div></div>
-        <p>سپس مقدار نوشته‌شده را با <code>getvalue()</code> دریافت کرده و چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Python
-Programming</div></div>
+
+        <p>
+            یک فایل به نام <code>message.txt</code> ایجاد کنید و متن
+            <code>Python is easy to learn.</code> را داخل آن بنویسید.
+        </p>
+
+        <p><strong>راهنما:</strong> از حالت <code>"w"</code> و متد <code>write()</code> استفاده کنید.</p>
+
         <div class="python-playground" data-playground="ch13-ex2">
             <div class="playground-header">
                 <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 2 · Write File</span></div>
@@ -6733,46 +6751,59 @@ Programming</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">filename = "message.txt"
+text = "Python is easy to learn."
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>محتوای مورد انتظار فایل:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">File</span>
+            <div class="code-block no-prompt">Python is easy to learn.</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol2"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol2">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>filename = "message.txt"
+text = "Python is easy to learn."
 
-file = io.StringIO()
-file.write("Python\n")
-file.write("Programming")
-
-print(file.getvalue())</pre>
+with open(filename, "w") as file:
+    file.write(text)</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۳ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۳</span>
             <div>
-                <strong>خواندن خط به خط و شماره‌گذاری</strong>
-                <small>درجه سختی: متوسط</small>
+                <strong>خواندن فایل خط‌به‌خط</strong>
+                <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>محتوای زیر را در یک <code>StringIO</code> قرار دهید:</p>
-        <div class="code-container"><span class="code-label">Content</span><div class="code-block no-prompt">Ali
+
+        <p>
+            فایل <code>names.txt</code> شامل نام‌های زیر است.
+            فایل را باز کنید و با استفاده از حلقه <code>for</code> هر نام را در یک خط چاپ کنید.
+        </p>
+
+        <div class="code-container">
+            <span class="code-label">File Content</span>
+            <div class="code-block no-prompt">Ali
 Sara
-Reza
-Mina</div></div>
-        <p>سپس با استفاده از یک حلقه، خطوط را یکی‌یکی خوانده و با شماره خط چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">1: Ali
-2: Sara
-3: Reza
-4: Mina</div></div>
+Reza</div>
+        </div>
+
         <div class="python-playground" data-playground="ch13-ex3">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 3 · Read Lines with Numbers</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 3 · Read Lines</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -6780,43 +6811,59 @@ Mina</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">filename = "names.txt"
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">Ali
+Sara
+Reza</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol3"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol3">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>filename = "names.txt"
 
-content = "Ali\nSara\nReza\nMina"
-
-with io.StringIO(content) as file:
-    for number, line in enumerate(file, start=1):
-        print(f"{number}: {line.strip()}")</pre>
+with open(filename, "r") as file:
+    for line in file:
+        print(line.strip())</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۴ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۴</span>
             <div>
-                <strong>افزودن به فایل (Append)</strong>
-                <small>درجه سختی: متوسط</small>
+                <strong>استفاده از readline()</strong>
+                <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>یک <code>StringIO</code> با محتوای اولیه زیر بسازید:</p>
-        <div class="code-container"><span class="code-label">Initial</span><div class="code-block no-prompt">Line 1
-Line 2</div></div>
-        <p>سپس خط <code>Line 3</code> را به انتهای آن اضافه کنید. در نهایت کل محتوا را چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Line 1
-Line 2
-Line 3</div></div>
+
+        <p>
+            فایل <code>languages.txt</code> شامل دو خط زیر است.
+            با استفاده از <code>readline()</code> خط اول و دوم را بخوانید.
+        </p>
+
+        <div class="code-container">
+            <span class="code-label">File Content</span>
+            <div class="code-block no-prompt">Python
+JavaScript</div>
+        </div>
+
         <div class="python-playground" data-playground="ch13-ex4">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 4 · Append to File</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 4 · readline()</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -6824,37 +6871,55 @@ Line 3</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">filename = "languages.txt"
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">Python
+JavaScript</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol4"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol4">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>filename = "languages.txt"
 
-file = io.StringIO("Line 1\nLine 2\n")
-file.write("Line 3")
-print(file.getvalue())</pre>
+with open(filename, "r") as file:
+    line1 = file.readline()
+    line2 = file.readline()
+
+print(line1.strip())
+print(line2.strip())</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۵ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۵</span>
             <div>
-                <strong>بستن خودکار فایل با <code>with</code></strong>
+                <strong>مدیریت فایل با with</strong>
                 <small>درجه سختی: متوسط</small>
             </div>
         </div>
-        <p>یک <code>StringIO</code> با محتوای دلخواه بسازید. با استفاده از بلوک <code>with</code> آن را باز کرده و یک خط بخوانید. سپس بعد از اتمام بلوک، بررسی کنید که فایل بسته شده است یا خیر.</p>
-        <p>برای بررسی بسته شدن، از ویژگی <code>closed</code> استفاده کنید و مقدار آن را چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار (مقدار closed بعد از with):</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">True</div></div>
+
+        <p>
+            فایل <code>test.txt</code> را با استفاده از <code>with</code> باز کنید.
+            سپس خارج از بلوک <code>with</code> بررسی کنید که فایل بسته شده است یا خیر.
+        </p>
+
         <div class="python-playground" data-playground="ch13-ex5">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 5 · with Statement</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 5 · with</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -6862,50 +6927,60 @@ print(file.getvalue())</pre>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">filename = "test.txt"
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">True</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol5"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol5">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>filename = "test.txt"
 
-file = io.StringIO("Hello")
-
-with file:
-    file.readline()
+with open(filename, "r") as file:
+    print(file.read())
 
 print(file.closed)</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۶ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۶</span>
             <div>
-                <strong>کار با <code>pathlib.PurePath</code></strong>
-                <small>درجه سختی: متوسط</small>
+                <strong>ساخت مسیر با Path</strong>
+                <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>یک شیء <code>PurePath</code> از مسیر زیر بسازید:</p>
-        <div class="code-container"><span class="code-label">Path</span><div class="code-block no-prompt">/home/user/docs/file.txt</div></div>
-        <p>سپس مقادیر زیر را چاپ کنید:</p>
-        <ul>
-            <li><code>name</code> — نام فایل</li>
-            <li><code>stem</code> — نام فایل بدون پسوند</li>
-            <li><code>suffix</code> — پسوند</li>
-            <li><code>parent</code> — پوشه والد</li>
-        </ul>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">file.txt
-file
-.txt
-/home/user/docs</div></div>
+
+        <p>
+            با استفاده از <code>Path</code> مسیر زیر را بسازید:
+        </p>
+
+        <div class="code-container">
+            <span class="code-label">Path</span>
+            <div class="code-block no-prompt">documents/python/lesson.txt</div>
+        </div>
+
+        <p>
+            مسیر ساخته‌شده را در متغیر <code>file_path</code> قرار دهید و چاپ کنید.
+        </p>
+
         <div class="python-playground" data-playground="ch13-ex6">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 6 · pathlib PurePath</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 6 · pathlib</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -6913,16 +6988,95 @@ file
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">from pathlib import Path
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">documents/python/lesson.txt</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol6"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol6">
             <strong>پاسخ:</strong>
-            <pre>from pathlib import PurePath
+            <pre>from pathlib import Path
 
-path = PurePath("/home/user/docs/file.txt")
+file_path = Path("documents") / "python" / "lesson.txt"
+
+print(file_path)</pre>
+        </div>
+    </div>
+
+
+    <!-- ===== تمرین ۷ ===== -->
+    <div class="exercise-card">
+        <div class="exercise-head">
+            <span class="exercise-num">۷</span>
+            <div>
+                <strong>شناخت اجزای مسیر</strong>
+                <small>درجه سختی: متوسط</small>
+            </div>
+        </div>
+
+        <p>
+            مسیر زیر را با <code>Path</code> بسازید و چهار مورد زیر را چاپ کنید:
+        </p>
+
+        <ul>
+            <li>نام فایل با <code>name</code></li>
+            <li>نام فایل بدون پسوند با <code>stem</code></li>
+            <li>پسوند فایل با <code>suffix</code></li>
+            <li>پوشه والد با <code>parent</code></li>
+        </ul>
+
+        <div class="code-container">
+            <span class="code-label">Path</span>
+            <div class="code-block no-prompt">/home/user/projects/app.py</div>
+        </div>
+
+        <div class="python-playground" data-playground="ch13-ex7">
+            <div class="playground-header">
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 7 · Path Parts</span></div>
+                <div class="playground-status"></div>
+                <div class="playground-actions">
+                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
+                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
+                </div>
+            </div>
+            <div class="playground-editor-wrap">
+                <textarea class="python-editor">from pathlib import Path
+
+path = Path("/home/user/projects/app.py")
+
+# کد خود را اینجا بنویسید</textarea>
+            </div>
+            <div class="playground-output">▶ Output will be shown here...</div>
+        </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">app.py
+app
+.py
+/home/user/projects</div>
+        </div>
+
+        <button class="solution-toggle" type="button" data-solution="ch13-sol7"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
+        <div class="exercise-solution" id="ch13-sol7">
+            <strong>پاسخ:</strong>
+            <pre>from pathlib import Path
+
+path = Path("/home/user/projects/app.py")
 
 print(path.name)
 print(path.stem)
@@ -6931,80 +7085,30 @@ print(path.parent)</pre>
         </div>
     </div>
 
-    <!-- ===== تمرین ۷ ===== -->
-    <div class="exercise-card">
-        <div class="exercise-head">
-            <span class="exercise-num">۷</span>
-            <div>
-                <strong>کار با <code>os.path</code></strong>
-                <small>درجه سختی: سخت</small>
-            </div>
-        </div>
-        <p>مسیر زیر را در نظر بگیرید:</p>
-        <div class="code-container"><span class="code-label">Path</span><div class="code-block no-prompt">/projects/python/main.py</div></div>
-        <p>با استفاده از توابع ماژول <code>os.path</code> موارد زیر را انجام دهید و چاپ کنید:</p>
-        <ul>
-            <li>ترکیب دو مسیر <code>/projects</code> و <code>python/app.py</code> با <code>os.path.join</code></li>
-            <li>نام فایل با <code>os.path.basename</code></li>
-            <li>مسیر پوشه با <code>os.path.dirname</code></li>
-            <li>جدا کردن نام و پسوند با <code>os.path.splitext</code></li>
-        </ul>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">/projects/python/app.py
-main.py
-/projects/python
-('main', '.py')</div></div>
-        <div class="python-playground" data-playground="ch13-ex7">
-            <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 7 · os.path</span></div>
-                <div class="playground-status"></div>
-                <div class="playground-actions">
-                    <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
-                    <button type="button" class="playground-btn run" data-action="run"><i class="fas fa-play"></i> Run</button>
-                </div>
-            </div>
-            <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
-            </div>
-            <div class="playground-output">▶ Output will be shown here...</div>
-        </div>
-        <button class="solution-toggle" type="button" data-solution="ch13-sol7"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-        <div class="exercise-solution" id="ch13-sol7">
-            <strong>پاسخ:</strong>
-            <pre>import os
-
-path = "/projects/python/main.py"
-
-print(os.path.join("/projects", "python/app.py"))
-print(os.path.basename(path))
-print(os.path.dirname(path))
-print(os.path.splitext(path))</pre>
-        </div>
-    </div>
 
     <!-- ===== تمرین ۸ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۸</span>
             <div>
-                <strong>پردازش CSV ساده</strong>
-                <small>درجه سختی: سخت</small>
+                <strong>پیدا کردن پوشه والد</strong>
+                <small>درجه سختی: ساده</small>
             </div>
         </div>
-        <p>یک رشته CSV با محتوای زیر داریم:</p>
-        <div class="code-container"><span class="code-label">CSV</span><div class="code-block no-prompt">name,age,city
-Ali,25,Tehran
-Sara,30,Shiraz
-Reza,28,Mashhad</div></div>
-        <p>با استفاده از <code>StringIO</code> و متد <code>readline</code>، خطوط را خوانده و به لیستی از دیکشنری‌ها تبدیل کنید. کلیدها نام ستون‌ها و مقادیر هر ردیف باشند.</p>
-        <p>در نهایت هر دیکشنری را چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">{'name': 'Ali', 'age': '25', 'city': 'Tehran'}
-{'name': 'Sara', 'age': '30', 'city': 'Shiraz'}
-{'name': 'Reza', 'age': '28', 'city': 'Mashhad'}</div></div>
+
+        <p>
+            مسیر زیر را در نظر بگیرید. با استفاده از <code>parent</code>
+            نام پوشه‌ای که فایل داخل آن قرار دارد را چاپ کنید.
+        </p>
+
+        <div class="code-container">
+            <span class="code-label">Path</span>
+            <div class="code-block no-prompt">projects/python/lesson.py</div>
+        </div>
+
         <div class="python-playground" data-playground="ch13-ex8">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 8 · CSV Parsing</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 8 · Parent</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -7012,53 +7116,59 @@ Reza,28,Mashhad</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">from pathlib import Path
+
+path = Path("projects/python/lesson.py")
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">python</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol8"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol8">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>from pathlib import Path
 
-csv_data = """name,age,city
-Ali,25,Tehran
-Sara,30,Shiraz
-Reza,28,Mashhad"""
+path = Path("projects/python/lesson.py")
 
-with io.StringIO(csv_data) as file:
-    headers = file.readline().strip().split(",")
-    rows = []
-    for line in file:
-        values = line.strip().split(",")
-        row_dict = dict(zip(headers, values))
-        rows.append(row_dict)
-
-for row in rows:
-    print(row)</pre>
+print(path.parent.name)</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۹ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۹</span>
             <div>
-                <strong>ذخیره لیست در فایل و بازخوانی</strong>
-                <small>درجه سختی: چالشی</small>
+                <strong>بررسی وضعیت یک مسیر</strong>
+                <small>درجه سختی: متوسط</small>
             </div>
         </div>
-        <p>لیست زیر را در نظر بگیرید:</p>
-        <div class="code-container"><span class="code-label">Python</span><div class="code-block no-prompt">names = ["Ali", "Sara", "Reza", "Mina"]</div></div>
-        <p>با استفاده از <code>StringIO</code>، هر نام را در یک خط بنویسید. سپس فایل را ببندید و دوباره باز کنید (یک <code>StringIO</code> جدید با همان محتوا بسازید) و خطوط را خوانده و به صورت شماره‌گذاری‌شده چاپ کنید.</p>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">1: Ali
-2: Sara
-3: Reza
-4: Mina</div></div>
+
+        <p>
+            مسیر <code>notes.txt</code> را با <code>Path</code> مشخص کنید.
+            سپس با استفاده از متدهای زیر وضعیت آن را بررسی کنید:
+        </p>
+
+        <ul>
+            <li><code>exists()</code></li>
+            <li><code>is_file()</code></li>
+            <li><code>is_dir()</code></li>
+        </ul>
+
         <div class="python-playground" data-playground="ch13-ex9">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 9 · Write and Read List</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 9 · Path Check</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -7066,62 +7176,64 @@ for row in rows:
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">from pathlib import Path
+
+path = Path("notes.txt")
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار در صورتی که فایل وجود داشته باشد:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">True
+True
+False</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol9"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol9">
             <strong>پاسخ:</strong>
-            <pre>import io
+            <pre>from pathlib import Path
 
-names = ["Ali", "Sara", "Reza", "Mina"]
+path = Path("notes.txt")
 
-# نوشتن در فایل
-file = io.StringIO()
-for name in names:
-    file.write(name + "\n")
-content = file.getvalue()
-file.close()
-
-# بازخوانی از فایل جدید
-with io.StringIO(content) as file:
-    for number, line in enumerate(file, start=1):
-        print(f"{number}: {line.strip()}")</pre>
+print(path.exists())
+print(path.is_file())
+print(path.is_dir())</pre>
         </div>
     </div>
+
 
     <!-- ===== تمرین ۱۰ ===== -->
     <div class="exercise-card">
         <div class="exercise-head">
             <span class="exercise-num">۱۰</span>
             <div>
-                <strong>شبیه‌سازی سیستم فایل با دیکشنری</strong>
-                <small>درجه سختی: چالشی</small>
+                <strong>ترکیب Path و open()</strong>
+                <small>درجه سختی: متوسط</small>
             </div>
         </div>
-        <p>یک سیستم فایل ساده را با استفاده از دیکشنری شبیه‌سازی کنید. دیکشنری <code>filesystem</code> را به صورت خالی شروع کنید.</p>
-        <p>سه تابع زیر را پیاده‌سازی کنید:</p>
-        <ul>
-            <li><code>write_file(filename, content)</code> — فایل را با محتوای داده‌شده ایجاد یا بازنویسی کند.</li>
-            <li><code>read_file(filename)</code> — محتوای فایل را برگرداند؛ اگر فایل وجود نداشت، پیام <code>File not found</code> را برگرداند.</li>
-            <li><code>append_file(filename, content)</code> — اگر فایل وجود داشت، محتوا را به انتهای آن اضافه کند؛ در غیر این صورت فایل را ایجاد کند.</li>
-        </ul>
-        <p>سپس مراحل زیر را انجام دهید:</p>
-        <ol>
-            <li>فایل <code>notes.txt</code> را با محتوای <code>"Hello\n"</code> ایجاد کنید.</li>
-            <li>به آن <code>"World\n"</code> اضافه کنید.</li>
-            <li>محتوای فایل را بخوانید و چاپ کنید.</li>
-            <li>محتوای یک فایل ناموجود مثل <code>missing.txt</code> را بخوانید و نتیجه را چاپ کنید.</li>
-        </ol>
-        <p><strong>خروجی مورد انتظار:</strong></p>
-        <div class="code-container"><span class="code-label">Output</span><div class="code-block no-prompt">Hello
-World
 
-File not found</div></div>
+        <p>
+            حالا مفاهیم این فصل را با هم ترکیب کنید.
+            مسیر فایل <code>python.txt</code> را با <code>Path</code> مشخص کنید،
+            نام فایل را چاپ کنید و سپس محتوای فایل را با <code>open()</code> بخوانید.
+        </p>
+
+        <div class="code-container">
+            <span class="code-label">File Content</span>
+            <div class="code-block no-prompt">Python
+File Handling</div>
+        </div>
+
         <div class="python-playground" data-playground="ch13-ex10">
             <div class="playground-header">
-                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 10 · File System Simulation</span></div>
+                <div class="playground-title"><i class="fas fa-code"></i><span>Exercise 10 · Path + open()</span></div>
                 <div class="playground-status"></div>
                 <div class="playground-actions">
                     <button type="button" class="playground-btn clear" data-action="clear"><i class="fas fa-eraser"></i> Clear</button>
@@ -7129,44 +7241,44 @@ File not found</div></div>
                 </div>
             </div>
             <div class="playground-editor-wrap">
-                <textarea class="python-editor"></textarea>
+                <textarea class="python-editor">from pathlib import Path
+
+file_path = Path("python.txt")
+
+# کد خود را اینجا بنویسید</textarea>
             </div>
             <div class="playground-output">▶ Output will be shown here...</div>
         </div>
+
+        <p><strong>خروجی مورد انتظار:</strong></p>
+
+        <div class="code-container">
+            <span class="code-label">Output</span>
+            <div class="code-block no-prompt">python.txt
+Python
+File Handling</div>
+        </div>
+
         <button class="solution-toggle" type="button" data-solution="ch13-sol10"><i class="fas fa-eye"></i> نمایش پاسخ</button>
+
         <div class="exercise-solution" id="ch13-sol10">
             <strong>پاسخ:</strong>
-            <pre>filesystem = {}
+            <pre>from pathlib import Path
 
+file_path = Path("python.txt")
 
-def write_file(filename, content):
-    filesystem[filename] = content
+print(file_path.name)
 
-
-def read_file(filename):
-    if filename not in filesystem:
-        return "File not found"
-    return filesystem[filename]
-
-
-def append_file(filename, content):
-    if filename in filesystem:
-        filesystem[filename] += content
-    else:
-        filesystem[filename] = content
-
-
-write_file("notes.txt", "Hello\n")
-append_file("notes.txt", "World\n")
-
-print(read_file("notes.txt"))
-print(read_file("missing.txt"))</pre>
+with open(file_path, "r") as file:
+    print(file.read())</pre>
         </div>
     </div>
 
     <hr class="lesson-divider">
+
     <p style="color: var(--text-muted); text-align: center; font-size: 0.95rem;">
-        <i class="fas fa-info-circle"></i> تمام تمرین‌های این فصل را می‌توانید مستقیماً در همین صفحه اجرا کنید.
+        <i class="fas fa-info-circle"></i>
+        تمرین‌های این فصل را می‌توانید مستقیماً در محیط کدنویسی اجرا کنید.
     </p>
 `
 ,
