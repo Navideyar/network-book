@@ -20449,170 +20449,194 @@ Execute Block</div>
     بلکه می‌تواند بر اساس مقدار داده‌ها <strong>تصمیم بگیرد</strong>.
 </p>`
 ,
-"ch8-2": `<div class="section-header"> <div class="section-badge">۸</div> <div> <h1>حل مسئله با شرط‌ها و تمرین‌های ترکیبی</h1> <div class="meta">فصل ۸ · بخش ۲ از ۲</div> </div>
-
+"ch8-2": `<div class="section-header">
+<div class="section-badge">۸</div>
+<div>
+<h1>حل مسئله با شرط‌ها و تمرین‌های ترکیبی</h1>
+<div class="meta">فصل ۸ · بخش ۲ از ۲</div>
+</div>
 </div>
 
 <blockquote class="lesson-goal">
 <strong class="goal-title">هدف جلسه</strong>
 <p>در پایان این جلسه باید بتوانی:</p>
 <ol>
-<li>یک مسئله ساده را به ورودی، حالت‌ها و تصمیم‌های قابل‌کدنویسی تبدیل کنی.</li>
-<li>تشخیص بدهی چه زمانی از <code>if</code>، <code>elif</code> و <code>else</code> استفاده کنی.</li>
-<li>شرط‌های چندگانه را با <code>and</code> و <code>or</code> ترکیب کنی.</li>
-<li>در مسائل مناسب از <strong>Nested Conditions</strong> استفاده کنی.</li>
-<li>ترتیب شرط‌ها و حالت‌های مرزی را درست مدیریت کنی.</li>
-<li>یک مسئله واقعی را مرحله‌به‌مرحله تحلیل، پیاده‌سازی و تست کنی.</li>
+<li>یک مسئله را به <strong>ورودی، قوانین، حالت‌ها و خروجی</strong> تبدیل کنی.</li>
+<li>بر اساس تعداد حالت‌ها از <code>if</code>، <code>elif</code> و <code>else</code> استفاده کنی.</li>
+<li>شرط‌ها را با <code>and</code>، <code>or</code> و <code>not</code> ترکیب کنی.</li>
+<li>شرط‌های بازه‌ای و حالت‌های مرزی را درست پیاده‌سازی و تست کنی.</li>
+<li>تشخیص بدهی چه زمانی شرط تو‌در‌تو مناسب است و چه زمانی <code>and</code> خواناتر است.</li>
+<li>یک مسئله واقعی را مرحله‌به‌مرحله تحلیل، کدنویسی و تست کنی.</li>
 </ol>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">1. از نوشتن شرط تا حل مسئله</h2>
+<h2 class="lesson-title">1. قبل از کدنویسی، مسئله را به اجزای ساده تبدیل کن</h2>
 
-<p>در بخش قبلی یاد گرفتیم که با <code>if</code>، <code>elif</code> و <code>else</code> می‌توانیم بر اساس یک شرط تصمیم بگیریم.</p>
+<p>در بخش قبلی یاد گرفتیم که <code>if</code>، <code>elif</code> و <code>else</code> برای تصمیم‌گیری در برنامه استفاده می‌شوند.</p>
+
+<p>اما در یک مسئله واقعی، معمولاً سخت‌ترین قسمت نوشتن <code>if</code> نیست؛ بلکه این است که بفهمیم <strong>دقیقاً چه چیزی را باید بررسی کنیم</strong>.</p>
+
+<p>یک روش ساده این است که هر مسئله را ابتدا به چهار بخش تبدیل کنیم:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if condition:
-    ...
-elif condition:
-    ...
-else:
-    ...</div>
+<span class="code-label">مدل حل مسئله</span>
+<div class="code-block no-prompt">Input
+  ↓
+قوانین و شرط‌ها
+  ↓
+تصمیم
+  ↓
+Output</div>
 </div>
 
-<p>اما در برنامه‌نویسی واقعی، مشکل اصلی معمولاً <strong>نوشتن Syntax</strong> نیست؛ بلکه این است که بدانیم یک مسئله را چگونه به شرط‌های درست تبدیل کنیم.</p>
-
-<p>مثلاً مسئله زیر را در نظر بگیر:</p>
+<p>مثلاً مسئله:</p>
 
 <blockquote>
 اگر نمره دانش‌آموز حداقل 10 باشد، قبول است؛ در غیر این صورت مردود.
 </blockquote>
 
-<p>قبل از کدنویسی باید قانون مسئله را به یک شرط تبدیل کنیم:</p>
+<p>آن را این‌طور تحلیل می‌کنیم:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">قانون:
-نمره حداقل 10 → قبول
+<span class="code-label">تحلیل</span>
+<div class="code-block no-prompt">Input  → score
 
-شرط:
-score >= 10</div>
+قانون  → score >= 10
 
+اگر شرط درست باشد → Pass
+اگر درست نباشد      → Fail</div>
 </div>
 
-<p>حالا کدنویسی ساده می‌شود:</p>
+<p>حالا تبدیل آن به Python ساده است:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">score = 15
 
 if score >= 10:
-print("Pass")
+    print("Pass")
 else:
-print("Fail")</div>
-
+    print("Fail")</div>
 </div>
 
-<p>پس اولین مهارت مهم این جلسه این است:</p>
-
 <blockquote>
-<strong>ابتدا قانون مسئله را بفهم، سپس آن را به شرط تبدیل کن.</strong>
+<strong>اول منطق مسئله را مشخص کن؛ بعد Syntax را بنویس.</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">2. وقتی مسئله چند حالت دارد</h2>
+<h2 class="lesson-title">2. کلمات مسئله را به شرط تبدیل کن</h2>
 
-<p>اگر مسئله بیشتر از دو حالت داشته باشد، معمولاً از <code>elif</code> استفاده می‌کنیم.</p>
+<p>یکی از مهم‌ترین مهارت‌ها در حل مسائل شرطی، تبدیل عبارت‌های معمولی به عملگرهای Python است.</p>
 
-<p>مثلاً:</p>
-
-<blockquote>
-نمره را دسته‌بندی کن:
-<br>18 تا 20 → Excellent
-<br>15 تا 17 → Good
-<br>10 تا 14 → Pass
-<br>کمتر از 10 → Fail
-</blockquote>
-
-<p>به جای ساختن چند <code>if</code> مستقل، می‌توانیم از یک زنجیره شرطی استفاده کنیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">score = 16
-
-if score >= 18:
-print("Excellent")
-elif score >= 15:
-print("Good")
-elif score >= 10:
-print("Pass")
-else:
-print("Fail")</div>
-
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>در مسئله</th>
+<th>در Python</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>بیشتر از</td><td><code>&gt;</code></td></tr>
+<tr><td>کمتر از</td><td><code>&lt;</code></td></tr>
+<tr><td>حداقل</td><td><code>&gt;=</code></td></tr>
+<tr><td>حداکثر</td><td><code>&lt;=</code></td></tr>
+<tr><td>برابر</td><td><code>==</code></td></tr>
+<tr><td>برابر نیست</td><td><code>!=</code></td></tr>
+<tr><td>و</td><td><code>and</code></td></tr>
+<tr><td>یا</td><td><code>or</code></td></tr>
+<tr><td>نباشد / نیست</td><td><code>not</code> یا مقایسه مناسب</td></tr>
+</tbody>
+</table>
 </div>
 
-<p>خروجی:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Good</div>
-</div>
-
-<p>نکته مهم این است که Python شرط‌ها را <strong>از بالا به پایین</strong> بررسی می‌کند.</p>
-
-<p>برای <code>score = 16</code>:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">16 >= 18  → False
-16 >= 15  → True</div>
-</div>
-
-<p>به محض اینکه شرط دوم <code>True</code> شود، بخش مربوط به آن اجرا می‌شود و Python دیگر شرط‌های پایین‌تر را بررسی نمی‌کند.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">3. ترتیب شرط‌ها چرا مهم است؟</h2>
-
-<p>یکی از مهم‌ترین خطاهای منطقی در شرط‌های چندحالتی، قرار دادن شرط‌ها در ترتیب اشتباه است.</p>
-
-<p>مثلاً:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">score = 19
-
-if score >= 10:
-print("Pass")
-elif score >= 18:
-print("Excellent")
-else:
-print("Fail")</div>
-
-</div>
-
-<p>ممکن است انتظار داشته باشیم <code>Excellent</code> چاپ شود، اما خروجی:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Pass</div>
-</div>
-
-<p>است.</p>
-
-<p>چون شرط اول:</p>
+<p>مثلاً «حداقل 10» یعنی خود 10 هم مجاز است:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">score >= 10</div>
 </div>
 
-<p>برای عدد 19 درست است؛ بنابراین Python همان بخش را اجرا می‌کند و دیگر به <code>elif</code> نمی‌رسد.</p>
+<p>اما <code>score &gt; 10</code> یعنی 10 دیگر شامل شرط نیست.</p>
 
-<p>پس وقتی شرط‌ها روی یکدیگر هم‌پوشانی دارند، معمولاً باید <strong>شرط خاص‌تر را قبل از شرط عمومی‌تر</strong> قرار دهیم:</p>
+<p>پس هنگام خواندن مسئله، روی کلماتی مثل <strong>حداقل، حداکثر، بیشتر، کمتر، و، یا</strong> دقت کن؛ همین کلمات معمولاً ساختار شرط را مشخص می‌کنند.</p>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">3. وقتی مسئله چند حالت دارد</h2>
+
+<p>اگر فقط دو حالت داریم، معمولاً <code>if / else</code> کافی است.</p>
+
+<p>اگر چند حالت مختلف داریم، از <code>elif</code> بین آن‌ها استفاده می‌کنیم.</p>
+
+<p>مثلاً:</p>
+
+<blockquote>
+18 تا 20 → Excellent<br>
+15 تا کمتر از 18 → Good<br>
+10 تا کمتر از 15 → Pass<br>
+کمتر از 10 → Fail
+</blockquote>
+
+<p>می‌توانیم این قانون را به شکل ساده‌تری بنویسیم:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">score = 16
+
+if score >= 18:
+    print("Excellent")
+elif score >= 15:
+    print("Good")
+elif score >= 10:
+    print("Pass")
+else:
+    print("Fail")</div>
+</div>
+
+<p>برای <code>score = 16</code>، Python شرط‌ها را از بالا به پایین بررسی می‌کند:</p>
+
+<div class="code-container">
+<span class="code-label">بررسی</span>
+<div class="code-block no-prompt">16 >= 18  → False
+16 >= 15  → True
+→ Good</div>
+</div>
+
+<p>به محض اینکه یک شرط در زنجیره <code>if / elif</code> درست شود، همان بلوک اجرا می‌شود و Python دیگر سراغ شرط‌های بعدی نمی‌رود.</p>
+
+<blockquote>
+<strong><code>if</code> و <code>elif</code> یک مسیر تصمیم‌گیری می‌سازند؛ فقط اولین شرط درست اجرا می‌شود.</strong>
+</blockquote>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">4. ترتیب شرط‌ها مهم است</h2>
+
+<p>وقتی شرط‌ها روی یکدیگر هم‌پوشانی دارند، ترتیب آن‌ها می‌تواند نتیجه برنامه را تغییر دهد.</p>
+
+<p>این کد را ببین:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">score = 19
+
+if score >= 10:
+    print("Pass")
+elif score >= 18:
+    print("Excellent")
+else:
+    print("Fail")</div>
+</div>
+
+<p>ممکن است انتظار داشته باشیم <code>Excellent</code> چاپ شود، اما خروجی <code>Pass</code> است.</p>
+
+<p>چرا؟ چون برای 19، شرط اول یعنی <code>score &gt;= 10</code> از همان ابتدا درست است؛ بنابراین Python دیگر به <code>elif</code> نمی‌رسد.</p>
+
+<p>نسخه درست:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -20626,314 +20650,38 @@ else:
     print("Fail")</div>
 </div>
 
-<p>یک قانون ساده برای مسائل این‌چنینی:</p>
+<p>در چنین مسئله‌هایی، معمولاً <strong>شرط محدودتر یا خاص‌تر را زودتر</strong> قرار می‌دهیم.</p>
 
 <blockquote>
-<strong>از حالت سخت‌تر یا خاص‌تر شروع کن و به حالت عمومی‌تر برس.</strong>
+<strong>قبل از اجرای کد، از بالا به پایین بررسی کن: «آیا یک شرط عمومی‌تر زودتر از شرط خاص‌تر True می‌شود؟»</strong>
 </blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">4. لازم نیست همیشه همه بازه‌ها را بنویسیم</h2>
+<h2 class="lesson-title">5. شرط‌های بازه‌ای و حالت‌های مرزی</h2>
 
-<p>برای دسته‌بندی نمره‌ها می‌توانستیم بنویسیم:</p>
+<p>گاهی می‌خواهیم بررسی کنیم یک مقدار داخل یک بازه قرار دارد.</p>
 
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if 18 <= score <= 20:
-    print("Excellent")
-elif 15 <= score <= 17:
-    print("Good")
-elif 10 <= score <= 14:
-    print("Pass")
-else:
-    print("Fail")</div>
-</div>
-
-<p>اما در این مسئله روش کوتاه‌تر و خواناتری داریم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if score >= 18:
-    print("Excellent")
-elif score >= 15:
-    print("Good")
-elif score >= 10:
-    print("Pass")
-else:
-    print("Fail")</div>
-</div>
-
-<p>چرا شرط دوم فقط <code>score >= 15</code> است؟</p>
-
-<p>چون اگر Python به <code>elif</code> رسیده باشد، می‌دانیم شرط قبلی درست نبوده است.</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">score >= 18 → False
-
-پس می‌دانیم:
-score < 18
-
-حالا:
-score >= 15
-
-یعنی:
-15 <= score < 18</div>
-
-</div>
-
-<p>بنابراین خود ساختار <code>if / elif</code> بخشی از محدودیت بازه را برای ما مشخص می‌کند.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">5. شرط‌های ترکیبی با <code>and</code></h2>
-
-<p>گاهی یک تصمیم به <strong>چند شرط هم‌زمان</strong> وابسته است.</p>
-
-<p>مثلاً:</p>
-
-<blockquote>
-برای قبولی، نمره حداقل 10 باشد <strong>و</strong> حضور حداقل 80 درصد باشد.
-</blockquote>
-
-<p>دو شرط داریم:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">score >= 10
-attendance >= 80</div>
-</div>
-
-<p>چون هر دو باید درست باشند، از <code>and</code> استفاده می‌کنیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">score = 15
-attendance = 90
-
-if score >= 10 and attendance >= 80:
-print("Passed")
-else:
-print("Failed")</div>
-
-</div>
-
-<p>اگر یکی از شرط‌ها نادرست باشد، کل شرط <code>and</code> نادرست می‌شود.</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">score >= 10       → True
-attendance >= 80 → False
-
-True and False → False</div>
-
-</div>
-
-<p>بنابراین خروجی:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Failed</div>
-</div>
-
-<p>پس:</p>
-
-<blockquote>
-<strong><code>and</code> یعنی همه شرط‌های موردنظر باید برقرار باشند.</strong>
-</blockquote>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">6. شرط‌های ترکیبی با <code>or</code></h2>
-
-<p>گاهی کافی است <strong>یکی از چند حالت</strong> برقرار باشد.</p>
-
-<p>مثلاً:</p>
-
-<blockquote>
-اگر کاربر Admin یا Manager باشد، اجازه ورود دارد.
-</blockquote>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">role = "Manager"
-
-if role == "Admin" or role == "Manager":
-print("Access granted")
-else:
-print("Access denied")</div>
-
-</div>
-
-<p>در این مثال:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">role == "Admin"   → False
-role == "Manager" → True
-
-False or True → True</div>
-
-</div>
-
-<p>پس دسترسی مجاز است.</p>
-
-<blockquote>
-<strong><code>or</code> یعنی کافی است حداقل یکی از شرط‌ها درست باشد.</strong>
-</blockquote>
-
-<p>دقت کن که هر مقایسه باید کامل نوشته شود.</p>
-
-<p>درست:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if color == "red" or color == "blue":
-    print("Allowed")</div>
-</div>
-
-<p>نه:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if color == "red" or "blue":
-    print("Allowed")</div>
-</div>
-
-<p>در حالت درست، هر دو طرف <code>or</code> یک مقایسه کامل هستند.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">7. ترکیب چند شرط در یک مسئله واقعی</h2>
-
-<p>فرض کن یک فروشگاه اینترنتی داریم و کاربر فقط زمانی اجازه خرید دارد که:</p>
-
-<ul>
-<li>موجودی کافی داشته باشد.</li>
-<li>حساب کاربری فعال باشد.</li>
-</ul>
-
-<p>اطلاعات:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">balance = 500
-price = 300
-account_active = True</div>
-</div>
-
-<p>شرط موجودی:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">balance >= price</div>
-</div>
-
-<p>شرط فعال بودن حساب نیز:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">account_active</div>
-</div>
-
-<p>چون هر دو شرط لازم هستند:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if balance >= price and account_active:
-    print("Purchase allowed")
-else:
-    print("Purchase denied")</div>
-</div>
-
-<p>از آنجا که <code>account_active</code> خودش یک Boolean است، نیازی نیست بنویسیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">account_active == True</div>
-</div>
-
-<p>نوشتن مستقیم آن خواناتر است:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if balance >= price and account_active:</div>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">8. Nested Condition — شرط تو در تو</h2>
-
-<p>گاهی تصمیم دوم فقط زمانی معنا دارد که تصمیم اول برقرار باشد. در این حالت می‌توانیم از <strong>Nested Condition</strong> استفاده کنیم.</p>
-
-<p>مثلاً:</p>
-
-<blockquote>
-ابتدا بررسی کن کاربر حداقل 18 سال دارد. اگر داشت، سپس بررسی کن کارت شناسایی معتبر دارد یا نه.
-</blockquote>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">age = 20
-has_id = True
-
-if age >= 18:
-if has_id:
-print("Entry allowed")
-else:
-print("Valid ID required")
-else:
-print("You are too young")</div>
-
-</div>
-
-<p>در اینجا شرط دوم داخل شرط اول قرار گرفته است.</p>
-
-<p>یعنی اگر:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">age >= 18</div>
-</div>
-
-<p>برقرار نباشد، اصلاً بررسی کارت شناسایی انجام نمی‌شود.</p>
-
-<p>اما اگر فقط می‌خواهیم بگوییم <strong>هر دو شرط باید درست باشند</strong>، معمولاً می‌توانیم کد را ساده‌تر کنیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if age >= 18 and has_id:
-    print("Entry allowed")</div>
-</div>
-
-<p>پس:</p>
-
-<ul>
-<li>اگر دو شرط مستقل هستند و هر دو باید برقرار باشند → معمولاً <code>and</code> ساده‌تر است.</li>
-<li>اگر تصمیم دوم به نتیجه یا مسیر تصمیم اول وابسته است → <strong>Nested Condition</strong> می‌تواند مناسب باشد.</li>
-</ul>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">9. شرط‌های بازه‌ای در Python</h2>
-
-<p>Python اجازه می‌دهد مقایسه‌های زنجیره‌ای را بسیار خوانا بنویسیم.</p>
-
-<p>مثلاً:</p>
-
-<blockquote>آیا دما بین 20 و 30 درجه است؟</blockquote>
+<p>Python برای این کار مقایسه زنجیره‌ای دارد:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">temperature = 25
 
 if 20 <= temperature <= 30:
-print("Normal")</div>
-
+    print("Normal")</div>
 </div>
 
-<p>این عبارت از نظر منطقی معادل است با:</p>
+<p>این عبارت یعنی:</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">20 <= temperature
+AND
+temperature <= 30</div>
+</div>
+
+<p>و از نظر منطقی با این کد برابر است:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -20941,83 +20689,12 @@ print("Normal")</div>
     print("Normal")</div>
 </div>
 
-<p>در Python شکل اول معمولاً خواناتر است.</p>
+<p>در مسائل شرطی، <strong>مرزها</strong> بسیار مهم‌اند. اگر قانون بگوید «حداقل 10»، باید مقدار 10 را هم آزمایش کنیم.</p>
 
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">10. دقت به کلمات مسئله</h2>
-
-<p>یکی از مهارت‌های مهم در حل مسائل شرطی، تبدیل دقیق کلمات مسئله به عملگر مقایسه‌ای است.</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>عبارت</th>
-<th>عملگر مناسب</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>بیشتر از</td>
-<td><code>></code></td>
-</tr>
-<tr>
-<td>کمتر از</td>
-<td><code><</code></td>
-</tr>
-<tr>
-<td>حداقل</td>
-<td><code>>=</code></td>
-</tr>
-<tr>
-<td>حداکثر</td>
-<td><code><=</code></td>
-</tr>
-<tr>
-<td>برابر</td>
-<td><code>==</code></td>
-</tr>
-<tr>
-<td>برابر نیست</td>
-<td><code>!=</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<p>مثلاً:</p>
-
-<blockquote>اگر نمره <strong>حداقل 10</strong> باشد، قبول است.</blockquote>
-
-<p>«حداقل 10» یعنی خود عدد 10 نیز شامل شود:</p>
+<p>مثلاً اگر قانون تخفیف این باشد:</p>
 
 <div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if score >= 10:</div>
-</div>
-
-<p>نه:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if score > 10:</div>
-</div>
-
-<p>چون در حالت دوم، نمره 10 قبول نمی‌شود.</p>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">11. تست حالت‌های مرزی</h2>
-
-<p>یک برنامه شرطی را نباید فقط با یک مقدار آزمایش کنیم.</p>
-
-<p>به‌خصوص زمانی که قانون شامل مرزهایی مثل «حداقل»، «حداکثر» یا «بیشتر از» است، باید مقادیر نزدیک به مرز را تست کنیم.</p>
-
-<p>مثلاً در این قانون:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">قانون</span>
 <div class="code-block no-prompt">1,000,000 یا بیشتر → 20٪
 500,000 تا کمتر از 1,000,000 → 10٪
 کمتر از 500,000 → 0٪</div>
@@ -21026,55 +20703,192 @@ print("Normal")</div>
 <p>مقادیر مهم برای تست:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">499,999
-500,000
-500,001
+<span class="code-label">Test Cases</span>
+<div class="code-block no-prompt">499_999
+500_000
+500_001
 
-999,999
-1,000,000
-1,000,001</div>
-
+999_999
+1_000_000
+1_000_001</div>
 </div>
 
-<p>این مقادیر کمک می‌کنند مطمئن شویم مرزهای شرط‌ها را درست پیاده‌سازی کرده‌ایم.</p>
+<p>اگر برنامه برای این مقادیر درست عمل کند، احتمال خطای مربوط به مرزها کمتر می‌شود.</p>
+
+<blockquote>
+<strong>هر جا در مسئله «حداقل»، «حداکثر»، «بیشتر» یا «کمتر» دیدی، مقدار دقیق مرز را هم تست کن.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">12. حل مسئله مرحله‌به‌مرحله: سیستم تخفیف</h2>
+<h2 class="lesson-title">6. ترکیب چند شرط با <code>and</code> و <code>or</code></h2>
 
-<p>حالا یک مسئله کامل را از ابتدا حل کنیم.</p>
+<h3>and — وقتی همه شرط‌ها لازم‌اند</h3>
 
-<h3>صورت مسئله</h3>
-
-<p>یک فروشگاه برای مشتریان خود قوانین زیر را دارد:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">مبلغ خرید 1,000,000 یا بیشتر → 20٪ تخفیف
-مبلغ خرید 500,000 یا بیشتر → 10٪ تخفیف
-کمتر از 500,000 → بدون تخفیف</div>
-</div>
-
-<h3>مرحله ۱ — مشخص کردن داده</h3>
-
-<p>فقط مبلغ خرید برای تعیین تخفیف اصلی لازم است:</p>
+<p>فرض کن برای قبولی، هم نمره حداقل 10 باشد و هم حضور حداقل 80 درصد.</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
-<div class="code-block no-prompt">price</div>
+<div class="code-block no-prompt">score = 15
+attendance = 90
+
+if score >= 10 and attendance >= 80:
+    print("Passed")
+else:
+    print("Failed")</div>
 </div>
 
-<h3>مرحله ۲ — مشخص کردن حالت‌ها</h3>
+<p>با <code>and</code>، همه شرط‌ها باید درست باشند.</p>
 
 <div class="code-container">
 <span class="code-label">Code</span>
-<div class="code-block no-prompt">price >= 1,000,000 → 20٪
-price >= 500,000  → 10٪
-در غیر این صورت   → 0٪</div>
+<div class="code-block no-prompt">True and True   → True
+True and False  → False
+False and True  → False
+False and False → False</div>
 </div>
 
-<h3>مرحله ۳ — تبدیل قوانین به شرط</h3>
+<h3>or — وقتی یکی از شرط‌ها کافی است</h3>
+
+<p>فرض کن کاربر اگر <code>Admin</code> یا <code>Manager</code> باشد، اجازه ورود دارد:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">role = "Manager"
+
+if role == "Admin" or role == "Manager":
+    print("Access granted")
+else:
+    print("Access denied")</div>
+</div>
+
+<p>با <code>or</code> کافی است حداقل یکی از شرط‌ها درست باشد.</p>
+
+<div class="code-container">
+<span class="code-label">Code</span>
+<div class="code-block no-prompt">True or True   → True
+True or False  → True
+False or True  → True
+False or False → False</div>
+</div>
+
+<p><strong>یک اشتباه رایج:</strong></p>
+
+<div class="code-container">
+<span class="code-label">اشتباه</span>
+<div class="code-block no-prompt">if color == "red" or "blue":
+    print("Allowed")</div>
+</div>
+
+<p>باید هر مقایسه را کامل بنویسیم:</p>
+
+<div class="code-container">
+<span class="code-label">درست</span>
+<div class="code-block no-prompt">if color == "red" or color == "blue":
+    print("Allowed")</div>
+</div>
+
+<h3>not — برعکس کردن یک شرط</h3>
+
+<p>اگر یک مقدار Boolean داشته باشیم، <code>not</code> نتیجه آن را برعکس می‌کند:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">is_active = False
+
+if not is_active:
+    print("Account is inactive")</div>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">7. چه زمانی Nested Condition مناسب است؟</h2>
+
+<p>شرط تو‌در‌تو یعنی یک شرط داخل بلوک شرط دیگری قرار بگیرد.</p>
+
+<p>مثلاً ابتدا بررسی می‌کنیم کاربر حداقل 18 سال دارد؛ فقط در این صورت بررسی کارت شناسایی معنا دارد:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">age = 20
+has_id = True
+
+if age >= 18:
+    if has_id:
+        print("Entry allowed")
+    else:
+        print("Valid ID required")
+else:
+    print("You are too young")</div>
+</div>
+
+<p>اینجا تصمیم دوم واقعاً به نتیجه تصمیم اول وابسته است؛ بنابراین Nested Condition قابل‌درک است.</p>
+
+<p>اما اگر فقط می‌خواهیم بگوییم «هر دو شرط باید درست باشند»، معمولاً <code>and</code> ساده‌تر است:</p>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">if age >= 18 and has_id:
+    print("Entry allowed")</div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>موقعیت</th>
+<th>انتخاب معمول</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>چند شرط مستقل و همه لازم‌اند</td>
+<td><code>and</code></td>
+</tr>
+<tr>
+<td>یکی از چند حالت کافی است</td>
+<td><code>or</code></td>
+</tr>
+<tr>
+<td>تصمیم دوم فقط بعد از تصمیم اول معنا دارد</td>
+<td>Nested Condition</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<hr class="lesson-divider">
+
+<h2 class="lesson-title">8. حل مسئله واقعی: سیستم تخفیف</h2>
+
+<p>حالا همه این مفاهیم را در یک مسئله واقعی ترکیب کنیم.</p>
+
+<h3>صورت مسئله</h3>
+
+<blockquote>
+یک فروشگاه برای مشتریان خود این قوانین را دارد:
+<br>مبلغ خرید 1,000,000 یا بیشتر → 20٪ تخفیف
+<br>مبلغ خرید 500,000 یا بیشتر → 10٪ تخفیف
+<br>کمتر از 500,000 → بدون تخفیف
+</blockquote>
+
+<h3>مرحله ۱ — مشخص کردن Input</h3>
+
+<div class="code-container">
+<span class="code-label">Python</span>
+<div class="code-block no-prompt">price = 750_000</div>
+</div>
+
+<h3>مرحله ۲ — تبدیل قوانین به حالت‌ها</h3>
+
+<div class="code-container">
+<span class="code-label">منطق</span>
+<div class="code-block no-prompt">price >= 1_000_000 → discount = 20
+price >= 500_000  → discount = 10
+در غیر این صورت   → discount = 0</div>
+</div>
+
+<h3>مرحله ۳ — نوشتن شرط‌ها</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -21086,16 +20900,11 @@ else:
     discount = 0</div>
 </div>
 
-<p>دقت کن که شرط دوم فقط <code>price >= 500_000</code> است.</p>
+<p>چرا شرط دوم فقط <code>price &gt;= 500_000</code> است؟</p>
 
-<p>چون اگر Python به <code>elif</code> برسد، می‌دانیم شرط اول برقرار نبوده است؛ بنابراین خودبه‌خود می‌دانیم:</p>
+<p>چون اگر Python به <code>elif</code> برسد، می‌دانیم شرط اول درست نبوده است؛ بنابراین قیمت کمتر از 1,000,000 است.</p>
 
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">price < 1,000,000</div>
-</div>
-
-<h3>مرحله ۴ — محاسبه مقدار تخفیف</h3>
+<h3>مرحله ۴ — محاسبه مبلغ تخفیف و قیمت نهایی</h3>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -21110,88 +20919,51 @@ final_price = price - discount_amount</div>
 <div class="code-block no-prompt">price = 750_000
 
 if price >= 1_000_000:
-discount = 20
+    discount = 20
 elif price >= 500_000:
-discount = 10
+    discount = 10
 else:
-discount = 0
+    discount = 0
 
 discount_amount = price * discount / 100
 final_price = price - discount_amount
 
 print("Discount:", discount, "%")
 print("Final price:", final_price)</div>
-
 </div>
 
 <p>خروجی:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">Output</span>
 <div class="code-block no-prompt">Discount: 10 %
 Final price: 675000.0</div>
 </div>
 
-<p>در این مثال چند مفهوم قبلی با هم ترکیب شدند:</p>
+<p>در این مثال، مسیر حل مسئله این بود:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">Variables
-    +
-Arithmetic Operators
-    +
-if / elif / else
-    ↓
-حل مسئله</div>
+<span class="code-label">مدل ذهنی</span>
+<div class="code-block no-prompt">price
+  ↓
+تشخیص حالت
+  ↓
+تعیین discount
+  ↓
+محاسبه discount_amount
+  ↓
+محاسبه final_price
+  ↓
+print</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">13. اضافه کردن چند شرط به مسئله</h2>
+<h2 class="lesson-title">9. اضافه کردن یک قانون جدید</h2>
 
-<p>حالا مسئله را کمی واقعی‌تر می‌کنیم.</p>
+<p>حالا فرض کن مشتری عضو باشگاه نیز می‌تواند 5٪ تخفیف اضافه بگیرد.</p>
 
-<blockquote>
-اگر مشتری عضو باشگاه باشد، 5 درصد تخفیف اضافه دریافت می‌کند.
-</blockquote>
-
-<p>داده‌های ما:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">price = 1_200_000
-member = True</div>
-</div>
-
-<p>ابتدا تخفیف اصلی را مشخص می‌کنیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if price >= 1_000_000:
-    discount = 20
-elif price >= 500_000:
-    discount = 10
-else:
-    discount = 0</div>
-</div>
-
-<p>سپس وضعیت عضویت را جداگانه بررسی می‌کنیم:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if member:
-    discount = discount + 5</div>
-</div>
-
-<p>حالا محاسبه قیمت نهایی:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">discount_amount = price * discount / 100
-final_price = price - discount_amount</div>
-</div>
-
-<p>برنامه کامل:</p>
+<p>این یک تصمیم جدا از تعیین تخفیف بر اساس مبلغ است؛ بنابراین می‌توانیم آن را جداگانه بررسی کنیم:</p>
 
 <div class="code-container">
 <span class="code-label">Python</span>
@@ -21199,157 +20971,82 @@ final_price = price - discount_amount</div>
 member = True
 
 if price >= 1_000_000:
-discount = 20
+    discount = 20
 elif price >= 500_000:
-discount = 10
+    discount = 10
 else:
-discount = 0
+    discount = 0
 
 if member:
-discount = discount + 5
+    discount = discount + 5
 
 discount_amount = price * discount / 100
 final_price = price - discount_amount
 
 print("Discount:", discount, "%")
 print("Final price:", final_price)</div>
-
 </div>
 
 <p>خروجی:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">Output</span>
 <div class="code-block no-prompt">Discount: 25 %
 Final price: 900000.0</div>
 </div>
 
-<p>اینجا دو تصمیم جدا داریم:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">تصمیم اول:
-تعیین تخفیف بر اساس مبلغ
-
-تصمیم دوم:
-افزودن تخفیف عضویت</div>
-
-</div>
-
-<p>این روش معمولاً از قرار دادن همه قوانین در یک شرط بسیار طولانی خواناتر است.</p>
+<p>نکته مهم این است که لازم نیست تمام قوانین یک مسئله را داخل یک <code>if</code> بسیار طولانی قرار دهیم. اگر قوانین واقعاً دو تصمیم جدا هستند، جدا نگه‌داشتن آن‌ها معمولاً خواناتر است.</p>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">14. تبدیل یک مسئله متنی به کد</h2>
+<h2 class="lesson-title">10. روش استاندارد حل یک مسئله شرطی</h2>
 
-<p>یک روش بسیار مهم برای حل مسئله این است که جمله فارسی مسئله را به اجزای منطقی آن تبدیل کنیم.</p>
-
-<p>مثلاً:</p>
-
-<blockquote>
-اگر سن حداقل 18 باشد و کارت شناسایی داشته باشد، ورود مجاز است.
-</blockquote>
-
-<p>قانون را به دو شرط تقسیم می‌کنیم:</p>
+<p>وقتی با یک مسئله جدید روبه‌رو شدی، این مراحل را دنبال کن:</p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">سن حداقل 18
-AND
-کارت شناسایی دارد</div>
-</div>
-
-<p>سپس:</p>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if age >= 18 and has_id:
-    print("Entry allowed")</div>
-</div>
-
-<p>مثال دوم:</p>
-
-<blockquote>
-اگر کاربر Admin یا Manager باشد، دسترسی مجاز است.
-</blockquote>
-
-<div class="code-container">
-<span class="code-label">Python</span>
-<div class="code-block no-prompt">if role == "Admin" or role == "Manager":
-    print("Access granted")</div>
-</div>
-
-<p>پس هنگام خواندن یک مسئله، به کلمات منطقی توجه کن:</p>
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>در مسئله</th>
-<th>در Python</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>و</td>
-<td><code>and</code></td>
-</tr>
-<tr>
-<td>یا</td>
-<td><code>or</code></td>
-</tr>
-<tr>
-<td>نباشد / نیست</td>
-<td><code>not</code> یا مقایسه مناسب</td>
-</tr>
-<tr>
-<td>اگر</td>
-<td><code>if</code></td>
-</tr>
-<tr>
-<td>در غیر این صورت اگر</td>
-<td><code>elif</code></td>
-</tr>
-<tr>
-<td>در غیر این صورت</td>
-<td><code>else</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<hr class="lesson-divider">
-
-<h2 class="lesson-title">15. روش استاندارد حل مسائل شرطی</h2>
-
-<p>برای اینکه در مسائل جدید سردرگم نشوی، می‌توانی همیشه این ترتیب را دنبال کنی:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">روش حل</span>
 <div class="code-block no-prompt">1. مسئله را دقیق بخوان
         ↓
 2. Input را مشخص کن
         ↓
-3. حالت‌های ممکن را پیدا کن
+3. Output را مشخص کن
         ↓
-4. قانون هر حالت را بنویس
+4. قوانین و حالت‌ها را بنویس
         ↓
-5. شرط‌ها را طراحی کن
+5. کلمات «و»، «یا»، «حداقل» و ... را پیدا کن
         ↓
-6. ترتیب شرط‌ها را بررسی کن
+6. شرط‌ها را طراحی کن
         ↓
-7. کد را بنویس
+7. ترتیب شرط‌ها را بررسی کن
         ↓
-8. حالت‌های عادی و مرزی را تست کن</div>
+8. کد را بنویس
+        ↓
+9. حالت‌های عادی و مرزی را تست کن</div>
 </div>
 
-<p>این روش باعث می‌شود به‌جای اینکه مستقیم وارد کدنویسی شوی، ابتدا <strong>منطق مسئله</strong> را مشخص کنی.</p>
+<p>مثلاً قبل از نوشتن یک <code>if</code> از خودت بپرس:</p>
+
+<div class="code-container">
+<span class="code-label">Checklist</span>
+<div class="code-block no-prompt">چه داده‌ای دارم؟
+چه نتیجه‌ای باید تولید کنم؟
+چند حالت وجود دارد؟
+قانون هر حالت چیست؟
+آیا شرط‌ها روی هم اثر دارند؟
+آیا به and یا or نیاز دارم؟
+مرزهای مهم کجا هستند؟
+چه مقادیری را باید تست کنم؟</div>
+</div>
+
+<blockquote>
+<strong>حل مسئله یعنی تبدیل قوانین یک مسئله واقعی به تصمیم‌های دقیق و قابل‌اجرا.</strong>
+</blockquote>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">16. تمرین و تثبیت</h2>
+<h2 class="lesson-title">11. تمرین و تثبیت</h2>
 
-<p>ابتدا خودت هر تمرین را حل و اجرا کن؛ سپس در صورت نیاز پاسخ را ببین.</p>
+<p>ابتدا هر تمرین را خودت حل و اجرا کن؛ سپس در صورت نیاز پاسخ را ببین.</p>
 
 <div class="exercise-card">
 <div class="exercise-head">
@@ -21374,21 +21071,18 @@ AND
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-1"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-1">
 <strong>پاسخ:</strong>
 <pre>number = 8
 
 if number % 2 == 0:
-print("Even")
+    print("Even")
 else:
-print("Odd")</pre>
-
+    print("Odd")</pre>
 </div>
 </div>
 
@@ -21402,7 +21096,6 @@ print("Odd")</pre>
 </div>
 
 <p>برنامه‌ای بنویس که عدد را بررسی کند:</p>
-
 <ul>
 <li>مثبت → <code>Positive</code></li>
 <li>منفی → <code>Negative</code></li>
@@ -21421,23 +21114,20 @@ print("Odd")</pre>
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-2"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-2">
 <strong>پاسخ:</strong>
 <pre>number = -5
 
 if number > 0:
-print("Positive")
+    print("Positive")
 elif number < 0:
-print("Negative")
+    print("Negative")
 else:
-print("Zero")</pre>
-
+    print("Zero")</pre>
 </div>
 </div>
 
@@ -21464,22 +21154,19 @@ print("Zero")</pre>
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-3"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-3">
 <strong>پاسخ:</strong>
 <pre>age = 22
 has_id = True
 
 if age >= 18 and has_id:
-print("Entry allowed")
+    print("Entry allowed")
 else:
-print("Entry denied")</pre>
-
+    print("Entry denied")</pre>
 </div>
 </div>
 
@@ -21488,17 +21175,16 @@ print("Entry denied")</pre>
 <span class="exercise-num">۴</span>
 <div>
 <strong>سطح نمره</strong>
-<small>ترتیب درست شرط‌ها</small>
+<small>ترتیب درست شرط‌ها و حالت‌های مرزی</small>
 </div>
 </div>
 
 <p>برنامه‌ای بنویس:</p>
-
 <div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">قانون</span>
 <div class="code-block no-prompt">18 تا 20 → Excellent
-15 تا 17 → Good
-10 تا 14 → Pass
+15 تا کمتر از 18 → Good
+10 تا کمتر از 15 → Pass
 کمتر از 10 → Fail</div>
 </div>
 
@@ -21514,25 +21200,22 @@ print("Entry denied")</pre>
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-4"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-4">
 <strong>پاسخ:</strong>
 <pre>score = 12
 
 if score >= 18:
-print("Excellent")
+    print("Excellent")
 elif score >= 15:
-print("Good")
+    print("Good")
 elif score >= 10:
-print("Pass")
+    print("Pass")
 else:
-print("Fail")</pre>
-
+    print("Fail")</pre>
 </div>
 </div>
 
@@ -21546,7 +21229,6 @@ print("Fail")</pre>
 </div>
 
 <p>فروشگاهی شرایط زیر را دارد:</p>
-
 <ul>
 <li>مبلغ خرید حداقل <code>500_000</code> باشد.</li>
 <li>مشتری عضو باشگاه باشد.</li>
@@ -21555,7 +21237,6 @@ print("Fail")</pre>
 <p>اگر هر دو برقرار بودند، <code>Special discount</code> و در غیر این صورت <code>Normal discount</code> چاپ شود.</p>
 
 <p>اطلاعات:</p>
-
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">price = 700_000
@@ -21574,22 +21255,19 @@ member = True</div>
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-5"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-5">
 <strong>پاسخ:</strong>
 <pre>price = 700_000
 member = True
 
 if price >= 500_000 and member:
-print("Special discount")
+    print("Special discount")
 else:
-print("Normal discount")</pre>
-
+    print("Normal discount")</pre>
 </div>
 </div>
 
@@ -21603,7 +21281,6 @@ print("Normal discount")</pre>
 </div>
 
 <p>برنامه‌ای بنویس که بر اساس مبلغ خرید و وضعیت عضویت، تخفیف و قیمت نهایی را محاسبه کند:</p>
-
 <ul>
 <li><code>1_000_000+</code> → 20٪</li>
 <li><code>500_000+</code> → 10٪</li>
@@ -21612,7 +21289,6 @@ print("Normal discount")</pre>
 </ul>
 
 <p>اطلاعات:</p>
-
 <div class="code-container">
 <span class="code-label">Python</span>
 <div class="code-block no-prompt">price = 1_200_000
@@ -21631,33 +21307,30 @@ member = True</div>
 <div class="playground-editor-wrap"><textarea class="python-editor"># کد خودت را اینجا بنویس
 
 </textarea></div>
-
 <div class="playground-output">▶ Output will be shown here...</div>
 </div>
 
 <button class="solution-toggle" type="button" data-solution="sol11-6"><i class="fas fa-eye"></i> نمایش پاسخ</button>
-
 <div class="exercise-solution" id="sol11-6">
 <strong>پاسخ:</strong>
 <pre>price = 1_200_000
 member = True
 
 if price >= 1_000_000:
-discount = 20
+    discount = 20
 elif price >= 500_000:
-discount = 10
+    discount = 10
 else:
-discount = 0
+    discount = 0
 
 if member:
-discount = discount + 5
+    discount = discount + 5
 
 discount_amount = price * discount / 100
 final_price = price - discount_amount
 
 print("Discount:", discount, "%")
 print("Final price:", final_price)</pre>
-
 </div>
 </div>
 
@@ -21668,14 +21341,14 @@ print("Final price:", final_price)</pre>
 <p>هر سؤال را پاسخ بده و بعد گزینه‌ات را انتخاب کن تا پاسخ و توضیح همان سؤال نمایش داده شود.</p>
 
 <div class="quiz-card">
-<p>❓ سؤال ۱ — مفهومی: بهترین ترتیب برای حل یک مسئله شرطی کدام است؟</p>
+<p>❓ سؤال ۱ — مفهومی: قبل از نوشتن شرط، کدام کار منطقی‌تر است؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) کدنویسی → تست → فهم مسئله → انتخاب شرط</button>
-<button onclick="selectOption(this)">ب) Input → شناسایی حالت‌ها → طراحی شرط → کدنویسی → تست</button>
-<button onclick="selectOption(this)">ج) <code>if</code> → <code>else</code> → <code>print</code> → Input</button>
-<button onclick="selectOption(this)">د) تست → <code>elif</code> → Input → کدنویسی</button>
+<button onclick="selectOption(this)">الف) مستقیم نوشتن <code>if</code></button>
+<button onclick="selectOption(this)">ب) مشخص کردن Input، قوانین، حالت‌ها و Output</button>
+<button onclick="selectOption(this)">ج) نوشتن چند <code>print</code></button>
+<button onclick="selectOption(this)">د) تست قبل از فهم مسئله</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>ابتدا باید داده‌ها، حالت‌های ممکن و قوانین تصمیم‌گیری را مشخص کنیم و سپس سراغ کدنویسی و تست برویم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>ابتدا باید منطق مسئله را مشخص کنیم؛ سپس شرط‌ها و کد را می‌نویسیم.</div>
 </div>
 
 <div class="quiz-card">
@@ -21685,12 +21358,11 @@ print("Final price:", final_price)</pre>
 <div class="code-block no-prompt">score = 19
 
 if score >= 10:
-print("Pass")
+    print("Pass")
 elif score >= 18:
-print("Excellent")
+    print("Excellent")
 else:
-print("Fail")</div>
-
+    print("Fail")</div>
 </div>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>Excellent</code></button>
@@ -21698,7 +21370,7 @@ print("Fail")</div>
 <button onclick="selectOption(this)">ج) <code>Fail</code></button>
 <button onclick="selectOption(this)">د) Error</button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>شرط اول برای 19 درست است؛ بنابراین Python همان بخش را اجرا می‌کند و دیگر سراغ <code>elif</code> نمی‌رود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>شرط اول برای 19 درست است؛ بنابراین Python قبل از رسیدن به <code>elif</code> همان بخش را اجرا می‌کند.</div>
 </div>
 
 <div class="quiz-card">
@@ -21709,7 +21381,7 @@ print("Fail")</div>
 <button onclick="selectOption(this)">ج) <code>if age >= 18:<br>    has_id</code></button>
 <button onclick="selectOption(this)">د) <code>if age == 18 and has_id == False:</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>چون هر دو شرط باید برقرار باشند، از <code>and</code> استفاده می‌کنیم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>چون هر دو شرط باید برقرار باشند، <code>and</code> مناسب است.</div>
 </div>
 
 <div class="quiz-card">
@@ -21720,7 +21392,7 @@ print("Fail")</div>
 <button onclick="selectOption(this)">ج) <code>if color == "red" or color == "blue":</code></button>
 <button onclick="selectOption(this)">د) <code>if color == ("red" or "blue"):</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>هر مقایسه باید به‌صورت کامل نوشته شود: <code>color == "red"</code> یا <code>color == "blue"</code>.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>هر مقایسه باید کامل نوشته شود: <code>color == "red"</code> یا <code>color == "blue"</code>.</div>
 </div>
 
 <div class="quiz-card">
@@ -21731,18 +21403,18 @@ print("Fail")</div>
 <button onclick="selectOption(this)">ج) <code>score == 11</code></button>
 <button onclick="selectOption(this)">د) <code>score <= 10</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>«حداقل 10» یعنی 10 نیز شامل قانون است؛ بنابراین از <code>>=</code> استفاده می‌کنیم.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>«حداقل 10» یعنی 10 نیز شامل قانون است.</div>
 </div>
 
 <div class="quiz-card">
-<p>❓ سؤال ۶ — Nested Condition: کدام گزینه نمونه صحیحی از شرط تو در تو است؟</p>
+<p>❓ سؤال ۶ — شرط بازه‌ای: کدام عبارت بررسی می‌کند که <code>temperature</code> بین 20 و 30، شامل دو مرز، باشد؟</p>
 <div class="quiz-options">
-<button onclick="selectOption(this)">الف) <code>if age >= 18 and has_id:<br>    print("Allowed")</code></button>
-<button onclick="selectOption(this)">ب) <code>if age >= 18:<br>    if has_id:<br>        print("Allowed")</code></button>
-<button onclick="selectOption(this)">ج) <code>if age >= 18:<br>print("Allowed")</code></button>
-<button onclick="selectOption(this)">د) <code>if age:<br>    has_id</code></button>
+<button onclick="selectOption(this)">الف) <code>20 &lt; temperature &lt; 30</code></button>
+<button onclick="selectOption(this)">ب) <code>20 &lt;= temperature &lt;= 30</code></button>
+<button onclick="selectOption(this)">ج) <code>temperature &gt;= 20 or temperature &lt;= 30</code></button>
+<button onclick="selectOption(this)">د) <code>temperature == 20 and temperature == 30</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در Nested Condition یک شرط داخل بلوک شرط دیگری قرار می‌گیرد.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در این حالت هر دو مرز شامل بازه هستند، پس از <code>&lt;=</code> استفاده می‌کنیم.</div>
 </div>
 
 <div class="quiz-card">
@@ -21752,14 +21424,13 @@ print("Fail")</div>
 <div class="code-block no-prompt">price = 800_000
 
 if price >= 1_000_000:
-discount = 20
+    discount = 20
 elif price >= 500_000:
-discount = 10
+    discount = 10
 else:
-discount = 0
+    discount = 0
 
 print(discount)</div>
-
 </div>
 <div class="quiz-options">
 <button onclick="selectOption(this)">الف) <code>0</code></button>
@@ -21767,41 +21438,33 @@ print(discount)</div>
 <button onclick="selectOption(this)">ج) <code>10</code></button>
 <button onclick="selectOption(this)">د) <code>20</code></button>
 </div>
-<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>مبلغ 800,000 کمتر از 1,000,000 اما بزرگ‌تر یا مساوی 500,000 است؛ بنابراین تخفیف 10 درصد می‌شود.</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>800,000 کمتر از 1,000,000 و حداقل 500,000 است؛ بنابراین تخفیف 10 درصد است.</div>
 </div>
 
 <hr class="lesson-divider">
 
-<h2 class="lesson-title">🎯 جمع‌بندی جلسه</h2>
+<h2 class="lesson-title">جمع‌بندی جلسه</h2>
 
-<p>در بخش قبلی یاد گرفتیم که شرط‌ها چگونه نوشته می‌شوند. در این جلسه یک قدم مهم‌تر برداشتیم:</p>
-
-<blockquote>
-<strong>یاد گرفتیم چگونه یک مسئله را به مجموعه‌ای از تصمیم‌های قابل‌کدنویسی تبدیل کنیم.</strong>
-</blockquote>
-
-<p>هسته حل یک مسئله شرطی این است:</p>
+<p>در این جلسه از «نوشتن شرط» یک قدم جلوتر رفتیم و یاد گرفتیم چگونه <strong>یک مسئله را تحلیل کنیم و منطق آن را به کد تبدیل کنیم.</strong></p>
 
 <div class="code-container">
-<span class="code-label">Code</span>
+<span class="code-label">هسته حل مسئله</span>
 <div class="code-block no-prompt">مسئله
-   ↓
+  ↓
 Input
-   ↓
-حالت‌های ممکن
-   ↓
-قوانین هر حالت
-   ↓
+  ↓
+قوانین و حالت‌ها
+  ↓
 if / elif / else
-   ↓
-and / or در صورت نیاز
-   ↓
-محاسبه نتیجه
-   ↓
-تست حالت‌های مختلف</div>
+  ↓
+and / or / not در صورت نیاز
+  ↓
+محاسبه یا تصمیم
+  ↓
+Output
+  ↓
+تست حالت‌های عادی و مرزی</div>
 </div>
-
-<p>مهم‌ترین نکاتی که باید از این جلسه بلد باشی:</p>
 
 <div class="table-wrap">
 <table>
@@ -21812,65 +21475,26 @@ and / or در صورت نیاز
 </tr>
 </thead>
 <tbody>
-<tr>
-<td><code>if</code></td>
-<td>بررسی اولین شرط</td>
-</tr>
-<tr>
-<td><code>elif</code></td>
-<td>بررسی حالت جایگزین، فقط اگر شرط‌های قبلی برقرار نباشند</td>
-</tr>
-<tr>
-<td><code>else</code></td>
-<td>پوشش حالت باقی‌مانده</td>
-</tr>
-<tr>
-<td><code>and</code></td>
-<td>همه شرط‌ها باید درست باشند</td>
-</tr>
-<tr>
-<td><code>or</code></td>
-<td>حداقل یکی از شرط‌ها باید درست باشد</td>
-</tr>
-<tr>
-<td>Nested Condition</td>
-<td>وقتی تصمیم دوم به تصمیم اول وابسته است</td>
-</tr>
-<tr>
-<td>شرط بازه‌ای</td>
-<td>مثل <code>20 <= x <= 30</code></td>
-</tr>
-<tr>
-<td>حالت مرزی</td>
-<td>مقادیر دقیق اطراف مرزهای شرط را تست کن</td>
-</tr>
+<tr><td><code>if</code></td><td>اگر شرط درست باشد، بلوک مربوطه اجرا می‌شود.</td></tr>
+<tr><td><code>elif</code></td><td>حالت جایگزین در همان زنجیره شرطی.</td></tr>
+<tr><td><code>else</code></td><td>وقتی هیچ‌کدام از شرط‌های قبلی درست نباشند.</td></tr>
+<tr><td><code>and</code></td><td>همه شرط‌های لازم باید درست باشند.</td></tr>
+<tr><td><code>or</code></td><td>حداقل یکی از شرط‌ها باید درست باشد.</td></tr>
+<tr><td><code>not</code></td><td>نتیجه منطقی یک شرط را برعکس می‌کند.</td></tr>
+<tr><td>Nested Condition</td><td>وقتی تصمیم دوم به مسیر تصمیم اول وابسته است.</td></tr>
+<tr><td>شرط بازه‌ای</td><td>مثل <code>20 &lt;= x &lt;= 30</code>.</td></tr>
+<tr><td>حالت مرزی</td><td>مقادیر دقیق اطراف مرز شرط را حتماً تست کن.</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>و مهم‌تر از همه، وقتی با یک مسئله جدید روبه‌رو شدی، مستقیم سراغ <code>if</code> نرو.</p>
-
-<p>ابتدا از خودت بپرس:</p>
-
-<div class="code-container">
-<span class="code-label">Code</span>
-<div class="code-block no-prompt">چه داده‌ای دارم؟
-چه حالت‌هایی وجود دارد؟
-قانون هر حالت چیست؟
-آیا شرط‌ها با هم هم‌پوشانی دارند؟
-آیا به and یا or نیاز دارم؟
-مرزهای شرط کجا هستند؟
-چطور می‌توانم نتیجه را تست کنم؟</div>
-</div>
-
 <blockquote>
-<strong>برنامه‌نویسی فقط نوشتن Syntax نیست؛ مهارت اصلی این است که قوانین یک مسئله واقعی را به تصمیم‌های دقیق و قابل‌اجرا تبدیل کنیم.</strong>
+<strong>مسئله را به Input، قوانین، تصمیم و Output تبدیل کن؛ بعد سراغ کدنویسی برو.</strong>
 </blockquote>
 
-<p>تا اینجا با <strong>Variables، Data Types، Operators، Input/Output و Conditions</strong> ابزارهای اصلی برای ساخت برنامه‌های ساده را در اختیار داریم.</p>
+<p>تا اینجا با <strong>Variables، Data Types، Operators، Input/Output و Conditions</strong> ابزارهای اصلی ساخت برنامه‌های ساده را در اختیار داریم.</p>
 
-<p>در فصل بعد وارد <strong>Loops</strong> می‌شویم و یاد می‌گیریم چگونه یک بخش از برنامه را چندین بار اجرا کنیم. ابتدا با <code>while</code> شروع می‌کنیم و سپس به <code>for</code>، <code>range()</code> و <code>enumerate()</code> می‌رسیم.</p>`
-
+<p>در فصل بعد وارد <strong>Loops</strong> می‌شویم و یاد می‌گیریم چگونه یک بخش از برنامه را چندین بار اجرا کنیم؛ ابتدا با <code>while</code> و سپس <code>for</code> و <code>range()</code>.</p>`
 ,
 "ch9-1": `<div class="section-header">
     <div class="section-badge">۹</div>
