@@ -40094,7 +40094,27 @@ sys.stdout = StringIO()
 sys.stderr = StringIO()
 `);
             let result = null, error = null;
-            try { result = await pyodide.runPythonAsync(code); } catch (e) { error = e; }
+
+try {
+    // آماده‌سازی فایل‌های موردنیاز فصل ۱۳
+    const playgroundId = root.dataset.playground;
+
+    if (playgroundId && playgroundId.startsWith('ch13-')) {
+        pyodide.runPython(`
+from pathlib import Path
+
+Path("notes.txt").write_text("Hello Python\\nFile Handling")
+Path("names.txt").write_text("Ali\\nSara\\nReza")
+Path("languages.txt").write_text("Python\\nJavaScript\\nC++")
+Path("test.txt").write_text("Test file")
+Path("python.txt").write_text("Python is easy to learn")
+`);
+    }
+
+    result = await pyodide.runPythonAsync(code);
+} catch (e) {
+    error = e;
+}
             const captured = pyodide.runPython(`
 out = sys.stdout.getvalue()
 err = sys.stderr.getvalue()
