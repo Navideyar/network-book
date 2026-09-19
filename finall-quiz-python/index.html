@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آزمون تستی پایتون | ZeroDay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #eef1f3;
+    --card: #ffffff;
+    --border: #e7ebee;
+    --text: #1c2733;
+    --muted: #93a0ab;
+    --accent: #2ea3d6;
+    --accent-soft: #eaf6fb;
+    --correct: #14b892;
+    --correct-soft: #e6f9f4;
+    --wrong: #ef5b6a;
+    --wrong-soft: #fdecee;
+    --skeleton-a: #eceff2;
+    --skeleton-b: #e2e7eb;
+    --sans: 'Vazirmatn', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--sans);
+    color:var(--text);
+    background:var(--bg);
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    padding:56px 20px;
+  }
+
+  .blob{position:fixed;border-radius:50%;filter:blur(60px);z-index:0;pointer-events:none;}
+  .blob.b1{width:420px;height:420px;background:#dfe4e8;top:-120px;left:-100px;opacity:.7;}
+  .blob.b2{width:520px;height:520px;background:#e3ecef;bottom:-200px;right:-160px;opacity:.6;}
+  .blob.b3{width:260px;height:260px;background:#eef6f2;top:40%;right:10%;opacity:.5;}
+
+  .wrap{
+    position:relative;z-index:1;
+    max-width:920px;margin:0 auto;
+    display:grid;
+    grid-template-columns:1.7fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    .wrap{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    box-shadow:0 12px 34px rgba(28,39,51,0.05);
+    padding:28px 26px;
+  }
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    grid-column:1 / -1;
+    display:flex;align-items:center;gap:16px;
+    padding:16px 22px;
+  }
+  .switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .slider{
+    position:absolute;inset:0;background:#d7dde2;border-radius:999px;cursor:pointer;transition:.2s ease;
+  }
+  .switch .slider::before{
+    content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s ease;box-shadow:0 1px 3px rgba(0,0,0,.18);
+  }
+  .switch input:checked + .slider{background:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(20px);}
+  .toolbar-text{display:flex;flex-direction:column;gap:2px;}
+  .toolbar-text strong{font-size:14px;}
+  .toolbar-text span{font-size:12.5px;color:var(--muted);}
+
+  /* ---------- question card ---------- */
+  .q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .q-head h1{font-size:16px;font-weight:700;margin:0;}
+
+  .options{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:14px;}
+  .opt{display:flex;align-items:center;gap:12px;}
+  .opt .idx{font-size:12.5px;color:var(--muted);flex-shrink:0;width:22px;text-align:center;}
+  .opt .radio{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid #c7ced4;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .opt .radio svg{width:11px;height:11px;opacity:0;transition:opacity .15s ease;}
+
+  .opt .pill{
+    position:relative;flex:1;min-height:48px;border-radius:18px;overflow:hidden;
+    background:repeating-linear-gradient(
+      -45deg,
+      var(--skeleton-a) 0px, var(--skeleton-a) 8px,
+      var(--skeleton-b) 8px, var(--skeleton-b) 16px
+    );
+    display:flex;align-items:center;padding:12px 22px;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .opt .pill span{
+    font-size:14.5px;font-weight:500;opacity:0;transform:translateY(4px);
+    transition:opacity .2s ease .05s, transform .2s ease .05s;
+    line-height:1.7;
+    direction:ltr;text-align:left;
+    display:block;width:100%;
+    word-break:break-word;white-space:pre-wrap;
+  }
+
+  /* hover: only plain reveal, no verdict color, and only while not yet revealed */
+  .opt:not(.revealed):hover .pill{background:#f3f6f8;}
+  .opt:not(.revealed):hover .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+  .opt:not(.revealed):hover .radio{border-color:var(--accent);}
+
+  /* revealed: locked-in state after selection or answer-key mode */
+  .opt.revealed .pill{background:#f6f8f9;cursor:default;}
+  .opt.revealed .pill span{opacity:1;transform:translateY(0);color:var(--text);}
+
+  .opt.revealed.correct-mark .pill{background:var(--correct-soft);}
+  .opt.revealed.correct-mark .pill span{color:#0d7a61;font-weight:600;}
+  .opt.revealed.correct-mark .radio{background:var(--correct);border-color:var(--correct);}
+  .opt.revealed.correct-mark .radio svg{opacity:1;}
+
+  .opt.revealed.wrong-mark .pill{background:var(--wrong-soft);}
+  .opt.revealed.wrong-mark .pill span{color:#c33646;font-weight:600;}
+  .opt.revealed.wrong-mark .radio{background:var(--wrong);border-color:var(--wrong);}
+  .opt.revealed.wrong-mark .radio svg{opacity:1;}
+
+  .hint{font-size:12px;color:var(--muted);margin:0 0 18px;}
+
+  .explain-box{
+    display:none;
+    background:var(--accent-soft);
+    border:1px solid #cfe9f4;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:20px;
+  }
+  .explain-box.show{display:block;}
+  .explain-box .et{font-size:13px;font-weight:700;color:var(--accent);margin:0 0 6px;}
+  .explain-box p{font-size:13.5px;line-height:2;color:var(--text);margin:0;}
+
+  .q-footer{display:flex;flex-direction:column;gap:12px;}
+  .q-footer-row{display:flex;justify-content:space-between;align-items:center;}
+  .next-btn{
+    display:flex;align-items:center;gap:6px;background:#0f1b2a;color:#fff;border:none;
+    border-radius:12px;padding:11px 20px;font-family:var(--sans);font-size:14px;font-weight:600;
+    cursor:pointer;transition:opacity .15s ease;
+  }
+  .next-btn:hover{opacity:.88;}
+  .next-btn svg{width:15px;height:15px;}
+  .q-count{font-size:13px;color:var(--muted);}
+  .progress-track{height:6px;background:var(--skeleton-a);border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);width:0%;transition:width .3s ease;border-radius:6px;}
+
+  /* ---------- timer card ---------- */
+  .timer-card h2{font-size:15px;font-weight:700;margin:0 0 20px;}
+  .timer-grid{display:flex;justify-content:space-between;gap:8px;margin-bottom:16px;}
+  .timer-box{flex:1;background:#f5f8fa;border:1px solid var(--border);border-radius:12px;padding:12px 4px;text-align:center;}
+  .timer-box .val{font-size:19px;font-weight:800;color:var(--text);display:block;margin-bottom:4px;}
+  .timer-box .lbl{font-size:11px;color:var(--muted);}
+  .timer-note{font-size:12px;color:var(--muted);line-height:1.9;border-top:1px dashed var(--border);padding-top:14px;}
+
+  /* ---------- mobile responsive (kept last so it wins the cascade) ---------- */
+  @media (max-width:600px){
+    body{padding:28px 10px;}
+    .blob.b1{width:220px;height:220px;top:-80px;left:-80px;}
+    .blob.b2{width:260px;height:260px;bottom:-120px;right:-100px;}
+    .blob.b3{display:none;}
+
+    .wrap{gap:12px;}
+    .card{border-radius:16px;padding:16px 14px;}
+
+    .toolbar{padding:12px 14px;gap:10px;}
+    .switch{width:40px;height:23px;}
+    .switch .slider::before{width:17px;height:17px;left:3px;top:3px;}
+    .switch input:checked + .slider::before{transform:translateX(17px);}
+    .toolbar-text strong{font-size:12.5px;}
+    .toolbar-text span{font-size:11px;line-height:1.6;}
+
+    .q-head{margin-bottom:16px;}
+    .q-head h1{font-size:14px;}
+    #qText{font-size:13.5px !important;line-height:1.8 !important;margin:-2px 0 16px !important;}
+
+    .options{gap:9px;margin-bottom:6px;}
+    .opt{gap:7px;align-items:flex-start;}
+    .opt .idx{width:14px;font-size:11.5px;margin-top:12px;}
+    .opt .radio{width:19px;height:19px;margin-top:10px;}
+    .opt .radio svg{width:9px;height:9px;}
+
+    .opt .pill{
+      min-height:42px;
+      padding:11px 14px !important;
+      background-size:200% 200%;
+      border-radius:14px;
+    }
+    .opt .pill span{
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .hint{font-size:11px;margin:0 0 14px;}
+    .explain-box{padding:12px 13px;margin-bottom:16px;}
+    .explain-box .et{font-size:12px;}
+    .explain-box p{font-size:12.5px;line-height:1.8;}
+
+    .q-footer{gap:10px;}
+    .q-footer-row{flex-wrap:wrap;gap:8px;}
+    .next-btn{padding:9px 15px;font-size:13px;}
+    .next-btn svg{width:13px;height:13px;}
+    .q-count{font-size:12px;}
+
+    .timer-card h2{font-size:13.5px;margin:0 0 14px;}
+    .timer-grid{gap:6px;margin-bottom:12px;}
+    .timer-box{padding:9px 2px;border-radius:10px;}
+    .timer-box .val{font-size:15px;margin-bottom:2px;}
+    .timer-box .lbl{font-size:9.5px;}
+    .timer-note{font-size:11px;line-height:1.8;padding-top:12px;}
+  }
+
+  @media (max-width:360px){
+    body{padding:20px 8px;}
+    .card{padding:14px 11px;}
+    .timer-grid{flex-wrap:wrap;}
+    .timer-box{flex:1 1 40%;}
+    .opt .pill span{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="wrap">
+
+  <div class="card toolbar">
+    <label class="switch">
+      <input type="checkbox" id="answerKeyToggle">
+      <span class="slider"></span>
+    </label>
+    <div class="toolbar-text">
+      <strong>حالت پاسخنامه</strong>
+      <span>با فعال کردن این گزینه، کدر بودن گزینه‌ها برای همه‌ی سوالات برطرف می‌شود و پاسخ صحیح به‌همراه توضیح تشریحی نمایش داده می‌شود</span>
+    </div>
+  </div>
+
+  <!-- question card -->
+  <div class="card">
+    <div class="q-head">
+      <h1 id="qLabel">سوال 1</h1>
+    </div>
+
+    <p style="font-size:15px;font-weight:600;line-height:1.9;margin:-8px 0 20px;color:var(--text);" id="qText"></p>
+
+    <ul class="options" id="optList"></ul>
+    <p class="hint" id="hintText">برای مشاهده‌ی پاسخ، روی یکی از گزینه‌ها کلیک کنید</p>
+
+    <div class="explain-box" id="explainBox">
+      <p class="et">توضیح تشریحی</p>
+      <p id="explainText"></p>
+    </div>
+
+    <div class="q-footer">
+      <div class="q-footer-row">
+        <button class="next-btn" id="nextBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          سوال بعد
+        </button>
+        <span class="q-count" id="qCount">سوال 1 از 25</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <!-- timer card -->
+  <div class="card timer-card">
+    <h2>زمان باقی مانده</h2>
+    <div class="timer-grid">
+      <div class="timer-box"><span class="val" id="tRoz">۰۰</span><span class="lbl">روز</span></div>
+      <div class="timer-box"><span class="val" id="tSaat">۰۰</span><span class="lbl">ساعت</span></div>
+      <div class="timer-box"><span class="val" id="tDaghigheh">۵۰</span><span class="lbl">دقیقه</span></div>
+      <div class="timer-box"><span class="val" id="tSaniyeh">۰۰</span><span class="lbl">ثانیه</span></div>
+    </div>
+    <p class="timer-note">*در صورت پایان زمان، جواب‌های شما نادرست محاسبه می‌شود</p>
+  </div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// ۲۵ سوال تستی پایتون – زمان آزمون ۵۰ دقیقه
+// ---------------------------------------------------------------
+const questions = [
+  {
+    q: "برای باز کردن فایل به شکلی که فایل حتی در صورت رخ دادن خطا به‌درستی بسته شود، کدام روش مناسب‌تر است؟",
+    options: [
+      "استفاده از open() بدون هیچ مدیریت خاصی",
+      "استفاده از with open(...) as f: (Context Manager)",
+      "استفاده از global",
+      "استفاده از try بدون except"
+    ],
+    answer: 1,
+    explanation: "دستور with یک Context Manager است و فایل را در پایان بلوک، حتی اگر خطایی رخ دهد، به‌صورت خودکار می‌بندد. بنابراین نیازی به فراخوانی دستی close() نیست."
+  },
+  {
+    q: "خروجی کد زیر چیست؟\n\ntext = \"Python\"\nprint(text[1:4])",
+    options: ["Pyt", "yth", "ytho", "Python"],
+    answer: 1,
+    explanation: "برش [1:4] از ایندکس ۱ تا قبل از ۴ را برمی‌گرداند. کاراکترهای ایندکس ۱، ۲ و ۳ برابر y، t و h هستند."
+  },
+  {
+    q: "Lambda Function در پایتون چیست؟",
+    options: [
+      "تابعی که فقط برای کار با فایل‌ها استفاده می‌شود.",
+      "تابع ناشناس و کوتاهی که معمولاً در یک عبارت تعریف می‌شود.",
+      "تابعی که فقط داخل کلاس قابل استفاده است.",
+      "تابعی که فقط برای محاسبات ریاضی است."
+    ],
+    answer: 1,
+    explanation: "تابع لامبدا یک تابع ناشناس و تک‌عبارتی است که با کلمه کلیدی lambda تعریف می‌شود و معمولاً برای عملیات کوتاه و ساده به کار می‌رود."
+  },
+  {
+    q: "با توجه به کد زیر، میانگین امتیازهای کاربر دوم (Reza) چگونه محاسبه می‌شود؟\n\nusers = [\n    {\"name\": \"Ali\", \"scores\": [15, 18, 20]},\n    {\"name\": \"Reza\", \"scores\": [12, 16, 18]}\n]",
+    options: [
+      "sum(users[1]['scores']) / len(users[1]['scores'])",
+      "sum(users[0]['scores']) / len(users[0]['scores'])",
+      "users[1]['scores'] / 3",
+      "len(users[1]['scores'])"
+    ],
+    answer: 0,
+    explanation: "کاربر دوم Reza در ایندکس 1 قرار دارد. برای میانگین، مجموع نمرات را با sum() گرفته و بر تعداد آن‌ها با len() تقسیم می‌کنیم."
+  },
+  {
+    q: "کدام کد فقط خطوطی را که با ERROR شروع می‌شوند انتخاب کرده و فاصله‌های اضافی آن‌ها را حذف می‌کند؟",
+    options: [
+      "with open('data.txt','r') as f:\n    lines = [line.strip() for line in f if line.strip().startswith('ERROR')]",
+      "lines = [line for line in f]",
+      "lines = f.read().split()",
+      "lines = [line.strip() for line in f if 'ERROR' not in line]"
+    ],
+    answer: 0,
+    explanation: "این List Comprehension هر خط را با strip() پاکسازی می‌کند و فقط خطوطی را نگه می‌دارد که پس از پاکسازی با ERROR شروع شوند."
+  },
+  {
+    q: "خروجی کد زیر چیست؟\n\ndef calculate(a, b=5):\n    return a * b\n\nprint(calculate(3, 2))\nprint(calculate(4))",
+    options: ["6 و 20", "15 و 20", "6 و 4", "خطا می‌دهد."],
+    answer: 0,
+    explanation: "در فراخوانی اول a=3 و b=2 است، پس حاصل 3*2=6 می‌شود. در فراخوانی دوم فقط a=4 داده شده و b مقدار پیش‌فرض 5 را می‌گیرد، پس حاصل 4*5=20 می‌شود."
+  },
+  {
+    q: "اگر کلید score در دیکشنری وجود نداشته باشد، خروجی عبارت زیر چیست؟\n\nuser.get('score', 0)",
+    options: ["None", "خطا", "0", "False"],
+    answer: 2,
+    explanation: "متد get() در صورت نبودن کلید، به‌جای خطا مقدار پیش‌فرض داده‌شده را برمی‌گرداند. اینجا مقدار پیش‌فرض 0 است."
+  },
+  {
+    q: "کدام تابع داخلی پایتون هنگام پیمایش یک لیست، هم index و هم value را در اختیار ما قرار می‌دهد؟",
+    options: ["range()", "zip()", "enumerate()", "map()"],
+    answer: 2,
+    explanation: "enumerate() در هر تکرار یک جفت (index, value) برمی‌گرداند و برای دسترسی هم‌زمان به ایندکس و مقدار مناسب است."
+  },
+  {
+    q: "خروجی کد زیر چیست؟\n\nnums = [x for x in range(5) if x % 2 == 0]",
+    options: ["[1, 3, 5]", "[0, 1, 2, 3, 4]", "[0, 2, 4]", "[2, 4]"],
+    answer: 2,
+    explanation: "range(5) اعداد ۰ تا ۴ را تولید می‌کند و شرط x % 2 == 0 فقط اعداد زوج را نگه می‌دارد: ۰، ۲ و ۴."
+  },
+  {
+    q: "کدام گزینه درباره کلیدهای Dictionary صحیح است؟",
+    options: [
+      "کلیدها می‌توانند تکراری باشند و حتماً باید String باشند.",
+      "کلیدها باید Unique و Hashable باشند؛ مانند str، int و tuple.",
+      "کلیدها فقط باید عدد باشند.",
+      "کلیدها باید حتماً List باشند."
+    ],
+    answer: 1,
+    explanation: "کلیدهای دیکشنری باید یکتا و قابل هش باشند. انواع تغییرناپذیر مانند رشته، عدد و تاپل می‌توانند کلید باشند، اما لیست و دیکشنری نمی‌توانند."
+  },
+  {
+    q: "تابع input() در پایتون چه نوع داده‌ای برمی‌گرداند؟",
+    options: ["int", "str", "float", "bool"],
+    answer: 1,
+    explanation: "تابع input() همیشه خروجی را به‌صورت رشته (str) برمی‌گرداند؛ حتی اگر کاربر عدد وارد کند. برای تبدیل باید از int() یا float() استفاده کرد."
+  },
+  {
+    q: "برای شمارش تعداد تکرار کلمات در یک Dictionary، بدون ایجاد KeyError، کدام روش مناسب است؟",
+    options: [
+      "استفاده از try-except یا .get() با مقدار پیش‌فرض 0",
+      "استفاده از global",
+      "استفاده از input()",
+      "استفاده از continue"
+    ],
+    answer: 0,
+    explanation: "روش استاندارد استفاده از counts[word] = counts.get(word, 0) + 1 است. همچنین می‌توان با try-except خطای KeyError را مدیریت کرد."
+  },
+  {
+    q: "در عبارت‌های منطقی and و or، Short-Circuiting به چه معناست؟",
+    options: [
+      "تمام قسمت‌های عبارت همیشه اجرا می‌شوند.",
+      "وقتی نتیجه نهایی مشخص شود، بخش‌های باقی‌مانده ارزیابی نمی‌شوند.",
+      "فقط عبارت‌های or اجرا می‌شوند.",
+      "باعث ایجاد Exception می‌شود."
+    ],
+    answer: 1,
+    explanation: "در and اگر عملوند اول False باشد، بقیه ارزیابی نمی‌شود. در or اگر عملوند اول True باشد، بقیه ارزیابی نمی‌شود."
+  },
+  {
+    q: "در پروژه‌های واقعی پایتون، اگر برنامه‌ای بخواهد فایلی را بخواند که ممکن است وجود نداشته باشد، بهترین ساختار چیست؟",
+    options: [
+      "استفاده از شرط ساده if file_exists: و سپس رها کردن برنامه به امان خدا.",
+      "استفاده از try-except همراه با except FileNotFoundError: برای گرفتن خطا و مدیریت پیام آن.",
+      "استفاده از حلقه بی‌نهایت while True تا کاربر فایل دیگری بدهد.",
+      "استفاده از کلمه کلیدی global در ابتدای فایل."
+    ],
+    answer: 1,
+    explanation: "با try-except و گرفتن FileNotFoundError می‌توان از کرش کردن برنامه جلوگیری کرد و پیام مناسب یا رفتار جایگزین نمایش داد."
+  },
+  {
+    q: "کدام گزینه درباره Scope متغیرها (Local و Global) صحیح است؟",
+    options: [
+      "متغیرهای تعریف‌شده داخل یک تابع به صورت پیش‌فرض گلوبال هستند.",
+      "برای تغییر مقدار متغیرهای گلوبال در داخل تابع، به global نیاز داریم.",
+      "متغیرهای لوکال در بیرون از تابع نیز قابل دسترسی هستند.",
+      "پایتون اجازه استفاده از متغیرهای هم‌نام در داخل و خارج تابع را نمی‌دهد."
+    ],
+    answer: 1,
+    explanation: "متغیرهای داخل تابع به‌صورت پیش‌فرض Local هستند. برای تغییر یک متغیر Global در داخل تابع باید از global استفاده کرد؛ در غیر این صورت فقط خواندن آن ممکن است."
+  },
+  {
+    q: "خروجی قطعه کد زیر چیست؟\n\nx = 10\ny = 3\nprint(x // y, x % y)",
+    options: ["1 3.333", "1 3", "3 3", "10 3"],
+    answer: -1,
+    explanation: "هیچ‌کدام از گزینه‌ها درست نیست. 10 // 3 برابر 3 است (تقسیم صحیح) و 10 % 3 برابر 1 است (باقیمانده). بنابراین خروجی واقعی 3 1 می‌شود که در گزینه‌ها وجود ندارد."
+  },
+  {
+    q: "بلوک finally چه زمانی اجرا می‌شود؟",
+    options: [
+      "فقط زمانی که خطایی رخ دهد.",
+      "فقط زمانی که هیچ خطایی رخ ندهد.",
+      "در هر صورت؛ چه خطایی رخ دهد و چه رخ ندهد.",
+      "فقط زمانی که از raise استفاده شود."
+    ],
+    answer: 2,
+    explanation: "بلوک finally همیشه اجرا می‌شود؛ چه خطا رخ دهد، چه مدیریت شود، و چه کد با موفقیت تمام شود. معمولاً برای آزادسازی منابع استفاده می‌شود."
+  },
+  {
+    q: "کدام گزینه درباره ویژگی‌های Tuple نادرست است؟",
+    options: [
+      "تاپل‌ها Immutable هستند.",
+      "می‌توان از Tuple Unpacking استفاده کرد.",
+      "تاپل‌ها ساختارهای ترتیبی (Ordered) هستند.",
+      "عناصر داخل تاپل حتماً باید درون پرانتز () قرار بگیرند."
+    ],
+    answer: 3,
+    explanation: "تاپل می‌تواند بدون پرانتز هم ساخته شود؛ مثلاً t = 1, 2, 3 یک تاپل است. پرانتز برای خوانایی یا موارد خاص مثل تاپل خالی () و تاپل تک‌عضوی (5,) لازم است."
+  },
+  {
+    q: "خروجی کد زیر چیست؟\n\ndata = [(\"apple\", 3), (\"banana\", 1), (\"cherry\", 2)]\nsorted_data = sorted(data, key=lambda item: item[1])\nprint(sorted_data[0][0])",
+    options: ["cherry", "banana", "apple", "خطا می‌دهد چون تاپل قابل مرتب‌سازی نیست."],
+    answer: 1,
+    explanation: "مرتب‌سازی بر اساس عنصر دوم تاپل‌ها انجام می‌شود: banana: 1، cherry: 2، apple: 3. پس اولین عنصر لیست مرتب‌شده (\"banana\", 1) است و sorted_data[0][0] برابر banana می‌شود."
+  },
+  {
+    q: "کدام متد از ماژول re تمام الگوهای منطبق با یک عبارت منظم را در متن پیدا کرده و به شکل یک لیست از استرینگ‌ها برمی‌گرداند؟",
+    options: ["re.match()", "re.search()", "re.findall()", "re.split()"],
+    answer: 2,
+    explanation: "re.findall() همه تطابق‌های الگو در متن را پیدا می‌کند و به‌صورت لیستی از رشته‌ها برمی‌گرداند. re.match() فقط از ابتدای رشته، re.search() اولین تطابق، و re.split() متن را بر اساس الگو تقسیم می‌کند."
+  },
+  {
+    q: "خروجی کد زیر چیست؟\n\ns1 = {1, 2, 3}\ns2 = {2, 3, 4}\nprint(s1 & s2)",
+    options: ["{1, 2, 3, 4}", "{2, 3}", "{1}", "{4}"],
+    answer: 1,
+    explanation: "عملگر & بین مجموعه‌ها یعنی اشتراک (Intersection) و فقط عناصر مشترک دو مجموعه را برمی‌گرداند. عناصر مشترک 2 و 3 هستند."
+  },
+  {
+    q: "در کنترل جریان حلقه‌ها، دستور continue چه کاری انجام می‌دهد؟",
+    options: [
+      "کل حلقه را فوراً متوقف می‌کند و از آن خارج می‌شود.",
+      "تکرار فعلی را متوقف کرده و به سراغ تکرار بعدی حلقه می‌رود.",
+      "هیچ کاری انجام نمی‌دهد (No-op).",
+      "برنامه را ریست می‌کند."
+    ],
+    answer: 1,
+    explanation: "continue بقیه کدهای داخل حلقه در همان دور را رد می‌کند، اما حلقه را کامل قطع نمی‌کند؛ برخلاف break که از کل حلقه خارج می‌شود."
+  },
+  {
+    q: "مفهوم self در متدهای یک Class در پایتون چیست؟",
+    options: [
+      "اشاره به متغیرهای گلوبال اسکریپت دارد.",
+      "به نمونه (Instance) خاصی از کلاس که در حال حاضر متد روی آن اجرا می‌شود، اشاره می‌کند.",
+      "یک کلمه رزرو شده برای ارث‌بری (Inheritance) است.",
+      "نسخه کپی‌شده کلاس را برمی‌گرداند."
+    ],
+    answer: 1,
+    explanation: "self اولین پارامتر متدهای نمونه است و اجازه می‌دهد به ویژگی‌ها و متدهای همان شیء دسترسی داشته باشیم. پایتون هنگام فراخوانی متد، خود شیء را به‌صورت خودکار به‌عنوان self پاس می‌دهد."
+  },
+  {
+    q: "کدام کتابخانه داخلی پایتون برای کار با فایل‌های متنی ساختاریافته جدولی (سطر و ستون) استفاده می‌شود؟",
+    options: ["json", "math", "csv", "re"],
+    answer: 2,
+    explanation: "ماژول csv در پایتون برای خواندن و نوشتن فایل‌های متنی جدولی مانند فایل‌های CSV استفاده می‌شود."
+  },
+  {
+    q: "تفاوت اصلی بین متدهای .append() و .extend() در لیست‌های پایتون چیست؟",
+    options: [
+      "متد append کل یک لیست را به عنوان یک عنصر تکی اضافه می‌کند، اما extend عناصر آن لیست را به صورت مجزا به لیست اصلی الحاق می‌کند.",
+      "هیچ تفاوتی ندارند و هر دو یک کار را انجام می‌دهند.",
+      "متد extend فقط برای اعداد کار می‌کند اما append برای استرینگ‌هاست.",
+      "متد append لیست را برعکس می‌کند ولی extend لیست را مرتب می‌کند."
+    ],
+    answer: 0,
+    explanation: "مثال:\na = [1, 2]\na.append([3, 4])   # نتیجه: [1, 2, [3, 4]]\na.extend([3, 4])   # نتیجه: [1, 2, 3, 4]\nappend کل شیء را به‌عنوان یک عضو اضافه می‌کند، اما extend عناصر آن را جداگانه اضافه می‌کند."
+  }
+];
+
+let current = 0;
+const total = questions.length;
+let answerKeyMode = false;
+const selected = new Array(total).fill(null);
+
+const qLabel = document.getElementById('qLabel');
+const qText = document.getElementById('qText');
+const optList = document.getElementById('optList');
+const qCount = document.getElementById('qCount');
+const progressFill = document.getElementById('progressFill');
+const nextBtn = document.getElementById('nextBtn');
+const hintText = document.getElementById('hintText');
+const explainBox = document.getElementById('explainBox');
+const explainText = document.getElementById('explainText');
+const answerKeyToggle = document.getElementById('answerKeyToggle');
+
+const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`;
+const crossSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+function render(){
+  const item = questions[current];
+  const userChoice = selected[current];
+  const revealAll = answerKeyMode || userChoice !== null;
+
+  qLabel.textContent = `سوال ${current+1}`;
+  qText.textContent = item.q;
+  qCount.textContent = `سوال ${current+1} از ${total}`;
+  optList.innerHTML = '';
+
+  item.options.forEach((opt, i) => {
+    const li = document.createElement('li');
+    let cls = 'opt';
+    let iconSvg = '';
+
+    if(revealAll){
+      cls += ' revealed';
+      if(i === item.answer){
+        cls += ' correct-mark';
+        iconSvg = checkSvg;
+      }else if(i === userChoice){
+        cls += ' wrong-mark';
+        iconSvg = crossSvg;
+      }
+    }
+
+    li.className = cls;
+    li.dataset.index = i;
+    li.innerHTML = `
+      <span class="idx">${i+1}-</span>
+      <span class="radio">${iconSvg}</span>
+      <span class="pill"><span></span></span>
+    `;
+    li.querySelector('.pill span').textContent = opt;
+    optList.appendChild(li);
+  });
+
+  hintText.style.display = (revealAll) ? 'none' : 'block';
+  if(answerKeyMode || userChoice !== null){
+    explainBox.classList.add('show');
+    explainText.textContent = item.explanation;
+  }else{
+    explainBox.classList.remove('show');
+  }
+
+  progressFill.style.width = ((current+1)/total*100) + '%';
+}
+
+optList.addEventListener('click', (e) => {
+  const li = e.target.closest('.opt');
+  if(!li) return;
+  if(selected[current] !== null) return;
+  selected[current] = Number(li.dataset.index);
+  render();
+});
+
+nextBtn.addEventListener('click', () => {
+  current = (current + 1) % total;
+  render();
+});
+
+answerKeyToggle.addEventListener('change', (e) => {
+  answerKeyMode = e.target.checked;
+  render();
+});
+
+render();
+
+// ---------------- countdown timer (50 minutes) ----------------
+const EXAM_MINUTES = 50;
+let remaining = EXAM_MINUTES * 60;
+
+const tRoz = document.getElementById('tRoz');
+const tSaat = document.getElementById('tSaat');
+const tDaghigheh = document.getElementById('tDaghigheh');
+const tSaniyeh = document.getElementById('tSaniyeh');
+
+function toFa(n){
+  const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  return String(n).padStart(2,'0').split('').map(d => faDigits[d] ?? d).join('');
+}
+
+function tick(){
+  if(remaining <= 0){ clearInterval(timerId); return; }
+  remaining--;
+  const days = Math.floor(remaining / 86400);
+  const hours = Math.floor((remaining % 86400) / 3600);
+  const mins = Math.floor((remaining % 3600) / 60);
+  const secs = remaining % 60;
+  tRoz.textContent = toFa(days);
+  tSaat.textContent = toFa(hours);
+  tDaghigheh.textContent = toFa(mins);
+  tSaniyeh.textContent = toFa(secs);
+}
+tick();
+const timerId = setInterval(tick, 1000);
+</script>
+</body>
+</html>
