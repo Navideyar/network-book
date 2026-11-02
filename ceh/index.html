@@ -2182,6 +2182,722 @@ table strong{background:none;padding:0}
 
 <div class="box important"><i class="fas fa-trophy"></i><div><strong>تبریک!</strong>شما فصل دوم (Footprinting and Reconnaissance) را به پایان رساندید! حالا می‌دانید چطور بدون اینکه حتی یک بسته به سمت هدف بفرستید، اطلاعات حیاتی جمع‌آوری کنید. در فصل بعد (Scanning Networks)، وارد فاز فعال می‌شویم و یاد می‌گیریم چطور با ارسال بسته‌های شبکه، میزبان‌های زنده و پورت‌های باز را شناسایی کنیم.</div></div>
 `
+,
+"s8": `
+<div class="section-header"><div class="section-badge">08</div><div><h1>مفاهیم و کشف میزبان</h1><div class="meta">Module 03 · Scanning Networks · Session 1 of 3</div></div></div>
+
+<p>تا اینجا یاد گرفتیم چطور بدون اینکه حتی یک بسته به سمت هدف بفرستیم، اطلاعات حیاتی جمع‌آوری کنیم. اما Footprinting فقط نیمی از داستان است. حالا وقت آن رسیده که وارد فاز دوم بشویم: <strong>Network Scanning (اسکن شبکه)</strong>. در این مرحله، ما به طور مستقیم با شبکه هدف تعامل می‌کنیم تا ببینیم چه میزبان‌هایی زنده هستند و چه پورت‌هایی بازند. با ما همراه باشید تا با تکنیک‌های کشف میزبان (Host Discovery) آشنا شویم.</p>
+
+<h2>01. تعریف و اهداف Network Scanning</h2>
+<p><strong>Network Scanning</strong> مجموعه‌ای از فرآیندهای مختلف برای شناسایی میزبان (Host)، پورت‌ها و سرویس‌های شبکه است که منجر به ایجاد یک پروفایل و نقشه از شبکه هدف می‌گردد. این فاز یکی از اجزای حیاتی جمع‌آوری اطلاعات (Information Gathering) است و شبیه به این است که مهاجم با ارسال بسته‌های TCP/IP (Probes) به شبکه، اطلاعاتی را از آن پس می‌گیرد.</p>
+
+<img src="images/CEHv13_03/slide_3.webp" alt="Network Scanning Concept" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳: مفهوم اسکن شبکه (ارسال Probe و دریافت اطلاعات)</div>
+
+<p>اهداف اصلی Network Scanning عبارتند از:</p>
+<ul>
+<li><strong>شناسایی میزبان‌های در دسترس:</strong> کدام کامپیوترها یا سرورها روشن و متصل به شبکه هستند؟</li>
+<li><strong>شناسایی پورت‌های باز:</strong> روی آن میزبان‌ها چه پورت‌هایی (مثل 80، 443، 22) باز است؟</li>
+<li><strong>شناسایی سیستم‌عامل و معماری:</strong> سیستم‌عامل هدف ویندوز است یا لینوکس؟ چه نسخه‌ای دارد؟</li>
+<li><strong>شناسایی سرویس‌های در حال اجرا:</strong> روی پورت‌های باز چه سرویس‌هایی (مثل Apache، SSH، FTP) در حال اجرا هستند؟</li>
+<li><strong>کشف آسیب‌پذیری‌ها:</strong> آیا سرویس‌های اجراشده دارای نقاط ضعف شناخته‌شده هستند؟</li>
+</ul>
+
+<div class="box note"><i class="fas fa-crosshairs"></i><div><strong>نکته طلایی</strong>در دنیای تست نفوذ اخلاقی، اسکن شبکه اولین مرحله‌ای است که در آن احتمال شناسایی شما توسط IDS/IPS وجود دارد. بنابراین، یک هکر اخلاقی باید بداند چطور با تکنیک‌های Stealth (مخفیانه) اسکن کند تا شناسایی نشود.</div></div>
+
+<h2>02. ارتباط TCP/IP (TCP/IP Communication)</h2>
+<p>برای درک بهتر اسکن شبکه، باید بدانیم که یک اتصال TCP چطور برقرار می‌شود و چطور پایان می‌یابد. این دانش پایه، اساس تمام تکنیک‌های اسکن است.</p>
+
+<h3>۱-۲. برقراری اتصال (Three-way Handshake)</h3>
+<p>هر اتصال TCP با یک دست‌دادن سه‌مرحله‌ای شروع می‌شود:</p>
+<ol>
+<li><strong>SYN:</strong> کلاینت یک بسته SYN با شماره توالی (SEQ) اولیه به سرور می‌فرستد. (درخواست برای برقراری ارتباط)</li>
+<li><strong>SYN + ACK:</strong> سرور با یک بسته SYN+ACK پاسخ می‌دهد. (تأیید دریافت و درخواست متقابل)</li>
+<li><strong>ACK:</strong> کلاینت یک بسته ACK نهایی می‌فرستد. (تأیید نهایی و برقراری اتصال)</li>
+</ol>
+
+<h3>۲-۲. پایان اتصال (TCP Session Termination)</h3>
+<p>برای قطع اتصال، از یک فرآیند چهارمرحله‌ای با فلگ FIN استفاده می‌شود:</p>
+<ol>
+<li>کلاینت یک بسته <strong>FIN</strong> ارسال می‌کند.</li>
+<li>سرور با <strong>ACK</strong> پاسخ می‌دهد و اعلام می‌کند که درخواست را دریافت کرده است.</li>
+<li>سرور هم یک بسته <strong>FIN</strong> ارسال می‌کند.</li>
+<li>کلاینت با <strong>ACK</strong> نهایی پاسخ می‌دهد و اتصال بسته می‌شود.</li>
+</ol>
+
+<img src="images/CEHv13_03/slide_5.webp" alt="TCP Communication" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵: نحوه برقراری (Three-way Handshake) و پایان اتصال TCP</div>
+
+<h2>03. متدولوژی اسکن در CEH (CEH Scanning Methodology)</h2>
+<p>در دوره CEH، فرآیند اسکن شبکه به یک متدولوژی منظم و گام‌به‌گام تقسیم می‌شود که هر مرحله پیش‌نیاز مرحله بعدی است:</p>
+
+<img src="images/CEHv13_03/slide_6.webp" alt="CEH Scanning Methodology" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶: متدولوژی اسکن شبکه CEH</div>
+
+<ol>
+<li><strong>Check for Live Systems:</strong> بررسی اینکه کدام میزبان‌ها زنده هستند (همین جلسه).</li>
+<li><strong>Check for Open Ports:</strong> شناسایی پورت‌های باز روی میزبان‌های زنده (جلسه بعد).</li>
+<li><strong>Banner Grabbing:</strong> استخراج اطلاعات بیشتر از سرویس‌های روی پورت‌های باز (مثل نسخه نرم‌افزار).</li>
+<li><strong>Scan for Vulnerability:</strong> جستجوی آسیب‌پذیری‌های شناخته‌شده با ابزارهای اسکن.</li>
+<li><strong>Draw Network Diagram:</strong> ترسیم نقشه شبکه هدف برای درک بهتر معماری.</li>
+<li><strong>Prepare Proxies:</strong> آماده‌سازی پروکسی برای مخفی نگه داشتن هویت واقعی خود.</li>
+</ol>
+
+<h2>04. تکنیک‌های کشف میزبان (Host Discovery Techniques)</h2>
+<p>قبل از اینکه بخواهیم پورت‌ها را اسکن کنیم، باید بدانیم کدام کامپیوترها در شبکه روشن هستند. به این کار <strong>Host Discovery</strong> یا کشف میزبان می‌گویند. تکنیک‌های مختلفی برای این کار وجود دارد:</p>
+
+<h3>۱-۴. ARP Ping Scan</h3>
+<p>این روش یکی از دقیق‌ترین و سریع‌ترین روش‌ها برای کشف میزبان‌ها در <strong>شبکه محلی (LAN)</strong> است. ابزار <code>Nmap</code> با ارسال درخواست ARP و بررسی پاسخ‌ها، میزبان‌های زنده را شناسایی می‌کند. اگر میزبانی پاسخ ARP بدهد، ۱۰۰٪ زنده است. این روش معمولاً توسط فایروال‌ها مسدود نمی‌شود.</p>
+
+<h3>۲-۴. UDP Ping Scan</h3>
+<p>در این روش، بسته‌های UDP به پورت‌های خاصی ارسال می‌شود. اگر پورت بسته باشد، پاسخ ICMP Port Unreachable دریافت می‌شود که نشان می‌دهد میزبان زنده است.</p>
+
+<h3>۳-۴. ICMP ECHO Ping Scan</h3>
+<p>همان دستور <code>ping</code> معروف! با ارسال بسته ICMP ECHO Request، منتظر ICMP ECHO Reply می‌مانیم. اگر پاسخ دریافت شود، میزبان زنده است. این روش ساده است، اما اغلب فایروال‌ها و ویندوزهای امروزی ICMP را مسدود می‌کنند.</p>
+
+<h3>۴-۴. ICMP ECHO Ping Sweep</h3>
+<p>مشابه Ping Scan، اما به جای یک میزبان، برای یک <strong>محدوده کامل</strong> از آدرس‌های IP (مثلاً 192.168.1.1 تا 192.168.1.254) اجرا می‌شود تا تمام میزبان‌های زنده شبکه پیدا شوند.</p>
+
+<h3>۵-۴. TCP SYN Ping Scan</h3>
+<p>در این روش، یک بسته SYN به پورت خاصی (مثلاً 80) ارسال می‌شود. اگر میزبان با SYN+ACK یا RST پاسخ دهد، یعنی زنده است. این روش stealth است زیرا اتصال TCP هرگز کامل نمی‌شود (Handshake کامل نمی‌شود) و معمولاً در لاگ‌ها ثبت نمی‌شود.</p>
+
+<h3>۶-۴. TCP ACK Ping Scan</h3>
+<p>در این روش، یک بسته ACK خالی به میزبان ارسال می‌شود. اگر میزبان زنده باشد، با یک بسته RST پاسخ می‌دهد. این روش برای عبور از فایروال‌هایی که SYN را مسدود می‌کنند، بسیار مؤثر است.</p>
+
+<img src="images/CEHv13_03/slide_11.webp" alt="TCP ACK Ping Scan" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۱: TCP ACK Ping Scan (اگر RST دریافت شود، میزبان زنده است)</div>
+
+<p>دستور Nmap برای این کار:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sn -PA 10.10.10.10</pre></div>
+
+<h3>۷-۴. IP Protocol Ping Scan</h3>
+<p>در این روش، بسته‌های IP با پروتکل‌های مختلف (مثل ICMP، TCP، UDP) ارسال می‌شود تا بررسی شود کدام یک از پروتکل‌ها توسط میزبان پاسخ داده می‌شوند. این روش برای شناسایی میزبان‌هایی است که فایروال آن‌ها فقط برخی از پروتکل‌های خاص را عبور می‌دهد.</p>
+
+<h2>05. ابزارهای شناسایی سیستم‌های زنده</h2>
+<p>ابزارهای زیادی برای کشف میزبان‌های زنده وجود دارد. معروف‌ترین آن‌ها <strong>Nmap</strong> است، اما ابزارهای تجاری و متن‌باز دیگری نیز وجود دارند:</p>
+
+<img src="images/CEHv13_03/slide_13.webp" alt="Live System Discovery Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۳: ابزارهای شناسایی سیستم‌های زنده (Angry IP Scanner)</div>
+
+<ul>
+<li><strong>Nmap:</strong> استاندارد طلایی و متن‌باز برای اسکن شبکه.</li>
+<li><strong>Hping3:</strong> ابزار خط فرمان برای ساخت و ارسال بسته‌های سفارشی TCP/IP.</li>
+<li><strong>Angry IP Scanner:</strong> یک ابزار ساده، سریع و گرافیکی برای اسکن محدوده IP.</li>
+<li><strong>SolarWinds Engineer’s Toolset:</strong> مجموعه‌ای تجاری از ابزارهای شبکه.</li>
+<li><strong>Colasoft Ping Tool:</strong> ابزاری برای Ping گروهی.</li>
+<li><strong>ابزارهای دیگر:</strong> Advanced IP Scanner، OpUtils، Ultra Ping Pro، Visual Ping Tester.</li>
+</ul>
+
+<h2>06. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: Network Scanning معمولاً در کدام مرحله از حمله انجام می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) قبل از Footprinting</button>
+<button data-correct="true" onclick="selectOption(this)">ب) بعد از Footprinting و قبل از نفوذ (Gaining Access)</button>
+<button onclick="selectOption(this)">ج) بعد از پاک کردن ردپا</button>
+<button onclick="selectOption(this)">د) فقط در فاز نگهداری دسترسی</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>اسکن شبکه دومین مرحله از CEH Framework است و بعد از جمع‌آوری اطلاعات (Footprinting) انجام می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: در Three-way Handshake، ترتیب صحیح بسته‌ها کدام است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) SYN, ACK, SYN+ACK</button>
+<button data-correct="true" onclick="selectOption(this)">ب) SYN, SYN+ACK, ACK</button>
+<button onclick="selectOption(this)">ج) ACK, SYN, SYN+ACK</button>
+<button onclick="selectOption(this)">د) SYN, FIN, ACK</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>کلاینت SYN می‌فرستد، سرور SYN+ACK پاسخ می‌دهد و کلاینت ACK نهایی را می‌فرستد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: کدام تکنیک کشف میزبان در شبکه‌های محلی (LAN) دقیق‌ترین و غیرقابل مسدودسازی‌ترین روش است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) ICMP ECHO Ping</button>
+<button onclick="selectOption(this)">ب) TCP SYN Ping</button>
+<button data-correct="true" onclick="selectOption(this)">ج) ARP Ping Scan</button>
+<button onclick="selectOption(this)">د) UDP Ping</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>ARP در لایه ۲ کار می‌کند و اکثر فایروال‌ها نمی‌توانند آن را مسدود کنند. اگر میزبانی پاسخ ARP داد، حتماً زنده است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: اگر مهاجم یک بسته ACK خالی به هدف بفرستد و هدف با RST پاسخ دهد، چه نتیجه‌ای می‌گیریم؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) پورت باز است</button>
+<button data-correct="true" onclick="selectOption(this)">ب) میزبان زنده است</button>
+<button onclick="selectOption(this)">ج) میزبان خاموش است</button>
+<button onclick="selectOption(this)">د) فایروال وجود دارد</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در TCP ACK Ping Scan، اگر میزبان با RST پاسخ دهد، یعنی بسته را دریافت کرده و زنده است (حتی اگر پورت بسته باشد).</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: کدام دستور Nmap برای اسکن TCP ACK Ping استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) nmap -sn -PS 10.10.10.10</button>
+<button data-correct="true" onclick="selectOption(this)">ب) nmap -sn -PA 10.10.10.10</button>
+<button onclick="selectOption(this)">ج) nmap -sn -PE 10.10.10.10</button>
+<button onclick="selectOption(this)">د) nmap -sn -PU 10.10.10.10</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>سوییچ -PA برای TCP ACK Ping، -PS برای TCP SYN Ping، -PE برای ICMP ECHO و -PU برای UDP Ping است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۳-۱</h3>
+<p><strong>۱.</strong> Network Scanning دومین فاز از متدولوژی CEH است که در آن با ارسال بسته‌های TCP/IP (Probe) به شناسایی میزبان‌ها، پورت‌ها و سرویس‌ها می‌پردازیم.</p>
+<p><strong>۲.</strong> درک Three-way Handshake (SYN, SYN+ACK, ACK) و پایان اتصال (FIN, ACK) پیش‌نیاز فهم تکنیک‌های اسکن است.</p>
+<p><strong>۳.</strong> متدولوژی CEH شامل ۶ مرحله است: کشف میزبان‌های زنده ← کشف پورت‌های باز ← Banner Grabbing ← اسکن آسیب‌پذیری ← ترسیم نقشه شبکه ← آماده‌سازی پروکسی.</p>
+<p><strong>۴.</strong> تکنیک‌های کشف میزبان شامل ARP Ping (بهترین برای LAN)، UDP Ping، ICMP ECHO (Ping)، TCP SYN/ACK Ping و IP Protocol Ping است.</p>
+<p><strong>۵.</strong> ابزارهای اصلی برای این کار Nmap، Hping3 و Angry IP Scanner هستند.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 3-2) به سراغ <strong>کشف پورت و سرویس</strong> می‌رویم: تکنیک‌های TCP Connect Scan، Half-Open Scan، Xmas، FIN، NULL، ACK Flag، IDLE Scan، UDP Scan و SCTP Scan را به‌طور کامل بررسی می‌کنیم و یاد می‌گیریم چطور پورت‌های باز را تشخیص دهیم.</div></div>
+`
+,
+"s9": `
+<div class="section-header"><div class="section-badge">09</div><div><h1>کشف پورت و سرویس</h1><div class="meta">Module 03 · Scanning Networks · Session 2 of 3</div></div></div>
+
+<p>در جلسه قبل یاد گرفتیم چطور با ارسال بسته‌های ICMP یا ARP، میزبان‌های زنده را پیدا کنیم. اما یک میزبان زنده، فقط یک آدرس IP است. برای اینکه بفهمیم روی این میزبان چه سرویس‌هایی در حال اجراست، باید پورت‌های باز آن را شناسایی کنیم. در این جلسه، با تکنیک‌های مختلف اسکن پورت، از روش‌های ساده و پر سر و صدا تا روش‌های مخفیانه و پیچیده، آشنا می‌شویم.</p>
+
+<h2>01. Port and Service Discovery (کشف پورت و سرویس)</h2>
+<p>یک سیستم می‌تواند تا ۶۵,۵۳۵ پورت TCP و ۶۵,۵۳۵ پورت UDP داشته باشد. هر سرویس (مثل وب، ایمیل، SSH) روی یک یا چند پورت خاص گوش می‌دهد. هدف از اسکن پورت، پیدا کردن پورت‌هایی است که در حالت <strong>باز (Open)</strong> یا <strong>فیلترشده (Filtered)</strong> قرار دارند.</p>
+
+<img src="images/CEHv13_03/slide_14.webp" alt="Port and Service Discovery Tree" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۴: درخت دسته‌بندی روش‌های کشف پورت و سرویس</div>
+
+<p>روش‌های اسکن پورت به دسته‌های زیر تقسیم می‌شوند:</p>
+<ul>
+<li><strong>Open TCP Scanning:</strong> شامل TCP Connect (Full Open) و Stealth (Half-open) است.</li>
+<li><strong>Stealth TCP Scanning:</strong> شامل Inverse TCP Flag (Xmas, FIN, NULL) و ACK Flag Probe است.</li>
+<li><strong>Third Party and Spoofed:</strong> شامل IDLE/IPID Header Scan است.</li>
+<li><strong>UDP Scanning</strong></li>
+<li><strong>SCTP Scanning:</strong> شامل SCTP INIT و SCTP COOKIE ECHO است.</li>
+</ul>
+
+<h2>02. TCP Connect / Full Open Scan</h2>
+<p>این ساده‌ترین و بنیادی‌ترین روش اسکن پورت است. در این روش، اسکنر یک <strong>اتصال TCP کامل (Three-way Handshake)</strong> با هدف برقرار می‌کند.</p>
+
+<ul>
+<li><strong>نحوه کار:</strong> اسکنر یک بسته SYN به پورت مورد نظر می‌فرستد. اگر پورت باز باشد، سرور با SYN+ACK پاسخ می‌دهد. اسکنر هم ACK نهایی را می‌فرستد و اتصال کامل می‌شود (اتصال برقرار). سپس اسکنر اتصال را می‌بندد. اگر پورت بسته باشد، سرور با RST پاسخ می‌دهد.</li>
+<li><strong>مزایا:</strong> دقت بسیار بالا (۱۰۰٪)، نیازی به دسترسی Root ندارد (با یک کاربر معمولی هم می‌توان اجرا کرد).</li>
+<li><strong>معایب:</strong> به شدت پر سر و صدا است و در لاگ‌های سرور (Application Logs) و IDS/IPS ثبت می‌شود.</li>
+</ul>
+
+<p>دستور Nmap برای این اسکن:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sT 192.168.1.10</pre></div>
+
+<h2>03. Stealth / Half-Open Scan (اسکن مخفیانه)</h2>
+<p>این روش که به <strong>TCP SYN Scan</strong> نیز معروف است، پرکاربردترین روش اسکن در دنیای هک اخلاقی است. در این روش، اتصال TCP هرگز کامل نمی‌شود (Half-Open).</p>
+
+<ul>
+<li><strong>نحوه کار:</strong> اسکنر یک بسته SYN به پورت هدف می‌فرستد.
+    <ul>
+        <li>اگر پورت <strong>باز</strong> باشد، سرور با SYN+ACK پاسخ می‌دهد. اسکنر بلافاصله یک بسته <strong>RST</strong> می‌فرستد تا اتصال را قطع کند (قبل از اینکه کامل شود).</li>
+        <li>اگر پورت <strong>بسته</strong> باشد، سرور با RST پاسخ می‌دهد.</li>
+    </ul>
+</li>
+<li><strong>مزایا:</strong> بسیار سریع، مخفیانه (چون اتصال کامل نمی‌شود، در لاگ‌های برنامه ثبت نمی‌شود).</li>
+<li><strong>معایب:</strong> نیاز به دسترسی Root/Administrator دارد (برای ساخت بسته‌های خام).</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_16.webp" alt="Stealth Half-open Scan" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۶: نحوه کار Stealth Scan (ارسال RST بلافاصله بعد از SYN+ACK)</div>
+
+<p>دستور Nmap:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sS 192.168.1.10</pre></div>
+
+<h2>04. Inverse TCP Flag Scans (Xmas, FIN, NULL, Maimon)</h2>
+<p>این روش‌ها بر اساس یک نقص در پیاده‌سازی پروتکل TCP (RFC 793) کار می‌کنند. طبق استاندارد، اگر یک پورت <strong>بسته</strong> باشد، باید به هر بسته غیرمنتظره‌ای با <strong>RST</strong> پاسخ دهد. اما اگر پورت <strong>باز</strong> باشد، باید بسته را نادیده بگیرد و پاسخی ندهد. این روش‌ها از این قانون سوءاستفاده می‌کنند.</p>
+
+<h3>۱-۴. FIN Scan</h3>
+<p>یک بسته با فلگ FIN (بدون هیچ فلگ دیگری) ارسال می‌شود.</p>
+<ul>
+<li>پورت باز: پاسخ نمی‌دهد (No Response).</li>
+<li>پورت بسته: RST می‌فرستد.</li>
+</ul>
+
+<h3>۲-۴. NULL Scan</h3>
+<p>یک بسته با <strong>هیچ فلگی</strong> (هیچ کدام از فلگ‌های TCP ست نشده) ارسال می‌شود.</p>
+<ul>
+<li>پورت باز: پاسخ نمی‌دهد.</li>
+<li>پورت بسته: RST می‌فرستد.</li>
+</ul>
+
+<h3>۳-۴. Xmas Scan</h3>
+<p>یک بسته با فلگ‌های <strong>FIN، PSH و URG</strong> همزمان ارسال می‌شود. (چون همه چراغ‌ها روشن می‌شوند، به آن Xmas می‌گویند).</p>
+
+<img src="images/CEHv13_03/slide_18.webp" alt="Xmas Scan" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۸: Xmas Scan (ارسال FIN+URG+PSH)</div>
+
+<ul>
+<li>پورت باز: پاسخ نمی‌دهد.</li>
+<li>پورت بسته: RST می‌فرستد.</li>
+</ul>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نکته بسیار مهم</strong>این روش‌ها (FIN، NULL، Xmas) <strong>فقط روی سیستم‌های مبتنی بر UNIX/Linux</strong> کار می‌کنند. سیستم‌عامل ویندوز از استاندارد RFC 793 پیروی نمی‌کند و به <strong>تمام</strong> این بسته‌ها (حتی برای پورت‌های باز) با RST پاسخ می‌دهد. بنابراین، این اسکن‌ها روی ویندوز شکست می‌خورند.</div></div>
+
+<h3>۴-۴. TCP Maimon Scan</h3>
+<p>این روش توسط Uriel Maimon کشف شد. در این روش، یک بسته با فلگ‌های <strong>FIN + ACK</strong> ارسال می‌شود.</p>
+<ul>
+<li>پورت باز: پاسخ نمی‌دهد.</li>
+<li>پورت بسته: RST می‌فرستد.</li>
+</ul>
+<p>دستور Nmap برای این اسکن‌ها:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sF 192.168.1.10 # FIN Scan
+nmap -sN 192.168.1.10 # NULL Scan
+nmap -sX 192.168.1.10 # Xmas Scan
+nmap -sM 192.168.1.10 # Maimon Scan</pre></div>
+
+<h2>05. ACK Flag Scanning و ACK Flag Probe Scanning</h2>
+<p>برخلاف اسکن‌های قبلی، اسکن ACK برای تشخیص <strong>پورت‌های باز</strong> نیست، بلکه برای تشخیص <strong>وجود فایروال</strong> و قوانین آن طراحی شده است.</p>
+
+<h3>۱-۵. ACK Flag Scan</h3>
+<p>یک بسته ACK به هدف ارسال می‌شود.</p>
+<ul>
+<li>اگر هدف پاسخ <strong>RST</strong> دهد، یعنی هیچ فایروال Stateful در مسیر نیست (Unfiltered).</li>
+<li>اگر هدف پاسخی ندهد، یعنی یک فایروال Stateful (مثل Cisco ASA) بسته را دور ریخته است.</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_22.webp" alt="ACK Flag Scanning" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۲: تفاوت ACK Scan در حضور فایروال و عدم حضور آن</div>
+
+<h3>۲-۵. ACK Flag Probe Scan</h3>
+<p>در این روش، علاوه بر ارسال بسته ACK، فیلدهای <strong>TTL</strong> یا <strong>Window</strong> بسته RST دریافتی بررسی می‌شوند تا بفهمیم آیا پورت باز است یا خیر. (البته این روش به ندرت جواب می‌دهد و بیشتر جنبه آموزشی دارد).</p>
+<ul>
+<li><strong>TTL-based:</strong> اگر مقدار TTL بسته RST کمتر از ۶۴ باشد، پورت باز است.</li>
+<li><strong>Window-based:</strong> اگر مقدار Window در بسته RST غیر صفر باشد، پورت باز است.</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_23.webp" alt="ACK Flag Probe" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۳: ACK Flag Probe (بررسی TTL و Window)</div>
+
+<h2>06. IDLE / IPID Header Scan (اسکن کاملاً کور)</h2>
+<p>این یکی از پیچیده‌ترین و مخفیانه‌ترین روش‌های اسکن است. در این روش، مهاجم از یک ماشین واسط (Zombie) استفاده می‌کند و هرگز آدرس IP خود را به هدف نشان نمی‌دهد. به همین دلیل به آن <strong>Blind Scan</strong> (اسکن کور) می‌گویند.</p>
+
+<h3>مراحل انجام IDLE Scan</h3>
+<ol>
+<li><strong>گام ۱ (Probe Zombie):</strong> مهاجم یک بسته SYN/ACK به زامبی می‌فرستد. زامبی با یک بسته RST پاسخ می‌دهد که حاوی یک مقدار <strong>IPID</strong> (مثلاً ۳۱۳۳۷) است.</li>
+<li><strong>گام ۲ (Spoofed SYN):</strong> مهاجم یک بسته SYN به هدف می‌فرستد، اما آدرس مبدأ را <strong>آدرس IP زامبی</strong> جعل می‌کند.</li>
+<li><strong>گام ۳ (واکنش هدف):</strong>
+    <ul>
+        <li>اگر پورت هدف <strong>باز</strong> باشد، هدف یک SYN/ACK به زامبی می‌فرستد. زامبی (که غافلگیر شده) یک RST به هدف می‌فرستد و مقدار IPID خود را <strong>یک واحد افزایش می‌دهد</strong> (۳۱۳۳۸).</li>
+        <li>اگر پورت هدف <strong>بسته</strong> باشد، هدف یک RST به زامبی می‌فرستد. زامبی این RST را نادیده می‌گیرد و IPID تغییر نمی‌کند.</li>
+    </ul>
+</li>
+<li><strong>گام ۴ (Probe Zombie Again):</strong> مهاجم دوباره به زامبی بسته SYN/ACK می‌فرستد و IPID جدید را می‌خواند. اگر IPID <strong>۲ واحد</strong> افزایش یافته باشد (۳۱۳۳۹)، یعنی پورت هدف باز بوده است.</li>
+</ol>
+
+<img src="images/CEHv13_03/slide_24.webp" alt="IDLE Scan" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۴: مراحل IDLE Scan (استفاده از IPID زامبی)</div>
+
+<p>دستور Nmap:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -Pn -sI zombie_host target_host</pre></div>
+
+<h2>07. UDP Scanning</h2>
+<p>اسکن UDP بسیار کندتر و دشوارتر از TCP است، زیرا UDP اتصال‌گرا نیست.</p>
+<ul>
+<li><strong>نحوه کار:</strong> یک بسته UDP خالی به پورت هدف فرستاده می‌شود.
+    <ul>
+        <li>اگر پورت <strong>بسته</strong> باشد، سرور یک پیام <strong>ICMP Port Unreachable</strong> برمی‌گرداند.</li>
+        <li>اگر پورت <strong>باز</strong> باشد، ممکن است هیچ پاسخی ندهد (یا اگر سرویس پاسخ‌ده باشد، پاسخ UDP بدهد).</li>
+    </ul>
+</li>
+<li><strong>چالش:</strong> چون پاسخ ندادن می‌تواند هم معنای باز بودن پورت باشد و هم فیلتر شدن آن توسط فایروال، تشخیص دقیق دشوار است.</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_26.webp" alt="UDP Scanning" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۶: UDP Scanning (پورت باز = بدون پاسخ، پورت بسته = ICMP Unreachable)</div>
+
+<p>دستور Nmap:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sU 192.168.1.10</pre></div>
+
+<h2>08. SCTP INIT و SCTP COOKIE ECHO Scanning</h2>
+<p>SCTP (Stream Control Transmission Protocol) یک پروتکل انتقالی است که بیشتر در شبکه‌های مخابراتی (VoIP) استفاده می‌شود. اسکن آن شبیه به TCP SYN Scan است.</p>
+
+<h3>۱-۸. SCTP INIT Scanning</h3>
+<p>یک بسته INIT به هدف ارسال می‌شود.</p>
+<ul>
+<li>پورت باز: پاسخ <strong>INIT+ACK</strong> دریافت می‌شود.</li>
+<li>پورت بسته: پاسخ <strong>ABORT</strong> دریافت می‌شود.</li>
+</ul>
+
+<h3>۲-۸. SCTP COOKIE ECHO Scanning</h3>
+<p>یک بسته COOKIE ECHO ارسال می‌شود.</p>
+<ul>
+<li>پورت باز: هیچ پاسخی نمی‌آید (No Response).</li>
+<li>پورت بسته: پاسخ <strong>ABORT</strong> دریافت می‌شود.</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_27.webp" alt="SCTP Scanning" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۷: SCTP INIT Scanning (مقایسه با Four-way Handshake)</div>
+
+<p>دستور Nmap:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sY 192.168.1.10 # SCTP INIT Scan
+nmap -sZ 192.168.1.10 # SCTP COOKIE ECHO Scan</pre></div>
+
+<h2>09. SYN/FIN Scanning با IP Fragments</h2>
+<p>این یک روش جدید نیست، بلکه یک اصلاح (Modification) روی روش‌های قبلی است. در این روش، هدر TCP به چندین قطعه (Fragment) کوچک تقسیم می‌شود تا فایروال‌ها و سیستم‌های IDS نتوانند محتوای بسته را به درستی تحلیل کنند.</p>
+
+<img src="images/CEHv13_03/slide_29.webp" alt="IP Fragmentation" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۹: SYN/FIN Scanning با استفاده از IP Fragments</div>
+
+<p>دستور Nmap:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sS -f -T4 -A -v 192.168.168.5</pre></div>
+
+<h2>10. Service Version Discovery و OS Discovery</h2>
+<p>وقتی پورت‌های باز را پیدا کردیم، باید بفهمیم چه سرویسی و با چه نسخه‌ای روی آن‌ها اجرا می‌شود. این کار به ما کمک می‌کند آسیب‌پذیری‌های مربوط به آن نسخه را پیدا کنیم.</p>
+
+<h3>Service Version Discovery</h3>
+<p>ابزار Nmap با ارسال بسته‌های خاص و تحلیل پاسخ‌ها، نسخه سرویس را تشخیص می‌دهد.</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sV 192.168.1.10</pre></div>
+
+<h3>OS Discovery</h3>
+<p>با تحلیل نحوه پاسخ‌دهی TCP/IP Stack (مثلاً مقدار TTL، اندازه پنجره، ترتیب گزینه‌ها)، می‌توان سیستم‌عامل را تشخیص داد.</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -O 192.168.1.10</pre></div>
+
+<h2>11. Banner Grabbing (استخراج بنر)</h2>
+<p><strong>Banner Grabbing</strong> فرآیند استخراج اطلاعات (Banner) از سرویس‌های در حال اجرا روی پورت‌های باز است. این اطلاعات معمولاً شامل نام نرم‌افزار، نسخه آن و گاهی سیستم‌عامل است.</p>
+
+<h3>۱-۱۱. Passive Banner Grabbing</h3>
+<p>در این روش، مهاجم بدون ارسال درخواست مستقیم، اطلاعات را از منابع غیرمستقیم جمع‌آوری می‌کند:</p>
+<ul>
+<li><strong>Banner Grabbing from Error Message:</strong> ایجاد یک خطا (مثلاً ارسال درخواست نامعتبر) و خواندن پیام خطا که حاوی نسخه نرم‌افزار است.</li>
+<li><strong>Sniffing Network Traffic:</strong> شنود ترافیک شبکه و تحلیل بسته‌های تبادل‌شده.</li>
+<li><strong>Banner Grabbing from Web Page:</strong> بررسی کدهای HTML صفحه و متادیتای آن.</li>
+<li><strong>Banner Grabbing with Netcraft:</strong> استفاده از سایت Netcraft برای شناسایی وب‌سرور.</li>
+</ul>
+
+<h3>۲-۱۱. Active Banner Grabbing</h3>
+<p>در این روش، مهاجم مستقیماً با سرویس تعامل می‌کند:</p>
+<ul>
+<li><strong>Specially Crafted Packet:</strong> ارسال بسته‌های دستکاری‌شده و تحلیل پاسخ.</li>
+<li><strong>Banner Grabbing with Telnet:</strong> اتصال به پورت (مثلاً 80) با Telnet و خواندن پاسخ سرور.</li>
+<li><strong>Banner Grabbing with Ping (TTL):</strong> تشخیص سیستم‌عامل از روی مقدار TTL اولیه (لینوکس=۶۴، مایکروسافت=۱۲۸، سیسکو=۲۵۵).</li>
+</ul>
+
+<img src="images/CEHv13_03/slide_37.webp" alt="Banner Grabbing Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۷: ابزار ID Serve برای Banner Grabbing</div>
+
+<p>مثال استفاده از Netcat (nc) برای Banner Grabbing:</p>
+<div class="code-container"><div class="code-label">bash · netcat</div><pre class="code-block">nc -vv www.example.com 80
+GET / HTTP/1.0
+[Press Enter twice]</pre></div>
+
+<h2>12. مقابله با اسکن پورت و Banner Grabbing</h2>
+
+<h3>۱-۱۲. Countermeasures ضد Port Scanning</h3>
+<ul>
+<li>پیکربندی قوانین فایروال و سیستم تشخیص نفوذ برای شناسایی و مسدود کردن درخواست‌های اسکن.</li>
+<li>استفاده از ابزارهای اسکن پورت برای تست دوره‌ای شبکه و بررسی عملکرد دستگاه‌های امنیتی.</li>
+<li>اطمینان از بروزرسانی دستگاه‌های امنیتی (فایروال، روتر، IDS).</li>
+<li>غیرفعال نمودن سرویس‌ها و پورت‌های بلااستفاده.</li>
+<li>مسدود کردن تمام ترافیک‌های ICMP (برای جلوگیری از ICMP Ping Scan).</li>
+</ul>
+
+<h3>۲-۱۲. Countermeasures ضد Banner Grabbing</h3>
+<ul>
+<li>غیرفعال نمودن سرویس‌های غیرضروری برای محدودسازی افشای اطلاعات.</li>
+<li>نمایش بنرهای اشتباه برای گمراه کردن نفوذگران.</li>
+<li>استفاده از ابزارهایی مانند ServerMask و IIS Lockdown برای تغییر بنر IIS.</li>
+<li>تغییر <code>ServerTokens</code> به <code>Prod</code> و <code>ServerSignature</code> به <code>Off</code> در فایل <code>httpd.conf</code> آپاچی.</li>
+<li>غیرفعال کردن بخش <code>expose_php</code> در فایل <code>php.ini</code>.</li>
+<li>مدیریت پسوند صفحات وب در آپاچی با <code>mod_negotiation</code> و در IIS با نرم‌افزارهایی مانند PageXchanger.</li>
+</ul>
+
+<h2>13. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: کدام روش اسکن پورت نیاز به دسترسی Root دارد اما در لاگ‌های برنامه ثبت نمی‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) TCP Connect Scan</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Stealth / Half-open Scan</button>
+<button onclick="selectOption(this)">ج) UDP Scan</button>
+<button onclick="selectOption(this)">د) Xmas Scan</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در Stealth Scan (SYN Scan)، اتصال هرگز کامل نمی‌شود و چون برنامه‌ها معمولاً فقط اتصالات کامل را لاگ می‌کنند، این روش ثبت نمی‌شود. اما برای ساخت بسته‌های خام نیاز به Root دارد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: اگر مهاجم یک بسته با فلگ‌های FIN، PSH و URG ارسال کند، از کدام اسکن استفاده کرده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) NULL Scan</button>
+<button onclick="selectOption(this)">ب) FIN Scan</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Xmas Scan</button>
+<button onclick="selectOption(this)">د) Maimon Scan</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>در Xmas Scan، فلگ‌های FIN، PSH و URG همزمان روشن می‌شوند (مثل چراغ‌های درخت کریسمس).</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: کدام یک از اسکن‌های زیر برای تشخیص وجود فایروال طراحی شده و نه پورت باز؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) SYN Scan</button>
+<button onclick="selectOption(this)">ب) FIN Scan</button>
+<button data-correct="true" onclick="selectOption(this)">ج) ACK Flag Scan</button>
+<button onclick="selectOption(this)">د) UDP Scan</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>ACK Flag Scan با ارسال بسته ACK و بررسی پاسخ RST، وجود فایروال Stateful را تشخیص می‌دهد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: در IDLE Scan، اگر IPID زامبی ۲ واحد افزایش یابد، چه نتیجه‌ای می‌گیریم؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) پورت هدف بسته است.</button>
+<button data-correct="true" onclick="selectOption(this)">ب) پورت هدف باز است.</button>
+<button onclick="selectOption(this)">ج) زامبی خاموش شده است.</button>
+<button onclick="selectOption(this)">د) فایروال وجود دارد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>افزایش ۲ واحدی IPID یعنی زامبی یک SYN/ACK دریافت کرده و یک RST فرستاده است، پس پورت باز بوده است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: چرا Inverse TCP Flag Scans (مثل FIN و Xmas) روی ویندوز کار نمی‌کنند؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) ویندوز از پروتکل TCP پشتیبانی نمی‌کند.</button>
+<button onclick="selectOption(this)">ب) ویندوز همیشه پورت‌های باز را می‌بندد.</button>
+<button data-correct="true" onclick="selectOption(this)">ج) ویندوز استاندارد RFC 793 را دنبال نمی‌کند و به همه بسته‌ها RST می‌فرستد.</button>
+<button onclick="selectOption(this)">د) ویندوز فقط به بسته‌های SYN پاسخ می‌دهد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>طبق RFC 793، پورت باز نباید به بسته‌های FIN/NULL/Xmas پاسخ دهد، اما ویندوز به همه آن‌ها RST می‌فرستد و این اسکن‌ها را بی‌نتیجه می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: برای شناسایی سیستم‌عامل از روی TTL، اگر TTL اولیه ۱۲۸ باشد، سیستم‌عامل چیست؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) لینوکس</button>
+<button data-correct="true" onclick="selectOption(this)">ب) ویندوز (Microsoft)</button>
+<button onclick="selectOption(this)">ج) سیسکو</button>
+<button onclick="selectOption(this)">د) مک</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>مقادیر پیش‌فرض TTL: لینوکس=۶۴، ویندوز=۱۲۸، سیسکو=۲۵۵.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 7: کدام دستور Nmap برای تشخیص نسخه سرویس‌های در حال اجرا استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>nmap -O</code></button>
+<button data-correct="true" onclick="selectOption(this)">ب) <code>nmap -sV</code></button>
+<button onclick="selectOption(this)">ج) <code>nmap -sS</code></button>
+<button onclick="selectOption(this)">د) <code>nmap -sU</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>سوییچ <code>-sV</code> برای Service Version Discovery و سوییچ <code>-O</code> برای OS Discovery استفاده می‌شود.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۳-۲</h3>
+<p><strong>۱.</strong> TCP Connect Scan یک اتصال کامل برقرار می‌کند (دقیق اما پر سر و صدا)، در حالی که Stealth Scan از اتصال Half-Open استفاده می‌کند (سریع و مخفیانه، اما نیازمند Root).</p>
+<p><strong>۲.</strong> Inverse TCP Flag Scans (FIN، NULL، Xmas) از عدم پاسخ‌دهی پورت‌های باز برای تشخیص استفاده می‌کنند، اما روی ویندوز کار نمی‌کنند.</p>
+<p><strong>۳.</strong> ACK Flag Scan برای تشخیص فایروال است، نه پورت باز. IDLE Scan یک اسکن کاملاً کور با استفاده از یک ماشین زامبی است.</p>
+<p><strong>۴.</strong> UDP Scan کند و دشوار است، اما برای کشف سرویس‌های مبتنی بر UDP (مثل DNS و SNMP) ضروری است.</p>
+<p><strong>۵.</strong> Service Version Discovery و OS Discovery با Nmap به ما می‌گویند چه سرویس‌هایی و با چه نسخه‌ای روی پورت‌های باز در حال اجرا هستند.</p>
+<p><strong>۶.</strong> Banner Grabbing (فعال یا غیرفعال) اطلاعات بیشتری از سرویس‌ها استخراج می‌کند و با غیرفعال کردن بنرها و تغییر تنظیمات سرور (مثل ServerTokens در آپاچی) می‌توان با آن مقابله کرد.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 3-3) به سراغ <strong>دور زدن و ناشناسی</strong> می‌رویم: Source Port Manipulation، IP Address Decoy، IP Spoofing، ساخت بسته‌های سفارشی با Colasoft و Nmap، ترسیم نقشه شبکه و ابزارهای Anonymizer مثل TOR و Tails را بررسی می‌کنیم.</div></div>
+`
+,
+"s10": `
+<div class="section-header"><div class="section-badge">10</div><div><h1>دور زدن و ناشناسی</h1><div class="meta">Module 03 · Scanning Networks · Session 3 of 3</div></div></div>
+
+<p>در جلسات قبل یاد گرفتیم چطور با ارسال بسته‌های مختلف، پورت‌های باز و سرویس‌های شبکه را شناسایی کنیم. اما یک هکر اخلاقی یا یک مهاجم حرفه‌ای، هیچ‌وقت نمی‌خواهد که هویت واقعی‌اش لو برود. در این جلسه، به سراغ تکنیک‌های <strong>دور زدن (Evasion)</strong> و <strong>ناشناسی (Anonymity)</strong> می‌رویم؛ از جعل آدرس IP و پورت مبدأ گرفته تا استفاده از شبکه‌های تور (TOR) و ابزارهای پاک‌سازی ردپا. با ما همراه باشید!</p>
+
+<h2>01. دستکاری پورت مبدأ (Source Port Manipulation)</h2>
+<p>بسیاری از فایروال‌ها قوانینی دارند که به ترافیک ورودی از پورت‌های خاصی (مثل پورت ۵۳ برای DNS یا پورت ۸۰ برای HTTP) اجازه عبور می‌دهند. مهاجم با <strong>جعل پورت مبدأ</strong> (Source Port) می‌تواند خود را شبیه به یک سرویس قانونی جا بزند و از فایروال عبور کند.</p>
+
+<p>ابزار Nmap با سوییچ <code>--source-port</code> (یا <code>-g</code>) این امکان را فراهم می‌کند:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -sS --source-port 53 192.168.1.10</pre></div>
+<p>در این مثال، اسکنر خود را به عنوان یک درخواست DNS (پورت ۵۳) نشان می‌دهد تا احتمال مسدود شدنش توسط فایروال کاهش یابد.</p>
+
+<h2>02. جعل آدرس IP با Decoy (طعمه)</h2>
+<p>در روش <strong>IP Address Decoy</strong>، مهاجم علاوه بر آدرس IP واقعی خود، تعداد زیادی آدرس IP جعلی (طعمه) را نیز به عنوان مبدأ بسته‌ها قرار می‌دهد. هدف این است که سیستم‌های امنیتی و لاگ‌ها را گمراه کند تا نتوانند منبع واقعی حمله را تشخیص دهند.</p>
+
+<p>دستور Nmap برای استفاده از Decoy:</p>
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap -D RND:10 192.168.1.10</pre></div>
+<p>در این دستور، ۱۰ آدرس IP تصادفی (RND) به عنوان طعمه تولید می‌شود و همراه با IP واقعی شما به سمت هدف ارسال می‌گردد. مدیر شبکه فکر می‌کند که ۱۱ سیستم مختلف در حال اسکن هستند!</p>
+
+<h2>03. جعل آدرس IP (IP Address Spoofing)</h2>
+<p>در <strong>IP Spoofing</strong>، مهاجم آدرس IP مبدأ بسته را به طور کامل جعل می‌کند (مثلاً به جای IP خود، IP یک سرور معروف یا یک آدرس نامربوط را قرار می‌دهد). این کار باعث می‌شود قربانی پاسخ‌ها را به آدرس جعلی بفرستد و نتواند مهاجم واقعی را ردیابی کند.</p>
+
+<img src="images/CEHv13_03/slide_42.webp" alt="IP Spoofing" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۲: IP Spoofing با استفاده از Hping3</div>
+
+<p>ابزار <strong>Hping3</strong> یکی از قدرتمندترین ابزارها برای جعل IP و ارسال بسته‌های سفارشی است. سوییچ <code>-a</code> (یا <code>--spoof</code>) برای جعل آدرس مبدأ استفاده می‌شود:</p>
+<div class="code-container"><div class="code-label">bash · hping3</div><pre class="code-block">hping3 www.certifiedhacker.com -a 7.7.7.7</pre></div>
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نکته مهم</strong>وقتی از IP Spoofing استفاده می‌کنید، پاسخ سرور به آدرس جعلی می‌رود، نه به شما! بنابراین این تکنیک بیشتر برای حملات DoS یا اسکن‌های کور (Blind Scan) استفاده می‌شود، نه برای سناریوهایی که نیاز به دریافت پاسخ دارید.</div></div>
+
+<h2>04. ایجاد بسته‌های سفارشی (Custom Packets)</h2>
+<p>گاهی اوقات برای دور زدن فایروال‌ها و سیستم‌های IDS/IPS، باید بسته‌های شبکه را دقیقاً مطابق میل خود بسازیم. دو ابزار اصلی برای این کار وجود دارند:</p>
+
+<h3>۱-۴. Colasoft Packet Builder</h3>
+<p>یک ابزار گرافیکی ویندوزی که به شما اجازه می‌دهد بسته‌های شبکه را از صفر بسازید، هدرهای TCP/IP را ویرایش کنید و حتی بسته‌های قطعه‌قطعه‌شده (Fragmented) تولید کنید تا سیستم‌های امنیتی نتوانند محتوای آن‌ها را تحلیل کنند.</p>
+
+<img src="images/CEHv13_03/slide_43.webp" alt="Colasoft Packet Builder" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۳: رابط کاربری Colasoft Packet Builder</div>
+
+<h3>۲-۴. ساخت بسته سفارشی در Nmap</h3>
+<p>Nmap با سوییچ‌های <code>--data</code> و <code>--data-string</code> به شما اجازه می‌دهد یک payload دلخواه به بسته‌های ارسالی اضافه کنید. این کار برای دور زدن IDSهایی که به دنبال الگوهای خاص هستند، بسیار مفید است.</p>
+
+<img src="images/CEHv13_03/slide_44.webp" alt="Nmap Custom Packets" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۴: ایجاد بسته‌های سفارشی با Nmap (--data و --data-string)</div>
+
+<div class="code-container"><div class="code-label">bash · nmap</div><pre class="code-block">nmap 10.10.10.10 --data 0xdeadbeef
+nmap 10.10.10.10 --data-string "Ph34r my l33t skills"</pre></div>
+
+<h2>05. ترسیم نقشه شبکه (Draw Network Diagram)</h2>
+<p>پس از جمع‌آوری اطلاعات و اسکن شبکه، نوبت به ترسیم نقشه می‌رسد. <strong>ترسیم نقشه شبکه</strong> اطلاعات باارزشی در مورد شبکه و معماری آن به نفوذگر می‌دهد. نقشه شبکه، ساختار فیزیکی و منطقی شبکه هدف را مشخص می‌کند و به مهاجم کمک می‌کند تا مسیر حمله را پیدا کند.</p>
+
+<img src="images/CEHv13_03/slide_45.webp" alt="Network Diagram" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۵: نمونه نقشه شبکه (Intranet و DMZ)</div>
+
+<p>ابزارهای معروف برای ترسیم نقشه شبکه عبارتند از:</p>
+<ul>
+<li><strong>Network Topology Mapper</strong> (SolarWinds)</li>
+<li><strong>LANState</strong></li>
+<li><strong>OpManager</strong></li>
+<li><strong>Network View</strong></li>
+<li><strong>Net Brain Enterprise Suite</strong></li>
+<li><strong>HP OpenView Network Node Manager</strong></li>
+</ul>
+
+<img src="images/CEHv13_03/slide_46.webp" alt="Network Diagram Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۶: ابزارهای ترسیم نقشه شبکه (Network View)</div>
+
+<h2>06. آماده‌سازی پروکسی (Prepare Proxies)</h2>
+<p>سرور پروکسی دارای برنامه‌ای است که به عنوان یک واسط (Intermediary) برای برقراری ارتباط با سیستم‌های دیگر استفاده می‌شود. نفوذگران برای مخفی ماندن آدرس مبدأ خود، از سرورهای پروکسی استفاده می‌کنند. آن‌ها معمولاً از یک <strong>زنجیره (Chain)</strong> از این سرورها استفاده می‌کنند تا ردیابی را بسیار دشوارتر کنند.</p>
+
+<img src="images/CEHv13_03/slide_47.webp" alt="Proxy Chaining" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۷: زنجیره پروکسی (Proxy Chaining) برای مخفی‌سازی هویت</div>
+
+<p>ابزارهای معروف برای مدیریت و استفاده از پروکسی‌ها:</p>
+<ul>
+<li><strong>Proxy Switcher</strong></li>
+<li><strong>Proxy Workbench</strong></li>
+<li><strong>Proxy Cap</strong></li>
+<li><strong>TOR</strong></li>
+<li><strong>CyberGhost</strong></li>
+<li><strong>Proxifier</strong></li>
+<li><strong>CCProxy</strong></li>
+<li><strong>Fiddler</strong></li>
+</ul>
+
+<img src="images/CEHv13_03/slide_48.webp" alt="Proxy Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۸: ابزار Proxy Switcher</div>
+
+<h2>07. ابزارهای ناشناسی (Anonymizers)</h2>
+<p>یک <strong>Anonymizer</strong> کلیه اطلاعات قابل شناسایی را از سیستم کاربر حذف می‌کند. این اطلاعات می‌تواند مربوط به جستجوها و فعالیت‌های کاربر (Internet Surf) باشد. Anonymizers فعالیت‌های کاربر را مخفی نموده و باعث عدم شناسایی و Trace شدن می‌شوند.</p>
+
+<img src="images/CEHv13_03/slide_49.webp" alt="Why use Anonymizer" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۹: دلایل استفاده از Anonymizer</div>
+
+<h3>۱-۷. Tails (سیستم‌عامل ناشناس)</h3>
+<p><strong>Tails</strong> یک سیستم‌عامل زنده (Live) است که کاربر می‌تواند آن را روی هر سیستمی از طریق USB، SD card یا DVD اجرا کند. هدف این ابزار حفظ حریم خصوصی است و به شما کمک می‌کند تا در اینترنت به صورت مخفی فعالیت نمایید و بدون ردیابی بر روی کامپیوتر مدنظر، آن را ترک کنید. تمام ترافیک اینترنت شما در Tails به طور خودکار از شبکه TOR عبور می‌کند.</p>
+
+<img src="images/CEHv13_03/slide_50.webp" alt="Tails OS" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۰: سیستم‌عامل Tails و مسیریابی از طریق TOR</div>
+
+<h3>۲-۷. G-Zapper (پاک‌سازی کوکی‌های گوگل)</h3>
+<p>گوگل برای ردیابی فعالیت‌های وب کاربری مانند کلیدهای جستجو، نتایج جستجو و سایت‌های مشاهده‌شده، مجموعه‌ای از کوکی‌ها را بر روی سیستم کاربر تنظیم و ذخیره می‌کند. از اطلاعات موجود در کوکی‌های گوگل می‌توان به عنوان شواهد (Evidence) جهت ارائه به دادگاه استفاده نمود. ابزار <strong>G-Zapper</strong> برای حذف و مدیریت این اطلاعات طراحی شده است.</p>
+
+<img src="images/CEHv13_03/slide_51.webp" alt="G-Zapper" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۱: ابزار G-Zapper برای پاک‌سازی کوکی‌های گوگل</div>
+
+<h3>۳-۷. سایر ابزارهای ناشناسی</h3>
+<ul>
+<li><strong>Psiphon</strong></li>
+<li><strong>Anonymizer Universal</strong></li>
+<li><strong>Hide Your IP Address</strong></li>
+<li><strong>Guardster</strong></li>
+<li><strong>Ultrasurf</strong></li>
+<li><strong>Hope Proxy</strong></li>
+</ul>
+
+<img src="images/CEHv13_03/slide_52.webp" alt="Anonymizer Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۲: Ultrasurf (نمونه‌ای از ابزارهای Anonymizer)</div>
+
+<h2>08. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: اگر مهاجم بخواهد از فایروالی که فقط به ترافیک DNS اجازه عبور می‌دهد رد شود، از کدام تکنیک استفاده می‌کند؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) IP Spoofing</button>
+<button onclick="selectOption(this)">ب) IP Address Decoy</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Source Port Manipulation</button>
+<button onclick="selectOption(this)">د) Proxy Chaining</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>با دستکاری پورت مبدأ (مثلاً استفاده از پورت 53)، ترافیک شبیه به DNS می‌شود و از فایروال عبور می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: دستور <code>nmap -D RND:10 192.168.1.10</code> چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) آدرس IP واقعی را جعل می‌کند.</button>
+<button data-correct="true" onclick="selectOption(this)">ب) ۱۰ آدرس IP جعلی (طعمه) را با IP واقعی ترکیب می‌کند.</button>
+<button onclick="selectOption(this)">ج) ۱۰ بسته سفارشی تولید می‌کند.</button>
+<button onclick="selectOption(this)">د) ۱۰ بار پشت سر هم اسکن می‌کند.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>سوییچ -D (Decoy) آدرس‌های IP جعلی را تولید می‌کند تا منبع واقعی اسکن مخفی بماند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: کدام ابزار برای جعل کامل آدرس IP مبدأ و ارسال بسته‌های سفارشی استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Nmap</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Hping3</button>
+<button onclick="selectOption(this)">ج) Colasoft Packet Builder</button>
+<button onclick="selectOption(this)">د) TOR</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Hping3 با سوییچ -a (یا --spoof) آدرس IP مبدأ را جعل می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: سیستم‌عامل Tails چه ویژگی منحصر‌به‌فردی دارد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) فقط روی موبایل نصب می‌شود.</button>
+<button onclick="selectOption(this)">ب) نیاز به نصب دائمی روی هارد دارد.</button>
+<button data-correct="true" onclick="selectOption(this)">ج) یک سیستم‌عامل Live است که تمام ترافیک را از TOR عبور می‌دهد.</button>
+<button onclick="selectOption(this)">د) سرعت اینترنت را افزایش می‌دهد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Tails از طریق USB یا DVD بوت می‌شود، هیچ ردی روی کامپیوتر باقی نمی‌گذارد و ترافیک را از TOR عبور می‌دهد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: ابزار G-Zapper برای چه کاری طراحی شده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) جعل آدرس IP</button>
+<button onclick="selectOption(this)">ب) ساخت بسته‌های سفارشی</button>
+<button data-correct="true" onclick="selectOption(this)">ج) حذف و مدیریت کوکی‌های ردیابی گوگل</button>
+<button onclick="selectOption(this)">د) ترسیم نقشه شبکه</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>G-Zapper کوکی‌های گوگل را که برای ردیابی فعالیت‌های وب استفاده می‌شوند، حذف می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: ابزار Colasoft Packet Builder چه قابلیتی به هکر می‌دهد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) اسکن خودکار پورت‌ها</button>
+<button data-correct="true" onclick="selectOption(this)">ب) ساخت بسته‌های شبکه سفارشی و قطعه‌قطعه‌شده</button>
+<button onclick="selectOption(this)">ج) ترسیم نقشه شبکه</button>
+<button onclick="selectOption(this)">د) پاک کردن کوکی‌های مرورگر</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>این ابزار به شما اجازه می‌دهد بسته‌های شبکه را از صفر بسازید و برای دور زدن فایروال‌ها و IDSها استفاده کنید.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۳-۳ (پایان فصل ۳)</h3>
+<p><strong>۱.</strong> دستکاری پورت مبدأ (Source Port Manipulation) با Nmap (<code>--source-port</code>) به مهاجم کمک می‌کند تا از قوانین فایروال عبور کند.</p>
+<p><strong>۲.</strong> IP Address Decoy (<code>-D</code>) آدرس‌های IP جعلی را با IP واقعی ترکیب می‌کند تا ردیابی را گمراه کند.</p>
+<p><strong>۳.</strong> IP Spoofing با Hping3 (<code>-a</code>) برای جعل کامل آدرس مبدأ استفاده می‌شود، اما پاسخ‌ها به آدرس جعلی برمی‌گردند.</p>
+<p><strong>۴.</strong> ساخت بسته‌های سفارشی با Colasoft Packet Builder و Nmap (<code>--data</code>) برای دور زدن IDSها و فایروال‌ها حیاتی است.</p>
+<p><strong>۵.</strong> ترسیم نقشه شبکه با ابزارهایی مثل Network Topology Mapper و LANState به درک بهتر معماری هدف کمک می‌کند.</p>
+<p><strong>۶.</strong> استفاده از زنجیره پروکسی، TOR، سیستم‌عامل Tails و ابزارهای Anonymizer مثل G-Zapper، هویت واقعی مهاجم را مخفی می‌کند.</p>
+</div>
+
+<div class="box note"><i class="fas fa-trophy"></i><div><strong>تبریک!</strong>شما فصل سوم (Scanning Networks) را به پایان رساندید! حالا می‌دانید چطور میزبان‌های زنده را پیدا کنید، پورت‌های باز را اسکن کنید و هویت خود را مخفی نگه دارید. در فصل بعد (Enumeration)، وارد مرحله بعدی می‌شویم: استخراج اطلاعات دقیق‌تر مثل نام کاربران، سرویس‌های اشتراک‌گذاری فایل و ساختار دایرکتوری از سیستم‌های هدف.</div></div>
+`
+
         };
 
         const toFa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
