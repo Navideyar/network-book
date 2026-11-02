@@ -1,0 +1,2436 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebBook-CEH v13</title>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- وزیرمتن: فونت اصلی متن فارسی و لاتین -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet">
+    <!-- جی‌بی‌ترینز مونو: فقط برای کد، شماره‌ها و برچسب‌های فنی -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+/* ===== WebBook-CEH v13 — Red Team Terminal Theme (v2: typography & lesson polish) ===== */
+:root{
+  /* فونت‌ها: وزیرمتن برای تمام متن فارسی/لاتین، جی‌بی‌ترینز مونو فقط برای کد و برچسب‌های فنی */
+  --font-body:'Vazirmatn','Segoe UI',Tahoma,system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Vazirmatn',ui-monospace,SFMono-Regular,Consolas,monospace;
+  --fs:1;
+
+  --primary:#00FF9C; --primary-hover:#00CC7A; --primary-soft:rgba(0,255,156,.08);
+  --primary-glow:rgba(0,255,156,.18); --accent:#FF4D6D; --accent-soft:rgba(255,77,109,.1);
+  --bg-body:#0A0E14; --bg-card:#111720; --bg-navbar:rgba(10,14,20,.88); --bg-sunken:#0D1219; --bg-raised:#151D29;
+  --text-main:#CBD5E3; --text-heading:#EEF3FA; --text-muted:#7C8BA1;
+  --border:#1E2836; --border-strong:#2D3A4D;
+  --shadow-sm:none; --shadow:0 10px 30px -10px rgba(0,0,0,.75);
+  --radius:14px; --radius-sm:10px;
+  --mark:rgba(0,255,156,.16);
+  --note-bg:rgba(0,255,156,.06); --note-border:#00CC7A;
+  --important-bg:rgba(56,189,248,.07); --important-border:#38BDF8;
+  --warning-bg:rgba(255,180,0,.07); --warning-border:#E0A800;
+  --correct-bg:rgba(0,255,156,.12); --correct-border:#00FF9C; --correct-text:#7DFFC4;
+  --wrong-bg:rgba(255,77,109,.12); --wrong-border:#FF4D6D; --wrong-text:#FF9EB0;
+  --code-bg:#070B10; --code-bar:#0F1621; --code-text:#C8D2E0; --terminal-green:#00FF9C;
+  --sidebar-width:320px;
+}
+[data-theme="light"]{
+  --primary:#00875A; --primary-hover:#006B47; --primary-soft:rgba(0,135,90,.08);
+  --primary-glow:rgba(0,135,90,.14); --accent:#D93654; --accent-soft:rgba(217,54,84,.06);
+  --bg-body:#F4F6FA; --bg-card:#FFFFFF; --bg-navbar:rgba(255,255,255,.9); --bg-sunken:#EDF1F6; --bg-raised:#F8FAFC;
+  --text-main:#2B3648; --text-heading:#0F172A; --text-muted:#64748B;
+  --border:#DDE3EC; --border-strong:#C5CFDD;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.04); --shadow:0 8px 24px -8px rgba(16,24,40,.12);
+  --mark:rgba(0,135,90,.14);
+  --note-bg:#EEF9F3; --note-border:#00875A;
+  --important-bg:#EFF6FF; --important-border:#2563EB;
+  --warning-bg:#FFFBEB; --warning-border:#D97706;
+  --correct-bg:#ECFDF5; --correct-border:#059669; --correct-text:#065F46;
+  --wrong-bg:#FEF2F2; --wrong-border:#DC2626; --wrong-text:#991B1B;
+  --code-bg:#0F172A; --code-bar:#1E293B; --code-text:#E2E8F0; --terminal-green:#4ADE80;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden;max-width:100%;scroll-behavior:smooth;font-size:calc(100% * var(--fs))}
+body{
+  font-family:var(--font-body);background:var(--bg-body);color:var(--text-main);
+  line-height:2.05;font-size:1.0625rem;font-weight:400;padding-top:60px;max-width:100%;overflow-x:hidden;
+  transition:background .3s,color .3s;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;font-kerning:normal;font-feature-settings:"kern","liga","calt";
+  background-image:radial-gradient(800px 320px at 90% -60px,var(--primary-glow),transparent 70%);
+  background-repeat:no-repeat;
+}
+::selection{background:var(--primary);color:#0A0E14}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+button{font-family:inherit}
+
+/* ---------- Navbar ---------- */
+.navbar{
+  position:fixed;inset:0 0 auto 0;height:60px;display:flex;align-items:center;gap:10px;padding:0 22px;
+  background:var(--bg-navbar);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);z-index:1000;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1rem;color:var(--text-heading);white-space:nowrap;letter-spacing:.2px}
+.brand-icon{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#0A0E14;font-size:.95rem;
+  background:linear-gradient(135deg,var(--primary),#00CC7A);box-shadow:0 0 16px var(--primary-glow);
+}
+.nav-spacer{flex:1}
+.theme-btn{
+  min-width:38px;height:38px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);
+  color:var(--text-muted);font-size:.95rem;cursor:pointer;transition:.2s;flex-shrink:0;padding:0 8px;font-weight:700;
+}
+.theme-btn:hover{color:var(--primary);border-color:var(--primary);background:var(--primary-soft)}
+.font-ctrl{display:flex;gap:6px;align-items:center}
+.font-ctrl .theme-btn{font-size:.82rem;line-height:1}
+.font-ctrl .theme-btn.sm{font-size:.7rem}
+.font-ctrl .theme-btn.lg{font-size:1rem}
+
+.progress-track{position:fixed;top:60px;inset-inline:0;height:3px;z-index:999;background:transparent}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:0 3px 3px 0;transition:width .12s}
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  position:fixed;top:60px;right:0;width:var(--sidebar-width);height:calc(100vh - 60px);overflow-y:auto;z-index:900;
+  background:var(--bg-card);border-left:1px solid var(--border);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sidebar-header{
+  display:flex;justify-content:space-between;align-items:center;padding:14px 16px;position:sticky;top:0;z-index:2;
+  background:var(--bg-card);border-bottom:1px solid var(--border);
+}
+.sidebar-header h3{font-size:.92rem;margin:0;display:flex;align-items:center;gap:8px;color:var(--text-heading);font-weight:800}
+.sidebar-header h3::before{display:none}
+.sidebar-header h3 i{color:var(--primary)}
+.sidebar-close{display:none;background:none;border:none;font-size:1rem;color:var(--text-muted);cursor:pointer;width:34px;height:34px;border-radius:8px}
+.sidebar-close:hover{background:var(--primary-soft);color:var(--primary)}
+
+.toc{padding:8px 8px 30px}
+.toc-chapter{border:0;margin-bottom:3px;border-radius:var(--radius-sm);overflow:hidden}
+.toc-chapter summary{
+  padding:10px 10px;font-weight:700;font-size:.86rem;line-height:1.5;color:var(--text-heading);cursor:pointer;
+  list-style:none;display:flex;align-items:flex-start;gap:8px;user-select:none;border-radius:var(--radius-sm);transition:background .2s;
+}
+.toc-chapter summary::-webkit-details-marker{display:none}
+.toc-chapter summary::after{
+  content:'\f107';font-family:'Font Awesome 6 Free';font-weight:900;margin-right:auto;margin-top:2px;
+  font-size:.75rem;color:var(--text-muted);transition:transform .25s;flex-shrink:0;
+}
+.toc-chapter[open] summary::after{transform:rotate(180deg)}
+.toc-chapter summary:hover{background:var(--bg-sunken)}
+.toc-chapter[open]>summary{color:var(--primary)}
+.chapter-num{
+  width:24px;height:24px;border-radius:6px;display:grid;place-items:center;flex-shrink:0;margin-top:1px;
+  background:var(--primary-soft);color:var(--primary);font-size:.72rem;font-weight:800;font-family:var(--font-mono);
+}
+.toc-chapter[open] .chapter-num{background:var(--primary);color:#0A0E14}
+.toc-sections{list-style:none;margin:2px 20px 6px 0;padding:0 10px 0 0;border-right:2px solid var(--border);background:none}
+.toc-sections li{margin:0}
+.toc-sections li::before{display:none}
+.toc-sections li a{
+  display:block;padding:6px 12px 6px 8px;margin-right:-2px;color:var(--text-muted);text-decoration:none;font-size:.83rem;line-height:1.7;
+  border-right:2px solid transparent;border-radius:0 6px 6px 0;transition:.18s;
+}
+.toc-sections li a:hover{color:var(--text-heading);background:var(--bg-sunken)}
+.toc-sections li a.active{color:var(--primary);background:var(--primary-soft);border-right-color:var(--primary);font-weight:700}
+
+.sidebar-toggle{
+  display:none;position:fixed;bottom:22px;left:22px;width:52px;height:52px;border-radius:14px;border:none;cursor:pointer;
+  background:var(--primary);color:#0A0E14;font-size:1.1rem;align-items:center;justify-content:center;z-index:950;
+  box-shadow:0 8px 24px var(--primary-glow);transition:transform .2s,background .2s;
+}
+.sidebar-toggle:hover{background:var(--primary-hover);transform:translateY(-2px)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:850;backdrop-filter:blur(3px)}
+.sidebar-overlay.open{display:block}
+
+/* ---------- Layout ---------- */
+.main{
+  max-width:860px;width:100%;min-width:0;margin:0 auto;margin-right:calc(var(--sidebar-width) + 24px);
+  padding:40px 28px 110px;overflow-x:hidden;transition:margin .3s;
+}
+.section{display:none;max-width:100%;min-width:0;overflow-wrap:break-word;animation:fadeIn .4s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- Section header ---------- */
+.section-header{
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:22px;margin-bottom:34px;padding:28px 30px;
+  background:
+    radial-gradient(420px 160px at 0% 0%,var(--primary-soft),transparent 70%),
+    linear-gradient(135deg,var(--bg-raised),var(--bg-card) 70%);
+  border:1px solid var(--border-strong);border-radius:18px;box-shadow:var(--shadow);
+}
+.section-header::before{content:'';position:absolute;top:0;right:0;width:5px;height:100%;background:linear-gradient(var(--primary),var(--accent))}
+.section-header::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:28px 28px;-webkit-mask-image:linear-gradient(90deg,#000,transparent 55%);mask-image:linear-gradient(90deg,#000,transparent 55%);
+}
+.section-header>*{position:relative;z-index:1}
+.section-badge{
+  width:62px;height:62px;border-radius:16px;display:grid;place-items:center;flex-shrink:0;color:#0A0E14;font-size:1.25rem;font-weight:800;font-family:var(--font-mono);
+  background:linear-gradient(135deg,var(--primary),#00CC7A);box-shadow:0 0 28px var(--primary-glow);
+}
+.section-header h1{font-size:1.65rem;line-height:1.55;font-weight:800;color:var(--text-heading);margin-bottom:6px;letter-spacing:-.2px}
+.section-header .meta{
+  display:inline-block;font-size:.78rem;color:var(--text-muted);font-family:var(--font-mono);font-weight:500;
+  direction:ltr;text-align:right;padding:2px 10px;border:1px solid var(--border-strong);border-radius:12px;background:var(--bg-sunken);line-height:1.9;
+}
+
+/* ---------- Typography ---------- */
+h2{
+  display:flex;align-items:center;gap:14px;margin:56px 0 22px;padding-bottom:14px;font-size:1.4rem;line-height:1.6;font-weight:800;
+  color:var(--text-heading);position:relative;letter-spacing:-.2px;
+  border-bottom:1px solid var(--border);
+}
+h2::after{content:'';position:absolute;bottom:-1px;right:0;width:84px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+h2:not(.has-num)::before{content:'#';font-family:var(--font-mono);color:var(--primary);font-weight:800;font-size:1.1em;flex-shrink:0;opacity:.85}
+.h2-num{
+  flex-shrink:0;min-width:44px;height:34px;padding:0 10px;display:inline-grid;place-items:center;border-radius:9px;
+  font:800 .95rem/1 var(--font-mono);color:var(--primary);background:var(--primary-soft);border:1px solid var(--primary-glow);
+}
+.h2-text{min-width:0}
+h3{margin:34px 0 14px;font-size:1.14rem;line-height:1.7;font-weight:700;color:var(--text-heading);display:flex;align-items:center;gap:10px}
+h3::before{content:'';width:5px;height:1.15em;border-radius:3px;background:var(--primary);flex-shrink:0;box-shadow:0 0 12px var(--primary-glow)}
+p{margin-bottom:20px;text-align:start;max-width:100%;line-height:2.05;color:var(--text-main);text-wrap:pretty}
+.section-header+p{
+  font-size:1.12rem;line-height:2.1;color:var(--text-heading);padding:4px 20px 4px 0;border-right:3px solid var(--primary);margin-bottom:10px;
+}
+strong{color:var(--text-heading);font-weight:700}
+p strong,li strong,td strong{
+  background:linear-gradient(transparent 62%,var(--mark) 62%);padding:0 2px;border-radius:2px;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+}
+em{font-style:normal;color:var(--primary);font-weight:600}
+
+ul,ol{margin:14px 0 26px;padding:0;list-style:none;max-width:100%}
+li{position:relative;margin-bottom:10px;line-height:2;padding-right:30px}
+ul>li::before{
+  content:'';position:absolute;right:8px;top:.95em;width:7px;height:7px;border-radius:2px;background:var(--primary);
+  transform:rotate(45deg);box-shadow:0 0 8px var(--primary-glow);
+}
+ol{counter-reset:item}
+ol>li{counter-increment:item;padding-right:40px}
+ol>li::before{
+  content:counter(item);position:absolute;right:0;top:.55em;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font:800 .8rem/1 var(--font-mono);color:var(--primary);background:var(--primary-soft);border:1px solid var(--primary-glow);
+}
+li>ul,li>ol{margin:8px 0 4px}
+
+blockquote{
+  position:relative;margin:30px 0;padding:22px 26px;font-style:normal;color:var(--text-heading);overflow-x:auto;
+  background:linear-gradient(135deg,var(--primary-soft),transparent 80%),var(--bg-card);
+  border:1px solid var(--primary-glow);border-right:4px solid var(--primary);border-radius:var(--radius);
+  box-shadow:0 0 0 1px rgba(0,0,0,.02),0 10px 30px -14px var(--primary-glow);
+}
+blockquote p{margin:0;max-width:none;text-align:center}
+blockquote strong{background:none;padding:0}
+:not(pre):not(.code-block)>code{
+  font-family:var(--font-mono);font-size:.86em;padding:2px 8px;border-radius:6px;direction:ltr;unicode-bidi:isolate;
+  background:var(--primary-soft);color:var(--primary);border:1px solid var(--border);
+}
+
+/* ---------- Info boxes ---------- */
+.box{
+  --c:var(--note-border);
+  position:relative;display:flex;gap:16px;margin:30px 0;padding:20px 22px;max-width:100%;min-width:0;overflow-wrap:break-word;
+  background:var(--bg-card);border:1px solid color-mix(in srgb,var(--c) 28%,var(--border));border-right:4px solid var(--c);
+  border-radius:var(--radius);box-shadow:var(--shadow-sm);align-items:flex-start;
+}
+.box>div{min-width:0;flex:1;font-size:.97rem;line-height:2}
+.box>i{
+  width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;font-size:1.05rem;margin-top:2px;
+  background:var(--c);color:#0A0E14;box-shadow:0 6px 16px -6px var(--c);
+}
+.box>div>strong:first-child{
+  display:block;margin-bottom:6px;font-size:1.02rem;font-weight:800;color:var(--c);background:none;padding:0;
+}
+.box.note{--c:var(--note-border);background:var(--note-bg)}
+.box.important{--c:var(--important-border);background:var(--important-bg)}
+.box.warning{--c:var(--warning-border);background:var(--warning-bg)}
+.box p{margin-bottom:10px}
+.box p:last-child{margin-bottom:0}
+
+/* ---------- Slide images ---------- */
+.pdf-image{
+  display:block;max-width:100%;height:auto;margin:0 auto;border-radius:12px;background:#fff;cursor:zoom-in;
+  border:1px solid var(--border-strong);box-shadow:var(--shadow);
+  transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;
+}
+.pdf-image:hover{transform:translateY(-2px);box-shadow:0 18px 44px -14px var(--primary-glow);border-color:var(--primary)}
+.slide-fig{margin:32px 0 34px;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-sm)}
+.slide-fig .image-caption{margin:12px 0 4px}
+.image-caption{
+  display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:.86rem;line-height:1.8;
+  color:var(--text-muted);margin:-14px 0 30px;font-weight:500;
+}
+.slide-fig .image-caption::before{
+  content:'\f03e';font-family:'Font Awesome 6 Free';font-weight:900;font-size:.78rem;color:var(--primary);opacity:.9;
+}
+
+/* lightbox */
+.lightbox{
+  position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(4,7,11,.92);backdrop-filter:blur(6px);cursor:zoom-out;
+}
+.lightbox.open{display:flex;animation:fadeIn .2s}
+.lightbox img{max-width:min(1400px,100%);max-height:calc(100vh - 110px);border-radius:10px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lightbox-cap{position:absolute;bottom:22px;left:24px;right:24px;text-align:center;color:#C8D2E0;font-size:.9rem}
+.lightbox-x{position:absolute;top:18px;left:20px;width:42px;height:42px;border-radius:12px;border:1px solid #2D3A4D;background:#111720;color:#EAF0F8;cursor:pointer;font-size:1rem}
+.lightbox-x:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ---------- Code ---------- */
+.code-container{position:relative;margin:28px 0;width:100%;max-width:100%;min-width:0}
+.code-label{
+  position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px;z-index:1;
+  font:600 .7rem var(--font-mono);color:#4B5E73;background:transparent;border-radius:0;pointer-events:none;direction:ltr;
+}
+.code-container::before{
+  content:'';position:absolute;top:12px;left:16px;width:10px;height:10px;border-radius:50%;z-index:2;
+  background:#FF5F57;box-shadow:16px 0 0 #FEBC2E,32px 0 0 #28C840;
+}
+.code-block{
+  display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  padding:52px 20px 20px;border-radius:12px;border:1px solid var(--border-strong);
+  background:linear-gradient(var(--code-bar) 0 36px,var(--code-bg) 36px);
+  color:var(--code-text);font:.9rem/1.85 var(--font-mono);direction:ltr;text-align:left;unicode-bidi:isolate;white-space:pre;
+  box-shadow:var(--shadow);
+}
+.code-block::before{content:'$ ';color:var(--terminal-green);font-weight:600}
+.code-block.no-prompt::before{content:none}
+
+/* ---------- Tables ---------- */
+.table-wrap{
+  width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:30px 0;
+  border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--bg-card);box-shadow:var(--shadow);
+}
+.table-wrap table{margin:0;border:0;border-radius:0}
+table{width:100%;border-collapse:separate;border-spacing:0;margin:28px 0;font-size:.95rem;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+th,td{padding:14px 18px;text-align:right;vertical-align:top;border:0;border-bottom:1px solid var(--border);line-height:1.9}
+th{
+  background:var(--primary-soft);color:var(--text-heading);font-weight:800;white-space:nowrap;border-bottom:2px solid var(--primary);
+  font-size:.9rem;
+}
+td:first-child{white-space:nowrap}
+tbody tr:nth-child(even) td{background:var(--bg-sunken)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--primary-soft);color:var(--text-heading)}
+td code{white-space:nowrap}
+table strong{background:none;padding:0}
+
+/* ---------- Quiz ---------- */
+.quiz-card{
+  position:relative;margin:30px 0 22px;padding:26px 26px 24px;background:var(--bg-card);border:1px solid var(--border-strong);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.quiz-card::before{
+  content:'';position:absolute;top:0;right:26px;left:26px;height:3px;border-radius:0 0 3px 3px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));opacity:.9;
+}
+.quiz-card>p{margin-bottom:20px;max-width:none;font-weight:800;font-size:1.06rem;line-height:1.95;color:var(--text-heading)}
+.quiz-options{display:flex;flex-direction:column;gap:10px}
+.quiz-options button{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:14px 18px;text-align:right;
+  font:inherit;font-size:.97rem;line-height:1.9;color:var(--text-main);background:var(--bg-sunken);
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;
+}
+.quiz-options button:hover:not(.correct):not(.wrong){border-color:var(--primary);background:var(--primary-soft);transform:translateX(-4px);color:var(--text-heading)}
+.quiz-options.answered button{cursor:default}
+.quiz-options.answered button:not(.correct):not(.wrong){opacity:.5}
+.quiz-options button.correct{border-color:var(--correct-border);background:var(--correct-bg);color:var(--correct-text);font-weight:700}
+.quiz-options button.wrong{border-color:var(--wrong-border);background:var(--wrong-bg);color:var(--wrong-text);font-weight:700}
+.quiz-options button.correct::after,.quiz-options button.wrong::after{
+  font-family:'Font Awesome 6 Free';font-weight:900;font-size:1.05rem;flex-shrink:0;
+}
+.quiz-options button.correct::after{content:'\f058'}
+.quiz-options button.wrong::after{content:'\f057'}
+.quiz-answer{
+  display:none;margin-top:18px;padding:16px 20px;font-size:.97rem;line-height:2;color:var(--text-heading);
+  background:var(--note-bg);border:1px solid color-mix(in srgb,var(--note-border) 30%,var(--border));border-right:4px solid var(--note-border);border-radius:var(--radius-sm);
+}
+.quiz-answer.show{display:block;animation:fadeIn .3s}
+.quiz-answer strong{background:none;padding:0;color:var(--note-border)}
+
+/* ---------- Summary ---------- */
+.summary-box{
+  margin:40px 0;padding:28px 30px;max-width:100%;min-width:0;overflow-wrap:break-word;
+  background:linear-gradient(180deg,var(--primary-soft),var(--bg-card) 120px);border:1px solid var(--primary-glow);
+  border-radius:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.summary-box::before{content:'';position:absolute;top:0;right:0;width:5px;height:100%;background:linear-gradient(var(--primary),var(--accent))}
+.summary-box h3{margin-top:0;color:var(--primary);font-size:1.2rem;font-weight:800}
+.summary-box h3::before{display:none}
+.summary-box p{max-width:none;margin-bottom:14px;padding-right:2px}
+.summary-box p:last-child{margin-bottom:0}
+.summary-box .code-container,.summary-box .code-block,.box .code-container,.box .code-block{max-width:100%;min-width:0}
+
+/* ---------- Nav buttons ---------- */
+.nav-buttons{display:flex;justify-content:space-between;gap:15px;margin-top:56px;padding-top:30px;border-top:1px solid var(--border)}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;padding:13px 28px;font:inherit;font-size:.96rem;font-weight:700;color:#0A0E14;
+  background:var(--primary);border:0;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px var(--primary-glow);transition:all .2s;
+}
+.nav-btn:hover:not(:disabled){background:var(--primary-hover);transform:translateY(-2px);box-shadow:0 8px 24px var(--primary-glow)}
+.nav-btn:disabled{background:var(--bg-sunken);color:var(--text-muted);border:1px solid var(--border);box-shadow:none;cursor:not-allowed}
+
+.placeholder{padding:60px 20px;text-align:center;color:var(--text-muted);background:var(--bg-card);border:1.5px dashed var(--border-strong);border-radius:var(--radius)}
+.placeholder i{display:block;margin-bottom:16px;font-size:2.5rem;color:var(--primary);opacity:.7}
+.placeholder p{margin-inline:auto;text-align:center}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1000px){
+  body{padding-top:54px;font-size:1rem;line-height:2}
+  .navbar{height:54px;padding:0 12px;gap:8px}
+  .progress-track{top:54px}
+  .brand span{display:none}
+  .sidebar{top:0;height:100vh;width:310px;max-width:88vw;transform:translateX(100%);border-left:0;box-shadow:-8px 0 30px rgba(0,0,0,.5);-webkit-overflow-scrolling:touch}
+  .sidebar.open{transform:none}
+  .sidebar-close{display:flex;align-items:center;justify-content:center}
+  .sidebar-toggle{display:flex}
+  .main{margin-right:0!important;padding:22px 16px 110px}
+  .section-header{padding:20px 18px;gap:14px;flex-wrap:wrap;border-radius:16px}
+  .section-badge{width:48px;height:48px;font-size:1.05rem;border-radius:13px}
+  .section-header h1{font-size:1.25rem;word-break:break-word}
+  .section-header+p{font-size:1.04rem;padding-right:14px}
+  h2{font-size:1.18rem;margin-top:44px;gap:10px}
+  .h2-num{min-width:38px;height:30px;font-size:.85rem}
+  p,ul,ol{max-width:none;text-align:start}
+  .code-block{font-size:.8rem;padding:46px 14px 16px}
+  .table-wrap{margin:22px -6px}
+  table{font-size:.86rem;min-width:450px}
+  th,td{padding:10px 12px}
+  .box{padding:16px;gap:12px}
+  .box>i{width:34px;height:34px;font-size:.95rem}
+  .quiz-card{padding:22px 16px 18px}
+  .quiz-options button{padding:12px 14px;font-size:.93rem}
+  .summary-box{padding:22px 18px}
+  .slide-fig{padding:6px;border-radius:14px}
+  .nav-buttons{flex-wrap:wrap;gap:10px}
+  .nav-btn{flex:1 1 auto;justify-content:center;padding:12px 16px;font-size:.9rem}
+}
+@media (max-width:480px){
+  .sidebar-toggle{bottom:18px;left:18px;width:50px;height:50px}
+  .main{padding:16px 10px 110px}
+  .code-block{font-size:.75rem}
+  table{min-width:380px}
+  .font-ctrl .theme-btn.sm{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .navbar,.progress-track,.sidebar,.sidebar-toggle,.nav-buttons,.lightbox{display:none!important}
+  body{padding:0;background:#fff;color:#000}
+  .main{margin:0;max-width:none;padding:0}
+  .section{display:block!important}
+  .box,.quiz-card,.summary-box,.slide-fig,.table-wrap{break-inside:avoid}
+}
+</style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-terminal"></i></div>
+            <span>ZeroDay · CEH v13</span>
+        </div>
+        <div class="nav-spacer"></div>
+        <div class="font-ctrl" role="group" aria-label="اندازه فونت">
+            <button class="theme-btn sm" onclick="changeFont(-1)" title="کوچک‌تر کردن متن" aria-label="کوچک‌تر کردن متن">آ</button>
+            <button class="theme-btn lg" onclick="changeFont(1)" title="بزرگ‌تر کردن متن" aria-label="بزرگ‌تر کردن متن">آ</button>
+        </div>
+        <button class="theme-btn" onclick="toggleTheme()" title="تغییر تم" aria-label="تغییر تم">
+            <i class="fas fa-sun theme-icon"></i>
+        </button>
+    </nav>
+
+    <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="فهرست مطالب">
+        <i class="fas fa-list-ul"></i>
+    </button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-bug"></i> CEH v13 · Modules</h3>
+            <button class="sidebar-close" id="sidebarClose" aria-label="بستن">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="toc" id="tocNav"></nav>
+    </aside>
+
+    <main class="main" id="mainContent"></main>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+        <button class="lightbox-x" id="lightboxClose" aria-label="بستن"><i class="fas fa-times"></i></button>
+        <img id="lightboxImg" alt="">
+        <div class="lightbox-cap" id="lightboxCap"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CEH v13 — 20 Chapters / 56 Sessions
+        // ============================================================
+        const course = [
+            {
+                "id": "ch1", "title": "Introduction to Ethical Hacking", "badge": "01",
+                "sections": [
+                    { "id": "s1", "num": 1, "title": "چشم‌انداز تهدید و مفاهیم حمله" },
+                    { "id": "s2", "num": 2, "title": "هکرها و چارچوب‌های تحلیل حمله" },
+                    { "id": "s3", "num": 3, "title": "ریسک، هوش تهدید و دفاع" },
+                    { "id": "s4", "num": 4, "title": "سیاست‌ها، AI و تست نفوذ" }
+                ]
+            },
+            {
+                "id": "ch2", "title": "Footprinting and Reconnaissance", "badge": "02",
+                "sections": [
+                    { "id": "s5", "num": 5, "title": "مفاهیم و جستجوی وب" },
+                    { "id": "s6", "num": 6, "title": "جمع‌آوری اطلاعات اجتماعی و فنی" },
+                    { "id": "s7", "num": 7, "title": "ابزارها و مقابله" }
+                ]
+            },
+            {
+                "id": "ch3", "title": "Scanning Networks", "badge": "03",
+                "sections": [
+                    { "id": "s8", "num": 8, "title": "مفاهیم و کشف میزبان" },
+                    { "id": "s9", "num": 9, "title": "کشف پورت و سرویس" },
+                    { "id": "s10", "num": 10, "title": "دور زدن و ناشناسی" }
+                ]
+            },
+            {
+                "id": "ch4", "title": "Enumeration", "badge": "04",
+                "sections": [
+                    { "id": "s11", "num": 11, "title": "Enumeration (کامل)" }
+                ]
+            },
+            {
+                "id": "ch5", "title": "Vulnerability Analysis", "badge": "05",
+                "sections": [
+                    { "id": "s12", "num": 12, "title": "Vulnerability Analysis (کامل)" }
+                ]
+            },
+            {
+                "id": "ch6", "title": "System Hacking", "badge": "06",
+                "sections": [
+                    { "id": "s13", "num": 13, "title": "احراز هویت و رمز عبور" },
+                    { "id": "s14", "num": 14, "title": "بهره‌برداری و ارتقای دسترسی" },
+                    { "id": "s15", "num": 15, "title": "اجرا و پنهان‌سازی" },
+                    { "id": "s16", "num": 16, "title": "پاک کردن ردپا" }
+                ]
+            },
+            {
+                "id": "ch7", "title": "Malware Threats", "badge": "07",
+                "sections": [
+                    { "id": "s17", "num": 17, "title": "مفاهیم، تروجان و ویروس" },
+                    { "id": "s18", "num": 18, "title": "باج‌افزار، کرم و بدافزار پیشرفته" },
+                    { "id": "s19", "num": 19, "title": "تحلیل و دفاع" }
+                ]
+            },
+            {
+                "id": "ch8", "title": "Sniffing", "badge": "08",
+                "sections": [
+                    { "id": "s20", "num": 20, "title": "مفاهیم و حملات سطح شبکه" },
+                    { "id": "s21", "num": 21, "title": "حملات VLAN و DNS" },
+                    { "id": "s22", "num": 22, "title": "ابزارها، شناسایی و مقابله" }
+                ]
+            },
+            {
+                "id": "ch9", "title": "Social Engineering", "badge": "09",
+                "sections": [
+                    { "id": "s23", "num": 23, "title": "مفاهیم و حملات Human-Based" },
+                    { "id": "s24", "num": 24, "title": "حملات Computer-Based و فیشینگ" },
+                    { "id": "s25", "num": 25, "title": "سرقت هویت، تهدید داخلی و دفاع" }
+                ]
+            },
+            {
+                "id": "ch10", "title": "Denial-of-Service", "badge": "10",
+                "sections": [
+                    { "id": "s26", "num": 26, "title": "مفاهیم و حملات رایج" },
+                    { "id": "s27", "num": 27, "title": "حملات پیشرفته و بات‌نت" },
+                    { "id": "s28", "num": 28, "title": "مطالعات موردی، ابزارها و مقابله" }
+                ]
+            },
+            {
+                "id": "ch11", "title": "Session Hijacking", "badge": "11",
+                "sections": [
+                    { "id": "s29", "num": 29, "title": "مفاهیم و سطح اپلیکیشن" },
+                    { "id": "s30", "num": 30, "title": "سطح شبکه و ابزارها" },
+                    { "id": "s31", "num": 31, "title": "مقابله" }
+                ]
+            },
+            {
+                "id": "ch12", "title": "Evading IDS, Firewalls, and Honeypots", "badge": "12",
+                "sections": [
+                    { "id": "s32", "num": 32, "title": "IDS و فایروال" },
+                    { "id": "s33", "num": 33, "title": "YARA، Snort و Bypass" },
+                    { "id": "s34", "num": 34, "title": "Honeypot و مقابله" }
+                ]
+            },
+            {
+                "id": "ch13", "title": "Hacking Web Servers", "badge": "13",
+                "sections": [
+                    { "id": "s35", "num": 35, "title": "Web Servers (کامل)" }
+                ]
+            },
+            {
+                "id": "ch14", "title": "Hacking Web Applications", "badge": "14",
+                "sections": [
+                    { "id": "s36", "num": 36, "title": "مفاهیم و حملات تزریق" },
+                    { "id": "s37", "num": 37, "title": "کنترل دسترسی، XSS و منطق" },
+                    { "id": "s38", "num": 38, "title": "متدولوژی هک" },
+                    { "id": "s39", "num": 39, "title": "API، Web Shell، تست و دفاع" }
+                ]
+            },
+            {
+                "id": "ch15", "title": "SQL Injection", "badge": "15",
+                "sections": [
+                    { "id": "s40", "num": 40, "title": "مفاهیم و انواع In-Band" },
+                    { "id": "s41", "num": 41, "title": "Blind، کشف و بهره‌برداری" },
+                    { "id": "s42", "num": 42, "title": "ابزارها، Evasion و مقابله" }
+                ]
+            },
+            {
+                "id": "ch16", "title": "Hacking Wireless Networks", "badge": "16",
+                "sections": [
+                    { "id": "s43", "num": 43, "title": "مفاهیم و توپولوژی" },
+                    { "id": "s44", "num": 44, "title": "شناسایی، رمزنگاری و حملات" },
+                    { "id": "s45", "num": 45, "title": "ابزارها و دفاع" }
+                ]
+            },
+            {
+                "id": "ch17", "title": "Hacking Mobile Platforms", "badge": "17",
+                "sections": [
+                    { "id": "s46", "num": 46, "title": "مفاهیم و تهدیدات اپلیکیشن" },
+                    { "id": "s47", "num": 47, "title": "Android و iOS" },
+                    { "id": "s48", "num": 48, "title": "سازمانی و دفاع" }
+                ]
+            },
+            {
+                "id": "ch18", "title": "IoT and OT Hacking", "badge": "18",
+                "sections": [
+                    { "id": "s49", "num": 49, "title": "مفاهیم، معماری و تهدیدات IoT" },
+                    { "id": "s50", "num": 50, "title": "متدولوژی و ابزارهای IoT" },
+                    { "id": "s51", "num": 51, "title": "OT Hacking" }
+                ]
+            },
+            {
+                "id": "ch19", "title": "Cloud Computing", "badge": "19",
+                "sections": [
+                    { "id": "s52", "num": 52, "title": "مفاهیم و مدل‌ها" },
+                    { "id": "s53", "num": 53, "title": "Container و Kubernetes" },
+                    { "id": "s54", "num": 54, "title": "تهدیدات، حملات و امنیت" }
+                ]
+            },
+            {
+                "id": "ch20", "title": "Cryptography", "badge": "20",
+                "sections": [
+                    { "id": "s55", "num": 55, "title": "مفاهیم، الگوریتم‌ها، هش و رمزنگاری سخت‌افزاری" },
+                    { "id": "s56", "num": 56, "title": "PKI، امضای دیجیتال، پروتکل‌ها، رمزنگاری دیسک، حملات و دفاع" }
+                ]
+            }
+        ];
+
+        // ============================================================
+        // درسنامه‌ها 
+        // ============================================================
+        const richContent = {
+"s1": `
+<div class="section-header"><div class="section-badge">01</div><div><h1>چشم‌انداز تهدید و مفاهیم حمله</h1><div class="meta">Module 01 · Introduction to Ethical Hacking · Session 1 of 4</div></div></div>
+
+<p>سلام! به اولین جلسه از دوره CEH v13 خوش آمدید. در این جلسه، می‌خوایم از دنیای واقعی شروع کنیم. ببینیم امروز چه خبره، چه خطراتی سازمان‌ها رو تهدید می‌کنه و با کدوم مفاهیم پایه باید آشنا بشیم. پس با ما همراه باشید!</p>
+
+<h2>01. چشم‌انداز تهدید (Threat Landscape)</h2>
+<p>برای اینکه بدونیم چرا امنیت مهمه، باید ببینیم اوضاع دنیا چطوره. شرکت <strong>CrowdStrike</strong> (یکی از غول‌های امنیت سایبری که پلتفرم Falcon رو داره و توی گزارش‌های Gartner به عنوان یکی از بهترین‌های EDR شناخته میشه) هر ساله گزارش‌های نگران‌کننده‌ای منتشر می‌کنه.</p>
+
+<p>وقتی اسم تهدیدات سایبری میاد، اولین چیزی که به ذهن می‌رسه افزایش تعداد مهاجمینه. طبق گزارش کراوداسترایک، فقط در یک بازه زمانی، <strong>۳۴ مهاجم جدید</strong> شناسایی شدن که مجموع مهاجمان شناخته‌شده رو به <strong>۲۳۲</strong> می‌رسونه.</p>
+
+<img src="images/CEHv13_01/slide_3.webp" alt="Threat Landscape - Adversaries" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳: افزایش تعداد مهاجمان و تهدیدات</div>
+
+<p>اما فقط تعداد مهاجم‌ها زیاد نشده، بلکه نوع حملات هم تغییر کرده. یه آمار جالب دیگه میگه حملاتی که به سمت فضای ابری (Cloud) نشونه‌گیری می‌کنن، <strong>۱۱۰ درصد</strong> رشد داشتن. یعنی سازمان‌ها هرچی به سمت ابر میرن، مهاجم‌ها هم اونجا رو شلوغ‌تر می‌کنن.</p>
+
+<img src="images/CEHv13_01/slide_4.webp" alt="Cloud conscious cases" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴: رشد ۱۱۰ درصدی حملات به فضای ابری</div>
+
+<p>همچنین، تعداد قربانیانی که اسمشون توی سایت‌های لیک اطلاعات (مخصوص گروه‌های جرایم سازمان‌یافته) منتشر میشه، <strong>۷۶ درصد</strong> نسبت به سال قبل رشد داشته. این یعنی مهاجم‌ها فقط دنبال نفوذ نیستن، بلکه میخوان آبروی قربانی رو هم ببرن یا ازش اخاذی کنن.</p>
+
+<img src="images/CEHv13_01/slide_5.webp" alt="eCrime Leak Sites" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵: رشد ۷۶ درصدی قربانیان در سایت‌های لیک</div>
+
+<p>یه بازار سیاه هم به اسم <strong>Access Broker</strong> (دلال‌های دسترسی) راه افتاده که <strong>۵۰ درصد</strong> رشد داشته. این افراد، دسترسی به سیستم‌های هک‌شده رو می‌خرن و می‌فروشن. یعنی ممکنه اصلاً خودشون هک نکنن، فقط بفروشن به کسی که پول بیشتری میده.</p>
+
+<img src="images/CEHv13_01/slide_6.webp" alt="Access Broker Ads" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶: رشد ۵۰ درصدی تبلیغات دلالان دسترسی</div>
+
+<p>حملات <strong>Vishing</strong> (فیشینگ صوتی) هم با رشد سرسام‌آور <strong>۴۴۲ درصدی</strong> مواجه شدن! یعنی دیگه فقط ایمیل نیست، بلکه زنگ می‌زنن و با ترفندهای اجتماعی اطلاعات رو درمیارن.</p>
+
+<img src="images/CEHv13_01/slide_7.webp" alt="Vishing and Breakout Time" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۷: آمار وحشتناک Vishing و زمان Breakout</div>
+
+<p>و شاید مهم‌ترین آمار این باشه: میانگین زمان <strong>Breakout</strong> (یعنی زمانی که طول می‌کشه یک مهاجم از لحظه ورود، دسترسی خودش رو توی شبکه گسترش بده) به <strong>۴۸ دقیقه</strong> کاهش پیدا کرده! و سریع‌ترین زمان ثبت‌شده فقط <strong>۵۱ ثانیه</strong> بوده! همچنین ۷۹ درصد از تشخیص‌ها در سال ۲۰۲۴ <strong>بدون بدافزار (Malware-Free)</strong> بودن، یعنی مهاجم‌ها از ابزارهای خود ویندوز استفاده می‌کنن تا شناسایی نشن.</p>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نفوذهای تعاملی (Interactive Intrusions) و CURLY SPIDER</strong>امروز دیگه مهاجم‌ها ربات نیستن که فقط اسکریپت اجرا کنن. گروه‌هایی مثل <strong>CURLY SPIDER</strong> به صورت دستی و مستقیم وارد سیستم میشن، طوری رفتار می‌کنن که انگار یه کاربر مجاز (مثل ادمین) هستن تا لو نرن. این روشها به عنوان Interactive Intrusions شناخته میشن.</div></div>
+
+<h2>02. مفاهیم پایه (Vulnerability, Threat, Attack, Exploit, Target)</h2>
+<p>حالا بیاید یه ذهنیت درست از مفاهیم پایه بسازیم. خیلی از افراد این کلمات رو اشتباه به کار می‌برن، ولی توی آزمون CEH و دنیای واقعی، تفاوتشون حیاتیه. تصور کنید یک گاوصندوق داریم:</p>
+<ul>
+<li><strong>Vulnerability (آسیب‌پذیری):</strong> قفل گاوصندوق خرابه. (یک ضعف یا نقص)</li>
+<li><strong>Threat (تهدید):</strong> یه دزد توی خیابون قدم می‌زنه. (یک عامل بالقوه)</li>
+<li><strong>Attack (حمله):</strong> دزد میاد سراغ گاوصندوق و شروع به کار می‌کنه. (اقدام)</li>
+<li><strong>Exploit (اکسپلویت):</strong> دزد از یه دیلم یا ابزار مخصوص برای شکستن قفل استفاده می‌کنه. (ابزار بهره‌برداری)</li>
+<li><strong>Target (هدف):</strong> خود گاوصندوق و پولی که توشه.</li>
+</ul>
+
+<h3>فرمول حمله (Attack Formula)</h3>
+<p>برای اینکه یک حمله واقعاً اتفاق بیفته، سه چیز لازمه که بهش میگن <strong>فرمول حمله</strong>:</p>
+<blockquote style="text-align:center; font-family:'JetBrains Mono', monospace; font-size:1.15rem; direction:ltr; color: var(--primary);">
+<strong>Attack = Motive (Goal) + Method (TTPs) + Vulnerability</strong>
+</blockquote>
+<p>یعنی مهاجم باید <strong>انگیزه</strong> داشته باشه، یک <strong>روش</strong> (تاکتیک و تکنیک) بلد باشه، و در سیستم هدف یک <strong>آسیب‌پذیری</strong> وجود داشته باشه. اگر یکی نباشه، حمله شکست می‌خوره.</p>
+
+<h2>03. Attack Vector و عوامل مؤثر بر Information Systems</h2>
+<p>یک <strong>Attack Vector</strong> (بردار حمله) به مسیر یا روشی گفته می‌شه که نفوذگر از طریق اون می‌تونه به یک سیستم اطلاعاتی دسترسی پیدا کنه و نفوذ کنه.</p>
+
+<p>سیستم‌های اطلاعاتی (Information Systems) در مرکز یک هدف قرار دارن و عوامل مختلفی اون‌ها رو تهدید می‌کنه:</p>
+
+<img src="images/CEHv13_01/slide_39.webp" alt="Attack Vectors" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۹: عوامل مؤثر بر سیستم‌های اطلاعاتی (Attack Vectors)</div>
+
+<ul>
+<li><strong>Unpatched Software:</strong> نرم‌افزارهای آپدیت نشده.</li>
+<li><strong>Social Networking & Insider Threats:</strong> تهدیدات داخلی و شبکه‌های اجتماعی.</li>
+<li><strong>Botnets & Targeted Malware:</strong> بات‌نت‌ها و بدافزارهای هدفمند.</li>
+<li><strong>Cloud & Virtualization:</strong> چالش‌های امنیتی در فضای ابری و مجازی‌سازی.</li>
+<li><strong>Inadequate Security Policies:</strong> سیاست‌های امنیتی ضعیف.</li>
+<li><strong>Hacktivism & Organized Cyber Crime:</strong> هکتیویسم و جرایم سازمان‌یافته.</li>
+</ul>
+
+<h2>04. انواع حملات (Types of Attacks)</h2>
+<p>حملات از نظر نحوه تعامل با هدف به پنج دسته اصلی تقسیم می‌شن:</p>
+<table>
+<thead><tr><th>نوع حمله</th><th>توضیح ساده</th><th>مثال</th></tr></thead>
+<tbody>
+<tr><td><strong>Passive (غیرفعال)</strong></td><td>مهاجم فقط تماشا می‌کنه و داده‌ها رو دستکاری نمی‌کنه.</td><td>Sniffing (شنود ترافیک)</td></tr>
+<tr><td><strong>Active (فعال)</strong></td><td>مهاجم داده‌ها رو دستکاری می‌کنه یا ارتباط رو قطع می‌کنه.</td><td>MITM, DoS, SQLi</td></tr>
+<tr><td><strong>Close-in (نزدیک)</strong></td><td>حمله در مجاورت فیزیکی هدف انجام میشه.</td><td>مهندسی اجتماعی، Shoulder Surfing</td></tr>
+<tr><td><strong>Insider (داخلی)</strong></td><td>یک فرد داخلی سازمان (کارمند) دسترسی غیرمجاز می‌گیره.</td><td>سرقت اطلاعات توسط کارمند ناراضی</td></tr>
+<tr><td><strong>Distribution (توزیع)</strong></td><td>دستکاری سخت‌افزار/نرم‌افزار در زنجیره تأمین قبل از تحویل.</td><td>کارگذاشتن Backdoor در کارخانه</td></tr>
+</tbody>
+</table>
+
+<img src="images/CEHv13_01/slide_23.webp" alt="Types of Attacks" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۳: دسته‌بندی انواع حملات</div>
+
+<h2>05. دسته‌بندی حملات (Attack Categories)</h2>
+<p>از دیدگاه لایه‌ای که هدف قرار می‌گیره، حملات به چهار دسته کلی تقسیم می‌شن:</p>
+
+<img src="images/CEHv13_01/slide_40.webp" alt="Attack Categories" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۰: دسته‌بندی حملات بر اساس لایه هدف</div>
+
+<ul>
+<li><strong>Operating System Attacks:</strong> حملات به نقص‌های ویندوز یا لینوکس (مثل Patch نشدن سیستم‌عامل).</li>
+<li><strong>Application Level Attacks:</strong> حملات به نرم‌افزارها و وب‌سایت‌ها (مثل SQL Injection).</li>
+<li><strong>Shrink Wrap Code Attacks:</strong> نصب نرم‌افزار با تنظیمات پیش‌فرض ناامن (بدون تغییر پیکربندی).</li>
+<li><strong>Misconfiguration Attacks:</strong> وقتی ادمین شبکه، سرور یا فایروال رو اشتباه تنظیم می‌کنه.</li>
+</ul>
+
+<h2>06. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: کدام گزینه تعریف دقیق «Exploit» است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) یک ضعف در سیستم</button>
+<button data-correct="true" onclick="selectOption(this)">ب) ابزار یا کدی که از یک آسیب‌پذیری سوءاستفاده می‌کند</button>
+<button onclick="selectOption(this)">ج) هدفی که قرار است هک شود</button>
+<button onclick="selectOption(this)">د) شخصی که حمله را انجام می‌دهد</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>اکسپلویت ابزار یا روشی است که از Vulnerability استفاده می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: در فرمول حمله (Motive + Method + Vulnerability)، منظور از Method چیست؟</p>
+<div class="quiz-options">
+<button data-correct="true" onclick="selectOption(this)">الف) تاکتیک‌ها، تکنیک‌ها و رویه‌ها (TTPs)</button>
+<button onclick="selectOption(this)">ب) نام کاربری و رمز عبور</button>
+<button onclick="selectOption(this)">ج) فایروال سازمان</button>
+<button onclick="selectOption(this)">د) نوع سیستم‌عامل</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>روش، همان TTPs (Tactics, Techniques, and Procedures) است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: اگر کارمندی از داخل سازمان اقدام به دزدیدن اطلاعات کند، چه نوع حمله‌ای است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Passive</button>
+<button onclick="selectOption(this)">ب) Active</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Insider</button>
+<button onclick="selectOption(this)">د) Close-in</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>حملات Insider توسط افراد داخلی سازمان رخ می‌دهد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: طبق آمار، سریع‌ترین زمان Breakout ثبت‌شده چقدر بوده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) ۵ دقیقه</button>
+<button onclick="selectOption(this)">ب) ۴۸ دقیقه</button>
+<button data-correct="true" onclick="selectOption(this)">ج) ۵۱ ثانیه</button>
+<button onclick="selectOption(this)">د) ۲ ساعت</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>سریع‌ترین زمان گسترش دسترسی مهاجم فقط ۵۱ ثانیه بوده است!</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: کدام نوع حمله شامل دستکاری سخت‌افزار یا نرم‌افزار در زنجیره تأمین قبل از تحویل است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Close-in</button>
+<button onclick="selectOption(this)">ب) Insider</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Distribution</button>
+<button onclick="selectOption(this)">د) Passive</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>حملات Distribution در زنجیره تأمین (Supply Chain) رخ می‌دهد.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۱</h3>
+<p><strong>۱.</strong> فضای تهدیدات به شدت در حال تغییر است و حملات سریع‌تر، بدون بدافزار و تعاملی‌تر (مثل CURLY SPIDER) شده‌اند.</p>
+<p><strong>۲.</strong> فرمول حمله ترکیبی از Motive (انگیزه)، Method (روش) و Vulnerability (آسیب‌پذیری) است.</p>
+<p><strong>۳.</strong> Attack Vector مسیری است که مهاجم برای نفوذ انتخاب می‌کند (مثل نرم‌افزار آپدیت‌نشده یا تهدید داخلی).</p>
+<p><strong>۴.</strong> حملات به دسته‌های Passive، Active، Close-in، Insider و Distribution تقسیم می‌شوند.</p>
+<p><strong>۵.</strong> از نظر لایه هدف، حملات به OS، Application، Shrink Wrap و Misconfiguration تقسیم می‌شوند.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 2) به سراغ <strong>هکرها و چارچوب‌های تحلیل حمله</strong> می‌رویم: انواع هکرها (White/Black Hat)، تفاوت هکر اخلاقی، مثلث CIA، Cyber Kill Chain، MITRE ATT&CK و Diamond Model را بررسی می‌کنیم.</div></div>
+`,
+"s2": `
+<div class="section-header"><div class="section-badge">02</div><div><h1>هکرها و چارچوب‌های تحلیل حمله</h1><div class="meta">Module 01 · Introduction to Ethical Hacking · Session 2 of 4</div></div></div>
+
+<p>در جلسه قبل یاد گرفتیم که حمله چطور اتفاق می‌افتد. اما چه کسی این حملات را انجام می‌دهد؟ در این جلسه، با انواع هکرها آشنا می‌شویم، تفاوت هکر اخلاقی با هکرهای مخرب را می‌فهمیم و یاد می‌گیریم که چطور حملات را مثل یک تحلیل‌گر امنیتی (و در عین حال مثل یک مهاجم) تحلیل کنیم. با ما همراه باشید!</p>
+
+<h2>01. انواع هکرها (Types of Hackers)</h2>
+<p>کلمه «هکر» ممکن است بار منفی داشته باشد، اما همه هکرها بد نیستند. هکرها بر اساس نیت (Intention) و سطح مهارتشان به دسته‌های مختلفی تقسیم می‌شوند. طبق اسلایدهای دوره، مهم‌ترین آن‌ها عبارتند از:</p>
+
+<img src="images/CEHv13_01/slide_25.webp" alt="Types of Hackers" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۵: انواع کلاه‌ها و هکرها</div>
+
+<ul>
+<li><strong>White Hat (کلاه سفید):</strong> همان «هکرهای اخلاقی» هستند. با مجوز سازمان تست می‌کنند، نقاط ضعف را پیدا می‌کنند و به بهبود امنیت کمک می‌کنند.</li>
+<li><strong>Black Hat (کلاه سیاه):</strong> هکرهای مخرب. با انگیزه‌های مالی، انتقام یا تخریب وارد سیستم‌ها می‌شوند.</li>
+<li><strong>Gray Hat (کلاه خاکستری):</strong> بین سفید و سیاه قرار دارند. ممکن است بدون اجازه وارد سیستم شوند، اما نیت تخریبی ندارند و معمولاً آسیب‌پذیری را به سازمان اطلاع می‌دهند.</li>
+<li><strong>Script Kiddie:</strong> افراد تازه‌کار با دانش فنی کم. آن‌ها صرفاً از ابزارهای هک آماده (مثل اسکریپت‌ها) استفاده می‌کنند بدون اینکه بدانند پشت صحنه چه اتفاقی می‌افتد.</li>
+<li><strong>Cyber Terrorist:</strong> هکرهایی با اهداف تروریستی. هدف آن‌ها ایجاد رعب و وحشت، تخریب زیرساخت‌های حیاتی و ایجاد آسیب‌های گسترده است.</li>
+<li><strong>Spy Hacker:</strong> جاسوسان سایبری. هدف آن‌ها فقط دزدیدن اطلاعات محرمانه و جاسوسی از سازمان‌ها یا کشورهاست.</li>
+</ul>
+
+<h2>02. تفاوت هکر و هکر اخلاقی (NDA و مراحل قرارداد)</h2>
+<p>یک هکر اخلاقی (Ethical Hacker) دقیقاً مثل یک هکر مخرب فکر می‌کند (شعار معروف: <em>"To beat a hacker, you need to think like one!"</em>)، اما در عمل تفاوت‌های اساسی وجود دارد.</p>
+
+<img src="images/CEHv13_01/slide_27.webp" alt="Hacker vs Ethical Hacker" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۷: تفاوت هکر و هکر اخلاقی</div>
+
+<p>یک هکر اخلاقی قبل از شروع هرگونه عملیاتی، مراحل قانونی و قراردادی را طی می‌کند:</p>
+<ul>
+<li><strong>NDA (Non-Disclosure Agreement):</strong> امضای تفاهم‌نامه عدم افشای اطلاعات. یعنی هکر متعهد می‌شود هر چیزی که در حین تست دیده (مثل باگ‌ها یا اطلاعات کاربران) را کاملاً محرمانه نگه دارد.</li>
+<li><strong>مجوز کتبی (Authorization):</strong> برای جلوگیری از هرگونه مشکل حقوقی، هکر باید مجوز کتبی از سازمان هدف داشته باشد.</li>
+<li><strong>مستندسازی:</strong> تمام مراحل کار باید مستند شود تا به مشتری تحویل داده شود.</li>
+</ul>
+
+<div class="box note"><i class="fas fa-file-signature"></i><div><strong>مراحل قرارداد تست نفوذ</strong>صحبت با مشتری و تعیین نیازها ← امضای NDA ← جمع‌آوری اطلاعات ← انجام تست نفوذ (Penetration Testing) ← آنالیز و بررسی موارد ← تنظیم گزارش نهایی و ارائه به مشتری.</div></div>
+
+<h2>03. مثلث امنیت (CIA Triad) و مدل امنیت/کارایی</h2>
+<p>در دنیای امنیت، سه اصل مقدس وجود دارد که به آن <strong>CIA Triad</strong> می‌گویند. هر حمله سایبری در نهایت یکی از این سه ضلع را هدف قرار می‌دهد:</p>
+
+<img src="images/CEHv13_01/slide_37.webp" alt="CIA Triad" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۷: مثلث CIA</div>
+
+<ul>
+<li><strong>Confidentiality (محرمانگی):</strong> اطلاعات فقط باید توسط افراد مجاز دیده شود (مثل رمزنگاری).</li>
+<li><strong>Integrity (یکپارچگی):</strong> اطلاعات باید دقیق و دست‌نخورده باقی بمانند (مثل جلوگیری از تغییر داده‌ها توسط هکر).</li>
+<li><strong>Availability (دسترسی):</strong> اطلاعات و سرویس‌ها باید هر زمان که کاربران مجاز نیاز دارند، در دسترس باشند (حملات DoS این ضلع را هدف می‌گیرند).</li>
+</ul>
+
+<p>همچنین در طراحی سیستم‌ها یک تعادل همیشگی بین سه فاکتور وجود دارد:</p>
+
+<img src="images/CEHv13_01/slide_38.webp" alt="Security Functionality Ease of Use" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۸: مدل تعادل امنیت، کارایی و راحتی استفاده</div>
+
+<ul>
+<li><strong>Security (امنیت):</strong> هرچه امنیت بالاتر برود...</li>
+<li><strong>Functionality (کارایی):</strong> ...ممکن است کارایی سیستم کاهش یابد...</li>
+<li><strong>Ease of Use (راحتی استفاده):</strong> ...و کار با سیستم سخت‌تر و پیچیده‌تر شود.</li>
+</ul>
+<p>یک هکر اخلاقی باید بداند که نمی‌توان همه‌چیز را ۱۰۰٪ امن کرد؛ بلکه باید تعادل درستی بین این سه برقرار شود.</p>
+
+<h2>04. چارچوب‌های تحلیل حمله (Attack Frameworks)</h2>
+<p>برای اینکه بفهمیم هکرها چطور حمله می‌کنند و چطور می‌توان جلوی آن‌ها را گرفت، از چارچوب‌های تحلیلی استفاده می‌کنیم. در این بخش با ۴ چارچوب مهم آشنا می‌شویم.</p>
+
+<h3>1.4. Cyber Kill Chain (زنجیره کشتار سایبری)</h3>
+<p>این مدل توسط شرکت Lockheed Martin معرفی شد و مراحل یک حمله را از ابتدا تا انتها به ۷ مرحله تقسیم می‌کند. اگر در هر مرحله از این زنجیره، مدافعان بتوانند حمله را متوقف کنند، حمله شکست می‌خورد.</p>
+
+<img src="images/CEHv13_01/slide_41.webp" alt="Cyber Kill Chain" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۱: مراحل Cyber Kill Chain</div>
+
+<ol>
+<li><strong>Reconnaissance (شناسایی):</strong> جمع‌آوری اطلاعات درباره هدف.</li>
+<li><strong>Weaponization (تسلیح):</strong> ساخت بدافزار یا اکسپلویت با استفاده از اطلاعات جمع‌آوری شده.</li>
+<li><strong>Delivery (تحویل):</strong> ارسال بدافزار به هدف (مثلاً از طریق ایمیل فیشینگ).</li>
+<li><strong>Exploitation (بهره‌برداری):</strong> اجرای کد مخرب روی سیستم هدف و نفوذ.</li>
+<li><strong>Installation (نصب):</strong> نصب بک‌دور (Backdoor) برای دسترسی‌های بعدی.</li>
+<li><strong>Command and Control (C2):</strong> برقراری ارتباط بین سیستم هک‌شده و سرور هکر.</li>
+<li><strong>Actions on Objectives (اجرای اهداف):</strong> دزدیدن داده‌ها، تخریب یا اخاذی.</li>
+</ol>
+
+<h3>2.4. MITRE ATT&CK و TTPs</h3>
+<p>یک دانشنامه عظیم از تاکتیک‌ها و تکنیک‌های هکرها که در دنیای واقعی مشاهده شده است. در این چارچوب، مفاهیم زیر مهم هستند:</p>
+
+<img src="images/CEHv13_01/slide_47.webp" alt="MITRE ATT&CK" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۷: ماتریس MITRE ATT&CK</div>
+
+<ul>
+<li><strong>Tactics (تاکتیک):</strong> «چرا» هکر این کار را می‌کند (مثلاً چرا می‌خواهد دسترسی اولیه بگیرد؟).</li>
+<li><strong>Techniques (تکنیک):</strong> «چگونه» این کار را انجام می‌دهد (مثلاً از طریق فیشینگ).</li>
+<li><strong>Procedures (رویه):</strong> جزئیات دقیق اجرای آن تکنیک توسط یک گروه هکری خاص.</li>
+</ul>
+<p>به مجموع این سه مورد، <strong>TTPs</strong> می‌گویند که امضای رفتاری هر گروه هکری را مشخص می‌کند.</p>
+
+<h3>3.4. Diamond Model of Intrusion Analysis</h3>
+<p>این مدل، یک نفوذ را به صورت یک الماس با ۴ ضلع تحلیل می‌کند. برای درک کامل یک حمله، باید هر ۴ ضلع را بررسی کنیم:</p>
+
+<img src="images/CEHv13_01/slide_48.webp" alt="Diamond Model" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۸: مدل الماس (Diamond Model)</div>
+
+<ul>
+<li><strong>Adversary (مهاجم):</strong> چه کسی حمله را انجام داده است؟</li>
+<li><strong>Infrastructure (زیرساخت):</strong> از چه سرورها یا IPهایی استفاده کرده است؟</li>
+<li><strong>Capability (توانمندی):</strong> از چه ابزار یا بدافزاری استفاده کرده است؟</li>
+<li><strong>Victim (قربانی):</strong> هدف حمله چه کسی یا چه سیستمی بوده است؟</li>
+</ul>
+
+<h3>4.4. CEH Ethical Hacking Framework (۵ فاز)</h3>
+<p>این چارچوب، متدولوژی اصلی دوره CEH برای انجام تست نفوذ است و شامل ۵ فاز اصلی می‌شود:</p>
+
+<img src="images/CEHv13_01/slide_44.webp" alt="CEH Framework" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۴: چارچوب ۵ فازی هک اخلاقی CEH</div>
+
+<ol>
+<li><strong>Reconnaissance (شناسایی):</strong> جمع‌آوری اطلاعات (Footprinting).</li>
+<li><strong>Vulnerability Scanning (اسکن آسیب‌پذیری):</strong> جستجوی نقاط ضعف سیستم.</li>
+<li><strong>Gaining Access (کسب دسترسی):</strong> نفوذ به سیستم با استفاده از آسیب‌پذیری.</li>
+<li><strong>Maintaining Access (حفظ دسترسی):</strong> نصب بک‌دور برای برگشتن.</li>
+<li><strong>Clearing Tracks (پاک کردن ردپا):</strong> پاک کردن لاگ‌ها تا شناسایی نشویم.</li>
+</ol>
+
+<div class="box important"><i class="fas fa-balance-scale"></i><div><strong>مقایسه CEH Framework با Cyber Kill Chain</strong>اگرچه هر دو مراحل حمله را نشان می‌دهند، اما <strong>CEH Framework</strong> برای آموزش تست نفوذ (از دید مهاجم) طراحی شده، در حالی که <strong>Cyber Kill Chain</strong> برای تحلیل، شناسایی و متوقف کردن حملات (از دید مدافع / SOC) طراحی شده است.</div></div>
+
+<h2>05. نشانه‌های نفوذ (Indicators of Compromise - IoCs)</h2>
+<p>در حین یک حمله، مهاجم ردپایی از خودش به جا می‌گذارد. به این ردپاها، <strong>IoCs</strong> یا نشانه‌های نفوذ می‌گویند. متخصصان امنیتی با رصد کردن مداوم این نشانه‌ها، متوجه حضور یک مهاجم در شبکه می‌شوند.</p>
+
+<img src="images/CEHv13_01/slide_43.webp" alt="Indicators of Compromise" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۳: چهار دسته اصلی نشانه‌های نفوذ</div>
+
+<p>این نشانه‌ها به ۴ دسته اصلی تقسیم می‌شوند:</p>
+<ul>
+<li><strong>Email Indicators:</strong> آدرس ایمیل فرستنده، موضوع و پیوست‌های مشکوک.</li>
+<li><strong>Network Indicators:</strong> آدرس‌های IP و URLهای مرتبط با Command & Control (C2).</li>
+<li><strong>Host-Based Indicators:</strong> کلیدهای رجیستری یا نام فایل‌های مخرب روی سیستم.</li>
+<li><strong>Behavioral Indicators:</strong> رفتارهای غیرعادی مثل اجرای اسکریپت‌های PowerShell از منابع ناشناس.</li>
+</ul>
+
+<h2>06. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: هکری که از ابزارهای آماده استفاده می‌کند و درک عمیقی از فناوری ندارد، چه نام دارد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) White Hat</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Script Kiddie</button>
+<button onclick="selectOption(this)">ج) Cyber Terrorist</button>
+<button onclick="selectOption(this)">د) Spy Hacker</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>اسکریپت کیدی‌ها تازه‌کارهایی هستند که فقط از ابزارهای آماده استفاده می‌کنند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: در مثلث CIA، کدام اصل تضمین می‌کند که اطلاعات توسط افراد غیرمجاز دیده نشود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Integrity</button>
+<button onclick="selectOption(this)">ب) Availability</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Confidentiality</button>
+<button onclick="selectOption(this)">د) Authentication</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>محرمانگی (Confidentiality) تضمین می‌کند که فقط افراد مجاز به اطلاعات دسترسی دارند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: در کدام مرحله از Cyber Kill Chain، هکر بدافزار را به قربانی ارسال می‌کند؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Weaponization</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Delivery</button>
+<button onclick="selectOption(this)">ج) Exploitation</button>
+<button onclick="selectOption(this)">د) Installation</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>در مرحله Delivery، بدافزار از طریق ایمیل یا وب‌سایت به قربانی تحویل داده می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: در مدل الماس (Diamond Model)، کدام ضلع به ابزارها و بدافزارهای مورد استفاده اشاره دارد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Adversary</button>
+<button onclick="selectOption(this)">ب) Infrastructure</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Capability</button>
+<button onclick="selectOption(this)">د) Victim</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Capability نشان‌دهنده توانمندی‌ها (ابزارها و بدافزارها)ی مهاجم است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: کدام چارچوب از دید «مدافعان» برای تحلیل و توقف حملات طراحی شده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) CEH Ethical Hacking Framework</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Cyber Kill Chain</button>
+<button onclick="selectOption(this)">ج) Diamond Model</button>
+<button onclick="selectOption(this)">د) OSSTMM</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Cyber Kill Chain ابزاری برای مدافعان است تا بتوانند حملات را متوقف کنند، در حالی که CEH Framework از دید تست نفوذ است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: کدام گزینه نمونه‌ای از یک Host-Based Indicator است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) یک آدرس ایمیل فرستنده</button>
+<button onclick="selectOption(this)">ب) یک آدرس IP مقصد</button>
+<button data-correct="true" onclick="selectOption(this)">ج) یک کلید رجیستری مشکوک</button>
+<button onclick="selectOption(this)">د) یک اسکریپت پاورشل</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>کلیدهای رجیستری، نام فایل‌ها یا DLLهای مشکوک، نشانه‌های Host-Based هستند. اسکریپت پاورشل یک Behavioral Indicator است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۲</h3>
+<p><strong>۱.</strong> هکرها بسته به نیت و مهارت به کلاه سفید (اخلاقی)، سیاه (مخرب)، خاکستری، اسکریپت کیدی، تروریست سایبری و جاسوس تقسیم می‌شوند.</p>
+<p><strong>۲.</strong> هکر اخلاقی با امضای NDA، داشتن مجوز کتبی و ارائه گزارش نهایی، تفاوت خود را با هکر مخرب نشان می‌دهد.</p>
+<p><strong>۳.</strong> امنیت، کارایی و راحتی استفاده سه ضلع یک مثلث هستند که همیشه باید بین آن‌ها تعادل برقرار شود. سه‌گانه CIA نیز پایه امنیت اطلاعات است.</p>
+<p><strong>۴.</strong> Cyber Kill Chain (۷ مرحله) و CEH Framework (۵ فاز) مراحل حمله را نشان می‌دهند. MITRE ATT&CK و Diamond Model برای تحلیل رفتار مهاجم استفاده می‌شوند.</p>
+<p><strong>۵.</strong> IoCs (نشانه‌های نفوذ) به چهار دسته Email، Network، Host-Based و Behavioral تقسیم می‌شوند و به تیم‌های امنیتی در شناسایی حملات کمک می‌کنند.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 3) به سراغ <strong>ریسک، هوش تهدید و دفاع</strong> می‌رویم: Information Assurance، مدل‌های دفاعی Defense-in-Depth، مدیریت ریسک، چرخه Cyber Threat Intelligence و فرآیند مدیریت حوادث (Incident Management) را بررسی می‌کنیم.</div></div>
+`
+,
+"s3": `
+<div class="section-header"><div class="section-badge">03</div><div><h1>ریسک، هوش تهدید و دفاع</h1><div class="meta">Module 01 · Introduction to Ethical Hacking · Session 3 of 4</div></div></div>
+
+<p>در جلسات قبل یاد گرفتیم حملات چطور شکل می‌گیرند و چه چارچوب‌هایی برای تحلیل آن‌ها وجود دارد. اما در این جلسه، تمرکز ما روی «سمت دفاع» است. چطور باید از یک سازمان محافظت کنیم؟ چطور ریسک‌ها را بسنجیم و چگونه اطلاعات به‌روز درباره مهاجمین جمع‌آوری کنیم؟ با ما همراه باشید تا با مفاهیم کلیدی ریسک، هوش تهدید و مدیریت حوادث آشنا شویم.</p>
+
+<h2>01. تضمین اطلاعات (Information Assurance - IA)</h2>
+<p>همه ما می‌دانیم که اطلاعات باید محافظت شوند. اما <strong>Information Assurance (IA)</strong> فراتر از یک آنتی‌ویروس ساده است. IA به مجموعه‌ای از اقدامات و سیاست‌ها گفته می‌شود که اطمینان می‌دهد یکپارچگی، دسترسی، محرمانگی و صحت اطلاعات و سیستم‌های اطلاعاتی، در طول چرخه حیات (استفاده، ذخیره‌سازی و انتقال) حفظ می‌شود.</p>
+
+<img src="images/CEHv13_01/slide_49.webp" alt="Information Assurance" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۴۹: مفهوم تضمین اطلاعات (IA)</div>
+
+<p>برای پیاده‌سازی IA، سازمان‌ها باید:</p>
+<ul>
+<li>سیاست‌های داخلی، فرآیندها و دستورالعمل‌های امنیتی ایجاد کنند.</li>
+<li>استراتژی احراز هویت (Authentication) شبکه و کاربران را طراحی کنند.</li>
+<li>تهدیدات و آسیب‌پذیری‌های شبکه را شناسایی کنند.</li>
+<li>برای تجهیزات مورد نیاز و رفع مشکلات موجود نقشه راه داشته باشند.</li>
+</ul>
+
+<h2>02. استراتژی امنیتی مستمر و تطبیقی (Continual/Adaptive Security Strategy)</h2>
+<p>در گذشته تصور می‌شد که امنیت یک خط مستقیم است (نصب فایروال، تمام!). اما امروز می‌دانیم که امنیت یک <strong>چرخه مستمر</strong> است. مدل امنیتی مدرن به جای یک رویکرد خطی، از چرخه‌ای استفاده می‌کند که شامل ۴ مرحله اصلی است:</p>
+
+<img src="images/CEHv13_01/slide_50.webp" alt="Continual Adaptive Security Strategy" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۰: چرخه امنیتی Predict, Protect, Detect, Respond</div>
+
+<ul>
+<li><strong>Predict (پیش‌بینی):</strong> ارزیابی ریسک، تحلیل سطح حمله (Attack Surface) و استفاده از هوش تهدید برای پیش‌بینی حملات.</li>
+<li><strong>Protect (محافظت):</strong> پیاده‌سازی دفاع لایه‌ای (Defense-in-Depth)، محافظت از Endpointها، شبکه و داده‌ها.</li>
+<li><strong>Detect (تشخیص):</strong> مانیتورینگ مداوم (Continuous Threat Monitoring) برای شناسایی نفوذها.</li>
+<li><strong>Respond (پاسخ):</strong> واکنش به حوادث (Incident Response) و رفع مشکل.</li>
+</ul>
+
+<h2>03. دفاع لایه‌ای (Defense-in-Depth Layers)</h2>
+<p>تصور کنید یک قلعه باستانی را می‌خواهید محافظت کنید. فقط یک دیوار کافی نیست؛ شما نیاز به خندق، دیوارهای بلند، نگهبانان و درهای محکم دارید. در امنیت سایبری هم همین‌طور است. <strong>دفاع لایه‌ای</strong> یعنی ایجاد چندین لایه امنیتی، به‌طوری که اگر یک لایه شکست، لایه‌های بعدی از سیستم محافظت کنند.</p>
+
+<img src="images/CEHv13_01/slide_52.webp" alt="Defense-in-Depth" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۲: لایه‌های دفاع در عمق (Defense-in-Depth)</div>
+
+<p>این لایه‌ها از بیرونی‌ترین تا درونی‌ترین لایه عبارتند از:</p>
+<ul>
+<li><strong>Policies, Procedures, and Awareness:</strong> سیاست‌ها و آگاهی‌بخشی به کاربران (اولین سد).</li>
+<li><strong>Physical (فیزیکی):</strong> قفل درها، دوربین‌ها و کنترل دسترسی فیزیکی.</li>
+<li><strong>Perimeter (محیطی):</strong> فایروال‌ها و سیستم‌های تشخیص نفوذ (IDS).</li>
+<li><strong>Internal Network (شبکه داخلی):</strong> Segmentation و VLANها.</li>
+<li><strong>Host (سیستم میزبان):</strong> آنتی‌ویروس و Hardening سیستم‌عامل.</li>
+<li><strong>Application (برنامه):</strong> امنیت نرم‌افزارها و وب‌سایت‌ها.</li>
+<li><strong>Data (داده):</strong> رمزنگاری و بکاپ‌گیری (درونی‌ترین لایه که باید محافظت شود).</li>
+</ul>
+
+<h2>04. ریسک (Risk)، سطوح ریسک و ماتریس ریسک</h2>
+<p>ریسک به <strong>درجه‌ای از عدم قطعیت</strong> یا احتمال وقوع یک رویداد نامطلوب گفته می‌شود که ممکن است به سیستم یا منابع آن آسیب وارد کند. فرمول ساده ریسک این است:</p>
+<blockquote style="text-align:center; font-family:'JetBrains Mono', monospace; font-size:1.1rem; direction:ltr; color: var(--primary);">
+<strong>Risk = Threat x Vulnerability x Impact</strong>
+</blockquote>
+
+<p>برای ارزیابی و اولویت‌بندی ریسک‌ها، از <strong>ماتریس ریسک (Risk Matrix)</strong> استفاده می‌کنیم که احتمال وقوع (Likelihood) را در برابر پیامد (Consequence) می‌سنجد:</p>
+
+<img src="images/CEHv13_01/slide_53.webp" alt="Risk Matrix and Levels" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۳: سطوح ریسک و ماتریس ریسک</div>
+
+<p>سطوح ریسک و اقدامات لازم برای هرکدام:</p>
+<ul>
+<li><strong>ریسک بالا (High / Extreme):</strong> نیاز به اقدام فوری. باید کنترل‌هایی برای کاهش ریسک به سطح پایین اعمال شود.</li>
+<li><strong>ریسک متوسط (Medium):</strong> اقدام فوری لازم نیست، اما باید در اسرع وقت کنترل‌هایی برای کاهش آن پیاده‌سازی شود.</li>
+<li><strong>ریسک پایین (Low):</strong> اقدامات پیشگیرانه برای کاهش اثرات ریسک انجام می‌شود.</li>
+</ul>
+
+<h2>05. مدیریت ریسک (Risk Management)</h2>
+<p>مدیریت ریسک یک فرآیند مستمر برای کاهش و حفظ ریسک در سطح قابل قبول است. این فرآیند شامل ۵ مرحله است:</p>
+<ol>
+<li><strong>Risk Identification (شناسایی):</strong> شناسایی منبع، علت، پیامدهای ریسک و تأثیر آن بر امنیت سازمان.</li>
+<li><strong>Risk Assessment (ارزیابی):</strong> ارزیابی ریسک‌های شناسایی‌شده و تخمین احتمال و تأثیر آن‌ها.</li>
+<li><strong>Risk Treatment (درمان/کاهش):</strong> انتخاب و پیاده‌سازی کنترل‌های مناسب برای ریسک‌های شناسایی‌شده.</li>
+<li><strong>Risk Tracking (ردیابی):</strong> اطمینان از اینکه کنترل‌های پیاده‌سازی‌شده به درستی کار می‌کنند و شناسایی ریسک‌های جدید.</li>
+<li><strong>Risk Review (بازبینی):</strong> ارزیابی مستمر عملکرد استراتژی مدیریت ریسک و به‌روزرسانی آن.</li>
+</ol>
+
+<h2>06. هوش تهدید سایبری (Cyber Threat Intelligence - CTI)</h2>
+<p>CTI به جمع‌آوری و تحلیل اطلاعات درباره تهدیدات و مهاجمان گفته می‌شود. هدف این است که تهدیدات ناشناخته را به تهدیدات شناخته‌شده تبدیل کنیم تا بتوانیم آمادگی، پیشگیری و پاسخ به حملات را بهبود ببخشیم.</p>
+
+<h3>سطوح هوش تهدید</h3>
+<img src="images/CEHv13_01/slide_55.webp" alt="CTI Levels" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۵: سطوح استراتژیک، تاکتیکی، عملیاتی و فنی هوش تهدید</div>
+
+<ul>
+<li><strong>Strategic (استراتژیک):</strong> اطلاعات سطح بالا برای مدیران ارشد (مثل تغییر ریسک‌ها در طولانی‌مدت).</li>
+<li><strong>Tactical (تاکتیکی):</strong> اطلاعاتی درباره تاکتیک‌ها و تکنیک‌های مهاجم (TTPs) برای مدیران SOC.</li>
+<li><strong>Operational (عملیاتی):</strong> اطلاعاتی درباره حملات در حال وقوع برای تیم‌های امنیتی و مدافعان.</li>
+<li><strong>Technical (فنی):</strong> اطلاعات دقیق درباره نشانه‌های نفوذ (IoCs)، هش‌ها و IPها برای کارکنان SOC.</li>
+</ul>
+
+<h3>چرخه ۵ مرحله‌ای هوش تهدید</h3>
+<img src="images/CEHv13_01/slide_56.webp" alt="CTI Lifecycle" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۶: چرخه هوش تهدید سایبری</div>
+
+<ol>
+<li><strong>Planning and Direction:</strong> تعریف نیازهای اطلاعاتی (چه چیزی باید بدانیم؟).</li>
+<li><strong>Collection:</strong> جمع‌آوری داده‌ها (OSINT، HUMINT، IMINT).</li>
+<li><strong>Processing and Exploitation:</strong> تبدیل داده خام به فرمت قابل تحلیل (فیلتر کردن، ترجمه).</li>
+<li><strong>Analysis and Production:</strong> ترکیب داده‌ها در یک گزارش اطلاعاتی نهایی و قابل اجرا.</li>
+<li><strong>Dissemination and Integration:</strong> تحویل اطلاعات به مصرف‌کنندگان نهایی (مدیران، تیم‌های SOC).</li>
+</ol>
+
+<h2>07. مدل تهدید بتمن (Batman’s Threat Model)</h2>
+<p>برای درک بهتر مفاهیم ریسک و تهدید، گاهی از مثال‌های داستانی استفاده می‌شود. اسلاید ۵۷ یک مدل تهدید جالب را با محوریت بتمن نشان می‌دهد. در این مدل، ما دارایی‌ها (Assets) را در برابر تهدیدها (Threats) با لایه‌های محافظتی (Protection) می‌سنجیم.</p>
+
+<img src="images/CEHv13_01/slide_57.webp" alt="Batman Threat Model" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۷: مدل تهدید بتمن (Batman's Threat Model)</div>
+
+<ul>
+<li><strong>Assets (دارایی‌ها):</strong> غار بتمن (Bat Cave)، آلفرد (Alfred)، ایمیل‌ها و پیامک‌ها.</li>
+<li><strong>Threats (تهدیدها):</strong> پلیس، جوکر (The Joker)، روزنامه‌نگاران.</li>
+<li><strong>Protection (محافظت):</strong> سیستم امنیتی، مخفی کردن مکان، رمزنگاری.</li>
+</ul>
+<p>این مدل نشان می‌دهد که هر دارایی در برابر چه تهدیدهایی آسیب‌پذیر است و چه لایه‌های محافظتی برای آن در نظر گرفته شده است.</p>
+
+<h2>08. فرآیند مدیریت حوادث (Incident Management Process)</h2>
+<p>وقتی یک حمله یا حادثه امنیتی رخ می‌دهد، نمی‌توان سردرگم شد. تیم‌های امنیتی از یک فرآیند ۹ مرحله‌ای برای مدیریت حادثه و بازگرداندن سیستم به حالت عادی استفاده می‌کنند:</p>
+
+<img src="images/CEHv13_01/slide_59.webp" alt="Incident Management Process" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۵۹: مراحل ۹ گانه مدیریت حوادث</div>
+
+<ol>
+<li><strong>Preparation (آمادگی):</strong> داشتن ابزارها، تیم‌ها و برنامه‌های لازم قبل از وقوع حادثه.</li>
+<li><strong>Incident Recording and Assignment (ثبت و تخصیص):</strong> ثبت حادثه و اختصاص آن به تیم مربوطه.</li>
+<li><strong>Incident Triage (اولویت‌بندی):</strong> تعیین شدت و فوریت حادثه.</li>
+<li><strong>Notification (اطلاع‌رسانی):</strong> اطلاع دادن به افراد و تیم‌های ذی‌ربط.</li>
+<li><strong>Containment (مهار):</strong> جلوگیری از گسترش حادثه.</li>
+<li><strong>Evidence Gathering and Forensic Analysis (جمع‌آوری شواهد و تحلیل فارنزیک):</strong> جمع‌آوری مدارک برای بررسی علت.</li>
+<li><strong>Eradication (ریشه‌کنی):</strong> حذف علت اصلی حادثه.</li>
+<li><strong>Recovery (بازیابی):</strong> بازگرداندن سیستم‌ها به حالت عادی.</li>
+<li><strong>Post-Incident Activities (فعالیت‌های پس از حادثه):</strong> مستندسازی، ارزیابی خسارت، بازبینی سیاست‌ها و بستن پرونده.</li>
+</ol>
+
+<h2>09. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: کدام گزینه جزء ۴ مرحله استراتژی امنیتی مستمر نیست؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Predict</button>
+<button onclick="selectOption(this)">ب) Protect</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Prevent</button>
+<button onclick="selectOption(this)">د) Respond</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>چرخه مستمر امنیتی شامل Predict, Protect, Detect و Respond است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: در دفاع لایه‌ای (Defense-in-Depth)، درونی‌ترین لایه که باید محافظت شود کدام است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) شبکه داخلی</button>
+<button data-correct="true" onclick="selectOption(this)">ب) داده‌ها (Data)</button>
+<button onclick="selectOption(this)">ج) سیستم‌های میزبان</button>
+<button onclick="selectOption(this)">د) محیط (Perimeter)</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>هسته اصلی که همه لایه‌های دیگر برای محافظت از آن ساخته شده‌اند، داده‌ها هستند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: در ماتریس ریسک، اگر احتمال وقوع حمله بسیار بالا باشد و پیامد آن نیز بسیار شدید باشد، سطح ریسک چه می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Low</button>
+<button onclick="selectOption(this)">ب) Medium</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Extreme / High</button>
+<button onclick="selectOption(this)">د) None</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>احتمال بالا + پیامد شدید = ریسک بسیار بالا (Extreme) که نیاز به اقدام فوری دارد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: کدام سطح از هوش تهدید (CTI) شامل جزئیات فنی مانند نشانه‌های نفوذ (IoCs) است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Strategic</button>
+<button onclick="selectOption(this)">ب) Tactical</button>
+<button onclick="selectOption(this)">ج) Operational</button>
+<button data-correct="true" onclick="selectOption(this)">د) Technical</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: د</strong><br>سطح Technical برای تیم‌های SOC طراحی شده و شامل IPها، هش‌ها و IoCs است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: در فرآیند مدیریت حوادث، کدام مرحله به معنای جلوگیری از گسترش حادثه است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Eradication</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Containment</button>
+<button onclick="selectOption(this)">ج) Recovery</button>
+<button onclick="selectOption(this)">د) Triage</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Containment (مهار) به معنای جلوگیری از سرایت حادثه به سایر بخش‌های شبکه است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۳</h3>
+<p><strong>۱.</strong> Information Assurance (IA) تضمین می‌کند که اطلاعات در طول چرخه حیات خود (استفاده، ذخیره، انتقال) از نظر محرمانگی، یکپارچگی و دسترسی محافظت شوند.</p>
+<p><strong>۲.</strong> امنیت یک چرخه مستمر است (Predict, Protect, Detect, Respond) و نیازمند دفاع لایه‌ای (Defense-in-Depth) در تمام سطوح از سیاست‌ها تا داده‌هاست.</p>
+<p><strong>۳.</strong> ریسک ترکیبی از احتمال و پیامد است و مدیریت آن شامل ۵ مرحله شناسایی، ارزیابی، درمان، ردیابی و بازبینی می‌شود.</p>
+<p><strong>۴.</strong> هوش تهدید سایبری (CTI) در ۴ سطح استراتژیک، تاکتیکی، عملیاتی و فنی به سازمان‌ها کمک می‌کند تا تهدیدات ناشناخته را به شناخته‌شده تبدیل کنند.</p>
+<p><strong>۵.</strong> مدیریت حوادث یک فرآیند ۹ مرحله‌ای است که از آمادگی شروع شده و به فعالیت‌های پس از حادثه (مستندسازی و بازبینی) ختم می‌شود.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 4) به سراغ <strong>سیاست‌ها، AI و تست نفوذ</strong> می‌رویم: نقش هوش مصنوعی در امنیت، ابزارهای مبتنی بر ChatGPT، سیاست‌های امنیتی، امنیت فیزیکی و مقایسه Security Audit با Penetration Testing را بررسی می‌کنیم.</div></div>
+`
+,
+"s4": `
+<div class="section-header"><div class="section-badge">04</div><div><h1>سیاست‌ها، AI و تست نفوذ</h1><div class="meta">Module 01 · Introduction to Ethical Hacking · Session 4 of 4</div></div></div>
+
+<p>به چهارمین و آخرین جلسه از فصل اول خوش آمدید! تا اینجا یاد گرفتیم که تهدیدات چطور شکل می‌گیرند، چه کسانی آن‌ها را انجام می‌دهند و چطور می‌توان آن‌ها را تحلیل کرد. اما در دنیای امروز، امنیت بدون «قانون»، «هوش مصنوعی» و «تست عملی» معنا ندارد. در این جلسه، با نقش AI و ML، سیاست‌های امنیتی (Security Policies) و در نهایت تست نفوذ (Penetration Testing) آشنا می‌شویم.</p>
+
+<h2>01. نقش هوش مصنوعی (AI) و یادگیری ماشین (ML) در امنیت</h2>
+<p>امروز دیگر نمی‌توان امنیت را فقط با نیروی انسانی و ابزارهای سنتی مدیریت کرد. حجم داده‌ها و پیچیدگی حملات آنقدر بالا رفته که پای هوش مصنوعی (AI) و یادگیری ماشین (ML) به وسط کشیده شده است.</p>
+
+<img src="images/CEHv13_01/slide_61.webp" alt="Role of AI and ML" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۱: نقش AI و ML در امنیت سایبری</div>
+
+<ul>
+<li><strong>AI (هوش مصنوعی):</strong> سیستم‌هایی که قادرند فکر کنند، یاد بگیرند و تصمیم‌گیری کنند (حتی برای تهدیداتی که آنتی‌ویروس‌های سنتی قادر به شناسایی آن‌ها نیستند).</li>
+<li><strong>ML (یادگیری ماشین):</strong> شاخه‌ای از AI که به سیستم اجازه می‌دهد بدون برنامه‌نویسی صریح یاد بگیرد (self-learning). مثلاً رفتار عادی شبکه را یاد می‌گیرد و در صورت انحراف، هشدار می‌دهد.</li>
+</ul>
+
+<p>کاربردهای اصلی AI/ML در امنیت عبارتند از:</p>
+<ul>
+<li>تشخیص ناهنجاری‌ها (Anomaly Detection) در لحظه (Real-time).</li>
+<li>شناسایی آسیب‌پذیری‌ها و اکسپلویت‌های جدید قبل از اینکه مهاجمان از آن‌ها استفاده کنند.</li>
+<li>کاهش بار تیم‌های امنیتی و کاهش هشدارهای اشتباه (False Positives).</li>
+</ul>
+
+<h2>02. هک اخلاقی مبتنی بر هوش مصنوعی (AI-Driven Ethical Hacking)</h2>
+<p>هکرهای اخلاقی هم می‌توانند از قدرت AI استفاده کنند. با کمک AI، سازمان‌ها می‌توانند از وقوع حملات پیش از موعد مطلع شوند، رفتار مهاجمان را تحلیل کنند و به موقع واکنش دهند.</p>
+
+<img src="images/CEHv13_01/slide_63.webp" alt="AI-Driven Ethical Hacking" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۳: مزایای استفاده از AI در هک اخلاقی</div>
+
+<p>مزایای استفاده از AI در تست نفوذ:</p>
+<ul>
+<li>افزایش سرعت کشف و پاسخ به تهدیدات.</li>
+<li>شناسایی دقیق‌تر آسیب‌پذیری‌ها و تهدیدات.</li>
+<li>امکان بررسی گسترده و همزمان سیستم‌ها و شبکه‌ها.</li>
+<li>کاهش نیاز به منابع انسانی و خودکارسازی (Automation) فرآیندها.</li>
+</ul>
+
+<h3>آیا AI جایگزین هکرهای اخلاقی می‌شود؟</h3>
+<p>پاسخ کوتاه: <strong>خیر</strong>.</p>
+
+<img src="images/CEHv13_01/slide_64.webp" alt="Will AI replace ethical hackers" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۴: چرا AI جایگزین هکرهای اخلاقی نمی‌شود</div>
+
+<p>AI یک ابزار قدرتمند است، اما جایگزین تخصص انسانی نمی‌شود. دلایل کلیدی:</p>
+<ul>
+<li>AI فقط بخشی از وظایف را خودکار می‌کند.</li>
+<li>هک اخلاقی نیازمند درک عمیق سیستم‌ها و خلاقیت انسانی است.</li>
+<li>AI نیاز به نظارت انسانی دارد.</li>
+<li>انسان‌ها می‌توانند نقاط ورود، آسیب‌پذیری‌ها و دیدگاه مهاجم را بهتر درک کنند.</li>
+</ul>
+<div class="box note"><i class="fas fa-robot"></i><div><strong>ترکیب انسان و AI</strong>بهترین نتیجه در امنیت، ترکیب هوش انسانی (خلاقیت، درک زمینه) با توان پردازشی AI (سرعت، تحلیل حجم عظیم داده) است.</div></div>
+
+<h3>ابزارهای هک اخلاقی مبتنی بر ChatGPT</h3>
+<p>امروزه ابزارهای زیادی بر پایه مدل‌های زبانی بزرگ (LLM) ساخته شده‌اند که به هکرهای اخلاقی در نوشتن اسکریپت‌ها و تحلیل‌ها کمک می‌کنند. طبق اسلاید ۶۵:</p>
+
+<img src="images/CEHv13_01/slide_65.webp" alt="ChatGPT-Powered Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۵: ابزارهای هک اخلاقی مبتنی بر ChatGPT</div>
+
+<ul>
+<li><strong>ShellGPT:</strong> برای نوشتن دستورات ترمینال و اسکریپت‌های شل.</li>
+<li><strong>PentestGPT:</strong> برای کمک به فرآیند تست نفوذ و ارائه دستورالعمل‌های گام‌به‌گام.</li>
+<li><strong>HackerGPT:</strong> دستیار مخصوص هکرها برای حل چالش‌های امنیتی.</li>
+<li><strong>BugBountyGPT:</strong> برای شکار باگ (Bug Bounty) و پیدا کردن آسیب‌پذیری‌های وب.</li>
+<li>و همچنین ابزارهای دیگری مانند AutoGPT، FreedomGPT و Ethical Hacker GPT.</li>
+</ul>
+
+<h2>03. سیاست‌های امنیتی (Security Policies)</h2>
+<p>یک سازمان بدون قانون، مثل یک شهر بدون پلیس است. <strong>سیاست امنیتی (Security Policy)</strong> مجموعه‌ای از اسناد و قوانین است که برای تأمین امنیت سازمان تهیه می‌شود.</p>
+
+<img src="images/CEHv13_01/slide_66.webp" alt="Security Policy" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۶: تعریف سیاست امنیتی</div>
+
+<p>اهداف اصلی یک سیاست امنیتی:</p>
+<ul>
+<li>حفظ یک چارچوب برای مدیریت امنیت شبکه.</li>
+<li>محافظت از منابع محاسباتی سازمان.</li>
+<li>جلوگیری از تغییرات غیرمجاز در داده‌ها.</li>
+<li>کاهش ریسک‌ها و تفکیک سطح دسترسی کاربران.</li>
+<li>محافظت از اطلاعات محرمانه در برابر سرقت.</li>
+</ul>
+
+<h3>دسته‌بندی سیاست‌های امنیتی</h3>
+<p>سیاست‌های امنیتی به دسته‌های مختلفی تقسیم می‌شوند:</p>
+
+<img src="images/CEHv13_01/slide_68.webp" alt="Classification of Security Policies" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۸: دسته‌بندی سیاست‌های امنیتی</div>
+
+<ul>
+<li><strong>User Policy:</strong> قوانین مربوط به استفاده کاربران از سیستم‌ها (مثل سیاست رمز عبور).</li>
+<li><strong>IT Policy:</strong> قوانین مربوط به پیکربندی سرورها و بکاپ‌گیری (Server Config & Backup).</li>
+<li><strong>Issue Specific Policy:</strong> قوانین مربوط به موضوعات خاص (مثل امنیت فیزیکی و پرسنلی).</li>
+<li><strong>Partner Policy:</strong> قوانین مربوط به همکاری با شرکای تجاری.</li>
+<li><strong>General Policy:</strong> سیاست‌های عمومی و کلی سازمان (مثل مدیریت بحران).</li>
+</ul>
+
+<h2>04. امنیت فیزیکی (Physical Security)</h2>
+<p>امنیت سایبری فقط به نرم‌افزار نیست! اگر یک هکر بتواند فیزیکی وارد اتاق سرور شود، تمام فایروال‌ها بی‌فایده می‌شوند. امنیت فیزیکی شامل موارد زیر است:</p>
+
+<img src="images/CEHv13_01/slide_69.webp" alt="Physical Security" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶۹: مولفه‌های امنیت فیزیکی</div>
+
+<ul>
+<li>محیط و اطراف شرکت (حفاظ‌ها و دیوارها).</li>
+<li>بخش پذیرش (Reception) و کنترل ورود.</li>
+<li>اتاق سرور و ایستگاه‌های کاری (قفل فیزیکی).</li>
+<li>کنترل دسترسی (کارت‌های هوشمند، اثر انگشت).</li>
+<li>حفظ و نگهداری از تجهیزات رایانه‌ای.</li>
+<li>جلوگیری از استراق سمع (شنود صدا یا امواج).</li>
+</ul>
+
+<h2>05. تست نفوذ (Penetration Testing)</h2>
+<p>تست نفوذ (Pentest) شبیه‌سازی یک حمله سایبری واقعی علیه سیستم‌های سازمان، با مجوز رسمی، برای پیدا کردن آسیب‌پذیری‌ها قبل از اینکه مهاجم واقعی آن‌ها را پیدا کند.</p>
+
+<h3>انواع تست نفوذ بر اساس میزان دانش</h3>
+<img src="images/CEHv13_01/slide_71.webp" alt="Penetration Testing Types" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۷۱: انواع تست نفوذ (White, Gray, Black Box)</div>
+
+<ul>
+<li><strong>White Box:</strong> تستر تمام اطلاعات شبکه، کدها و معماری را می‌داند (شبیه یک کارمند داخلی).</li>
+<li><strong>Black Box:</strong> تستر هیچ اطلاعاتی از سیستم ندارد (شبیه یک مهاجم واقعی از بیرون).</li>
+<li><strong>Gray Box:</strong> تستر اطلاعات جزئی دارد (مثلاً فقط آدرس IP و نام کاربری).</li>
+</ul>
+
+<h3>تیم قرمز (Red Team) در برابر تیم آبی (Blue Team)</h3>
+<img src="images/CEHv13_01/slide_72.webp" alt="Red vs Blue Team" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۷۲: رویارویی تیم قرمز و آبی</div>
+
+<ul>
+<li><strong>Red Team (حمله):</strong> تیم هکرهای اخلاقی که نقش مهاجم را بازی می‌کنند تا امنیت را بسنجند.</li>
+<li><strong>Blue Team (دفاع):</strong> تیم مدافعان (SOC) که وظیفه شناسایی و دفع حملات Red Team را بر عهده دارند.</li>
+</ul>
+
+<h3>مقایسه Security Audit، Vulnerability Assessment و Penetration Testing</h3>
+
+<img src="images/CEHv13_01/slide_73.webp" alt="Audit vs Vuln Assessment vs Pentest" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۷۳: مقایسه سه فرآیند امنیتی</div>
+
+<ul>
+<li><strong>Security Audit:</strong> فقط بررسی می‌کند که آیا سازمان استانداردها، سیاست‌ها و رویه‌ها را دنبال می‌کند یا خیر.</li>
+<li><strong>Vulnerability Assessment:</strong> تمرکز بر شناسایی آسیب‌پذیری‌هاست، اما مشخص نمی‌کند که آیا این آسیب‌پذیری‌ها واقعاً قابل اکسپلویت (بهره‌برداری) هستند یا نه.</li>
+<li><strong>Penetration Testing:</strong> با رویکردی مبتنی بر متدولوژی، نه تنها آسیب‌پذیری را پیدا می‌کند، بلکه با اکسپلویت کردن آن نشان می‌دهد که مهاجم می‌تواند با موفقیت وارد سیستم شود.</li>
+</ul>
+
+<h2>06. متدولوژی‌های تست امنیت (Security Testing Methodology)</h2>
+<p>برای اینکه تست نفوذ یک کار سیستماتیک و استاندارد باشد، از متدولوژی‌های مختلفی استفاده می‌شود:</p>
+
+<img src="images/CEHv13_01/slide_74.webp" alt="Security Testing Methodology" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۷۴: متدولوژی‌های تست امنیت</div>
+
+<ul>
+<li><strong>OWASP:</strong> استاندارد مخصوص امنیت وب‌سایت‌ها و اپلیکیشن‌ها.</li>
+<li><strong>OSSTMM:</strong> متدولوژی متن‌باز تست امنیت (Open Source Security Testing Methodology Manual).</li>
+<li><strong>ISSAF:</strong> چارچوب ارزیابی امنیت سیستم‌های اطلاعاتی.</li>
+<li><strong>ECSA/LPT:</strong> متدولوژی‌های ارائه شده توسط EC-Council.</li>
+</ul>
+
+<h2>07. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: کدام گزینه در مورد هوش مصنوعی (AI) صحیح‌تر است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) AI جایگزین تمام هکرهای اخلاقی خواهد شد.</button>
+<button data-correct="true" onclick="selectOption(this)">ب) AI ابزاری برای سرعت بخشیدن و خودکارسازی فرآیندهای امنیتی است.</button>
+<button onclick="selectOption(this)">ج) AI فقط برای هکرهای مخرب کاربرد دارد.</button>
+<button onclick="selectOption(this)">د) AI نیازی به نظارت انسانی ندارد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>AI یک ابزار قدرتمند برای کمک به هکرهای اخلاقی است، اما جایگزین تخصص انسانی نمی‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: کدام ابزار مبتنی بر ChatGPT برای نوشتن دستورات ترمینال طراحی شده است؟</p>
+<div class="quiz-options">
+<button data-correct="true" onclick="selectOption(this)">الف) ShellGPT</button>
+<button onclick="selectOption(this)">ب) PentestGPT</button>
+<button onclick="selectOption(this)">ج) BugBountyGPT</button>
+<button onclick="selectOption(this)">د) AutoGPT</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>ShellGPT مخصوص کمک به کاربران در نوشتن دستورات شل و ترمینال است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: سیاست امنیتی که مربوط به پیکربندی سرورها و بکاپ‌گیری است، چه نام دارد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) User Policy</button>
+<button data-correct="true" onclick="selectOption(this)">ب) IT Policy</button>
+<button onclick="selectOption(this)">ج) Partner Policy</button>
+<button onclick="selectOption(this)">د) General Policy</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>IT Policy شامل مواردی مثل Server Config & Backup می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: در تست نفوذ، اگر تستر هیچ اطلاعاتی از شبکه و سیستم نداشته باشد، کدام نوع تست انجام شده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) White Box</button>
+<button onclick="selectOption(this)">ب) Gray Box</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Black Box</button>
+<button onclick="selectOption(this)">د) Red Box</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>در Black Box تستر هیچ دانشی از سیستم ندارد و از بیرون (مثل یک مهاجم واقعی) تست می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: تفاوت اصلی Vulnerability Assessment و Penetration Testing چیست؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) هیچ تفاوتی ندارند.</button>
+<button onclick="selectOption(this)">ب) Vulnerability Assessment حتماً از ابزارهای AI استفاده می‌کند.</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Penetration Testing با اکسپلویت کردن، نشان می‌دهد که آیا آسیب‌پذیری واقعاً قابل بهره‌برداری است یا خیر.</button>
+<button onclick="selectOption(this)">د) Security Audit فقط شامل تست نفوذ است.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Vulnerability Assessment فقط آسیب‌پذیری‌ها را لیست می‌کند، اما Penetration Testing با اکسپلویت، عمق خطر را اثبات می‌کند.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۴ (و پایان فصل ۱)</h3>
+<p><strong>۱.</strong> AI و ML ابزارهای قدرتمندی برای افزایش سرعت، دقت و خودکارسازی در امنیت سایبری و هک اخلاقی هستند، اما جایگزین انسان نمی‌شوند.</p>
+<p><strong>۲.</strong> ابزارهای مبتنی بر ChatGPT مثل PentestGPT و ShellGPT به هکرهای اخلاقی در انجام سریع‌تر وظایفشان کمک می‌کنند.</p>
+<p><strong>۳.</strong> سیاست‌های امنیتی (Security Policies) چارچوب قانونی سازمان را مشخص می‌کنند و به دسته‌های مختلفی مثل IT Policy و User Policy تقسیم می‌شوند.</p>
+<p><strong>۴.</strong> امنیت فیزیکی (Physical Security) مکمل امنیت سایبری است و باید در کنار آن دیده شود.</p>
+<p><strong>۵.</strong> تست نفوذ (Penetration Testing) بر اساس دانش تستر به White/Gray/Black Box و بر اساس سناریو به Red/Blue Team تقسیم می‌شود.</p>
+<p><strong>۶.</strong> تفاوت اصلی Pentest با Audit و Vulnerability Assessment در اکسپلویت کردن آسیب‌پذیری‌ها برای اثبات عملی خطر است.</p>
+</div>
+
+<div class="box note"><i class="fas fa-trophy"></i><div><strong>تبریک!</strong>شما فصل اول از دوره CEH v13 را به پایان رساندید! حالا پایه‌های تئوری کاملی از هک اخلاقی، چارچوب‌های تحلیل، ریسک و تست نفوذ دارید. در فصل بعد (Footprinting and Reconnaissance)، وارد فاز عملی و جمع‌آوری اطلاعات درباره هدف می‌شویم.</div></div>
+`
+,
+"s5": `
+<div class="section-header"><div class="section-badge">05</div><div><h1>مفاهیم و جستجوی وب</h1><div class="meta">Module 02 · Footprinting and Reconnaissance · Session 1 of 3</div></div></div>
+
+<p>سلام و خوش آمدید به فصل دوم! تا اینجا یاد گرفتیم که حملات چگونه شکل می‌گیرند. اما هر حمله‌ای، پیش از آنکه شمشیر را بکشیم، نیازمند «تیز کردن تبر» است. همانطور که کنفوسیوس می‌گوید: <em>«شش ساعت برای قطع یک درخت به من بدهید، و من چهار ساعت اول را صرف تیز کردن تبر می‌کنم.»</em> در دنیای هک اخلاقی، این «تیز کردن تبر» همان <strong>Footprinting</strong> یا <strong>Reconnaissance</strong> است. در این جلسه، یاد می‌گیریم چطور بدون اینکه حتی یک بسته به سمت هدف بفرستیم، اطلاعات حیاتی جمع‌آوری کنیم. با ما همراه باشید!</p>
+
+<h2>01. تعریف و اهداف Footprinting</h2>
+<p><strong>Footprinting</strong> (جمع‌آوری اطلاعات) فرآیند جمع‌آوری بیشترین اطلاعات ممکن درباره یک هدف است. این کار اولین مرحله از هر حمله سایبری محسوب می‌شود و به نفوذگر کمک می‌کند تا قبل از اقدام به نفوذ، نقشه کاملی از قربانی در ذهن داشته باشد.</p>
+
+<p>اطلاعات به‌دست‌آمده از Footprinting در حملات مهندسی اجتماعی، نفوذ به شبکه یا سیستم، و حتی تست نفوذ اخلاقی، کاربرد فراوانی دارد.</p>
+
+<img src="images/CEHv13_02/slide_6.webp" alt="Footprinting Methodology" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۶: متدولوژی کامل Footprinting (Passive و Active)</div>
+
+<p>اهداف Footprinting را می‌توان در سه سطح دسته‌بندی کرد:</p>
+
+<h3>۱-۱. جمع‌آوری اطلاعات در مورد شبکه</h3>
+<ul>
+<li>نام دامنه (Domain Name)</li>
+<li>آدرس IP و محدوده شبکه</li>
+<li>سرویس‌های اجراشده روی پورت‌های TCP و UDP</li>
+<li>پروتکل‌های شبکه مورد استفاده</li>
+</ul>
+
+<h3>۲-۱. جمع‌آوری اطلاعات در مورد سیستم</h3>
+<ul>
+<li>نام کاربران و گروه‌های کاربری</li>
+<li>مشخصات و نسخه سیستم‌عامل</li>
+<li>جداول مسیریابی (Routing Tables)</li>
+<li>معماری کلی سیستم</li>
+</ul>
+
+<h3>۳-۱. جمع‌آوری اطلاعات در مورد سازمان</h3>
+<ul>
+<li>مشخصات وب‌سایت سازمان (تکنولوژی‌های استفاده‌شده)</li>
+<li>آدرس فیزیکی و شماره تماس‌ها</li>
+<li>جزئیات اطلاعات کارمندان (از طریق شبکه‌های اجتماعی و پروفایل‌های شغلی)</li>
+</ul>
+
+<div class="box note"><i class="fas fa-lightbulb"></i><div><strong>چرا Footprinting مهم است؟</strong>یک ضرب‌المثل قدیمی در دنیای امنیت وجود دارد: <em>«اطلاعات، قدرت است.»</em> هرچه اطلاعات شما درباره هدف بیشتر باشد، احتمال موفقیت حمله بالاتر و احتمال شناسایی شدن شما پایین‌تر خواهد بود. Footprinting به شما می‌گوید <strong>کجا</strong> ضربه بزنید، <strong>چگونه</strong> ضربه بزنید و <strong>چه زمانی</strong> بهترین فرصت است.</div></div>
+
+<h2>02. متدولوژی Passive و Active</h2>
+<p>به‌طور کلی، تکنیک‌های Footprinting به دو دسته بزرگ تقسیم می‌شوند:</p>
+
+<h3>۱-۲. Passive Footprinting (غیرفعال)</h3>
+<p>در این روش، نفوذگر <strong>هیچ تماس مستقیمی</strong> با سیستم یا شبکه هدف برقرار نمی‌کند. تمام اطلاعات از منابع عمومی، غیرمستقیم و ثالث به‌دست می‌آید. چون هیچ بسته‌ای به سمت هدف ارسال نمی‌شود، شناسایی نفوذگر تقریباً غیرممکن است.</p>
+<ul>
+<li><strong>جستجو در موتورهای جستجو:</strong> Google Hacking، Shodan</li>
+<li><strong>شبکه‌های اجتماعی:</strong> تحلیل پروفایل‌های کارمندان، گراف‌های اجتماعی</li>
+<li><strong>Whois Lookup:</strong> اطلاعات ثبت دامنه</li>
+<li><strong>مراجعه به سرویس‌های آنلاین:</strong> archive.org، Netcraft، People Search</li>
+<li><strong>Dark Web Searching Tools:</strong> جستجو در بازارهای سیاه</li>
+</ul>
+
+<h3>۲-۲. Active Footprinting (فعال)</h3>
+<p>در این روش، نفوذگر <strong>به‌طور مستقیم</strong> با سیستم هدف تعامل برقرار می‌کند و بسته‌هایی به سمت آن ارسال می‌کند. این روش اطلاعات دقیق‌تری به شما می‌دهد، اما ممکن است توسط IDS/IPS شناسایی شود.</p>
+<ul>
+<li><strong>DNS Footprinting:</strong> استعلام از سرورهای DNS (DNS Interrogation)</li>
+<li><strong>Network و Email Footprinting:</strong> Trace Route و ردیابی ایمیل</li>
+<li><strong>مهندسی اجتماعی:</strong> Eavesdropping، Shoulder Surfing، Dumpster Diving، Impersonation</li>
+<li><strong>ابزارهای پیشرفته:</strong> Maltego، Recon-ng، FOCA</li>
+</ul>
+
+<div class="box important"><i class="fas fa-balance-scale"></i><div><strong>نکته مهم</strong>در تست نفوذ اخلاقی، معمولاً <strong>از Passive شروع می‌کنیم</strong> تا کمترین ردپا را از خودمان به‌جا بگذاریم. سپس هرچه جلوتر می‌رویم، از Active استفاده می‌کنیم. ترتیب کار همیشه <strong>Passive → Active</strong> است.</div></div>
+
+<h2>03. Google Hacking</h2>
+<p><strong>Google Hacking</strong> یا Google Dorking، هنر استفاده از اپراتورهای پیشرفته جستجوی گوگل برای یافتن اطلاعات حساسی است که به‌طور تصادفی در وب ایندکس شده‌اند. جانی لانگ (Johnny Long) بنیان‌گذار این مفهوم است و پایگاه داده‌ای از این دستورات ایجاد کرده که به <strong>Google Hacking Database (GHDB)</strong> معروف است.</p>
+
+<p>برخی از مهم‌ترین اپراتورهای گوگل عبارتند از:</p>
+
+<table>
+<thead><tr><th>اپراتور</th><th>کارکرد</th><th>مثال</th></tr></thead>
+<tbody>
+<tr><td><code>cache:</code></td><td>صفحاتی که گوگل در حافظه کش نگه داشته است.</td><td><code>cache:example.com</code></td></tr>
+<tr><td><code>link:</code></td><td>صفحاتی که به موضوع مورد نظر لینک دارند.</td><td><code>link:example.com</code></td></tr>
+<tr><td><code>filetype:</code></td><td>جستجوی فرمت خاص (pdf, doc, ppt...)</td><td><code>filetype:pdf password</code></td></tr>
+<tr><td><code>site:</code></td><td>جستجو در یک سایت خاص</td><td><code>site:example.com admin</code></td></tr>
+<tr><td><code>intitle:</code></td><td>کلمه مورد نظر در عنوان صفحه باشد.</td><td><code>intitle:"index of"</code></td></tr>
+<tr><td><code>inurl:</code></td><td>کلمه مورد نظر در URL صفحه باشد.</td><td><code>inurl:admin.php</code></td></tr>
+</tbody>
+</table>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>هشدار اخلاقی</strong>استفاده از Google Dorking روی سایت‌هایی که مالک آن‌ها نیستید، ممکن است غیرقانونی تلقی شود. همیشه قبل از انجام این کار، مجوز کتبی از سازمان هدف داشته باشید.</div></div>
+
+<h2>04. Google Hacking Database (GHDB)</h2>
+<p>پایگاه داده <strong>GHDB</strong> توسط Exploit-DB نگهداری می‌شود و شامل هزاران «Dork» است که هرکدام برای یافتن نوع خاصی از اطلاعات حساس طراحی شده‌اند. دسته‌بندی‌های اصلی این پایگاه داده عبارتند از:</p>
+<ul>
+<li><strong>Files Containing Passwords:</strong> فایل‌هایی که احتمالاً حاوی رمز عبور هستند.</li>
+<li><strong>Files Containing Juicy Info:</strong> فایل‌هایی با اطلاعات ارزشمند (مثل شماره کارت).</li>
+<li><strong>Vulnerable Servers:</strong> سرورهایی با پیکربندی ناامن.</li>
+<li><strong>Files Containing Usernames:</strong> فایل‌هایی حاوی نام کاربری.</li>
+<li><strong>Various Online Devices:</strong> دستگاه‌های آنلاین (دوربین‌ها، روترها، پرینترها).</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_8.webp" alt="Google Hacking Database" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۸: پایگاه داده Google Hacking (GHDB) در Exploit-DB</div>
+
+<p>چند نمونه از Dorkهای معروف:</p>
+<ul>
+<li><code>site:github.com "BEGIN OPENSSH PRIVATE KEY"</code> — یافتن کلیدهای خصوصی SSH لو رفته!</li>
+<li><code>intitle:"index of" "parent directory"</code> — پیدا کردن لیست دایرکتوری‌های باز.</li>
+<li><code>inurl:"/wp-content/" "wp-config.php"</code> — یافتن فایل‌های حساس وردپرس.</li>
+</ul>
+
+<h2>05. Shodan Search Engine</h2>
+<p><strong>Shodan</strong> را می‌توان «گوگل دستگاه‌های اینترنت اشیا» نامید. برخلاف گوگل که صفحات وب را ایندکس می‌کند، Shodan دستگاه‌های متصل به اینترنت (دوربین‌های IP، روترها، سرورها، سیستم‌های ICS/SCADA و...) را جستجو می‌کند.</p>
+
+<p>Shodan اپراتورهای خاص خودش را دارد که در جدول زیر آمده است:</p>
+
+<table>
+<thead><tr><th>اپراتور</th><th>کارکرد</th></tr></thead>
+<tbody>
+<tr><td><code>port:</code></td><td>جستجو بر اساس شماره پورت</td></tr>
+<tr><td><code>country:</code></td><td>فیلتر بر اساس کد کشور</td></tr>
+<tr><td><code>city:</code></td><td>فیلتر بر اساس شهر</td></tr>
+<tr><td><code>os:</code></td><td>فیلتر بر اساس سیستم‌عامل</td></tr>
+<tr><td><code>product:</code></td><td>فیلتر بر اساس محصول نرم‌افزاری</td></tr>
+<tr><td><code>org:</code></td><td>فیلتر بر اساس سازمان</td></tr>
+<tr><td><code>hostname:</code></td><td>جستجو بر اساس نام هاست</td></tr>
+<tr><td><code>title:</code></td><td>جستجو در عنوان صفحه وب</td></tr>
+</tbody>
+</table>
+
+<p>نمونه‌ای از کوئری‌های واقعی Shodan:</p>
+<ul>
+<li><code>port:80,443 country:nl city:San Diego</code> — سرورهای وب در سن‌دیه‌گو هلند.</li>
+<li><code>os:server2008 product:openssh</code> — سرورهای ویندوز ۲۰۰۸ با OpenSSH.</li>
+<li><code>org:HOTnet server:weblogic</code> — سرورهای WebLogic در یک سازمان خاص.</li>
+<li><code>default password admin/1234</code> — دستگاه‌هایی که هنوز رمز پیش‌فرض دارند.</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_9.webp" alt="Shodan Queries" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۹: نمونه کوئری‌های Shodan</div>
+
+<div class="box warning"><i class="fas fa-shield-alt"></i><div><strong>خطر واقعی Shodan</strong>بسیاری از سازمان‌ها حتی نمی‌دانند که تجهیزاتشان (مثل دوربین‌های IP یا روترها) مستقیماً روی اینترنت باز است و توسط Shodan ایندکس شده. مهاجم با یک جستجوی ساده می‌تواند به این دستگاه‌ها دسترسی پیدا کند. <strong>همیشه اطمینان حاصل کنید که دستگاه‌های IoT شما پشت فایروال هستند و رمز پیش‌فرضشان تغییر کرده است.</strong></div></div>
+
+<h2>06. Video و Meta Search Engines</h2>
+<p>موتورهای جستجوی ویدیویی و متا (Meta Search) می‌توانند منابع اطلاعاتی ارزشمندی برای Footprinting باشند.</p>
+
+<h3>۱-۶. موتورهای جستجوی ویدیویی</h3>
+<p>پلتفرم‌هایی مثل YouTube، Vimeo و Dailymotion می‌توانند شامل ویدیوهایی باشند که ناخواسته اطلاعات حساسی را لو می‌دهند (مثل تور مجازی از دفاتر، پیکربندی سرورها، یا حتی صدای کارمندان).</p>
+
+<h3>۲-۶. موتورهای جستجوی متا (Meta Search Engines)</h3>
+<p>این موتورها نتایج چندین موتور جستجوی دیگر را ترکیب می‌کنند و معمولاً بر حفظ حریم خصوصی تأکید دارند. دو نمونه معروف:</p>
+
+<img src="images/CEHv13_02/slide_11.webp" alt="Meta Search Engines" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۱: موتورهای جستجوی متا (Startpage و MetaGer)</div>
+
+<ul>
+<li><strong>Startpage:</strong> نتایج گوگل را بدون ردیابی و با حفظ حریم خصوصی ارائه می‌دهد.</li>
+<li><strong>MetaGer:</strong> یک موتور جستجوی متن‌باز و آلمانی که نتایج چندین منبع را ترکیب می‌کند.</li>
+</ul>
+
+<h2>07. کشف زیردامنه (Find Subdomains)</h2>
+<p>یکی از مهم‌ترین کارها در Footprinting، کشف زیردامنه‌های (Subdomains) یک سازمان است. زیردامنه‌ها معمولاً کم‌تر محافظت می‌شوند و می‌توانند دروازه ورود به شبکه اصلی باشند.</p>
+
+<h3>۱-۷. روش‌های کشف زیردامنه</h3>
+<ul>
+<li><strong>DNSDumpster:</strong> یک ابزار آنلاین که زیردامنه‌ها را از منابع عمومی استخراج می‌کند.</li>
+<li><strong>Google Dork:</strong> با دستور <code>site:example.com -www</code> می‌توان زیردامنه‌ها را پیدا کرد.</li>
+<li><strong>ابزارهای خط فرمان:</strong> Sublist3r، Amass، Assetfinder و...</li>
+<li><strong>حمله Brute-Force:</strong> تست هزاران نام رایج زیردامنه با استفاده از dig و wordlist.</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_13.webp" alt="DNSDumpster Subdomain Discovery" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۳: کشف زیردامنه با DNSDumpster</div>
+
+<h3>۲-۷. روش AI برای کشف زیردامنه</h3>
+<p>با کمک هوش مصنوعی و اسکریپت‌های خودکار می‌توان فرآیند Brute-Force زیردامنه را سرعت بخشید. دو نمونه کد Bash (لینوکس) و PowerShell (ویندوز):</p>
+
+<img src="images/CEHv13_02/slide_14.webp" alt="AI for Subdomain Discovery" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۴: اسکریپت‌های Brute-Force برای کشف زیردامنه</div>
+
+<p>نمونه ساده Bash برای کشف زیردامنه:</p>
+
+<div class="code-container"><div class="code-label">bash · subdomain-bruteforce.sh</div><pre class="code-block no-prompt"><span style="color:#4B5E73">#!/bin/bash</span>
+<span style="color:#FF4D6D">DOMAIN</span>=<span style="color:#00FF9C">"example.com"</span>
+<span style="color:#FF4D6D">WORDLIST</span>=<span style="color:#00FF9C">"/usr/share/wordlists/subdomains-top1million-110000.txt"</span>
+<span style="color:#FF4D6D">OUTPUT</span>=<span style="color:#00FF9C">"found_subdomains.txt"</span>
+
+<span style="color:#4B5E73"># حلقه روی هر کلمه در wordlist</span>
+<span style="color:#FF4D6D">while</span> read -r SUB; <span style="color:#FF4D6D">do</span>
+  FULL=<span style="color:#00FF9C">"$SUB.$DOMAIN"</span>
+  RESULT=$(dig +short <span style="color:#00FF9C">"$FULL"</span>)
+  <span style="color:#FF4D6D">if</span> [[ -n <span style="color:#00FF9C">"$RESULT"</span> ]]; <span style="color:#FF4D6D">then</span>
+    echo <span style="color:#00FF9C">"$FULL -> $RESULT"</span>
+    echo <span style="color:#00FF9C">"$FULL"</span> >> <span style="color:#00FF9C">"$OUTPUT"</span>
+  <span style="color:#FF4D6D">fi</span>
+<span style="color:#FF4D6D">done</span> < <span style="color:#00FF9C">"$WORDLIST"</span></pre></div>
+
+<div class="box note"><i class="fas fa-robot"></i><div><strong>قدرت AI در Footprinting</strong>ابزارهای AI-Powered OSINT مثل <strong>Taranis AI</strong>، <strong>DorkGPT</strong> و <strong>DarkGPT</strong> می‌توانند با تحلیل خودکار منابع، سرعت و دقت جمع‌آوری اطلاعات را چند برابر کنند. در جلسه بعد (جلسه ۲-۳) به تفصیل این ابزارها را بررسی خواهیم کرد.</div></div>
+
+<h2>08. Surface, Deep و Dark Web</h2>
+<p>برای درک کامل Footprinting، باید بدانیم که اینترنت فقط همان چیزی نیست که در گوگل می‌بینیم. اینترنت به سه لایه اصلی تقسیم می‌شود:</p>
+
+<img src="images/CEHv13_02/slide_15.webp" alt="Surface Deep Dark Web" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۵: لایه‌های Surface, Deep و Dark Web (کوه یخ اینترنت)</div>
+
+<h3>۱-۸. Surface Web (وب سطحی)</h3>
+<p>تنها <strong>۵ درصد</strong> از اینترنت است و شامل صفحاتی می‌شود که توسط موتورهای جستجو ایندکس شده‌اند: Google, Yahoo, Yandex, Wikipedia, Reddit و...</p>
+
+<h3>۲-۸. Deep Web (وب عمیق)</h3>
+<p>حدود <strong>۹۵ درصد</strong> از اینترنت را تشکیل می‌دهد و شامل محتوایی است که ایندکس نشده‌اند: فضای ابری، داده‌های ثبت اختراع، مقالات علمی، اسناد حقوقی، سوابق مالی و پایگاه‌های داده خصوصی.</p>
+
+<h3>۳-۸. Dark Web (وب تاریک)</h3>
+<p>بخش کوچکی از Deep Web است که نیاز به نرم‌افزار خاص (مثل Tor) برای دسترسی دارد: سایت‌های Onion، بازارهای مخفی، روزنامه‌نگاری ناشناس و فعالیت‌های غیرقانونی.</p>
+
+<div class="box warning"><i class="fas fa-user-secret"></i><div><strong>هشدار</strong>دسترسی به Dark Web در بسیاری از کشورها غیرقانونی است و می‌تواند خطرات امنیتی جدی برای شما ایجاد کند. در چارچوب تست نفوذ اخلاقی، فقط با مجوز و در محیط کنترل‌شده اقدام کنید.</div></div>
+
+<h2>09. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: Footprinting در کدام مرحله از حمله انجام می‌شود؟</p>
+<div class="quiz-options">
+<button data-correct="true" onclick="selectOption(this)">الف) اولین مرحله (قبل از هر اقدام)</button>
+<button onclick="selectOption(this)">ب) بعد از نفوذ به سیستم</button>
+<button onclick="selectOption(this)">ج) در حین اجرای بدافزار</button>
+<button onclick="selectOption(this)">د) بعد از پاک کردن ردپا</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>Footprinting اولین مرحله از هر حمله است و پیش از هر اقدام مستقیم انجام می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: کدام یک از موارد زیر جزء Passive Footprinting محسوب می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Trace Route</button>
+<button data-correct="true" onclick="selectOption(this)">ب) جستجو در Google Hacking Database</button>
+<button onclick="selectOption(this)">ج) DNS Interrogation</button>
+<button onclick="selectOption(this)">د) مهندسی اجتماعی از طریق تماس تلفنی</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>جستجو در GHDB یک تکنیک Passive است چون هیچ بسته‌ای به سمت هدف ارسال نمی‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: اپراتور <code>filetype:pdf</code> در Google Hacking چه کاری انجام می‌دهد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) فقط صفحات PDF را از یک سایت خاص جستجو می‌کند.</button>
+<button data-correct="true" onclick="selectOption(this)">ب) فایل‌های PDF را در نتایج جستجو نمایش می‌دهد.</button>
+<button onclick="selectOption(this)">ج) از ایجاد فایل‌های PDF جلوگیری می‌کند.</button>
+<button onclick="selectOption(this)">د) فقط PDFهای کش‌شده گوگل را نشان می‌دهد.</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>این اپراتور باعث می‌شود گوگل فقط نتایجی را برگرداند که پسوند PDF دارند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: Shodan Search Engine مخصوص جستجوی چه چیزی است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) صفحات وب ایندکس‌شده</button>
+<button onclick="selectOption(this)">ب) تصاویر اینترنتی</button>
+<button data-correct="true" onclick="selectOption(this)">ج) دستگاه‌های متصل به اینترنت (IoT، سرورها، روترها)</button>
+<button onclick="selectOption(this)">د) ویدیوهای آنلاین</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Shodan به «گوگل دستگاه‌های اینترنت اشیا» معروف است و دستگاه‌های متصل به اینترنت را ایندکس می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: برای کشف زیردامنه‌های یک سازمان، کدام دستور Google Dork مفیدتر است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) <code>cache:example.com</code></button>
+<button onclick="selectOption(this)">ب) <code>link:example.com</code></button>
+<button data-correct="true" onclick="selectOption(this)">ج) <code>site:example.com -www</code></button>
+<button onclick="selectOption(this)">د) <code>intitle:example.com</code></button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>با <code>site:example.com -www</code> می‌توانید تمام صفحات زیردامنه‌های یک سازمان را ببینید، بدون اینکه صفحه اصلی (www) نمایش داده شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: طبق آمار، چه درصدی از اینترنت در Surface Web قرار دارد؟</p>
+<div class="quiz-options">
+<button data-correct="true" onclick="selectOption(this)">الف) حدود ۵ درصد</button>
+<button onclick="selectOption(this)">ب) حدود ۵۰ درصد</button>
+<button onclick="selectOption(this)">ج) حدود ۹۵ درصد</button>
+<button onclick="selectOption(this)">د) ۱۰۰ درصد</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: الف</strong><br>تنها حدود ۵ درصد از اینترنت در Surface Web (قابل ایندکس توسط موتورهای جستجو) قرار دارد و ۹۵ درصد بقیه در Deep Web و Dark Web است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۲-۱</h3>
+<p><strong>۱.</strong> Footprinting اولین مرحله از حمله است و شامل جمع‌آوری حداکثری اطلاعات درباره شبکه، سیستم و سازمان هدف می‌شود.</p>
+<p><strong>۲.</strong> متدولوژی Footprinting به دو دسته Passive (بدون تماس مستقیم) و Active (با تعامل مستقیم) تقسیم می‌شود. همیشه از Passive شروع می‌کنیم.</p>
+<p><strong>۳.</strong> Google Hacking با اپراتورهایی مثل <code>site</code>، <code>filetype</code>، <code>intitle</code> و <code>inurl</code> انجام می‌شود و GHDB یک پایگاه داده بزرگ از این Dorkها است.</p>
+<p><strong>۴.</strong> Shodan موتور جستجوی دستگاه‌های IoT و اینترنت است و اپراتورهای خاص خودش (port، country، os، product) را دارد.</p>
+<p><strong>۵.</strong> کشف زیردامنه با ابزارهایی مثل DNSDumpster، Google Dork و اسکریپت‌های Brute-Force انجام می‌شود.</p>
+<p><strong>۶.</strong> اینترنت به سه لایه Surface Web (۵٪)، Deep Web (۹۵٪) و Dark Web تقسیم می‌شود که هرکدام کاربرد خاص خودشان را در Footprinting دارند.</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 2-2) به سراغ <strong>جمع‌آوری اطلاعات اجتماعی و فنی</strong> می‌رویم: Competitive Intelligence، جستجوی افراد در شبکه‌های اجتماعی، Website Mirroring، Email Footprinting، Whois Footprinting، DNS Footprinting و Trace Route را به‌طور کامل بررسی می‌کنیم.</div></div>
+`,
+"s6": `
+<div class="section-header"><div class="section-badge">06</div><div><h1>جمع‌آوری اطلاعات اجتماعی و فنی</h1><div class="meta">Module 02 · Footprinting and Reconnaissance · Session 2 of 3</div></div></div>
+
+<p>در جلسه قبل یاد گرفتیم چطور با موتورهای جستجو، Shodan و کشف زیردامنه، اطلاعات اولیه را جمع کنیم. اما Footprinting فقط جستجوی گوگل نیست! در این جلسه، به سراغ منابعی می‌رویم که شاید به چشم نیایند: شبکه‌های اجتماعی، ایمیل‌ها، اطلاعات ثبت دامنه (Whois) و مسیر حرکت بسته‌های شبکه (Trace Route). با ما همراه باشید تا ببینید چطور یک مهاجم از یک پست ساده در لینکدین، به ساختار شبکه یک سازمان می‌رسد!</p>
+
+<h2>01. Competitive Intelligence Gathering (هوشمندی رقابتی)</h2>
+<p><strong>Competitive Intelligence</strong> فرآیند شناسایی، جمع‌آوری، تحلیل و تأیید اطلاعات درباره رقبا با استفاده از منابع عمومی و قانونی (مانند اینترنت، گزارش‌ها، مصاحبه‌ها) است. در Footprinting، ما از این تکنیک برای درک بهتر ساختار یک سازمان و نقاط ضعف آن استفاده می‌کنیم.</p>
+
+<img src="images/CEHv13_02/slide_17.webp" alt="Competitive Intelligence Gathering" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۷: منابع جمع‌آوری هوشمندی رقابتی</div>
+
+<p>منابع اصلی برای این کار عبارتند از:</p>
+<ul>
+<li>وب‌سایت شرکت‌ها و آگهی‌های استخدام (نشان‌دهنده تکنولوژی‌های استفاده‌شده).</li>
+<li>موتورهای جستجو و پایگاه‌های اطلاعاتی آنلاین.</li>
+<li>گزارش‌های خبری و سالانه.</li>
+<li>کنفرانس‌ها، نمایشگاه‌ها و روزنامه‌ها.</li>
+<li>ثبت اختراعات و علائم تجاری.</li>
+<li>کاتالوگ محصولات و فروشگاه‌ها.</li>
+<li>مصاحبه با مشتریان، فروشندگان، توزیع‌کنندگان و تأمین‌کنندگان.</li>
+</ul>
+
+<div class="box note"><i class="fas fa-briefcase"></i><div><strong>مثال از دنیای واقعی</strong>اگر یک شرکت در آگهی استخدام خود بنویسد "آشنایی با AWS و Kubernetes"، شما به عنوان یک هکر اخلاقی متوجه می‌شوید که زیرساخت ابری آن‌ها احتمالاً بر پایه AWS است. این اطلاعات می‌تواند به شما در انتخاب Attack Vector مناسب کمک کند.</div></div>
+
+<h2>02. جستجوی افراد در شبکه‌های اجتماعی (People Search)</h2>
+<p>سایت‌های شبکه‌های اجتماعی یک منبع گسترده از اطلاعات شخصی و سازمانی هستند. مهاجمان با ایجاد پروفایل‌های جعلی (Fake Profiles) سعی می‌کنند کارمندان را فریب دهند و اطلاعات حساس را به دست آورند.</p>
+
+<h3>ابزارها و وب‌سایت‌های جستجوی افراد</h3>
+<p>با این سایت‌ها می‌توانید اطلاعاتی مثل ایمیل، تصاویر، پروفایل‌های شبکه اجتماعی و آدرس وبلاگ افراد را پیدا کنید:</p>
+<ul>
+<li><strong>pipl.com:</strong> جستجوی افراد بر اساس نام، ایمیل، نام کاربری یا شماره تلفن.</li>
+<li><strong>peoplesmart.com</strong></li>
+<li><strong>411.com</strong></li>
+<li><strong>ussearch.com</strong></li>
+<li><strong>intelius.com</strong></li>
+<li><strong>peoplefinder.com</strong></li>
+<li><strong>veromi.net</strong></li>
+</ul>
+
+<img src="images/CEHv13_02/slide_18.webp" alt="People Search with Pipl" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۱۸: جستجوی افراد با استفاده از Pipl</div>
+
+<h3>ابزارهای تحلیل شبکه‌های اجتماعی</h3>
+<ul>
+<li><strong>BuzzSumo:</strong> برای پیدا کردن محتوای محبوب و تأثیرگذاران (Influencers) در یک حوزه.</li>
+<li><strong>Followerwonk:</strong> برای تحلیل و جستجوی بایو (Bio) کاربران توییتر.</li>
+<li><strong>Social Searcher:</strong> جستجوی زنده در شبکه‌های اجتماعی مختلف.</li>
+</ul>
+
+<h2>03. Website Footprinting و Mirroring (کپی و رصد وب‌سایت)</h2>
+<p>گاهی اوقات تحلیل یک وب‌سایت به صورت آنلاین کافی نیست (مثلاً به دلیل محدودیت سرعت یا خطر شناسایی). در این حالت، از <strong>Website Mirroring</strong> استفاده می‌کنیم.</p>
+
+<p><strong>Mirroring</strong> یعنی دانلود کل دایرکتوری‌ها و اطلاعات یک وب‌سایت روی سیستم لوکال خودمان، به‌طوری که بتوانیم آن را به صورت آفلاین مرور کنیم. ابزارهای معروف برای این کار:</p>
+<ul>
+<li><strong>BlackWidow</strong></li>
+<li><strong>Page Nest</strong></li>
+<li><strong>Ncollector Studio</strong></li>
+<li><strong>Backstreet Browser</strong></li>
+<li><strong>Website Ripper Copier</strong></li>
+<li><strong>Offline Explorer Enterprise</strong></li>
+<li><strong>HTTrack</strong> (پرکاربردترین ابزار متن‌باز)</li>
+</ul>
+
+<h3>رصد تغییرات وب‌سایت (Monitoring Web Updates)</h3>
+<p>ممکن است یک وب‌سایت هر روز تغییر کند. برای اینکه متوجه تغییرات (مثلاً اضافه شدن یک صفحه جدید یا تغییر محتوا) بشویم، از ابزارهایی مانند <strong>Website Watcher</strong> استفاده می‌کنیم. این ابزارها به صورت خودکار سایت را رصد کرده و در صورت تغییر، به شما اطلاع می‌دهند.</p>
+
+<h2>04. Email Footprinting و تحلیل هدر ایمیل</h2>
+<p><strong>Email Footprinting</strong> به فرآیند ردیابی یک ایمیل و به دست آوردن اطلاعاتی مانند مکان، زمان ارسال و مسیر طی‌شده توسط ایمیل گفته می‌شود. برنامه‌های <strong>Email Tracking</strong> با استفاده از پیکسل‌های نامرئی (Web Beacons) این کار را انجام می‌دهند.</p>
+
+<p>ابزارهای معروف برای ردیابی ایمیل:</p>
+<ul>
+<li><strong>Email Tracking Pro</strong></li>
+<li><strong>Yesware</strong></li>
+<li><strong>Zendio</strong></li>
+<li><strong>Contact Monkey</strong></li>
+<li><strong>Read Notify</strong></li>
+<li><strong>Who Read Me</strong></li>
+</ul>
+
+<img src="images/CEHv13_02/slide_25.webp" alt="Email Footprinting" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۵: ابزارهای ردیابی ایمیل</div>
+
+<h3>تحلیل هدر ایمیل (Email Header Analysis)</h3>
+<p>هر ایمیل شامل یک هدر (Header) است که اطلاعات زیادی در مورد مسیر حرکت آن دارد. با بررسی هدر، می‌توان IP فرستنده، سرورهای واسطه و حتی سیستم‌عامل و کلاینت ایمیل فرستنده را تشخیص داد.</p>
+
+<img src="images/CEHv13_02/slide_26.webp" alt="Email Header Analysis" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۶: تحلیل هدر ایمیل و فیلدهای کلیدی آن</div>
+
+<p>مهم‌ترین فیلدهای هدر ایمیل عبارتند از:</p>
+<ul>
+<li><strong>Delivered-To:</strong> آدرس گیرنده نهایی.</li>
+<li><strong>Received:</strong> مسیر سرورهایی که ایمیل از آن‌ها عبور کرده است (از پایین به بالا بخوانید).</li>
+<li><strong>Return-Path:</strong> آدرس بازگشت (معمولاً همان فرستنده).</li>
+<li><strong>Received-SPF:</strong> نتیجه بررسی SPF (اعتبارسنجی دامنه فرستنده).</li>
+<li><strong>DKIM-Signature:</strong> امضای دیجیتال برای تأیید اصالت ایمیل.</li>
+<li><strong>From:</strong> نام و آدرس فرستنده.</li>
+<li><strong>Subject:</strong> موضوع ایمیل.</li>
+</ul>
+
+<div class="box warning"><i class="fas fa-exclamation-triangle"></i><div><strong>نکته</strong>هدرهای جعلی (Spoofed) را می‌توان با بررسی دقیق فیلدهای Received و SPF/DKIM تشخیص داد. اگر دامنه فرستنده با Return-Path همخوانی نداشته باشد، احتمالاً ایمیل جعلی است (فیشینگ).</div></div>
+
+<h2>05. Whois Footprinting (جستجوی اطلاعات دامنه)</h2>
+<p><strong>Whois</strong> یک پایگاه داده عمومی است که اطلاعات مربوط به ثبت‌کنندگان دامنه (Domain Registrants) را نگهداری می‌کند. این اطلاعات شامل:</p>
+<ul>
+<li>نام و اطلاعات تماس مالک دامنه.</li>
+<li>تاریخ ثبت و انقضای دامنه.</li>
+<li>سرورهای DNS و IP مرتبط.</li>
+<li>سازمان ثبت‌کننده (Registrar).</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_28.webp" alt="Whois Footprinting Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۸: ابزارهای Whois Lookup</div>
+
+<p>ابزارهای معروف برای استخراج اطلاعات Whois:</p>
+<ul>
+<li><strong>Sam Spade</strong></li>
+<li><strong>Lan Who Is</strong></li>
+<li><strong>Hot whois</strong></li>
+<li><strong>Batch IP Converter</strong></li>
+<li><strong>Active Whois</strong></li>
+<li><strong>Caller IP</strong></li>
+<li>و یا سرویس‌های آنلاین مانند <strong>who.is</strong> و <strong>whois.icann.org</strong></li>
+</ul>
+
+<h2>06. DNS Footprinting و Trace Route</h2>
+<p>پس از Whois، نوبت به <strong>DNS Footprinting</strong> می‌رسد. سرورهای DNS اطلاعات حیاتی مانند نگاشت نام دامنه به IP را نگهداری می‌کنند. با استعلام از این سرورها می‌توان رکوردهای مختلف دامنه را استخراج کرد:</p>
+
+<ul>
+<li><strong>A Record:</strong> نگاشت نام دامنه به آدرس IPv4.</li>
+<li><strong>AAAA Record:</strong> نگاشت نام دامنه به آدرس IPv6.</li>
+<li><strong>MX Record:</strong> سرور ایمیل (Mail Exchange) دامنه.</li>
+<li><strong>CNAME Record:</strong> نام‌های مستعار (Alias) برای رکوردها.</li>
+<li><strong>SOA Record:</strong> سرور DNS مسئول و اطلاعات زمان‌بندی.</li>
+<li><strong>SRV Record:</strong> سرویس‌های خاص (مثل SIP یا LDAP).</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_29.webp" alt="DNS Records" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۲۹: انواع رکوردهای DNS</div>
+
+<p>ابزارها و سایت‌های معروف برای DNS Footprinting:</p>
+<ul>
+<li><strong>سایت‌ها:</strong> dnsstuff.com, securitytrails.com, mxtoolbox.com, checkdns.net</li>
+<li><strong>ابزارهای خط فرمان:</strong> <code>DIG</code>, <code>nslookup</code>, <code>dnsrecon</code>, <code>dnsenum</code>, <code>Fierce</code></li>
+</ul>
+
+<h3>Trace Route (ردیابی مسیر)</h3>
+<p><strong>Trace Route</strong> ابزاری برای پیدا کردن مسیر بسته‌های داده از مبدأ تا مقصد است. این ابزار با استفاده از پروتکل ICMP و فیلد <strong>TTL (Time to Live)</strong> کار می‌کند. هر روتر در مسیر، مقدار TTL را یک واحد کاهش می‌دهد و اگر TTL به صفر برسد، بسته را دور می‌اندازد و یک پیام خطا برمی‌گرداند.</p>
+
+<img src="images/CEHv13_02/slide_32.webp" alt="Trace Route Concept" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۲: نحوه کارکرد Trace Route با TTL</div>
+
+<p>دستورات Trace Route در سیستم‌عامل‌های مختلف:</p>
+<ul>
+<li><strong>ویندوز:</strong> <code>tracert</code> (از ICMP استفاده می‌کند).</li>
+<li><strong>لینوکس:</strong> <code>traceroute</code> (به صورت پیش‌فرض از UDP استفاده می‌کند).</li>
+<li><strong>لینوکس (TCP):</strong> <code>tcptraceroute</code> (از TCP استفاده می‌کند).</li>
+</ul>
+
+<p>ابزارهای گرافیکی و پیشرفته برای Trace Route:</p>
+<ul>
+<li><strong>PingPlotter</strong></li>
+<li><strong>3D Traceroute</strong></li>
+<li><strong>Path Analyzer Pro</strong></li>
+<li><strong>Neo Trace</strong></li>
+<li><strong>GEO Spider</strong></li>
+</ul>
+
+<div class="box note"><i class="fas fa-info-circle"></i><div><strong>نکته امنیتی</strong>گاهی اوقات فایروال‌ها با مسدود کردن ICMP مانع از اجرای Trace Route می‌شوند. در این صورت می‌توانید از Trace Route مبتنی بر TCP (مثل tcptraceroute) استفاده کنید که معمولاً از فیلترها عبور می‌کند.</div></div>
+
+<h2>07. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: کدام یک از موارد زیر یک منبع برای Competitive Intelligence Gathering محسوب می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) آگهی‌های استخدام شرکت رقیب</button>
+<button onclick="selectOption(this)">ب) گزارش‌های سالانه منتشرشده</button>
+<button onclick="selectOption(this)">ج) ثبت اختراعات و علائم تجاری</button>
+<button data-correct="true" onclick="selectOption(this)">د) همه موارد بالا</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: د</strong><br>همه این موارد منابع قانونی و عمومی برای جمع‌آوری هوشمندی رقابتی هستند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: ابزار Website Watcher برای چه کاری استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) کپی کردن کامل یک وب‌سایت برای استفاده آفلاین</button>
+<button data-correct="true" onclick="selectOption(this)">ب) رصد خودکار تغییرات یک وب‌سایت</button>
+<button onclick="selectOption(this)">ج) ردیابی ایمیل‌های ارسال‌شده</button>
+<button onclick="selectOption(this)">د) جستجوی اطلاعات Whois</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Website Watcher تغییرات وب‌سایت را رصد کرده و به شما اطلاع می‌دهد. کپی کردن سایت کار ابزارهایی مثل HTTrack است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: در هدر ایمیل، فیلد <code>Received</code> چه اطلاعاتی را نمایش می‌دهد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) نام فرستنده ایمیل</button>
+<button onclick="selectOption(this)">ب) موضوع ایمیل</button>
+<button data-correct="true" onclick="selectOption(this)">ج) مسیر سرورهایی که ایمیل از آن‌ها عبور کرده است</button>
+<button onclick="selectOption(this)">د) امضای دیجیتال ایمیل</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>فیلد Received نشان‌دهنده زنجیره سرورهایی است که ایمیل از آن‌ها عبور کرده است (از پایین به بالا).</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: کدام رکورد DNS سرور ایمیل یک دامنه را مشخص می‌کند؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) A Record</button>
+<button onclick="selectOption(this)">ب) CNAME Record</button>
+<button data-correct="true" onclick="selectOption(this)">ج) MX Record</button>
+<button onclick="selectOption(this)">د) SOA Record</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>MX (Mail Exchange) رکوردی است که سرور ایمیل دامنه را مشخص می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: Trace Route در ویندوز از کدام پروتکل به صورت پیش‌فرض استفاده می‌کند؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) TCP</button>
+<button onclick="selectOption(this)">ب) UDP</button>
+<button data-correct="true" onclick="selectOption(this)">ج) ICMP</button>
+<button onclick="selectOption(this)">د) SNMP</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>دستور <code>tracert</code> در ویندوز از پروتکل ICMP استفاده می‌کند، در حالی که <code>traceroute</code> در لینوکس به صورت پیش‌فرض از UDP استفاده می‌کند.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: کدام ابزار برای Mirroring وب‌سایت استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Website Watcher</button>
+<button data-correct="true" onclick="selectOption(this)">ب) HTTrack</button>
+<button onclick="selectOption(this)">ج) Pipl</button>
+<button onclick="selectOption(this)">د) Sam Spade</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>HTTrack یک ابزار متن‌باز و پرکاربرد برای دانلود و Mirroring کامل یک وب‌سایت است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۲-۲</h3>
+<p><strong>۱.</strong> Competitive Intelligence Gathering شامل جمع‌آوری اطلاعات قانونی درباره رقبا از منابع عمومی مثل آگهی‌های استخدام، گزارش‌ها و ثبت اختراعات است.</p>
+<p><strong>۲.</strong> جستجوی افراد با ابزارهایی مثل Pipl و PeopleSmart انجام می‌شود و شبکه‌های اجتماعی منبع طلایی برای مهندسی اجتماعی هستند.</p>
+<p><strong>۳.</strong> Website Mirroring با ابزارهایی مثل HTTrack برای تحلیل آفلاین سایت استفاده می‌شود و Website Watcher تغییرات سایت را رصد می‌کند.</p>
+<p><strong>۴.</strong> Email Footprinting با ردیابی ایمیل و تحلیل هدر (فیلدهای Received، SPF و DKIM) انجام می‌شود و می‌توان IP و مسیر فرستنده را پیدا کرد.</p>
+<p><strong>۵.</strong> Whois اطلاعات ثبت دامنه (مالک، DNS، تاریخ ثبت) را نشان می‌دهد و DNS Footprinting رکوردهای A، MX، CNAME و SOA را استخراج می‌کند.</p>
+<p><strong>۶.</strong> Trace Route با استفاده از TTL مسیر بسته‌ها را پیدا می‌کند: <code>tracert</code> در ویندوز (ICMP) و <code>traceroute</code> در لینوکس (UDP).</p>
+</div>
+
+<div class="box important"><i class="fas fa-forward"></i><div><strong>مسیر ادامه</strong>در جلسه بعد (Session 2-3) به سراغ <strong>ابزارها و مقابله</strong> می‌رویم: مهندسی اجتماعی در Footprinting، ابزارهای پیشرفته مثل Maltego، Recon-ng و FOCA، ابزارهای OSINT مبتنی بر AI (مثل Taranis AI) و در نهایت راه‌های مقابله با Footprinting را بررسی می‌کنیم.</div></div>
+`
+,
+"s7": `
+<div class="section-header"><div class="section-badge">07</div><div><h1>ابزارها و مقابله</h1><div class="meta">Module 02 · Footprinting and Reconnaissance · Session 3 of 3</div></div></div>
+
+<p>تا اینجا یاد گرفتیم چطور اطلاعات فنی و عمومی یک سازمان را جمع‌آوری کنیم. اما گاهی قوی‌ترین فایروال‌ها هم در برابر یک کارمند ناآگاه بی‌فایده هستند. در این جلسه، به سراغ <strong>مهندسی اجتماعی در Footprinting</strong> می‌رویم، با ابزارهای اتوماتیک و مبتنی بر هوش مصنوعی آشنا می‌شویم و در نهایت یاد می‌گیریم چطور در برابر این تهدیدات از خودمان محافظت کنیم.</p>
+
+<h2>01. Footprinting از طریق مهندسی اجتماعی (Social Engineering)</h2>
+<p><strong>مهندسی اجتماعی</strong> هنر بهره‌برداری از رفتارهای انسانی برای استخراج اطلاعات حساس است. مهندسان اجتماعی به این حقیقت امید دارند که مردم نسبت به اطلاعات باارزش خود بی‌اطلاع بوده و نسبت به محافظت از آن بی‌مبالات هستند.</p>
+
+<img src="images/CEHv13_02/slide_34.webp" alt="Social Engineering Footprinting" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۴: تکنیک‌های مهندسی اجتماعی در Footprinting</div>
+
+<p>مهم‌ترین تکنیک‌های مهندسی اجتماعی که در فاز Footprinting استفاده می‌شوند عبارتند از:</p>
+<ul>
+<li><strong>Shoulder Surfing (نگاه از روی شانه):</strong> مهاجم از نزدیک یا دور (با دوربین) صفحه کلید یا مانیتور قربانی را تماشا می‌کند تا رمز عبور یا اطلاعات حساس را ببیند.</li>
+<li><strong>Dumpster Diving (زباله‌گردی):</strong> جستجو در سطل‌های زباله سازمان برای پیدا کردن اسناد دور ریخته‌شده، یادداشت‌های چسب‌دار، پرینت‌های حاوی اطلاعات حساس یا حتی هاردهای دور انداخته‌شده.</li>
+<li><strong>Eavesdropping (استراق سمع):</strong> گوش دادن غیرمجاز به مکالمات تلفنی یا صحبت‌های حضوری کارمندان.</li>
+<li><strong>Impersonation (جعل هویت):</strong> مهاجم خود را به جای یک فرد مجاز (مثل پشتیبانی IT یا مدیر) جا می‌زند تا اطلاعات را درخواست کند.</li>
+</ul>
+
+<h3>جمع‌آوری اطلاعات از شبکه‌های اجتماعی</h3>
+<p>نفوذگران از ترفندهای مهندسی اجتماعی برای جمع‌آوری اطلاعات از طریق وب‌سایت‌های شبکه اجتماعی استفاده می‌کنند. ایجاد پروفایل جعلی برای طعمه قرار دادن کارمندان شرکت و به دست آوردن اطلاعات حساس، شناسایی علایق کارمندان و استفاده از آن‌ها برای استخراج اطلاعات بیشتر، شناسایی دوستان و فعالیت‌های اجتماعی کارمندان، از جمله این ترفندها هستند.</p>
+
+<img src="images/CEHv13_02/slide_35.webp" alt="Social Media Footprinting Table" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۵: آنچه کاربران/سازمان‌ها انجام می‌دهند و آنچه مهاجم به دست می‌آورد</div>
+
+<table>
+<thead><tr><th>کاری که کاربران می‌کنند</th><th>اطلاعاتی که مهاجم به دست می‌آورد</th></tr></thead>
+<tbody>
+<tr><td>نگه داشتن پروفایل</td><td>اطلاعات تماس، موقعیت مکانی و غیره</td></tr>
+<tr><td>ارتباط با دوستان، چت</td><td>لیست دوستان، اطلاعات دوستان</td></tr>
+<tr><td>به اشتراک گذاری عکس و ویدیو</td><td>هویت اعضای خانواده، علایق</td></tr>
+<tr><td>بازی کردن، عضویت در گروه‌ها</td><td>علایق</td></tr>
+<tr><td>ایجاد رویداد</td><td>فعالیت‌ها</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th>کاری که سازمان‌ها می‌کنند</th><th>اطلاعاتی که مهاجم به دست می‌آورد</th></tr></thead>
+<tbody>
+<tr><td>نظرسنجی از کاربران</td><td>استراتژی‌های کسب‌وکار</td></tr>
+<tr><td>تبلیغ محصولات</td><td>مشخصات محصول</td></tr>
+<tr><td>پشتیبانی کاربران</td><td>مهندسی اجتماعی</td></tr>
+<tr><td>استخدام</td><td>پلتفرم/تکنولوژی، بررسی پیشینه برای استخدام</td></tr>
+</tbody>
+</table>
+
+<h2>02. ابزارهای Footprinting</h2>
+<p>علاوه بر روش‌های دستی، ابزارهای قدرتمندی برای اتوماتیک‌سازی فرآیند Footprinting وجود دارند که سرعت و دقت کار را چندین برابر می‌کنند:</p>
+
+<img src="images/CEHv13_02/slide_36.webp" alt="Footprinting Tools" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۶: ابزارهای پیشرفته Footprinting</div>
+
+<ul>
+<li><strong>Maltego:</strong> یک ابزار قدرتمند برای تحلیل داده‌ها و کشف روابط بین موجودیت‌ها (افراد، سازمان‌ها، دامنه‌ها، IPها). Maltego این روابط را به صورت گرافیکی (نمودار) نمایش می‌دهد.</li>
+<li><strong>Recon-ng:</strong> یک چارچوب (Framework) ماژولار برای Footprinting و Reconnaissance که شبیه به Metasploit عمل می‌کند و از ماژول‌های مختلف برای جمع‌آوری اطلاعات از منابع عمومی (OSINT) استفاده می‌کند.</li>
+<li><strong>FOCA:</strong> ابزاری برای استخراج متادیتا (Metadata) از اسناد (مثل PDF، Word، Excel) که به‌طور عمومی در وب‌سایت‌ها منتشر شده‌اند. متادیتا می‌تواند شامل نام کاربری، مسیرهای شبکه، نرم‌افزارهای استفاده‌شده و حتی رمزهای عبور باشد!</li>
+<li><strong>Metagoofil:</strong> مشابه FOCA، برای استخراج متادیتا از فایل‌های عمومی طراحی شده است.</li>
+<li><strong>ابزارهای دیگر:</strong> Prefix Whois، Netmask، Net Scan Tools Pro، Binging، Tctrace، Search Bug.</li>
+</ul>
+
+<div class="box note"><i class="fas fa-search-plus"></i><div><strong>چرا FOCA خطرناک است؟</strong>سازمان‌ها اغلب فایل‌های PDF یا Word خود (مثل بروشورها یا گزارش‌های مالی) را به صورت آنلاین قرار می‌دهند. این فایل‌ها حاوی متادیتای پنهانی هستند که ممکن است شامل نام نویسنده، مسیر ذخیره‌سازی (مثل <code>C:\\Users\\Admin\\Desktop\\SecretProject</code>) و حتی نام سرورهای داخلی باشد. FOCA این اطلاعات را استخراج کرده و نقشه‌ای از شبکه داخلی به مهاجم می‌دهد.</div></div>
+
+<h2>03. ابزارهای OSINT مبتنی بر هوش مصنوعی (AI-Powered OSINT)</h2>
+<p>هوش مصنوعی انقلابی در جمع‌آوری اطلاعات ایجاد کرده است. ابزارهای AI-Powered OSINT می‌توانند حجم عظیمی از داده‌ها را در چند ثانیه تحلیل کنند و الگوهایی را کشف کنند که برای انسان‌ها قابل مشاهده نیست.</p>
+
+<img src="images/CEHv13_02/slide_37.webp" alt="Taranis AI" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۷: Taranis AI و ابزارهای OSINT مبتنی بر هوش مصنوعی</div>
+
+<ul>
+<li><strong>Taranis AI:</strong> یک ابزار OSINT است که با استفاده از هوش مصنوعی، اطلاعاتی را از منابع متنوع مثل وب‌سایت‌ها و خبرگزاری‌ها استخراج می‌کند. کاربرد اصلی آن در تحلیل ریسک در فضای سایبری، نظارت بر اخبار امنیتی درباره یک کشور، سازمان یا فرد است. Taranis AI برای سناریوهایی مثل تحلیل لحظه‌ای تهدیدات سایبری، پایش ریسک رسانه‌ای یا پیش‌بینی بحران‌های امنیتی، ابزاری بسیار هوشمند و کارآمد محسوب می‌شود.</li>
+<li><strong>DorkGPT و DorkGenius:</strong> ابزارهای مبتنی بر AI برای تولید خودکار Google Dorkهای پیشرفته. شما یک هدف را وارد می‌کنید و AI بهترین Dorkها را برای یافتن اطلاعات حساس تولید می‌کند.</li>
+<li><strong>DarkGPT:</strong> یک ابزار AI برای جستجو و تحلیل در وب تاریک (Dark Web). این ابزار می‌تواند به شناسایی تهدیدات و اطلاعات لو رفته در بازارهای سیاه کمک کند.</li>
+<li><strong>سایر ابزارها:</strong> ossinsight.io، cyclect.io، exploreai.vercel.app</li>
+</ul>
+
+<h2>04. مقابله با Footprinting (Countermeasures)</h2>
+<p>حالا که با قدرت Footprinting آشنا شدیم، وقت آن است که یاد بگیریم چطور از سازمان خود در برابر آن محافظت کنیم. مقابله با Footprinting شامل مسدود کردن دسترسی به اطلاعات و افزایش آگاهی است.</p>
+
+<img src="images/CEHv13_02/slide_38.webp" alt="Footprinting Countermeasures" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۸: راه‌های مقابله با Footprinting</div>
+
+<p>مهم‌ترین اقدامات دفاعی عبارتند از:</p>
+<ul>
+<li><strong>محدودسازی شبکه:</strong> محدود نمودن کارمندان برای دسترسی به سایت‌های شبکه‌های اجتماعی از طریق شبکه سازمان.</li>
+<li><strong>پیکربندی صحیح سرور:</strong> پیکربندی صحیح وب سرور برای جلوگیری از نشت اطلاعات و غیرفعال کردن پروتکل‌های ناخواسته (مثل بستن Directory Listing در Apache).</li>
+<li><strong>استفاده از IDS:</strong> استفاده از سیستم تشخیص نفوذ به منظور شناسایی ترافیک‌های مشکوک Footprinting.</li>
+<li><strong>آموزش کارمندان:</strong> آموزش کارمندان برای استفاده از نام‌های مستعار در وبلاگ‌ها و انجمن‌ها و عدم افشای اطلاعات شخصی/سازمانی.</li>
+<li><strong>ارزیابی اطلاعات:</strong> ارزیابی دقیق اطلاعات قبل از انتشار در وب‌سایت و عدم استفاده از اطلاعات حساس در گزارش‌های سالانه عمومی، اخبار یا کاتالوگ محصولات.</li>
+</ul>
+
+<img src="images/CEHv13_02/slide_39.webp" alt="Footprinting Countermeasures 2" class="pdf-image" loading="lazy">
+<div class="image-caption">اسلاید ۳۹: اقدامات تکمیلی برای مقابله با Footprinting</div>
+
+<p>اقدامات تکمیلی و فنی‌تر:</p>
+<ul>
+<li><strong>حفاظت از موقعیت مکانی:</strong> غیرفعال کردن Geo-Location در موبایل و غیرفعال کردن Geo-Tagging در دوربین‌ها.</li>
+<li><strong>شبکه‌های اجتماعی:</strong> عدم انتشار موقعیت مکانی یا برنامه سفر در شبکه‌های اجتماعی.</li>
+<li><strong>DNS امن:</strong> جدا سازی سرور DNS داخلی و خارجی با استفاده از Split DNS و محدودسازی Zone Transfer.</li>
+<li><strong>رمزنگاری:</strong> رمزنگاری و محافظت با پسورد برای اطلاعات حساس.</li>
+<li><strong>فیلتر ایمیل:</strong> جلوگیری از پذیرش ایمیل ناشناس توسط میل سرورها.</li>
+<li><strong>جمع‌آوری اطلاعات علیه خود:</strong> اجرای عملیات Footprinting علیه سازمان خود و حذف اطلاعات حساس یافت‌شده (Self-Footprinting).</li>
+</ul>
+
+<h2>05. خودآزمایی</h2>
+
+<div class="quiz-card">
+<p>❓ تست 1: مهاجمی که با نگاه کردن از روی شانه یک کارمند، رمز عبور او را می‌بیند، از کدام تکنیک استفاده کرده است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Dumpster Diving</button>
+<button data-correct="true" onclick="selectOption(this)">ب) Shoulder Surfing</button>
+<button onclick="selectOption(this)">ج) Eavesdropping</button>
+<button onclick="selectOption(this)">د) Impersonation</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Shoulder Surfing به معنای نگاه کردن از روی شانه یا فاصله دور برای مشاهده اطلاعات حساس است.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 2: ابزار FOCA برای چه کاری استفاده می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) کشف زیردامنه‌ها</button>
+<button data-correct="true" onclick="selectOption(this)">ب) استخراج متادیتا از اسناد عمومی</button>
+<button onclick="selectOption(this)">ج) جستجو در وب تاریک</button>
+<button onclick="selectOption(this)">د) تحلیل گرافیکی روابط موجودیت‌ها</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>FOCA متادیتای موجود در فایل‌های PDF، Word و Excel را استخراج می‌کند. این متادیتا می‌تواند شامل نام کاربری و مسیرهای شبکه باشد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 3: کدام ابزار برای تحلیل روابط گرافیکی بین افراد، دامنه‌ها و سازمان‌ها معروف است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) Recon-ng</button>
+<button onclick="selectOption(this)">ب) Metagoofil</button>
+<button data-correct="true" onclick="selectOption(this)">ج) Maltego</button>
+<button onclick="selectOption(this)">د) Shodan</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Maltego یک ابزار link analysis است که روابط بین موجودیت‌ها را به صورت گرافیکی نمایش می‌دهد.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 4: ابزار Taranis AI چه کاربردی دارد؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) تولید خودکار Google Dorkها</button>
+<button data-correct="true" onclick="selectOption(this)">ب) تحلیل ریسک و پایش اخبار امنیتی با هوش مصنوعی</button>
+<button onclick="selectOption(this)">ج) جستجو در Dark Web</button>
+<button onclick="selectOption(this)">د) استخراج متادیتای اسناد</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ب</strong><br>Taranis AI با استفاده از هوش مصنوعی، اطلاعات را از منابع مختلف استخراج کرده و برای تحلیل ریسک و پایش اخبار امنیتی استفاده می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 5: کدام اقدام برای مقابله با Footprinting در سطح وب سرور توصیه می‌شود؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) فعال کردن Directory Listing</button>
+<button onclick="selectOption(this)">ب) استفاده از نام‌های مستعار برای کارمندان</button>
+<button data-correct="true" onclick="selectOption(this)">ج) غیرفعال کردن نمایش لیست دایرکتوری‌ها در تنظیمات Apache</button>
+<button onclick="selectOption(this)">د) ارسال اطلاعات حساس در گزارش‌های سالانه</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>غیرفعال کردن Directory Listing مانع از مشاهده لیست فایل‌های موجود در سرور توسط مهاجم می‌شود.</div>
+</div>
+
+<div class="quiz-card">
+<p>❓ تست 6: تکنیک Dumpster Diving شامل چه کاری است؟</p>
+<div class="quiz-options">
+<button onclick="selectOption(this)">الف) نگاه کردن از روی شانه قربانی</button>
+<button onclick="selectOption(this)">ب) گوش دادن به مکالمات تلفنی</button>
+<button data-correct="true" onclick="selectOption(this)">ج) جستجو در سطل‌های زباله سازمان برای یافتن اسناد دور ریخته‌شده</button>
+<button onclick="selectOption(this)">د) جعل هویت یک کارمند</button>
+</div>
+<div class="quiz-answer"><strong>✅ پاسخ: ج</strong><br>Dumpster Diving به معنای جستجو در زباله‌ها برای یافتن اطلاعات حساس (مثل یادداشت‌ها یا اسناد دور ریخته‌شده) است.</div>
+</div>
+
+<div class="summary-box">
+<h3>🧠 جمع‌بندی جلسه ۲-۳ (پایان فصل ۲)</h3>
+<p><strong>۱.</strong> مهندسی اجتماعی یکی از قوی‌ترین روش‌های Footprinting است و شامل Shoulder Surfing، Dumpster Diving، Eavesdropping و Impersonation می‌شود.</p>
+<p><strong>۲.</strong> شبکه‌های اجتماعی منبع طلایی اطلاعات برای مهاجمان هستند؛ از اطلاعات تماس و لیست دوستان گرفته تا علایق و فعالیت‌ها.</p>
+<p><strong>۳.</strong> ابزارهای قدرتمندی مثل Maltego (تحلیل گرافیکی روابط)، Recon-ng (چارچوب OSINT) و FOCA (استخراج متادیتا) فرآیند Footprinting را اتوماتیک می‌کنند.</p>
+<p><strong>۴.</strong> هوش مصنوعی وارد دنیای OSINT شده است: Taranis AI برای تحلیل ریسک، DorkGPT برای تولید Dork و DarkGPT برای جستجو در Dark Web.</p>
+<p><strong>۵.</strong> مقابله با Footprinting نیازمند ترکیبی از محدودسازی شبکه، آموزش کارمندان، پیکربندی صحیح سرورها (مثل غیرفعال کردن Directory Listing)، حفاظت از Geo-Location و انجام Self-Footprinting است.</p>
+</div>
+
+<div class="box note"><i class="fas fa-quote-right"></i><div style="text-align:center; font-size:1.1rem; line-height:2.2;">
+<em>«اگر دشمن را بشناسی و خودت را بشناسی، از نتیجه صدها نبرد هراسی نخواهی داشت.»</em><br>
+<strong style="color:var(--primary); font-size:0.9rem;">— سون تزو (Sun Tzu)</strong>
+</div></div>
+
+<div class="box important"><i class="fas fa-trophy"></i><div><strong>تبریک!</strong>شما فصل دوم (Footprinting and Reconnaissance) را به پایان رساندید! حالا می‌دانید چطور بدون اینکه حتی یک بسته به سمت هدف بفرستید، اطلاعات حیاتی جمع‌آوری کنید. در فصل بعد (Scanning Networks)، وارد فاز فعال می‌شویم و یاد می‌گیریم چطور با ارسال بسته‌های شبکه، میزبان‌های زنده و پورت‌های باز را شناسایی کنیم.</div></div>
+`
+        };
+
+        const toFa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+        const allSections = [];
+        course.forEach((ch, chIdx) => {
+            ch.sections.forEach((sec, secIdx) => {
+                allSections.push(Object.assign({}, sec, {
+                    chapterId: ch.id,
+                    chapterTitle: ch.title,
+                    badge: ch.badge,
+                    num: sec.num,
+                    chapterIndex: chIdx,
+                    sectionIndex: secIdx,
+                    totalInChapter: ch.sections.length
+                }));
+            });
+        });
+
+        let currentIndex = 0;
+
+        function buildTOC() {
+            const toc = document.getElementById('tocNav');
+            toc.innerHTML = '';
+            course.forEach((ch, idx) => {
+                const details = document.createElement('details');
+                details.className = 'toc-chapter';
+                if (idx === 0) details.open = true; 
+                const summary = document.createElement('summary');
+                summary.innerHTML = '<span class="chapter-num">' + ch.badge + '</span><span>' + ch.title + '</span>';
+                details.appendChild(summary);
+                const ul = document.createElement('ul');
+                ul.className = 'toc-sections';
+                ch.sections.forEach(sec => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#' + sec.id;
+                    a.textContent = toFa(sec.num) + '. ' + sec.title;
+                    a.dataset.id = sec.id;
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const index = allSections.findIndex(s => s.id === sec.id);
+                        if (index !== -1) showSection(index);
+                    });
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+                details.appendChild(ul);
+                toc.appendChild(details);
+            });
+        }
+
+        function buildSections() {
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '';
+            allSections.forEach((sec, idx) => {
+                const div = document.createElement('div');
+                div.className = 'section' + (idx === 0 ? ' active' : '');
+                div.id = sec.id;
+                const isFirst = idx === 0;
+                const isLast = idx === allSections.length - 1;
+                let body = '';
+                if (richContent[sec.id]) {
+                    body = richContent[sec.id];
+                } else {
+                    body = `
+                        <div class="section-header">
+                            <div class="section-badge">${sec.badge}</div>
+                            <div>
+                                <h1>${sec.title}</h1>
+                                <div class="meta">Module ${sec.badge} · ${sec.chapterTitle} · Session ${toFa(sec.sectionIndex + 1)} of ${toFa(sec.totalInChapter)}</div>
+                            </div>
+                        </div>
+                        <div class="placeholder">
+                            <i class="fas fa-terminal"></i>
+                            <p>محتوای این جلسه در حال آماده‌سازی است...</p>
+                            <p style="font-size:0.88rem;margin-top:6px;opacity:0.7;">${sec.chapterTitle} — ${sec.title}</p>
+                        </div>
+                    `;
+                }
+                body += `
+                    <div class="nav-buttons">
+                        <button class="nav-btn" ${isFirst ? 'disabled' : ''} onclick="goToPrev()">
+                            ${isFirst ? 'جلسه قبلی' : '<i class="fas fa-arrow-right"></i> جلسه قبلی'}
+                        </button>
+                        <button class="nav-btn" ${isLast ? 'disabled' : ''} onclick="goToNext()">
+                            ${isLast ? 'پایان' : 'جلسه بعدی <i class="fas fa-arrow-left"></i>'}
+                        </button>
+                    </div>
+                `;
+                div.innerHTML = body;
+                main.appendChild(div);
+            });
+        }
+
+        function showSection(index) {
+            if (index < 0 || index >= allSections.length) return;
+            currentIndex = index;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(allSections[index].id);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('.toc-sections a').forEach(a => {
+                a.classList.remove('active');
+                if (a.dataset.id === allSections[index].id) a.classList.add('active');
+            });
+            const chIdx = allSections[index].chapterIndex;
+            document.querySelectorAll('.toc-chapter').forEach((d, i) => { d.open = (i === chIdx); });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.innerWidth <= 1000) closeSidebar();
+        }
+
+        function goToPrev() { if (currentIndex > 0) showSection(currentIndex - 1); }
+        function goToNext() { if (currentIndex < allSections.length - 1) showSection(currentIndex + 1); }
+
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const closeBtn = document.getElementById('sidebarClose');
+
+        function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+        toggleBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') !== 'light';
+            const newTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('ceh-theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('.theme-icon');
+            if (!icon) return;
+            if (theme === 'light') {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('ceh-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme === 'light' ? 'light' : 'dark');
+        updateThemeIcon(savedTheme);
+
+        function selectOption(btn) {
+            const parent = btn.parentElement;
+            if (parent.classList.contains('answered')) return;
+            parent.classList.add('answered');
+            const isCorrect = btn.dataset.correct === 'true';
+            parent.querySelectorAll('button').forEach(b => {
+                b.classList.remove('selected', 'correct', 'wrong');
+                if (b.dataset.correct === 'true') b.classList.add('correct');
+            });
+            if (!isCorrect) btn.classList.add('wrong');
+            parent.nextElementSibling.classList.add('show');
+        }
+
+        window.onscroll = function() {
+            const scroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('progressBar').style.width = (height > 0 ? (scroll / height * 100) : 0) + '%';
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+            if (e.key === 'ArrowLeft') goToNext();
+            if (e.key === 'ArrowRight') goToPrev();
+        });
+
+        function wrapTables() {
+            document.querySelectorAll('.section table').forEach(function(table) {
+                if (table.parentElement && table.parentElement.classList.contains('table-wrap')) return;
+                var wrap = document.createElement('div');
+                wrap.className = 'table-wrap';
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            });
+        }
+
+
+        // ---------- بهبودهای ظاهری درسنامه ----------
+        // شماره‌ی ابتدای تیترهای h2 (مثل «01.») به صورت چیپ جدا نمایش داده می‌شود
+        function enhanceHeadings() {
+            document.querySelectorAll('.section h2').forEach(function(h) {
+                if (h.classList.contains('has-num')) return;
+                var m = h.textContent.match(/^\s*([0-9۰-۹]{1,3})\s*[.\-–:]\s*(.+)$/s);
+                if (!m) return;
+                h.classList.add('has-num');
+                h.innerHTML = '<span class="h2-num"></span><span class="h2-text"></span>';
+                h.querySelector('.h2-num').textContent = m[1];
+                h.querySelector('.h2-text').textContent = m[2];
+            });
+        }
+
+        // هر تصویر اسلاید + کپشن داخل یک کادر (figure) و قابل بزرگ‌نمایی
+        function enhanceSlides() {
+            document.querySelectorAll('.section img.pdf-image').forEach(function(img) {
+                if (img.parentElement.classList.contains('slide-fig')) return;
+                var fig = document.createElement('figure');
+                fig.className = 'slide-fig';
+                img.parentNode.insertBefore(fig, img);
+                fig.appendChild(img);
+                var cap = fig.nextElementSibling;
+                if (cap && cap.classList.contains('image-caption')) fig.appendChild(cap);
+                img.decoding = 'async';
+                img.addEventListener('click', function() { openLightbox(img); });
+            });
+        }
+
+        var lightbox = document.getElementById('lightbox');
+        function openLightbox(img) {
+            document.getElementById('lightboxImg').src = img.currentSrc || img.src;
+            document.getElementById('lightboxImg').alt = img.alt || '';
+            var cap = img.parentElement.querySelector('.image-caption');
+            document.getElementById('lightboxCap').textContent = cap ? cap.textContent : '';
+            lightbox.classList.add('open');
+            lightbox.setAttribute('aria-hidden', 'false');
+        }
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            lightbox.setAttribute('aria-hidden', 'true');
+        }
+        lightbox.addEventListener('click', closeLightbox);
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+
+        // اندازه‌ی فونت (ذخیره در مرورگر)
+        var fontScale = parseFloat(localStorage.getItem('ceh-fs')) || 1;
+        function applyFont() { document.documentElement.style.setProperty('--fs', fontScale); }
+        function changeFont(dir) {
+            fontScale = Math.min(1.3, Math.max(0.85, Math.round((fontScale + dir * 0.05) * 100) / 100));
+            localStorage.setItem('ceh-fs', fontScale);
+            applyFont();
+        }
+        applyFont();
+
+        buildTOC();
+        buildSections();
+        wrapTables();
+        enhanceHeadings();
+        enhanceSlides();
+        showSection(0); // شروع از جلسه ۱
+    </script>
+
+</body>
+</html>

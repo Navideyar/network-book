@@ -202,6 +202,13 @@
             color: #5a6070;
         }
 
+        /* نشان «در حال تکمیل» */
+        .badge-progress {
+            background: rgba(250, 204, 21, 0.10);
+            color: #facc15;
+            border-color: rgba(250, 204, 21, 0.28);
+        }
+
         .chevron {
             width: 22px;
             height: 22px;
@@ -601,6 +608,12 @@
             border-color: rgba(148, 163, 184, .10);
         }
 
+        .badge-progress {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, .10);
+            border-color: rgba(251, 191, 36, .28);
+        }
+
         .chevron {
             color: #7dd3fc;
         }
@@ -889,7 +902,7 @@
                 </div>
             </div>
 
-            <!-- 4 – MCSA (فعال؛ تمرین‌ها و آزمون به زودی) -->
+            <!-- 4 – MCSA (در حال تکمیل) -->
             <div class="chapter active" id="mcsa">
                 <div class="chapter-header" onclick="toggleChapter('mcsa')">
                     <div class="chapter-left">
@@ -897,7 +910,7 @@
                         <span class="title">MCSA</span>
                     </div>
                     <div class="header-right">
-                        <span class="badge badge-on">در دسترس</span>
+                        <span class="badge badge-progress">در حال تکمیل</span>
                         <div class="chevron">
                             <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
                         </div>
@@ -918,7 +931,7 @@
                         <a href="javascript:void(0)" class="sub-item disabled">
                             <div class="sub-icon">✏️</div>
                             <div class="sub-content">
-                                <div class="sub-title">تمرین‌ها <span class="badge badge-off">به زودی</span></div>
+                                <div class="sub-title">تمرین‌ها <span class="badge badge-progress">در حال تکمیل</span></div>
                                 <div class="sub-desc">تمرین‌های عملی به همراه پاسخ</div>
                             </div>
                             <div class="sub-arrow">←</div>
@@ -926,7 +939,7 @@
                         <a href="javascript:void(0)" class="sub-item disabled">
                             <div class="sub-icon">🏆</div>
                             <div class="sub-content">
-                                <div class="sub-title">آزمون نهایی MCSA <span class="badge badge-off">به زودی</span></div>
+                                <div class="sub-title">آزمون نهایی MCSA <span class="badge badge-progress">در حال تکمیل</span></div>
                                 <div class="sub-desc">سنجش نهایی دانش شما</div>
                             </div>
                             <div class="sub-arrow">←</div>
@@ -935,19 +948,53 @@
                 </div>
             </div>
 
-            <!-- 5 – CEH -->
-            <a href="ceh.html" class="card locked">
-                <div class="card-top">
-                    <div style="display:flex;align-items:center;gap:12px">
+            <!-- 5 – CEH (باز شد – در حال تکمیل) -->
+            <div class="chapter active" id="ceh">
+                <div class="chapter-header" onclick="toggleChapter('ceh')">
+                    <div class="chapter-left">
                         <div class="num">۵</div>
                         <span class="title">CEH</span>
                     </div>
-                    <span class="badge badge-off">به زودی</span>
+                    <div class="header-right">
+                        <span class="badge badge-progress">در حال تکمیل</span>
+                        <div class="chevron">
+                            <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                        </div>
+                    </div>
                 </div>
                 <div class="desc">هکر قانون‌مند و آشنایی با تکنیک‌های تست نفوذ.</div>
-            </a>
 
-            <!-- 6 – SANS -->
+                <div class="sub-list">
+                    <div class="sub-list-inner">
+                        <a href="ceh/" class="sub-item primary">
+                            <div class="sub-icon">📖</div>
+                            <div class="sub-content">
+                                <div class="sub-title">درسنامه</div>
+                                <div class="sub-desc">فصل‌های جامع تست نفوذ</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <a href="javascript:void(0)" class="sub-item disabled">
+                            <div class="sub-icon">✏️</div>
+                            <div class="sub-content">
+                                <div class="sub-title">تمرین‌ها <span class="badge badge-progress">در حال تکمیل</span></div>
+                                <div class="sub-desc">تمرین‌های عملی به همراه پاسخ</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                        <a href="javascript:void(0)" class="sub-item disabled">
+                            <div class="sub-icon">🏆</div>
+                            <div class="sub-content">
+                                <div class="sub-title">آزمون نهایی CEH <span class="badge badge-progress">در حال تکمیل</span></div>
+                                <div class="sub-desc">سنجش نهایی دانش شما</div>
+                            </div>
+                            <div class="sub-arrow">←</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 – SANS (به زودی) -->
             <a href="sans.html" class="card locked">
                 <div class="card-top">
                     <div style="display:flex;align-items:center;gap:12px">
